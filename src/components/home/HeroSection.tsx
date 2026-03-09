@@ -90,9 +90,9 @@ function HeroVisual() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="absolute -top-2 right-2 sm:right-4 flex items-center gap-1.5 rounded-full bg-green-500/20 border border-green-500/40 px-2.5 py-1 text-[10px] sm:text-xs text-green-300 font-medium"
+        className="absolute -top-2 right-2 sm:right-4 flex items-center gap-1.5 rounded-full bg-green-500 border border-green-500/40 px-2.5 py-1 text-[10px] sm:text-xs text-white font-medium"
       >
-        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
         Datos en tiempo real
       </motion.div>
     </motion.div>
