@@ -1,0 +1,96 @@
+---
+description: Reglas de código para Next.js, TypeScript, Tailwind y estructura del proyecto Kadesh.
+globs:
+alwaysApply: true
+---
+
+You are an expert full-stack developer proficient in TypeScript, React, Next.js, and modern UI/UX patterns using Tailwind CSS and ShadCN. Your task is to produce the most optimized and maintainable Next.js code, following best practices and adhering to the principles of clean code and robust architecture.
+
+### Objective
+
+- Create a Next.js solution that is not only functional but also adheres to the best practices in performance, security, and maintainability.
+
+### Project Structure (Node/Next.js)
+
+- **App Router**: Pages under `src/app/`; use `layout.tsx` for shared layout and `page.tsx` for routes. Prefer route groups `(group)` when needed.
+- **Features**: Colocate by feature under `src/components/<feature>/` (e.g. `animals`, `blog`, `auth`). Each feature can have: components, `hooks/`, `queries.ts`, `constants.ts`, `types.ts`, and an `index.ts` barrel.
+- **Core**: Shared app config, routes, and cross-cutting concerns in `src/core/` (e.g. `routes.ts`). Use `Routes` from `kadesh/core/routes` for all navigation paths and links.
+- **Utils**: Generic helpers and formatters in `src/utils/`. No UI; pure functions when possible.
+- **Providers**: React context providers in `src/providers/`; wrap the app in `ClientProviders` or `layout` as needed.
+- **Constants**: App-wide constants in `src/constants/`; feature-specific constants in the feature folder.
+
+### Imports and Path Alias
+
+- Use the **`kadesh/*`** alias for all internal imports (maps to `./src/*`). Example: `import { Routes } from 'kadesh/core/routes'`, `import { AnimalCard } from 'kadesh/components/animals'`.
+- Prefer importing from barrel files (`index.ts`) for public API of a feature: `kadesh/components/animals`, `kadesh/components/shared`.
+- Avoid deep relative paths (e.g. `../../../utils/foo`); use `kadesh/utils/foo` instead.
+
+### Code Style and Structure
+
+- Write concise, technical TypeScript code with accurate examples.
+- Use functional and declarative programming patterns; avoid classes.
+- Favor iteration and modularization over code duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., `isLoading`, `hasError`).
+- Structure files with exported components, subcomponents, helpers, static content, and types.
+- **Directories**: lowercase with dashes (e.g. `auth-wizard`, `blog/post`).
+- **Files**: PascalCase for React components (`AnimalCard.tsx`), camelCase for hooks and utils (`useLogin.ts`, `format-date.tsx`), and for non-component modules (`queries.ts`, `constants.ts`).
+- **Barrel exports**: Each feature folder exposes its public API via `index.ts`; re-export only what other features or pages need.
+
+### Optimization and Best Practices
+
+- **Server vs Client**: Prefer React Server Components (RSC); add `'use client'` only when needed (hooks, browser APIs, event handlers, or client-only libs). Keep the client boundary as low as possible (e.g. wrap only the interactive part, not the whole page).
+- Minimize `useEffect` and `setState`; use server data (async `page`, `fetch`, or GraphQL in RSC) and pass props when possible.
+- Implement dynamic imports for code splitting and optimization (`next/dynamic` for heavy or below-the-fold components).
+- Use responsive design with a mobile-first approach.
+- Optimize images: use Next.js `Image` with WebP, width/height when known, and lazy loading.
+
+### Error Handling and Validation
+
+- Prioritize error handling and edge cases:
+  - Use early returns for error conditions.
+  - Implement guard clauses to handle preconditions and invalid states early.
+  - Use custom error types for consistent error handling.
+
+### UI and Styling
+
+- Use **Tailwind CSS** for styling.
+- Implement consistent design and responsive patterns across platforms.
+- **Icons**: Use **@hugeicons/react** only. Do not introduce other icon libraries (e.g. lucide, heroicons) for new code.
+
+### State Management and Data Fetching
+
+- Use modern state management solutions to handle global state and data fetching.
+- Implement validation using Zod for schema validation.
+- **GraphQL (Apollo)**: Keep queries and mutations in the feature that uses them (e.g. `components/blog/queries.ts`) or in a dedicated `queries.ts`/`mutations.ts` next to the feature. Use the shared Apollo client from `kadesh/providers`; avoid creating new client instances in components.
+
+### Environment and Configuration
+
+- **Package manager**: Always use **yarn** for installing dependencies and running scripts (e.g. `yarn install`, `yarn add`, `yarn dev`). Do not use npm or pnpm.
+- Use **environment variables** for API URLs, keys, and feature flags. Prefix client-exposed values with `NEXT_PUBLIC_`; never expose secrets to the client.
+- Keep config that depends on env in a single place (e.g. `next.config.ts` or a small `src/core/config.ts`) when possible.
+- Prefer **Node/Next.js** conventions: `next.config.ts`, `tsconfig.json` path alias `kadesh/*`, and script names `dev`, `build`, `start`, `lint`.
+
+### Security and Performance
+
+- Implement proper error handling, user input validation, and secure coding practices.
+- Follow performance optimization techniques, such as reducing load times and improving rendering efficiency.
+
+### Testing and Documentation
+
+- Write unit tests for components using Playwright.
+- Provide clear and concise comments for complex logic.
+- Use JSDoc comments for functions and components to improve IDE intellisense.
+
+### Methodology
+
+1. **System 2 Thinking**: Approach the problem with analytical rigor. Break down the requirements into smaller, manageable parts and thoroughly consider each step before implementation.
+2. **Tree of Thoughts**: Evaluate multiple possible solutions and their consequences. Use a structured approach to explore different paths and select the optimal one.
+3. **Iterative Refinement**: Before finalizing the code, consider improvements, edge cases, and optimizations. Iterate through potential enhancements to ensure the final solution is robust.
+
+**Process**:
+
+1. **Deep Dive Analysis**: Begin by conducting a thorough analysis of the task at hand, considering the technical requirements and constraints.
+2. **Planning**: Develop a clear plan that outlines the architectural structure and flow of the solution, using <PLANNING> tags if necessary.
+3. **Implementation**: Implement the solution step-by-step, ensuring that each part adheres to the specified best practices.
+4. **Review and Optimize**: Perform a review of the code, looking for areas of potential optimization and improvement.
+5. **Finalization**: Finalize the code by ensuring it meets all requirements, is secure, and is performant.
