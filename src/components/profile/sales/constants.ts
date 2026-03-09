@@ -171,7 +171,7 @@ export const SUBSCRIPTION_STATUS_OPTIONS = [
   { label: "Vencida", value: SUBSCRIPTION_STATUS.PAST_DUE },
   { label: "Cancelada", value: SUBSCRIPTION_STATUS.CANCELLED },
   { label: "No pagada", value: SUBSCRIPTION_STATUS.UNPAID },
-  { label: "En prueba", value: SUBSCRIPTION_STATUS.TRIALING },
+  { label: "Prueba gratuita", value: SUBSCRIPTION_STATUS.TRIALING },
 ] as const;
 
 /** Badge classes for subscription status. Unknown status uses neutral. */

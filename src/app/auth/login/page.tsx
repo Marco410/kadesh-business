@@ -1,24 +1,102 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import Image from "next/image";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Tabs, Tab } from "@heroui/tabs";
 import Logo from "kadesh/components/shared/Logo";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { EyeIcon, ViewOffIcon } from "@hugeicons/core-free-icons";
+import { EyeIcon, ViewOffIcon, StarIcon } from "@hugeicons/core-free-icons";
 import {
   useLogin,
   useRegister,
   useGoogleLogin,
 } from "../../../components/auth/hooks";
 
+/** Panel visual del sistema: mapa + leads (sin imagen externa). */
+function AuthPageVisual() {
+  return (
+    <div className="absolute inset-0 flex flex-col bg-[#0d0d0d]">
+      {/* Mapa de fondo con grid */}
+      <div
+        className="absolute inset-0 opacity-90"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(15,15,15,0.97) 0%, transparent 60%),
+            repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(60,60,60,0.2) 28px, rgba(60,60,60,0.2) 29px),
+            repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(60,60,60,0.2) 28px, rgba(60,60,60,0.2) 29px)
+          `,
+        }}
+      />
+      {/* Círculo de radio y pin */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div
+          className="w-64 h-64 rounded-full border-2 border-orange-500/60 border-dashed"
+          style={{ boxShadow: "0 0 0 4px rgba(247, 148, 94, 0.12)" }}
+        />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full w-6 h-6 rounded-full bg-orange-500 shadow-lg shadow-orange-500/40" />
+      </div>
+      {/* Overlay con gradiente y texto */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d0d] via-transparent to-[#0d0d0d]/80" />
+      <div className="relative z-10 flex flex-col items-center justify-center flex-1 p-8 text-center">
+        <h1 className="text-white/90 text-xl sm:text-xxl font-semibold max-w-sm mb-2">
+          Leads B2B desde Google Maps
+        </h1>
+        <p className="text-white/60 text-sm max-w-xs">
+          Elige ubicación, categoría y radio. Los datos se sincronizan con tu CRM.
+        </p>
+      </div>
+      {/* Mini lista de leads de ejemplo */}
+      <div className="relative z-10 p-6 pt-0">
+        <div className="rounded-xl border border-white/10 bg-[#1a1a1a]/80 backdrop-blur-sm p-4">
+          <p className="text-[10px] uppercase tracking-wider text-white/50 mb-2">
+            Ejemplo de leads
+          </p>
+          <ul className="space-y-2">
+            {["Bufete Legal García", "Dental Care CDMX", "Bar La Esquina"].map((name, i) => (
+              <li
+                key={name}
+                className="flex items-center justify-between text-xs text-white/80"
+              >
+                <span className="truncate pr-2">{name}</span>
+                <span className="flex items-center gap-1 text-amber-400 shrink-0">
+                  <HugeiconsIcon icon={StarIcon} size={12} />
+                  4.{i + 2}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function LoginPageContent() {
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const redirectPath = searchParams.get("redirect") || null;
-  const initialTab = searchParams.get("tab") || "login";
+  const tabParam = searchParams.get("tab");
+  const initialTab = tabParam === "register" ? "register" : "login";
 
   const [selectedTab, setSelectedTab] = useState(initialTab);
+
+  // Sincronizar tab con la URL al cargar (ej. /auth/login?tab=register)
+  useEffect(() => {
+    if (tabParam === "register") setSelectedTab("register");
+    else if (tabParam === "login") setSelectedTab("login");
+  }, [tabParam]);
+
+  const updateUrlForTab = (tab: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (tab === "register") {
+      params.set("tab", "register");
+    } else {
+      params.delete("tab");
+    }
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  };
   const [successMessage, setSuccessMessage] = useState("");
   const [showLoginPassword, setShowLoginPassword] = useState(false);
 
@@ -37,6 +115,8 @@ function LoginPageContent() {
     setName: setRegisterName,
     lastName: registerLastName,
     setLastName: setRegisterLastName,
+    companyName: registerCompanyName,
+    setCompanyName: setRegisterCompanyName,
     email: registerEmail,
     setEmail: setRegisterEmail,
     phone: registerPhone,
@@ -51,16 +131,13 @@ function LoginPageContent() {
   } = useRegister({
     onSuccess: () => {
       if (redirectPath) {
-        // If there's a redirect, automatically login and redirect
         setSuccessMessage("Registro exitoso. Iniciando sesión...");
-        // Auto-login will be handled by useRegister
       } else {
-        // Switch to login tab after successful registration
         setSelectedTab("login");
-        // Show success message
         setSuccessMessage(
           "Registro exitoso, ya puedes iniciar sesión con tus credenciales",
         );
+        updateUrlForTab("login");
       }
     },
     redirectTo: redirectPath,
@@ -75,28 +152,15 @@ function LoginPageContent() {
 
   return (
     <div className="min-h-screen flex bg-[#f5f5f5] dark:bg-[#0a0a0a] relative">
-      {/* Background Image - Mobile: full screen with blur, Desktop: left side */}
+      {/* Panel visual del sistema - Mobile: fondo con blur */}
       <div className="lg:hidden fixed inset-0 w-full h-full z-0">
-        <Image
-          src="/conectando.png"
-          alt="KADESH - Conectando vidas, rescatando almas"
-          fill
-          className="object-cover blur-xs"
-          priority
-        />
-        {/* Dark overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/40"></div>
+        <AuthPageVisual />
+        <div className="absolute inset-0 bg-black/50" aria-hidden />
       </div>
 
-      {/* Left side - Image (Desktop only) */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        <Image
-          src="/conectando.png"
-          alt="KADESH - Conectando vidas, rescatando almas"
-          fill
-          className="object-cover"
-          priority
-        />
+      {/* Panel visual del sistema - Desktop: lado izquierdo */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden min-h-screen">
+        <AuthPageVisual />
       </div>
 
       {/* Right side - Form */}
@@ -113,9 +177,11 @@ function LoginPageContent() {
             <Tabs
               selectedKey={selectedTab}
               onSelectionChange={(key) => {
-                setSelectedTab(key as string);
+                const tab = key as string;
+                setSelectedTab(tab);
                 setSuccessMessage("");
                 setGoogleError("");
+                updateUrlForTab(tab);
               }}
               className="w-full"
               classNames={{
@@ -309,6 +375,24 @@ function LoginPageContent() {
                         className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
                       />
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="register-company-name"
+                      className="block text-sm font-medium text-[#212121] dark:text-[#ffffff]"
+                    >
+                      Nombre de negocio <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="register-company-name"
+                      type="text"
+                      placeholder="Mi Empresa S.A. de C.V."
+                      value={registerCompanyName}
+                      onChange={(e) => setRegisterCompanyName(e.target.value)}
+                      required
+                      className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
+                    />
                   </div>
 
                   <div className="space-y-2">

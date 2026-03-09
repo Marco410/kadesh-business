@@ -18,6 +18,7 @@ import {
   CheckmarkCircle02Icon,
   Cancel01Icon,
 } from "@hugeicons/core-free-icons";
+import { useUser } from "kadesh/utils/UserContext";
 
 function formatPrice(cost: number, currency: string, frequency: string): string {
   const formatter = new Intl.NumberFormat("es-MX", {
@@ -81,6 +82,7 @@ function PlanCard({
 }) {
   const isActive = plan.active;
   const highlighted = isCurrentPlan === true;
+  const { user } = useUser();
 
   const headerBlock = (
     <>
@@ -116,7 +118,7 @@ function PlanCard({
         </ul>
       )}
 
-      {isActive && onSubscribe && plan.cost !== 0 && (
+      {isActive && onSubscribe && plan.cost !== 0 && user?.id && (
         <button
           type="button"
           onClick={() => onSubscribe(plan)}
@@ -186,7 +188,7 @@ function PlanCard({
                 </p>
               )}
               {plan.cost === 0 && (
-                <p className="mt-2 text-sm rounded-full bg-green-500 px-4 py-1 text-xs font-bold text-white">
+                <p className="mt-2 text-sm rounded-full bg-green-500 px-4 py-1 text-sm font-bold text-white">
                   Prueba gratuita de 1 mes
                 </p>
               )}

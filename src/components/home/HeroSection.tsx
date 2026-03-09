@@ -62,7 +62,7 @@ function HeroVisual() {
         {/* Leads list preview */}
         <div className="px-3 py-2 border-t border-white/5">
           <p className="text-[10px] sm:text-xs text-white/50 uppercase tracking-wider mb-2">
-            Leads encontrados
+            Clientes encontrados
           </p>
           <ul className="space-y-1.5">
             {MOCK_LEADS.map((lead, i) => (

@@ -138,6 +138,23 @@ export const CREATE_USER_MUTATION = gql`
   }
 `;
 
+export const CREATE_SAAS_COMPANY_MUTATION = gql`
+  mutation CreateSaasCompany($data: SaasCompanyCreateInput!) {
+    createSaasCompany(data: $data) {
+      id
+      name
+    }
+  }
+`;
+
+export interface CreateSaasCompanyVariables {
+  data: { name: string };
+}
+
+export interface CreateSaasCompanyResponse {
+  createSaasCompany: { id: string; name: string } | null;
+}
+
 export const UPDATE_USER_MUTATION = gql`
   mutation UpdateUser($where: UserWhereUniqueInput!, $data: UserUpdateInput!) {
     updateUser(where: $where, data: $data) {
@@ -253,6 +270,8 @@ export interface CreateUserVariables {
     email: string;
     password: string;
     phone?: string;
+    company?: { connect: { id: string } };
+    roles?: { connect: Array<{ id: string }> };
   };
 }
 

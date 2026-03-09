@@ -10,6 +10,13 @@ const MOCK_LEADS = [
   { name: "Bufete Legal García", phone: "+52 55 1234 5678", rating: 4.8, category: "Abogados" },
   { name: "Dental Care CDMX", phone: "+52 55 8765 4321", rating: 4.5, category: "Dentistas" },
   { name: "Bar La Esquina", phone: "+52 55 2345 6789", rating: 4.2, category: "Bares" },
+  { name: "Tortillería Las Palmas", phone: "+52 55 1122 3344", rating: 4.6, category: "Tortillerías" },
+  { name: "Farmacia México", phone: "+52 55 9988 7766", rating: 4.9, category: "Farmacias" },
+  { name: "Veterinaria Amigo Fiel", phone: "+52 55 4433 2211", rating: 4.7, category: "Veterinarias" },
+  { name: "Estética Luna", phone: "+52 55 6677 8899", rating: 4.3, category: "Estéticas" },
+  { name: "Cafetería Aroma Café", phone: "+52 55 3210 6543", rating: 4.4, category: "Cafeterías" },
+  { name: "Ferretería El Tornillo", phone: "+52 55 8765 1111", rating: 4.5, category: "Ferreterías" },
+  { name: "Librería Central", phone: "+52 55 2341 8723", rating: 4.8, category: "Librerías" },
 ];
 
 export default function InteractiveDemoSection() {
@@ -140,13 +147,13 @@ export default function InteractiveDemoSection() {
                 >
                   <div className="px-4 py-3 border-b border-[#e0e0e0] dark:border-[#2a2a2a] flex items-center justify-between">
                     <span className="text-sm font-semibold text-[#212121] dark:text-white">
-                      Leads encontrados
+                      Clientes encontrados
                     </span>
                     <span className="text-xs text-orange-500 font-medium">
                       {MOCK_LEADS.length} resultados
                     </span>
                   </div>
-                  <ul className="divide-y divide-[#e5e7eb] dark:divide-[#2a2a2a] max-h-[280px] overflow-y-auto">
+                  <ul className="divide-y divide-[#e5e7eb] dark:divide-[#2a2a2a] max-h-[390px] overflow-y-auto">
                     {MOCK_LEADS.map((lead, i) => (
                       <motion.li
                         key={lead.name}

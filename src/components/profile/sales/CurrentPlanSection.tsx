@@ -98,7 +98,7 @@ export default function CurrentPlanSection() {
             </button>
           </div>
           <span
-            className={`inline-flex items-center gap-1.5 w-fit px-3 py-1 rounded-full text-sm font-medium ${
+            className={`text-center inline-flex items-center gap-1.5 w-fit px-3 py-1 rounded-full text-sm font-medium ${
               SUBSCRIPTION_STATUS_CLASSES[subscription.status ?? ""] ??
               "bg-[#e0e0e0] dark:bg-[#3a3a3a] text-[#616161] dark:text-[#b0b0b0]"
             }`}

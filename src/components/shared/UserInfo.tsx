@@ -31,15 +31,7 @@ export default function UserInfo({ user, label = "Reportado por" }: UserInfoProp
         </h3>
         <div className="flex items-center gap-2">
           <Avatar
-            author={{
-              id: user.username || '',
-              name: user.name,
-              lastName: user.lastName || '',
-              username: user.username,
-              verified: user.verified || false,
-              profileImage: user.profileImage,
-              createdAt: user.createdAt,
-            }}
+            size={48}
             verify={user.verified || false}
           />
           <div className="flex flex-col">

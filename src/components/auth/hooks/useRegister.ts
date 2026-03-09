@@ -2,15 +2,24 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import {
   CREATE_USER_MUTATION,
+  CREATE_SAAS_COMPANY_MUTATION,
   AUTHENTICATE_USER_MUTATION,
   CreateUserVariables,
   CreateUserResponse,
+  CreateSaasCompanyVariables,
+  CreateSaasCompanyResponse,
   AuthenticateUserVariables,
   AuthenticateUserResponse
 } from 'kadesh/utils/queries';
+import {
+  ROLES_BY_NAMES_QUERY,
+  type RolesByNamesResponse,
+  type RolesByNamesVariables,
+} from 'kadesh/components/profile/sales/queries';
+import { Role } from 'kadesh/constants/constans';
 import { useUser } from 'kadesh/utils/UserContext';
 
 interface UseRegisterOptions {
@@ -23,6 +32,7 @@ export function useRegister(options?: UseRegisterOptions) {
   const { refreshUser } = useUser();
   const [name, setName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -33,6 +43,21 @@ export function useRegister(options?: UseRegisterOptions) {
     AuthenticateUserResponse,
     AuthenticateUserVariables
   >(AUTHENTICATE_USER_MUTATION);
+
+  const { data: rolesData } = useQuery<
+    RolesByNamesResponse,
+    RolesByNamesVariables
+  >(ROLES_BY_NAMES_QUERY, {
+    variables: { where: { name: { in: [Role.VENDEDOR, Role.ADMIN_COMPANY] } } },
+  });
+
+  const vendedorRoleId = rolesData?.roles?.find((r) => r.name === Role.VENDEDOR)?.id;
+  const adminCompanyRoleId = rolesData?.roles?.find((r) => r.name === Role.ADMIN_COMPANY)?.id;
+
+  const [createSaasCompany] = useMutation<
+    CreateSaasCompanyResponse,
+    CreateSaasCompanyVariables
+  >(CREATE_SAAS_COMPANY_MUTATION);
 
   const [createUser, { loading }] = useMutation<
     CreateUserResponse,
@@ -70,6 +95,7 @@ export function useRegister(options?: UseRegisterOptions) {
             // Clear form after successful redirect
             setName('');
             setLastName('');
+            setCompanyName('');
             setEmail('');
             setPhone('');
             setPassword('');
@@ -86,6 +112,7 @@ export function useRegister(options?: UseRegisterOptions) {
       // Clear form
       setName('');
       setLastName('');
+      setCompanyName('');
       setEmail('');
       setPhone('');
       setPassword('');
@@ -106,7 +133,7 @@ export function useRegister(options?: UseRegisterOptions) {
     e.preventDefault();
     setError('');
 
-    if (!name || !lastName || !email || !password || !confirmPassword) {
+    if (!name || !lastName || !companyName?.trim() || !email || !password || !confirmPassword) {
       setError('Por favor completa todos los campos obligatorios');
       return;
     }
@@ -121,17 +148,43 @@ export function useRegister(options?: UseRegisterOptions) {
       return;
     }
 
-    await createUser({
-      variables: {
-        data: {
-          name,
-          lastName,
-          email,
-          password,
-          phone: phone || undefined,
+    try {
+      const { data: companyData } = await createSaasCompany({
+        variables: {
+          data: { name: companyName.trim() },
         },
-      },
-    });
+      });
+
+      const companyId = companyData?.createSaasCompany?.id;
+      if (!companyId) {
+        setError('No se pudo crear la empresa. Intenta de nuevo.');
+        return;
+      }
+
+      const roleIds = [vendedorRoleId, adminCompanyRoleId].filter(
+        (id): id is string => Boolean(id)
+      );
+      if (roleIds.length === 0) {
+        setError('No se pudo asignar los roles. Recarga la página e intenta de nuevo.');
+        return;
+      }
+
+      await createUser({
+        variables: {
+          data: {
+            name,
+            lastName,
+            email,
+            password,
+            phone: phone || undefined,
+            company: { connect: { id: companyId } },
+            roles: { connect: roleIds.map((id) => ({ id })) },
+          },
+        },
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al registrar. Intenta de nuevo.');
+    }
   };
 
   return {
@@ -139,6 +192,8 @@ export function useRegister(options?: UseRegisterOptions) {
     setName,
     lastName,
     setLastName,
+    companyName,
+    setCompanyName,
     email,
     setEmail,
     phone,

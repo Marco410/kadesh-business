@@ -75,40 +75,6 @@ export default function ContactPage() {
           </div>
         </section>
 
-        {/* Additional Info Section */}
-        <section 
-          aria-labelledby="additional-contact-heading"
-          className="py-16 sm:py-24 bg-[#f5f5f5] dark:bg-[#0a0a0a]"
-        >
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              {...fadeInUp}
-              viewport={{ once: true }}
-              className="text-center"
-            >
-              <h2 
-                id="additional-contact-heading"
-                className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white mb-6"
-              >
-                Otras formas de contactarnos
-              </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8">
-                También puedes encontrarnos en nuestras redes sociales o visitar nuestra página de información para conocer más sobre KADESH y cómo trabajamos por el bienestar animal en México.
-              </p>
-              <nav aria-label="Enlaces de contacto adicionales">
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <a
-                    href="/conocenos"
-                    className="px-6 py-3 bg-white dark:bg-[#1e1e1e] text-orange-500 dark:text-orange-400 font-semibold rounded-xl hover:bg-orange-50 dark:hover:bg-[#2a2a2a] transition-colors border border-orange-500/20"
-                    aria-label="Conoce más sobre KADESH y nuestra misión"
-                  >
-                    Conoce más sobre KADESH
-                  </a>
-                </div>
-              </nav>
-            </motion.div>
-          </div>
-        </section>
 
         <Footer />
       </main>
