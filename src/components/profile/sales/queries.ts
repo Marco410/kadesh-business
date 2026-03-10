@@ -73,6 +73,7 @@ export const USER_COMPANY_CATEGORIES_QUERY = gql`
       stripeCustomerId
       company {
         id
+        name
         allowedGooglePlaceCategories
       }
     }
@@ -90,6 +91,7 @@ export interface UserCompanyCategoriesResponse {
     stripeCustomerId: string;
     company: {
       id: string;
+      name: string;
       allowedGooglePlaceCategories: string[];
     } | null;
   } | null;

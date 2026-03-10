@@ -322,7 +322,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       {/* Título + filtros por pipeline + tabla */}
       <div>
         <h2 className="text-xl font-bold text-[#212121] dark:text-[#ffffff] mb-4">
-          Clientes ({totalCount})
+          Clientes ({totalCount}) | {userData?.user?.company?.name ?? '--'}
         </h2>
         <FiltersLeadsSection
           selectedPipeline={selectedPipeline}
