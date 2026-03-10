@@ -180,6 +180,8 @@ export interface UpdateUserVariables {
     phone?: string | null;
     birthday?: string | null;
     profileImage?: { upload: File } | { disconnect?: boolean };
+    company?: { connect: { id: string } };
+    roles?: { connect: Array<{ id: string }> };
   };
 }
 

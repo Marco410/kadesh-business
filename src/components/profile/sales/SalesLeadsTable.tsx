@@ -157,11 +157,11 @@ export default function SalesLeadsTable({
               key={lead.id}
               role={assignMode ? undefined : "button"}
               tabIndex={assignMode ? undefined : 0}
-              onClick={() => !assignMode && router.push(Routes.profileLead(lead.id))}
+              onClick={() => !assignMode && router.push(Routes.panelLead(lead.id))}
               onKeyDown={(e) => {
                 if (!assignMode && (e.key === "Enter" || e.key === " ")) {
                   e.preventDefault();
-                  router.push(Routes.profileLead(lead.id));
+                  router.push(Routes.panelLead(lead.id));
                 }
               }}
               className={`border-b border-[#e0e0e0] dark:border-[#3a3a3a] transition-colors ${

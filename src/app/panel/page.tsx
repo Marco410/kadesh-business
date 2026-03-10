@@ -92,12 +92,12 @@ function DashboardWelcome({ userName }: { userName: string }) {
 
 function QuickActions({ hasVendedorRole }: { hasVendedorRole: boolean }) {
   const actions = [
-    { label: "Editar mi perfil", href: `${Routes.profile}?tab=profile`, icon: UserIcon },
+    { label: "Editar mi perfil", href: `${Routes.panel}?tab=profile`, icon: UserIcon },
     ...(hasVendedorRole
       ? [
-          { label: "Obtener nuevos clientes", href: Routes.profileSyncLeads, icon: Add01Icon },
-          { label: "Ver leads y ventas", href: `${Routes.profile}?tab=ventas`, icon: Chart01Icon },
-          { label: "Planes y precios", href: Routes.profilePlans, icon: FileAttachmentIcon },
+          { label: "Obtener nuevos clientes", href: Routes.panelSyncLeads, icon: Add01Icon },
+          { label: "Ver leads y ventas", href: `${Routes.panel}?tab=ventas`, icon: Chart01Icon },
+          { label: "Planes y precios", href: Routes.panelPlans, icon: FileAttachmentIcon },
         ]
       : []),
   ];

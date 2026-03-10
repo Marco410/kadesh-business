@@ -272,7 +272,7 @@ export default function AgregarVendedorSection() {
     <div className="w-full max-w-6xl mx-auto px-4 py-8">
       <div className="mb-6">
         <Link
-          href={`${Routes.profile}?tab=ventas`}
+          href={`${Routes.panel}?tab=ventas`}
           className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />

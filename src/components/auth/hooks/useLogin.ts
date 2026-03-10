@@ -62,7 +62,7 @@ export function useLogin(options?: UseLoginOptions) {
         } else if (window && window.history.length > 1) {
           router.back();
         } else {
-          router.push(Routes.home);
+          router.push(Routes.panel);
         }
       } else if (
         data.authenticateUserWithPassword.__typename ===

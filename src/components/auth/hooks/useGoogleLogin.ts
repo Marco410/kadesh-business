@@ -2,12 +2,21 @@
 
 import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation } from "@apollo/client";
+import { useMutation, useApolloClient } from "@apollo/client";
 import {
   AUTHENTICATE_USER_WITH_GOOGLE_MUTATION,
+  UPDATE_USER_MUTATION,
   type AuthenticateUserWithGoogleResponse,
   type AuthenticateUserWithGoogleVariables,
+  type UpdateUserVariables,
+  type UpdateUserResponse,
 } from "kadesh/utils/queries";
+import {
+  ROLES_BY_NAMES_QUERY,
+  type RolesByNamesResponse,
+  type RolesByNamesVariables,
+} from "kadesh/components/profile/sales/queries";
+import { Role } from "kadesh/constants/constans";
 import { useUser } from "kadesh/utils/UserContext";
 import { Routes } from "kadesh/core/routes";
 import type { AuthenticatedItem } from "kadesh/utils/types";
@@ -42,8 +51,43 @@ interface UseGoogleLoginOptions {
   redirectTo?: string | null;
 }
 
+/** Asigna roles Vendedor y Admin Company al usuario si no los tiene (p. ej. tras login con Google). */
+async function ensureSalesRoles(
+  client: ReturnType<typeof useApolloClient>,
+  userId: string,
+  currentRoleNames: string[]
+): Promise<void> {
+  const hasVendedor = currentRoleNames.some(
+    (name) => name.toLowerCase() === Role.VENDEDOR.toLowerCase()
+  );
+  if (hasVendedor) return;
+
+  const { data: rolesData } = await client.query<
+    RolesByNamesResponse,
+    RolesByNamesVariables
+  >({
+    query: ROLES_BY_NAMES_QUERY,
+    variables: { where: { name: { in: [Role.VENDEDOR] } } },
+  });
+
+  const vendedorRoleId = rolesData?.roles?.find((r) => r.name === Role.VENDEDOR)?.id;
+  const roleIds = [vendedorRoleId].filter(
+    (id): id is string => Boolean(id)
+  );
+  if (roleIds.length === 0) return;
+
+  await client.mutate<UpdateUserResponse, UpdateUserVariables>({
+    mutation: UPDATE_USER_MUTATION,
+    variables: {
+      where: { id: userId },
+      data: { roles: { connect: roleIds.map((id) => ({ id })) } },
+    },
+  });
+}
+
 export function useGoogleLogin(options?: UseGoogleLoginOptions) {
   const router = useRouter();
+  const client = useApolloClient();
   const { refreshUser, setUser } = useUser();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -72,9 +116,7 @@ export function useGoogleLogin(options?: UseGoogleLoginOptions) {
         if (typeof window !== "undefined") {
           localStorage.removeItem("keystonejs-session-token");
         }
-        console.log("result", result);
-
-        if (sessionToken){
+        if (sessionToken) {
           localStorage.setItem("keystonejs-session-token", sessionToken);
           const expires = new Date();
           expires.setTime(expires.getTime() + 30 * 24 * 60 * 60 * 1000);
@@ -85,6 +127,12 @@ export function useGoogleLogin(options?: UseGoogleLoginOptions) {
           roles?: Array<{ name: string; __typename?: string }>;
           __typename?: string;
         };
+        const roleNames = Array.isArray(u.roles) ? u.roles.map((r) => r.name) : [];
+        try {
+          await ensureSalesRoles(client, u.id, roleNames);
+        } catch {
+          // No bloquear el login si falla la asignación de roles
+        }
         const userFromLogin: AuthenticatedItem = {
           id: u.id,
           name: u.name ?? "",
@@ -108,7 +156,7 @@ export function useGoogleLogin(options?: UseGoogleLoginOptions) {
         if (options?.redirectTo) {
           router.push(options.redirectTo);
         } else {
-          router.push(Routes.home);
+          router.push(Routes.panel);
         }
       } else if (result.__typename === "UserAuthenticationWithGoogleFailure") {
         setError(result.message || "No se pudo iniciar sesión con Google");

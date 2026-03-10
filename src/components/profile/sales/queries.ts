@@ -1282,8 +1282,8 @@ export const GET_STRIPE_PAYMENT_METHODS = gql`
 `;
 
 export const GET_PAYMENT_METHOD = gql`
-  query PaymentSaasMethod($where: PaymentSaasMethodWhereUniqueInput!) {
-    paymentSaasMethod(where: $where) {
+  query GetSaasPaymentMethod($where: SaasPaymentMethodWhereUniqueInput!) {
+    saasPaymentMethod(where: $where) {
       id
     }
   }

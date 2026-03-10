@@ -50,7 +50,7 @@ export default function CurrentPlanSection() {
         </p>
         <button
           type="button"
-          onClick={() => router.push(Routes.profilePlans)}
+          onClick={() => router.push(Routes.panelPlans)}
           className="inline-flex px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-orange-500 text-white dark:bg-orange-500 hover:bg-orange-600 dark:hover:bg-orange-600"
         >
           Ver planes
@@ -91,7 +91,7 @@ export default function CurrentPlanSection() {
             />
             <button
               type="button"
-              onClick={() => router.push(Routes.profilePlans)}
+              onClick={() => router.push(Routes.panelPlans)}
               className="inline-flex px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-orange-500 text-white dark:bg-orange-500 hover:bg-orange-600 dark:hover:bg-orange-600"
             >
               Ver planes

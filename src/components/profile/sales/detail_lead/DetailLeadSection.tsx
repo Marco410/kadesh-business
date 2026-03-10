@@ -226,7 +226,7 @@ export default function DetailLeadSection() {
   ]);
 
   if (!id) {
-    router.replace(Routes.profile);
+    router.replace(Routes.panel);
     return null;
   }
 
@@ -250,7 +250,7 @@ export default function DetailLeadSection() {
           No se pudo cargar el lead o no existe.
         </p>
         <Link
-          href={`${Routes.profile}?tab=ventas`}
+          href={`${Routes.panel}?tab=ventas`}
           className="mt-4 inline-block text-orange-500 dark:text-orange-400 hover:underline"
         >
           Volver a Ventas
@@ -327,7 +327,7 @@ export default function DetailLeadSection() {
       <div className="flex flex-wrap items-center gap-3 mb-4 justify-between">
         <div className="flex flex-row gap-2">
           <Link
-            href={`${Routes.profile}?tab=ventas`}
+            href={`${Routes.panel}?tab=ventas`}
             className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />

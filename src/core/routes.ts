@@ -29,13 +29,13 @@ export const Routes = {
   contact: '/contacto',
   
   // Profile
-  profile: '/perfil',
-  profileLead: (id: string): string => `/perfil/ventas/lead/${id}`,
-  profileSyncLeads: '/perfil/ventas/obtener-clientes',
-  profileAddSalesperson: '/perfil/ventas/agregar-vendedor',
-  profilePlans: '/perfil/ventas/planes',
-  profilePlanSubscribe: (planId: string): string => `/perfil/ventas/planes/suscripcion/${planId}`,
-  profilePlanSubscriptionSuccess: "/perfil/ventas/planes/suscripcion/success",
+  panel: '/panel',
+  panelLead: (id: string): string => `/panel/ventas/lead/${id}`,
+  panelSyncLeads: '/panel/ventas/obtener-clientes',
+  panelAddSalesperson: '/panel/ventas/agregar-vendedor',
+  panelPlans: '/panel/ventas/planes',
+  panelPlanSubscribe: (planId: string): string => `/panel/ventas/planes/suscripcion/${planId}`,
+  panelPlanSubscriptionSuccess: "/panel/ventas/planes/suscripcion/success",
 
   
   // About

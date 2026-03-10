@@ -14,8 +14,6 @@ export function hasPlanFeature(
   planFeatures: PlanFeatureItemFromApi[] | null | undefined,
   featureKey: string
 ): boolean {
-  console.log("planFeatures", planFeatures);
-  console.log("featureKey", featureKey);
   if (!planFeatures?.length) return false;
   const feature = planFeatures.find((f) => f.key === featureKey);
   return feature?.included === true;

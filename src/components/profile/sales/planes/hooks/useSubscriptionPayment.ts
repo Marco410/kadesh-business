@@ -31,6 +31,7 @@ export function useSubscriptionPayment(
   const elements = useElements();
   const router = useRouter();
   const [loadingPayment, setLoadingPayment] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   const [createPaymentMethod] = useMutation(CREATE_PAYMENT_METHOD);
   const [createCompanySubscription] =
@@ -110,28 +111,27 @@ export function useSubscriptionPayment(
           method.card?.brand === paymentMethod.card?.brand,
       ) as { id: string } | undefined;
 
+      const paymentMethodVariables = {
+        user: { connect: { id: userId } },
+        cardType: paymentMethod.type,
+        lastFourDigits: paymentMethod.card.last4?.toString() ?? "",
+        expMonth: paymentMethod.card.exp_month?.toString() ?? "",
+        expYear: paymentMethod.card.exp_year?.toString() ?? "",
+        stripeProcessorId: "-",
+        stripePaymentMethodId: paymentMethod.id,
+        address: "",
+        postalCode:
+          paymentMethod.billing_details?.address?.postal_code?.toString() ?? "",
+        ownerName: userName,
+        country: paymentMethod.card.country ?? "",
+      };
+
       let paymentMethodId: string;
       let noDuplicatePaymentMethod: boolean;
 
       if (!stripePaymentMethodDuplicate) {
         const res = await createPaymentMethod({
-          variables: {
-            data: {
-              user: { connect: { id: userId } },
-              cardType: paymentMethod.type,
-              lastFourDigits: paymentMethod.card.last4?.toString() ?? "",
-              expMonth: paymentMethod.card.exp_month?.toString() ?? "",
-              expYear: paymentMethod.card.exp_year?.toString() ?? "",
-              stripeProcessorId: "-",
-              stripePaymentMethodId: paymentMethod.id,
-              address: "",
-              postalCode:
-                paymentMethod.billing_details?.address?.postal_code?.toString() ??
-                "",
-              ownerName: userName,
-              country: paymentMethod.card.country ?? "",
-            },
-          },
+          variables: { data: paymentMethodVariables },
         });
         paymentMethodId = (res.data as any).createSaasPaymentMethod.id;
         noDuplicatePaymentMethod = true;
@@ -143,8 +143,19 @@ export function useSubscriptionPayment(
           },
           fetchPolicy: "network-only",
         });
-        paymentMethodId = (getPaymentMethod as any).saasPaymentMethod.id;
-        noDuplicatePaymentMethod = false;
+        const existing = (getPaymentMethod as { saasPaymentMethod?: { id: string } | null })
+          ?.saasPaymentMethod;
+        if (existing?.id) {
+          paymentMethodId = existing.id;
+          noDuplicatePaymentMethod = false;
+        } else {
+          const res = await createPaymentMethod({
+            variables: { data: paymentMethodVariables },
+          });
+          paymentMethodId = (res.data as { createSaasPaymentMethod: { id: string } })
+            .createSaasPaymentMethod.id;
+          noDuplicatePaymentMethod = true;
+        }
       }
 
       const total = plan.cost.toFixed(2);
@@ -164,12 +175,16 @@ export function useSubscriptionPayment(
       });
 
       const result = response.data?.createCompanySubscription;
-      setLoadingPayment(false);
 
       if (result?.success) {
-        sileo.success({ title: result.message ?? "Suscripción activada." });
-        router.replace(Routes.profilePlanSubscriptionSuccess);
+        setRedirecting(true);
+        sileo.success({
+          title: result.message ?? "Suscripción activada.",
+          description: "¡Listo! Tu suscripción está activa y ahora puedes disfrutar de los beneficios del plan seleccionado.",
+        });
+        router.replace(Routes.panelPlanSubscriptionSuccess);
       } else {
+        setLoadingPayment(false);
         sileo.error({
           title:
             result?.message ??
@@ -186,5 +201,6 @@ export function useSubscriptionPayment(
   return {
     processSubscriptionPayment,
     loadingPayment,
+    redirecting,
   };
 }

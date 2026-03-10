@@ -22,13 +22,13 @@ export default function SuscripcionSuccessPage() {
             Tu plan ha sido activado correctamente. Ya puedes usar todas las funciones incluidas.
           </p>
           <Link
-            href={`${Routes.profile}?tab=ventas`}
+            href={`${Routes.panel}?tab=ventas`}
             className="mt-8 inline-block w-full rounded-xl bg-orange-500 px-6 py-3 text-center text-sm font-semibold text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
           >
             Ir a Ventas
           </Link>
           <Link
-            href={Routes.profilePlans}
+            href={Routes.panelPlans}
             className="mt-3 inline-block w-full rounded-xl border-2 border-[#e0e0e0] dark:border-[#3a3a3a] px-6 py-3 text-center text-sm font-semibold text-[#212121] dark:text-[#e0e0e0] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
           >
             Ver planes

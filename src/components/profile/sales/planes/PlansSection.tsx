@@ -249,7 +249,7 @@ export default function PlansSection({
   const paidPlans = plans.filter((p) => p.cost > 0);
 
   const handleSubscribe = (plan: SaasPlanItem) => {
-    router.push(Routes.profilePlanSubscribe(plan.id));
+    router.push(Routes.panelPlanSubscribe(plan.id));
   };
 
   return (
@@ -257,7 +257,7 @@ export default function PlansSection({
       {!hideBackLink && (
         <div className="mb-6">
           <Link
-            href={`${Routes.profile}?tab=ventas`}
+            href={`${Routes.panel}?tab=ventas`}
             className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />

@@ -21,6 +21,7 @@ import {
   type UpdateTechBusinessLeadMutation,
 } from "kadesh/components/profile/sales/queries";
 import SalesLeadsTable from "kadesh/components/profile/sales/SalesLeadsTable";
+import EmptyCompanySection from "kadesh/components/profile/sales/EmptyCompanySection";
 import StatsSection from "./StatsSection";
 import FiltersLeadsSection from "./FiltersLeadsSection";
 import CurrentPlanSection from "./CurrentPlanSection";
@@ -58,7 +59,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const [assignToVendedorId, setAssignToVendedorId] = useState<string | null>(null);
   const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
   const [assigning, setAssigning] = useState(false);
-  const { user } = useUser();
+  const { user, refreshUser } = useUser();
 
   const page = parsePageParam(searchParams.get("page"));
 
@@ -67,7 +68,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     return () => clearTimeout(t);
   }, [searchInput]);
 
-  const { data: userData } = useQuery<
+  const { data: userData, refetch: refetchUserCompany } = useQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {
@@ -253,13 +254,24 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       setPageInUrl(totalPages);
   }, [countData, totalPages, page]);
 
+  if (!companyId) {
+    return (
+      <EmptyCompanySection
+        userId={userId}
+        onSuccess={async () => {
+          await refetchUserCompany();
+          await refreshUser();
+        }}
+      />
+    );
+  }
+
   return (
     <SubscriptionProvider companyId={companyId}>
       <div className="w-full space-y-6">
         <CurrentPlanSection />
 
         <StatsSection userId={userId} companyId={companyId} isAdminCompany={isAdminCompany} salesComission={userData?.user?.salesComission ?? 0} />
-
 
       {/* Título + filtros por pipeline + tabla */}
       <div>

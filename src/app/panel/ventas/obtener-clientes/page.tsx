@@ -10,6 +10,7 @@ import { USER_COMPANY_CATEGORIES_QUERY, UserCompanyCategoriesResponse, UserCompa
 import { SubscriptionProvider } from "kadesh/components/profile/sales/SubscriptionContext";
 import { Routes } from "kadesh/core/routes";
 import { useUser } from "kadesh/utils/UserContext";
+import EmptyCompanySection from "kadesh/components/profile/sales/EmptyCompanySection";
 
 export default function ObtenerClientesPage() {
   const { user } = useUser();
@@ -24,6 +25,23 @@ export default function ObtenerClientesPage() {
   });
 
   const companyId = userData?.user?.company?.id ?? null;
+
+  if (!companyId) {
+    return (
+      <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#121212]">
+        <Navigation />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
+          <EmptyCompanySection
+            userId={userId}
+            onSuccess={async () => {
+            }}
+          />
+        </main>
+      <Footer />
+      </div>
+    );
+  }
+  
   return (
     <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#121212]">
       <Navigation />
@@ -39,7 +57,7 @@ export default function ObtenerClientesPage() {
           </div>
           <div className="mt-5 mb-4">
             <Link
-              href={`${Routes.profile}?tab=ventas`}
+              href={`${Routes.panel}?tab=ventas`}
               className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
             >
               <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />

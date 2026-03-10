@@ -21,6 +21,7 @@ import { cn } from "kadesh/utils/cn";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 import { useSubscriptionPayment } from "./hooks/useSubscriptionPayment";
+import EmptyCompanySection from "../EmptyCompanySection";
 
 function formatPrice(cost: number, currency: string): string {
   const formatter = new Intl.NumberFormat("es-MX", {
@@ -99,7 +100,7 @@ export default function SuscripcionSection() {
     : null;
   const stripeCustomerId = userData?.user?.stripeCustomerId;
 
-  const { processSubscriptionPayment, loadingPayment } = useSubscriptionPayment(
+  const { processSubscriptionPayment, loadingPayment, redirecting } = useSubscriptionPayment(
     user?.id,
     user?.email,
     stripeCustomerId,
@@ -116,11 +117,13 @@ export default function SuscripcionSection() {
     });
   };
 
+  const companyId = userData?.user?.company?.id ?? null;
+
   if (!id) {
     return (
       <div className="max-w-lg mx-auto space-y-6">
         <Link
-          href={Routes.profilePlans}
+          href={Routes.panelPlans}
           className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
@@ -129,7 +132,7 @@ export default function SuscripcionSection() {
         <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 text-center">
           <p className="text-[#616161] dark:text-[#b0b0b0]">Identificador de plan no válido.</p>
           <Link
-            href={Routes.profilePlans}
+            href={Routes.panelPlans}
             className="mt-4 inline-block rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
           >
             Ver planes
@@ -151,7 +154,7 @@ export default function SuscripcionSection() {
     return (
       <div className="max-w-lg mx-auto space-y-6">
         <Link
-          href={Routes.profilePlans}
+          href={Routes.panelPlans}
           className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
@@ -164,7 +167,7 @@ export default function SuscripcionSection() {
               : "Plan no encontrado."}
           </p>
           <Link
-            href={Routes.profilePlans}
+            href={Routes.panelPlans}
             className="mt-4 inline-block rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
           >
             Ver planes
@@ -176,10 +179,23 @@ export default function SuscripcionSection() {
 
   const isActive = plan.active;
 
+
+  if (!companyId) {
+    return (
+      <EmptyCompanySection
+        userId={user?.id ?? ""}
+        onSuccess={async () => {
+         /*  await refetchUserCompany();
+          await refreshUser(); */
+        }}
+      />
+    );
+  }
+
   return (
     <div className="w-full max-w-5xl mx-auto space-y-8">
       <Link
-        href={Routes.profilePlans}
+        href={Routes.panelPlans}
         className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
       >
         <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
@@ -244,7 +260,7 @@ export default function SuscripcionSection() {
           )}
           <div className="mt-6">
             <Link
-              href={Routes.profilePlans}
+              href={Routes.panelPlans}
               className="text-sm font-medium text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300"
             >
               Cambiar plan
@@ -316,20 +332,29 @@ export default function SuscripcionSection() {
             </label>
 
             <div className="flex flex-col gap-3 pt-2">
+              {(loadingPayment || redirecting) && (
+                <p className="text-center text-sm text-[#616161] dark:text-[#b0b0b0]">
+                  {redirecting ? "Redirigiendo a la confirmación…" : "Procesando el pago…"}
+                </p>
+              )}
               <button
                 type="submit"
-                disabled={!isActive || !acceptTerms || loadingPayment || !user?.email}
+                disabled={!isActive || !acceptTerms || loadingPayment || redirecting || !user?.email}
                 className={cn(
                   "w-full rounded-xl px-6 py-3 text-sm font-semibold text-white transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-60",
-                  isActive && acceptTerms && user?.email
+                  isActive && acceptTerms && user?.email && !redirecting
                     ? "bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
                     : "bg-[#9e9e9e] dark:bg-[#555]",
                 )}
               >
-                {loadingPayment ? "Procesando…" : "Confirmar suscripción"}
+                {redirecting
+                  ? "Redirigiendo…"
+                  : loadingPayment
+                    ? "Procesando…"
+                    : "Confirmar suscripción"}
               </button>
               <Link
-                href={Routes.profilePlans}
+                href={Routes.panelPlans}
                 className="w-full rounded-xl border-2 border-[#e0e0e0] dark:border-[#3a3a3a] px-6 py-3 text-center text-sm font-semibold text-[#212121] dark:text-[#e0e0e0] transition-colors hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
               >
                 Cancelar

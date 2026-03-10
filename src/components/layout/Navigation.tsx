@@ -193,6 +193,14 @@ export default function Navigation() {
           >
             Contacto
           </Link>
+
+          {/* Contacto Link */}
+          {user?.id ? (<Link
+            href={Routes.panel}
+            className={`font-semibold text-sm ${navLinkClass}`}
+          >
+            Panel de Control
+          </Link>) : null}
           
           {/* Theme Toggle Button */}
           {mounted && (
@@ -244,7 +252,7 @@ export default function Navigation() {
                     className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1e1e1e] rounded-lg shadow-lg py-2 min-w-[180px] z-50"
                   >
                     <Link
-                      href={Routes.profile}
+                      href={Routes.panel}
                       onClick={() => setAvatarDropdownOpen(false)}
                       className="block px-4 py-2 text-sm text-[#212121] dark:text-[#ffffff] hover:bg-orange-500/10 dark:hover:bg-white/10 transition-colors"
                     >
@@ -407,6 +415,15 @@ export default function Navigation() {
                     Contacto
                   </Link>
 
+                  {/* Planes Link Mobile */}
+                  {user?.id ? (<Link
+                    href={Routes.panel}
+                    onClick={() => setOpened(false)}
+                    className="text-white font-semibold text-lg no-underline opacity-92 hover:opacity-100 py-4 px-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all"
+                  >
+                    Panel de Control
+                  </Link>) : null}
+
                   {/* User Avatar or Login Button Mobile */}
                   {user?.id ? (
                     <div className="pt-4 border-t border-white/20">
@@ -432,7 +449,7 @@ export default function Navigation() {
                         </div>
                       </div>
                       <Link
-                        href={Routes.profile}
+                        href={Routes.panel}
                         onClick={() => setOpened(false)}
                         className="block text-white font-semibold text-lg opacity-92 hover:opacity-100 py-4 px-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all mb-2"
                       >

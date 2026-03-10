@@ -99,7 +99,6 @@ export default function StatsSection({ userId, companyId, isAdminCompany, salesC
   const contactados = contactadosData?.techBusinessLeadsCount ?? 0;
 
 
-  console.log("subscription", subscription);
 
   const hasPlanFeaturesRequired = hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.LEAD_SYNC) || hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT);
   return (
@@ -145,7 +144,7 @@ export default function StatsSection({ userId, companyId, isAdminCompany, salesC
          hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.LEAD_SYNC) && <div className="flex flex-col gap-1 min-w-0">
           <button
             type="button"
-            onClick={() => router.push(Routes.profileSyncLeads)}
+            onClick={() => router.push(Routes.panelSyncLeads)}
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 active:bg-orange-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors w-full sm:w-auto"
           >
             <HugeiconsIcon icon={Add01Icon} size={18} strokeWidth={2} />
@@ -157,7 +156,7 @@ export default function StatsSection({ userId, companyId, isAdminCompany, salesC
           hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT) && <div className="flex flex-col gap-1 min-w-0">
           <button
             type="button"
-            onClick={() => router.push(Routes.profileAddSalesperson)}
+            onClick={() => router.push(Routes.panelAddSalesperson)}
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors w-full sm:w-auto"
           >
             <HugeiconsIcon icon={UserAdd02Icon} size={18} strokeWidth={2} />
