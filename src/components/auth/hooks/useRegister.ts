@@ -21,6 +21,7 @@ import {
 } from 'kadesh/components/profile/sales/queries';
 import { Role } from 'kadesh/constants/constans';
 import { useUser } from 'kadesh/utils/UserContext';
+import { trackCompleteRegistration } from 'kadesh/utils/facebook-pixel';
 
 interface UseRegisterOptions {
   onSuccess?: () => void;
@@ -64,6 +65,7 @@ export function useRegister(options?: UseRegisterOptions) {
     CreateUserVariables
   >(CREATE_USER_MUTATION, {
     onCompleted: async () => {
+      trackCompleteRegistration();
       // Save credentials before clearing form
       const savedEmail = email;
       const savedPassword = password;

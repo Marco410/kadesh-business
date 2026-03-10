@@ -21,6 +21,7 @@ import { useUser } from "kadesh/utils/UserContext";
 import { Routes } from "kadesh/core/routes";
 import type { AuthenticatedItem } from "kadesh/utils/types";
 import { loadGoogleGsiScript } from "kadesh/utils/load-google-gsi";
+import { trackCompleteRegistration } from "kadesh/utils/facebook-pixel";
 
 declare global {
   interface Window {
@@ -109,6 +110,7 @@ export function useGoogleLogin(options?: UseGoogleLoginOptions) {
       }
 
       if (result.__typename === "UserAuthenticationWithGoogleSuccess") {
+        trackCompleteRegistration();
         const { item, sessionToken } = result;
         // En Google login NO guardamos el `sessionToken` custom en localStorage/cookie,
         // porque Keystone autentica `authenticatedItem` con su propia sesión (cookie)
