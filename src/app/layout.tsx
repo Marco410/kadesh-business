@@ -82,7 +82,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        {/* Meta Pixel Code */}
+        {/* Meta Pixel Code - test_event_code: usar NEXT_PUBLIC_META_PIXEL_TEST_EVENT_CODE=TEST75748 para "Probar eventos" */}
         <Script
           id="facebook-pixel"
           strategy="afterInteractive"
@@ -97,7 +97,7 @@ t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '1093441746302298');
-fbq('track', 'PageView');
+fbq('track', 'PageView'${process.env.NEXT_PUBLIC_META_PIXEL_TEST_EVENT_CODE ? `, { test_event_code: '${process.env.NEXT_PUBLIC_META_PIXEL_TEST_EVENT_CODE}' }` : ''});
           `,
           }}
         />
