@@ -593,6 +593,32 @@ export interface CreateTechStatusBusinessLeadMutation {
   };
 }
 
+/** Lista status por lead ids y vendedor para saber cuáles ya tienen status (evitar duplicados al asignar). */
+export const TECH_STATUS_BUSINESS_LEADS_BY_LEADS_AND_SALES_PERSON_QUERY = gql`
+  query TechStatusBusinessLeadsByLeadsAndSalesPerson(
+    $where: TechStatusBusinessLeadWhereInput!
+  ) {
+    techStatusBusinessLeads(where: $where, take: 500) {
+      businessLead {
+        id
+      }
+    }
+  }
+`;
+
+export interface TechStatusBusinessLeadsByLeadsAndSalesPersonVariables {
+  where: {
+    businessLead: { id: { in: string[] } };
+    salesPerson: { id: { equals: string } };
+  };
+}
+
+export interface TechStatusBusinessLeadsByLeadsAndSalesPersonResponse {
+  techStatusBusinessLeads: Array<{
+    businessLead: { id: string };
+  }>;
+}
+
 export const TECH_SALES_ACTIVITIES_COUNT_QUERY = gql`
   query TechSalesActivitiesCount($where: TechSalesActivityWhereInput!) {
     techSalesActivitiesCount(where: $where)

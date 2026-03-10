@@ -2,13 +2,15 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation, useApolloClient } from "@apollo/client";
 import {
   TECH_BUSINESS_LEADS_QUERY,
   TECH_BUSINESS_LEADS_COUNT_QUERY,
   USER_COMPANY_CATEGORIES_QUERY,
   COMPANY_VENDEDORES_QUERY,
   UPDATE_TECH_BUSINESS_LEAD_MUTATION,
+  CREATE_TECH_STATUS_BUSINESS_LEAD_MUTATION,
+  TECH_STATUS_BUSINESS_LEADS_BY_LEADS_AND_SALES_PERSON_QUERY,
   type TechBusinessLeadsResponse,
   type TechBusinessLeadsVariables,
   type TechBusinessLeadsCountResponse,
@@ -19,6 +21,10 @@ import {
   type CompanyVendedoresVariables,
   type UpdateTechBusinessLeadVariables,
   type UpdateTechBusinessLeadMutation,
+  type CreateTechStatusBusinessLeadVariables,
+  type CreateTechStatusBusinessLeadMutation,
+  type TechStatusBusinessLeadsByLeadsAndSalesPersonResponse,
+  type TechStatusBusinessLeadsByLeadsAndSalesPersonVariables,
 } from "kadesh/components/profile/sales/queries";
 import SalesLeadsTable from "kadesh/components/profile/sales/SalesLeadsTable";
 import EmptyCompanySection from "kadesh/components/profile/sales/EmptyCompanySection";
@@ -28,6 +34,7 @@ import CurrentPlanSection from "./CurrentPlanSection";
 import { SubscriptionProvider } from "./SubscriptionContext";
 import { useUser } from "kadesh/utils/UserContext";
 import { Role } from "kadesh/constants/constans";
+import { PIPELINE_STATUS } from "./constants";
 import { sileo } from "sileo";
 
 const LEADS_PAGE_SIZE = 10;
@@ -192,10 +199,17 @@ export default function SalesSection({ userId }: SalesSectionProps) {
 
   const leads = data?.techBusinessLeads ?? [];
 
+  const client = useApolloClient();
+
   const [updateLead] = useMutation<
     UpdateTechBusinessLeadMutation,
     UpdateTechBusinessLeadVariables
   >(UPDATE_TECH_BUSINESS_LEAD_MUTATION);
+
+  const [createLeadStatus] = useMutation<
+    CreateTechStatusBusinessLeadMutation,
+    CreateTechStatusBusinessLeadVariables
+  >(CREATE_TECH_STATUS_BUSINESS_LEAD_MUTATION);
 
   const handleToggleLead = useCallback((leadId: string) => {
     setSelectedLeadIds((prev) => {
@@ -217,6 +231,25 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const handleAssignToVendedor = useCallback(async () => {
     if (!assignToVendedorId || selectedLeadIds.size === 0) return;
     try {
+      const leadIdsArray = Array.from(selectedLeadIds);
+      const { data: existingStatusData } = await client.query<
+        TechStatusBusinessLeadsByLeadsAndSalesPersonResponse,
+        TechStatusBusinessLeadsByLeadsAndSalesPersonVariables
+      >({
+        query: TECH_STATUS_BUSINESS_LEADS_BY_LEADS_AND_SALES_PERSON_QUERY,
+        variables: {
+          where: {
+            businessLead: { id: { in: leadIdsArray } },
+            salesPerson: { id: { equals: assignToVendedorId } },
+          },
+        },
+      });
+      const leadIdsWithExistingStatus = new Set(
+        (existingStatusData?.techStatusBusinessLeads ?? []).map(
+          (s) => s.businessLead.id
+        )
+      );
+
       for (const leadId of selectedLeadIds) {
         await updateLead({
           variables: {
@@ -224,6 +257,19 @@ export default function SalesSection({ userId }: SalesSectionProps) {
             data: { salesPerson: { connect: [{ id: assignToVendedorId }] } },
           },
         });
+        if (!leadIdsWithExistingStatus.has(leadId)) {
+          await createLeadStatus({
+            variables: {
+              data: {
+                businessLead: { connect: { id: leadId } },
+                salesPerson: { connect: { id: assignToVendedorId } },
+                saasCompany: companyId ? { connect: { id: companyId } } : undefined,
+                pipelineStatus: PIPELINE_STATUS.DETECTADO,
+                opportunityLevel: null,
+              },
+            },
+          });
+        }
       }
       sileo.success({
         title: "Leads asignados",
@@ -238,7 +284,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
         description: e instanceof Error ? e.message : "No se pudieron asignar los leads.",
       });
     }
-  }, [assignToVendedorId, selectedLeadIds, updateLead, refetchLeads]);
+  }, [assignToVendedorId, selectedLeadIds, updateLead, createLeadStatus, refetchLeads, client, companyId]);
 
   const handleAssign = useCallback(async () => {
     setAssigning(true);
