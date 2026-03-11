@@ -51,7 +51,7 @@ function getValidTab(
   if (tabFromUrl === "vendedores" && (!isAdminCompany || !hasSalesPersonManagement)) {
     return "inicio";
   }
-  if (tabFromUrl === "archivos" && (!isAdminCompany || !hasUploadFilesFeature)) {
+  if (tabFromUrl === "archivos" && (!hasUploadFilesFeature)) {
     return "inicio";
   }
   return tabFromUrl as (typeof VALID_TABS)[number];
