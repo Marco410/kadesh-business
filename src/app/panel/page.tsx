@@ -3,6 +3,7 @@
 import { Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useQuery } from "@apollo/client";
 import { useUser } from "kadesh/utils/UserContext";
 import { Routes } from "kadesh/core/routes";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -17,6 +18,16 @@ import {
 import ProfileData from "kadesh/components/profile/ProfileData";
 import SalesSection from "kadesh/components/profile/sales/SalesSection";
 import VendedoresSection from "kadesh/components/profile/sales/vendedores/VendedoresSection";
+import {
+  USER_COMPANY_CATEGORIES_QUERY,
+  SUBSCRIPTION_STATUS_QUERY,
+  type UserCompanyCategoriesResponse,
+  type UserCompanyCategoriesVariables,
+  type SubscriptionStatusResponse,
+  type SubscriptionStatusVariables,
+} from "kadesh/components/profile/sales/queries";
+import { hasPlanFeature } from "kadesh/components/profile/sales/helpers/plan-features";
+import { PLAN_FEATURE_KEYS } from "kadesh/components/profile/sales/constants";
 import { Footer, Navigation } from "kadesh/components/layout";
 import { Role } from "kadesh/constants/constans";
 
@@ -25,7 +36,8 @@ const VALID_TABS = ["inicio", "profile", "ventas", "vendedores"] as const;
 function getValidTab(
   tabFromUrl: string | null,
   hasVendedorRole: boolean,
-  isAdminCompany: boolean
+  isAdminCompany: boolean,
+  hasSalesPersonManagement: boolean
 ): (typeof VALID_TABS)[number] {
   if (!tabFromUrl || !VALID_TABS.includes(tabFromUrl as (typeof VALID_TABS)[number])) {
     return "inicio";
@@ -33,7 +45,7 @@ function getValidTab(
   if (tabFromUrl === "ventas" && !hasVendedorRole) {
     return "inicio";
   }
-  if (tabFromUrl === "vendedores" && !isAdminCompany) {
+  if (tabFromUrl === "vendedores" && (!isAdminCompany || !hasSalesPersonManagement)) {
     return "inicio";
   }
   return tabFromUrl as (typeof VALID_TABS)[number];
@@ -43,7 +55,7 @@ const navItems = [
   { key: "inicio" as const, label: "Inicio", icon: DashboardSquare01Icon },
   { key: "profile" as const, label: "Datos del perfil", icon: UserIcon },
   { key: "ventas" as const, label: "Ventas", icon: Chart01Icon, requireVendedor: true },
-  { key: "vendedores" as const, label: "Vendedores", icon: UserIcon, requireAdminCompany: true },
+  { key: "vendedores" as const, label: "Vendedores", icon: UserIcon, requireAdminCompany: true, requireSalesPersonManagement: true },
 ];
 
 function DashboardSidebar({
@@ -51,11 +63,13 @@ function DashboardSidebar({
   onTabChange,
   hasVendedorRole,
   isAdminCompany,
+  hasSalesPersonManagement,
 }: {
   selectedTab: string;
   onTabChange: (key: string) => void;
   hasVendedorRole: boolean;
   isAdminCompany: boolean;
+  hasSalesPersonManagement: boolean;
 }) {
   return (
     <aside className="w-full lg:w-60 shrink-0">
@@ -63,6 +77,7 @@ function DashboardSidebar({
         {navItems.map((item) => {
           if ("requireVendedor" in item && item.requireVendedor && !hasVendedorRole) return null;
           if ("requireAdminCompany" in item && item.requireAdminCompany && !isAdminCompany) return null;
+          if ("requireSalesPersonManagement" in item && item.requireSalesPersonManagement && !hasSalesPersonManagement) return null;
           const isActive = selectedTab === item.key;
           return (
             <button
@@ -142,7 +157,30 @@ function ProfilePageContent() {
   const tabFromUrl = searchParams.get("tab");
   const hasVendedorRole = user?.roles?.some((r) => r.name === Role.VENDEDOR) ?? false;
   const isAdminCompany = user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
-  const selectedTab = getValidTab(tabFromUrl, hasVendedorRole, isAdminCompany);
+
+  const { data: userData } = useQuery<
+    UserCompanyCategoriesResponse,
+    UserCompanyCategoriesVariables
+  >(USER_COMPANY_CATEGORIES_QUERY, {
+    variables: { where: { id: user?.id ?? "" } },
+    skip: !user?.id,
+  });
+  const companyId = userData?.user?.company?.id ?? null;
+
+  const { data: subscriptionData } = useQuery<
+    SubscriptionStatusResponse,
+    SubscriptionStatusVariables
+  >(SUBSCRIPTION_STATUS_QUERY, {
+    variables: { companyId },
+    skip: !companyId,
+  });
+  const subscription = subscriptionData?.subscriptionStatus?.subscription ?? null;
+  const hasSalesPersonManagement = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT
+  );
+
+  const selectedTab = getValidTab(tabFromUrl, hasVendedorRole, isAdminCompany, hasSalesPersonManagement);
 
   const handleTabChange = (key: string) => {
     router.replace(`${pathname}?tab=${key}`, { scroll: false });
@@ -190,6 +228,7 @@ function ProfilePageContent() {
               onTabChange={handleTabChange}
               hasVendedorRole={hasVendedorRole}
               isAdminCompany={isAdminCompany}
+              hasSalesPersonManagement={hasSalesPersonManagement}
             />
 
             <main className="flex-1 min-w-0">
@@ -217,7 +256,7 @@ function ProfilePageContent() {
                 </div>
               )}
 
-              {selectedTab === "vendedores" && isAdminCompany && (
+              {selectedTab === "vendedores" && isAdminCompany && hasSalesPersonManagement && (
                 <div className="space-y-6">
                   <VendedoresSection userId={user.id} />
                 </div>
