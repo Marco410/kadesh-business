@@ -6,8 +6,10 @@ import {
   PowerOfDataSection,
   CRMWorkflowSection,
   SocialProofBanner,
+  AgencyTestimonialsSection,
   LandingPricingSection,
   FinalCTASection,
+  FAQSection,
 } from "kadesh/components/home";
 import { Footer, Navigation } from "kadesh/components/layout";
 
@@ -16,16 +18,16 @@ export default function HomePage() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "KADESH Negocios",
-    url: "https://www.kadesh.com.mx",
+    url: "https://www.negocios.kadesh.com.mx",
     description:
       "Prospección B2B inteligente: extrae leads desde Google Maps por categoría y radio. CRM integrado para ventas, propuestas y comisiones.",
     publisher: {
       "@type": "Organization",
       name: "KADESH Negocios",
-      url: "https://www.kadesh.com.mx",
+      url: "https://www.negocios.kadesh.com.mx",
       logo: {
         "@type": "ImageObject",
-        url: "https://www.kadesh.com.mx/logo.png",
+        url: "https://www.negocios.kadesh.com.mx/logo.png",
       },
       areaServed: { "@type": "Country", name: "México" },
     },
@@ -56,8 +58,10 @@ export default function HomePage() {
         <PowerOfDataSection />
         <CRMWorkflowSection />
         <SocialProofBanner />
+        <AgencyTestimonialsSection />
         <LandingPricingSection />
         <FinalCTASection />
+        <FAQSection />
         <Footer />
       </main>
     </>

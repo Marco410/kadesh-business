@@ -5,3 +5,5 @@ export { default as CRMWorkflowSection } from './CRMWorkflowSection';
 export { default as SocialProofBanner } from './SocialProofBanner';
 export { default as LandingPricingSection } from './LandingPricingSection';
 export { default as FinalCTASection } from './FinalCTASection';
+export { default as FAQSection } from './FAQSection';
+export { default as AgencyTestimonialsSection } from './AgencyTestimonialsSection';
