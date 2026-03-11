@@ -32,6 +32,7 @@ interface SalesLeadsTableProps {
   pageSize?: number;
   currentPage?: number;
   onPageChange?: (page: number) => void;
+  isAdminCompany?: boolean;
 }
 
 export default function SalesLeadsTable({
@@ -46,6 +47,7 @@ export default function SalesLeadsTable({
   pageSize = 10,
   currentPage = 1,
   onPageChange,
+  isAdminCompany = false,
 }: SalesLeadsTableProps) {
   const router = useRouter();
   const leadIds = leads.map((l) => l.id);
@@ -238,7 +240,30 @@ export default function SalesLeadsTable({
                 {lead.source ?? "—"}
               </td>
               <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
-                {lead.salesPerson?.[0]?.name ?? "—"} {lead.salesPerson?.[0]?.lastName ?? "—"}
+                {(() => {
+                  const persons = lead.salesPerson ?? [];
+                  const count = persons.length;
+                  if (isAdminCompany && count > 1) {
+                    const names = persons
+                      .map((sp) => [sp.name, sp.lastName].filter(Boolean).join(" ").trim())
+                      .filter(Boolean)
+                      .join(", ");
+                    return (
+                      <span
+                        title={names}
+                        className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-orange-500/15 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 dark:border-orange-400/30 cursor-help"
+                      >
+                        {count} asignado{count !== 1 ? "s" : ""}
+                      </span>
+                    );
+                  }
+                  if (isAdminCompany && count === 1) {
+                    const sp = persons[0];
+                    return [sp?.name, sp?.lastName].filter(Boolean).join(" ").trim() || "—";
+                  }
+                  if (isAdminCompany && count === 0) return "—";
+                  return `${lead.salesPerson?.[0]?.name ?? ""} ${lead.salesPerson?.[0]?.lastName ?? ""}`.trim() || "—";
+                })()}
               </td>
             </tr>
           );

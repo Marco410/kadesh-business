@@ -354,6 +354,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
           pageSize={LEADS_PAGE_SIZE}
           currentPage={effectivePage}
           onPageChange={setPageInUrl}
+          isAdminCompany={isAdminCompany}
         />
       </div>
     </div>

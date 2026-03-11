@@ -644,17 +644,26 @@ export const TECH_SALES_ACTIVITIES_QUERY = gql`
         id
         businessName
       }
+      assignedSeller {
+        id
+      }
     }
   }
 `;
 
 export interface TechSalesActivitiesVariables {
   where: {
-    AND: Array<{
+    AND?: Array<{
       assignedSeller: { id: { equals: string } };
       businessLead: { id: { equals: string } };
     }>;
+    assignedSeller?: { id: { in: string[] } };
   };
+}
+
+/** Filtro por múltiples vendedores (ej. calendario de empresa). */
+export interface TechSalesActivitiesCalendarVariables {
+  where: { assignedSeller: { id: { in: string[] } } };
 }
 
 export interface TechSalesActivitiesResponse {
@@ -666,6 +675,7 @@ export interface TechSalesActivitiesResponse {
     comments: string | null;
     createdAt: string;
     businessLead: { id: string; businessName: string } | null;
+    assignedSeller?: { id: string } | null;
   }>;
 }
 
@@ -753,6 +763,9 @@ export const TECH_PROPOSALS_QUERY = gql`
         id
         businessName
       }
+      assignedSeller {
+        id
+      }
     }
   }
 `;
@@ -765,11 +778,16 @@ export const TECH_PROPOSALS_COUNT_QUERY = gql`
 
 export interface TechProposalsVariables {
   where: {
-    AND: Array<{
+    AND?: Array<{
       assignedSeller: { id: { equals: string } };
       businessLead: { id: { equals: string } };
     }>;
+    assignedSeller?: { id: { in: string[] } };
   };
+}
+
+export interface TechProposalsCalendarVariables {
+  where: { assignedSeller: { id: { in: string[] } } };
 }
 
 /** Variables para filtrar propuestas por vendedor y estado (ej. comisiones = status Comprada) */
@@ -801,6 +819,7 @@ export interface TechProposalsResponse {
     approved: boolean | null;
     paid: boolean | null;
     businessLead: { id: string; businessName: string } | null;
+    assignedSeller?: { id: string } | null;
   }>;
 }
 
@@ -947,6 +966,9 @@ export const TECH_FOLLOW_UP_TASKS_QUERY = gql`
         id
         businessName
       }
+      assignedSeller {
+        id
+      }
     }
   }
 `;
@@ -959,11 +981,16 @@ export const TECH_FOLLOW_UP_TASKS_COUNT_QUERY = gql`
 
 export interface TechFollowUpTasksVariables {
   where: {
-    AND: Array<{
+    AND?: Array<{
       assignedSeller: { id: { equals: string } };
       businessLead: { id: { equals: string } };
     }>;
+    assignedSeller?: { id: { in: string[] } };
   };
+}
+
+export interface TechFollowUpTasksCalendarVariables {
+  where: { assignedSeller: { id: { in: string[] } } };
 }
 
 export interface TechFollowUpTasksResponse {
@@ -976,6 +1003,7 @@ export interface TechFollowUpTasksResponse {
     createdAt: string;
     updatedAt: string | null;
     businessLead: { id: string; businessName: string } | null;
+    assignedSeller?: { id: string } | null;
   }>;
 }
 

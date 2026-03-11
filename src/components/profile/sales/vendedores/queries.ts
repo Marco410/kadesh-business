@@ -44,6 +44,8 @@ export interface CompanyVendedoresWithStatsResponse {
   }>;
 }
 
+export type VendedorWithStats = CompanyVendedoresWithStatsResponse["users"][number];
+
 /** Detalle completo de un vendedor (para modal de detalles). */
 export const USER_VENDEDOR_DETAIL_QUERY = gql`
   query UserVendedorDetail($where: UserWhereUniqueInput!) {
