@@ -4,6 +4,7 @@ export { default as Avatar } from './Avatar';
 export { default as Autocomplete } from './Autocomplete';
 export type { AutocompleteOption } from './Autocomplete';
 export { default as ConfirmModal } from './ConfirmModal';
+export { default as InfoTooltip } from './InfoTooltip';
 export { default as UserInfo } from './UserInfo';
 export { default as StatusDatePicker } from './StatusDatePicker';
 export type { StatusDatePickerProps } from './StatusDatePicker';

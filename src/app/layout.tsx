@@ -6,6 +6,7 @@ import '@fontsource/inter/700.css';
 import ClientProviders from './ClientProviders';
 import { Metadata } from 'next';
 import Script from 'next/script';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.kadesh.com.mx'),
@@ -116,6 +117,7 @@ fbq('track', 'PageView'${process.env.NEXT_PUBLIC_META_PIXEL_TEST_EVENT_CODE ? `,
         <ClientProviders>
           {children}
         </ClientProviders>
+        <Analytics />
       </body>
     </html>
   );

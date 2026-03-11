@@ -18,6 +18,7 @@ import { Routes } from "kadesh/core/routes";
 import { useRouter } from "next/navigation";
 import { hasPlanFeature } from "./helpers/plan-features";
 import { useSubscription } from "./SubscriptionContext";
+import { InfoTooltip } from "kadesh/components/shared";
 
 interface StatsSectionProps {
   userId: string;
@@ -89,10 +90,10 @@ export default function StatsSection({ userId, companyId, isAdminCompany, salesC
   const allProposals = proposalsData?.techProposals ?? [];
 
   const ganancias = allProposals
-    .filter((p) => p.status === PROPOSAL_STATUS.COMPRADA)
+    .filter((p) => p.status === PROPOSAL_STATUS.COMPRADA && p.approved && !p.paid)
     .reduce((sum, p) => sum + (p.amount ?? 0), 0);
   const comisionesSinCierre = allProposals
-    .filter((p) => p.status !== PROPOSAL_STATUS.COMPRADA)
+    .filter((p) => (p.status === PROPOSAL_STATUS.ENVIADA || p.status === PROPOSAL_STATUS.PENDIENTE))
     .reduce((sum, p) => sum + (p.amount ?? 0), 0);
 
   const clientesGanados = clientesGanadosData?.techBusinessLeadsCount ?? 0;
@@ -104,34 +105,40 @@ export default function StatsSection({ userId, companyId, isAdminCompany, salesC
   return (
     <div className="flex flex-col gap-4">
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 ">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 overflow-visible">
         <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm">
           <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
-            Clientes ganados
+            Clientes ganados <InfoTooltip text="Clientes ganados son los leads que han sido cerrados como ganados por el vendedor." />
           </p>
           <p className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] mt-1">
             {clientesGanados}
           </p>
         </div>
-        <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm">
-          <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+        <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm justify-between flex flex-row overflow-visible">
+          <div className="flex flex-col items-start gap-1.5">
+          <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0] flex items-center gap-1.5">
             Mis comisiones
-          </p>
-          <p className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] mt-1">
-            {formatCurrency(ganancias * salesComission / 100)}
-          </p>
+            <InfoTooltip text="Comisión sobre propuestas con estado Comprada, no pagadas y aprobadas por el administrador." />
+            </p>
+            <p className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] mt-1">
+              {formatCurrency(ganancias * salesComission / 100)}
+            </p>
+          </div>
+        </div>
+        <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm justify-between flex flex-row overflow-visible">
+          <div className="flex flex-col items-start gap-1.5">
+            <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0] flex items-center gap-1.5">
+              Comisiones sin cierre
+              <InfoTooltip text="Comisión sobre propuestas con estado Enviada o Pendiente." />
+            </p>
+            <p className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] mt-1">
+              {formatCurrency(comisionesSinCierre * salesComission / 100)}
+            </p>
+          </div>
         </div>
         <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm">
           <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
-            Comisiones sin cierre
-          </p>
-          <p className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] mt-1">
-            {formatCurrency(comisionesSinCierre * salesComission / 100)}
-          </p>
-        </div>
-        <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm">
-          <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
-            Contactados
+            Contactados <InfoTooltip text="Contactados son los leads que se han contactado por primera vez por el vendedor. En los detalles del lead en 'Primer contacto'" />
           </p>
           <p className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] mt-1">
             {contactados}

@@ -16,19 +16,24 @@ import {
 } from "@hugeicons/core-free-icons";
 import ProfileData from "kadesh/components/profile/ProfileData";
 import SalesSection from "kadesh/components/profile/sales/SalesSection";
+import VendedoresSection from "kadesh/components/profile/sales/vendedores/VendedoresSection";
 import { Footer, Navigation } from "kadesh/components/layout";
 import { Role } from "kadesh/constants/constans";
 
-const VALID_TABS = ["inicio", "profile", "ventas"] as const;
+const VALID_TABS = ["inicio", "profile", "ventas", "vendedores"] as const;
 
 function getValidTab(
   tabFromUrl: string | null,
-  hasVendedorRole: boolean
+  hasVendedorRole: boolean,
+  isAdminCompany: boolean
 ): (typeof VALID_TABS)[number] {
   if (!tabFromUrl || !VALID_TABS.includes(tabFromUrl as (typeof VALID_TABS)[number])) {
     return "inicio";
   }
   if (tabFromUrl === "ventas" && !hasVendedorRole) {
+    return "inicio";
+  }
+  if (tabFromUrl === "vendedores" && !isAdminCompany) {
     return "inicio";
   }
   return tabFromUrl as (typeof VALID_TABS)[number];
@@ -38,22 +43,26 @@ const navItems = [
   { key: "inicio" as const, label: "Inicio", icon: DashboardSquare01Icon },
   { key: "profile" as const, label: "Datos del perfil", icon: UserIcon },
   { key: "ventas" as const, label: "Ventas", icon: Chart01Icon, requireVendedor: true },
+  { key: "vendedores" as const, label: "Vendedores", icon: UserIcon, requireAdminCompany: true },
 ];
 
 function DashboardSidebar({
   selectedTab,
   onTabChange,
   hasVendedorRole,
+  isAdminCompany,
 }: {
   selectedTab: string;
   onTabChange: (key: string) => void;
   hasVendedorRole: boolean;
+  isAdminCompany: boolean;
 }) {
   return (
     <aside className="w-full lg:w-60 shrink-0">
       <nav className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-2 shadow-sm">
         {navItems.map((item) => {
-          if (item.requireVendedor && !hasVendedorRole) return null;
+          if ("requireVendedor" in item && item.requireVendedor && !hasVendedorRole) return null;
+          if ("requireAdminCompany" in item && item.requireAdminCompany && !isAdminCompany) return null;
           const isActive = selectedTab === item.key;
           return (
             <button
@@ -132,7 +141,8 @@ function ProfilePageContent() {
   const pathname = usePathname();
   const tabFromUrl = searchParams.get("tab");
   const hasVendedorRole = user?.roles?.some((r) => r.name === Role.VENDEDOR) ?? false;
-  const selectedTab = getValidTab(tabFromUrl, hasVendedorRole);
+  const isAdminCompany = user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const selectedTab = getValidTab(tabFromUrl, hasVendedorRole, isAdminCompany);
 
   const handleTabChange = (key: string) => {
     router.replace(`${pathname}?tab=${key}`, { scroll: false });
@@ -179,6 +189,7 @@ function ProfilePageContent() {
               selectedTab={selectedTab}
               onTabChange={handleTabChange}
               hasVendedorRole={hasVendedorRole}
+              isAdminCompany={isAdminCompany}
             />
 
             <main className="flex-1 min-w-0">
@@ -203,6 +214,12 @@ function ProfilePageContent() {
               {selectedTab === "ventas" && hasVendedorRole && (
                 <div className="space-y-6">
                   <SalesSection userId={user.id} />
+                </div>
+              )}
+
+              {selectedTab === "vendedores" && isAdminCompany && (
+                <div className="space-y-6">
+                  <VendedoresSection userId={user.id} />
                 </div>
               )}
             </main>

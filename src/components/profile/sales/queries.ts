@@ -747,6 +747,8 @@ export const TECH_PROPOSALS_QUERY = gql`
       fileOrUrl
       createdAt
       updatedAt
+      approved
+      paid
       businessLead {
         id
         businessName
@@ -796,6 +798,8 @@ export interface TechProposalsResponse {
     fileOrUrl: string | null;
     createdAt: string;
     updatedAt: string | null;
+    approved: boolean | null;
+    paid: boolean | null;
     businessLead: { id: string; businessName: string } | null;
   }>;
 }
@@ -909,6 +913,8 @@ export interface UpdateTechProposalVariables {
     amount?: number | null;
     status?: string | null;
     fileOrUrl?: string | null;
+    approved?: boolean | null;
+    paid?: boolean | null;
   };
 }
 
@@ -1132,6 +1138,7 @@ export interface CompanyVendedoresResponse {
     salesPersonVerified: boolean | null;
   }>;
 }
+
 
 export const UPDATE_VENDEDOR_MUTATION = gql`
   mutation UpdateVendedor(
