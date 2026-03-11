@@ -200,6 +200,7 @@ export const PLAN_FEATURE_KEYS = {
   PROPOSALS: "proposals",//ready
   CALENDAR_CRM: "calendar_crm",
   SALES_COMMISSION: "sales_commission",
+  UPLOAD_FILES: "upload_files",
 } as const;
 
 export type PlanFeatureKey = (typeof PLAN_FEATURE_KEYS)[keyof typeof PLAN_FEATURE_KEYS];
@@ -249,5 +250,9 @@ export const PLAN_FEATURES_MAP: Record<
   [PLAN_FEATURE_KEYS.ASSIGN_SALES_PERSON]: {
     name: "Asignar vendedor",
     description: "Asignar vendedor al lead",
+  },
+  [PLAN_FEATURE_KEYS.UPLOAD_FILES]: {
+    name: "Subir archivos",
+    description: "Subir archivos",
   },
 };

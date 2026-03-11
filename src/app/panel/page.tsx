@@ -14,10 +14,12 @@ import {
   Add01Icon,
   ArrowRight01Icon,
   FileAttachmentIcon,
+  FileIcon,
 } from "@hugeicons/core-free-icons";
 import ProfileData from "kadesh/components/profile/ProfileData";
 import SalesSection from "kadesh/components/profile/sales/SalesSection";
 import VendedoresSection from "kadesh/components/profile/sales/vendedores/VendedoresSection";
+import ArchivosSection from "kadesh/components/profile/sales/archivos/ArchivosSection";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
   SUBSCRIPTION_STATUS_QUERY,
@@ -31,13 +33,14 @@ import { PLAN_FEATURE_KEYS } from "kadesh/components/profile/sales/constants";
 import { Footer, Navigation } from "kadesh/components/layout";
 import { Role } from "kadesh/constants/constans";
 
-const VALID_TABS = ["inicio", "profile", "ventas", "vendedores"] as const;
+const VALID_TABS = ["inicio", "profile", "ventas", "vendedores", "archivos"] as const;
 
 function getValidTab(
   tabFromUrl: string | null,
   hasVendedorRole: boolean,
   isAdminCompany: boolean,
-  hasSalesPersonManagement: boolean
+  hasSalesPersonManagement: boolean,
+  hasUploadFilesFeature: boolean
 ): (typeof VALID_TABS)[number] {
   if (!tabFromUrl || !VALID_TABS.includes(tabFromUrl as (typeof VALID_TABS)[number])) {
     return "inicio";
@@ -48,6 +51,9 @@ function getValidTab(
   if (tabFromUrl === "vendedores" && (!isAdminCompany || !hasSalesPersonManagement)) {
     return "inicio";
   }
+  if (tabFromUrl === "archivos" && (!isAdminCompany || !hasUploadFilesFeature)) {
+    return "inicio";
+  }
   return tabFromUrl as (typeof VALID_TABS)[number];
 }
 
@@ -56,6 +62,7 @@ const navItems = [
   { key: "profile" as const, label: "Datos del perfil", icon: UserIcon },
   { key: "ventas" as const, label: "Ventas", icon: Chart01Icon, requireVendedor: true },
   { key: "vendedores" as const, label: "Vendedores", icon: UserIcon, requireAdminCompany: true, requireSalesPersonManagement: true },
+  { key: "archivos" as const, label: "Archivos", icon: FileIcon, requireAdminCompany: false, requireUploadFilesFeature: true },
 ];
 
 function DashboardSidebar({
@@ -64,12 +71,14 @@ function DashboardSidebar({
   hasVendedorRole,
   isAdminCompany,
   hasSalesPersonManagement,
+  hasUploadFilesFeature,
 }: {
   selectedTab: string;
   onTabChange: (key: string) => void;
   hasVendedorRole: boolean;
   isAdminCompany: boolean;
   hasSalesPersonManagement: boolean;
+  hasUploadFilesFeature: boolean;
 }) {
   return (
     <aside className="w-full lg:w-60 shrink-0">
@@ -78,6 +87,7 @@ function DashboardSidebar({
           if ("requireVendedor" in item && item.requireVendedor && !hasVendedorRole) return null;
           if ("requireAdminCompany" in item && item.requireAdminCompany && !isAdminCompany) return null;
           if ("requireSalesPersonManagement" in item && item.requireSalesPersonManagement && !hasSalesPersonManagement) return null;
+          if ("requireUploadFilesFeature" in item && item.requireUploadFilesFeature && !hasUploadFilesFeature) return null;
           const isActive = selectedTab === item.key;
           return (
             <button
@@ -179,8 +189,11 @@ function ProfilePageContent() {
     subscription?.planFeatures ?? null,
     PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT
   );
-
-  const selectedTab = getValidTab(tabFromUrl, hasVendedorRole, isAdminCompany, hasSalesPersonManagement);
+  const hasUploadFilesFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.UPLOAD_FILES
+  );
+  const selectedTab = getValidTab(tabFromUrl, hasVendedorRole, isAdminCompany, hasSalesPersonManagement, hasUploadFilesFeature);
 
   const handleTabChange = (key: string) => {
     router.replace(`${pathname}?tab=${key}`, { scroll: false });
@@ -229,6 +242,7 @@ function ProfilePageContent() {
               hasVendedorRole={hasVendedorRole}
               isAdminCompany={isAdminCompany}
               hasSalesPersonManagement={hasSalesPersonManagement}
+              hasUploadFilesFeature={hasUploadFilesFeature}
             />
 
             <main className="flex-1 min-w-0">
@@ -259,6 +273,12 @@ function ProfilePageContent() {
               {selectedTab === "vendedores" && isAdminCompany && hasSalesPersonManagement && (
                 <div className="space-y-6">
                   <VendedoresSection userId={user.id} />
+                </div>
+              )}
+
+              {selectedTab === "archivos" && isAdminCompany && hasUploadFilesFeature && (
+                <div className="space-y-6">
+                  <ArchivosSection userId={user.id} />
                 </div>
               )}
             </main>
