@@ -276,7 +276,7 @@ function ProfilePageContent() {
                 </div>
               )}
 
-              {selectedTab === "archivos" && isAdminCompany && hasUploadFilesFeature && (
+              {selectedTab === "archivos" && hasUploadFilesFeature && (
                 <div className="space-y-6">
                   <ArchivosSection userId={user.id} />
                 </div>
