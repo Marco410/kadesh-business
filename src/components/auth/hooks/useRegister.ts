@@ -22,6 +22,7 @@ import {
 import { Role } from 'kadesh/constants/constans';
 import { useUser } from 'kadesh/utils/UserContext';
 import { trackCompleteRegistration } from 'kadesh/utils/facebook-pixel';
+import { Routes } from 'kadesh/core/routes';
 
 interface UseRegisterOptions {
   onSuccess?: () => void;
@@ -92,7 +93,7 @@ export function useRegister(options?: UseRegisterOptions) {
             }
             
             await refreshUser();
-            router.push(options.redirectTo);
+            router.push(Routes.panel);
             
             // Clear form after successful redirect
             setName('');

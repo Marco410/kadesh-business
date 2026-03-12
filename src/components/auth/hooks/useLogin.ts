@@ -59,9 +59,7 @@ export function useLogin(options?: UseLoginOptions) {
         await refreshUser();
         if (options?.redirectTo) {
           router.push(options.redirectTo);
-        } else if (window && window.history.length > 1) {
-          router.back();
-        } else {
+        }  else {
           router.push(Routes.panel);
         }
       } else if (
