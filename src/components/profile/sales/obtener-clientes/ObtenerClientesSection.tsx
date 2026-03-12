@@ -303,7 +303,19 @@ export default function ObtenerClientesSection() {
         </div>
       )}
 
-      {showZeroResultsHint && (
+   
+
+      <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 dark:bg-gray-800/50">
+        <div
+          ref={mapContainerRef}
+          className="w-full h-[550px]"
+          style={{ minHeight: 320 }}
+        />
+      </div>
+      {!leafletReady && (
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400">Cargando mapa…</p>
+      )}
+        {showZeroResultsHint && (
         <div className="rounded-xl border border-purple-200 dark:border-purple-800/60 bg-purple-50 dark:bg-purple-900/20 p-6">
           <div className="flex gap-4">
             <span className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-800/40 flex items-center justify-center">
@@ -324,17 +336,6 @@ export default function ObtenerClientesSection() {
             </div>
           </div>
         </div>
-      )}
-
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 dark:bg-gray-800/50">
-        <div
-          ref={mapContainerRef}
-          className="w-full h-[550px]"
-          style={{ minHeight: 320 }}
-        />
-      </div>
-      {!leafletReady && (
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400">Cargando mapa…</p>
       )}
     </div>
   );
