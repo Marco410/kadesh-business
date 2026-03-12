@@ -7,3 +7,4 @@ export { default as LandingPricingSection } from './LandingPricingSection';
 export { default as FinalCTASection } from './FinalCTASection';
 export { default as FAQSection } from './FAQSection';
 export { default as AgencyTestimonialsSection } from './AgencyTestimonialsSection';
+export { default as CategoriesMarqueeSection } from './CategoriesMarqueeSection';

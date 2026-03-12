@@ -2,6 +2,7 @@
 
 import {
   HeroSection,
+  CategoriesMarqueeSection,
   InteractiveDemoSection,
   PowerOfDataSection,
   CRMWorkflowSection,
@@ -54,6 +55,7 @@ export default function HomePage() {
       <main className="min-h-screen">
         <Navigation />
         <HeroSection />
+        <CategoriesMarqueeSection />
         <InteractiveDemoSection />
         <PowerOfDataSection />
         <CRMWorkflowSection />
