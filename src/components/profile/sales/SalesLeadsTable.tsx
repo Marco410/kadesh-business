@@ -245,15 +245,28 @@ export default function SalesLeadsTable({
                   const count = persons.length;
                   if (isAdminCompany && count > 1) {
                     const names = persons
-                      .map((sp) => [sp.name, sp.lastName].filter(Boolean).join(" ").trim())
-                      .filter(Boolean)
+                      .map((sp) => {
+                        const full = [sp?.name, sp?.lastName].filter(Boolean).join(" ").trim();
+                        return full || "Sin nombre";
+                      })
                       .join(", ");
+                    const tooltipText = names || `${count} vendedores asignados`;
                     return (
-                      <span
-                        title={names}
-                        className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-orange-500/15 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 dark:border-orange-400/30 cursor-help"
-                      >
-                        {count} asignado{count !== 1 ? "s" : ""}
+                      <span className="group relative inline-flex">
+                        <span
+                          aria-describedby={lead.id ? `tooltip-${lead.id}-sp` : undefined}
+                          className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-orange-500/15 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 dark:border-orange-400/30 cursor-help"
+                          tabIndex={0}
+                        >
+                          {count} asignado{count !== 1 ? "s" : ""}
+                        </span>
+                        <span
+                          id={lead.id ? `tooltip-${lead.id}-sp` : undefined}
+                          role="tooltip"
+                          className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs font-normal text-white bg-[#212121] dark:bg-[#333] rounded-lg shadow-lg max-w-[200px] whitespace-normal text-center opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-opacity z-50"
+                        >
+                          {tooltipText}
+                        </span>
                       </span>
                     );
                   }
