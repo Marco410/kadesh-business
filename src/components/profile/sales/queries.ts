@@ -172,6 +172,9 @@ export interface TechBusinessLeadsVariables {
     };
     category?: { equals: string } | { in: string[] };
     businessName?: { contains: string; mode?: "insensitive" };
+    city?: { contains: string; mode?: "insensitive" };
+    state?: { contains: string; mode?: "insensitive" };
+    country?: { contains: string; mode?: "insensitive" };
   };
   /** Filtro aplicado a la relación status: solo se devuelven status que coincidan (company + opcionalmente salesPerson). */
   statusWhere?: TechStatusBusinessLeadWhereInputFilter | null;
@@ -349,6 +352,9 @@ export interface TechBusinessLeadsCountVariables {
     };
     category?: { equals: string } | { in: string[] };
     businessName?: { contains: string; mode?: "insensitive" };
+    city?: { contains: string; mode?: "insensitive" };
+    state?: { contains: string; mode?: "insensitive" };
+    country?: { contains: string; mode?: "insensitive" };
   };
 }
 

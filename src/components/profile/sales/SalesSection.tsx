@@ -63,6 +63,12 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [cityInput, setCityInput] = useState("");
+  const [debouncedCity, setDebouncedCity] = useState("");
+  const [stateInput, setStateInput] = useState("");
+  const [debouncedState, setDebouncedState] = useState("");
+  const [countryInput, setCountryInput] = useState("");
+  const [debouncedCountry, setDebouncedCountry] = useState("");
   const [assignToVendedorId, setAssignToVendedorId] = useState<string | null>(null);
   const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
   const [assigning, setAssigning] = useState(false);
@@ -74,6 +80,18 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     const t = setTimeout(() => setDebouncedSearch(searchInput.trim()), 300);
     return () => clearTimeout(t);
   }, [searchInput]);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedCity(cityInput.trim()), 300);
+    return () => clearTimeout(t);
+  }, [cityInput]);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedState(stateInput.trim()), 300);
+    return () => clearTimeout(t);
+  }, [stateInput]);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedCountry(countryInput.trim()), 300);
+    return () => clearTimeout(t);
+  }, [countryInput]);
 
   const { data: userData, refetch: refetchUserCompany } = useQuery<
     UserCompanyCategoriesResponse,
@@ -131,11 +149,23 @@ export default function SalesSection({ userId }: SalesSectionProps) {
         some: { AND: statusSomeConditions },
       },
     }),
+    ...(selectedCategory != null && selectedCategory !== "" && {
+      category: { equals: selectedCategory },
+    }),
     ...(debouncedSearch.length > 0 && {
       businessName: {
         contains: normalizeSearch(debouncedSearch),
         mode: "insensitive" as const,
       },
+    }),
+    ...(debouncedCity.length > 0 && {
+      city: { contains: normalizeSearch(debouncedCity), mode: "insensitive" as const },
+    }),
+    ...(debouncedState.length > 0 && {
+      state: { contains: normalizeSearch(debouncedState), mode: "insensitive" as const },
+    }),
+    ...(debouncedCountry.length > 0 && {
+      country: { contains: normalizeSearch(debouncedCountry), mode: "insensitive" as const },
     }),
   };
 
@@ -154,7 +184,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       return;
     }
     setPageInUrl(1);
-  }, [selectedPipeline, selectedCategory, debouncedSearch]);
+  }, [selectedPipeline, selectedCategory, debouncedSearch, debouncedCity, debouncedState, debouncedCountry]);
 
   const { data: countData } = useQuery<
     TechBusinessLeadsCountResponse,
@@ -168,7 +198,6 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const totalPages = Math.max(1, Math.ceil(totalCount / LEADS_PAGE_SIZE));
   const effectivePage = totalCount > 0 ? Math.min(page, totalPages) : page;
 
-  /** Filtro para que la API solo devuelva el status que coincida con esta company (y vendedor si no es admin). */
   const statusWhere =
     companyId != null
       ? isAdminCompany
@@ -331,6 +360,12 @@ export default function SalesSection({ userId }: SalesSectionProps) {
           onCategoryChange={setSelectedCategory}
           searchQuery={searchInput}
           onSearchChange={setSearchInput}
+          cityQuery={cityInput}
+          onCityChange={setCityInput}
+          stateQuery={stateInput}
+          onStateChange={setStateInput}
+          countryQuery={countryInput}
+          onCountryChange={setCountryInput}
           vendedores={vendedores}
           assignToVendedorId={assignToVendedorId}
           onAssignToVendedorChange={setAssignToVendedorId}
