@@ -61,6 +61,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const searchParams = useSearchParams();
   const [selectedPipeline, setSelectedPipeline] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [filterByVendedorId, setFilterByVendedorId] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [cityInput, setCityInput] = useState("");
@@ -125,10 +126,11 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   }));
 
   const statusSomeConditions: Array<{
-    salesPerson?: { id: { equals: string } };
+    salesPerson?: { id: { equals: string } } | null;
     saasCompany?: { id: { equals: string } };
     pipelineStatus?: { equals: string };
   }> = [];
+  
   if (!isAdminCompany) {
     statusSomeConditions.push({ salesPerson: { id: { equals: userId } } });
   }
@@ -138,9 +140,16 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   if (selectedPipeline != null) {
     statusSomeConditions.push({ pipelineStatus: { equals: selectedPipeline } });
   }
+  if (filterByVendedorId != null && filterByVendedorId !== "" && filterByVendedorId !== "sin_asignar") {
+      statusSomeConditions.push({ salesPerson: { id: { equals: filterByVendedorId } } });
+  }
 
   const where = {
-    ...(!isAdminCompany ? { salesPerson: { some: { id: { equals: userId } } } } : {}),
+    ...(filterByVendedorId === "sin_asignar"
+      ? { salesPerson: { none: {} } }
+      : !isAdminCompany
+        ? { salesPerson: { some: { id: { equals: userId } } } }
+        : {}),
     ...(companyId != null && {
       saasCompany: { some: { id: { equals: companyId } } },
     }),
@@ -184,7 +193,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       return;
     }
     setPageInUrl(1);
-  }, [selectedPipeline, selectedCategory, debouncedSearch, debouncedCity, debouncedState, debouncedCountry]);
+  }, [selectedPipeline, selectedCategory, filterByVendedorId, debouncedSearch, debouncedCity, debouncedState, debouncedCountry]);
 
   const { data: countData } = useQuery<
     TechBusinessLeadsCountResponse,
@@ -366,6 +375,8 @@ export default function SalesSection({ userId }: SalesSectionProps) {
           onStateChange={setStateInput}
           countryQuery={countryInput}
           onCountryChange={setCountryInput}
+          filterByVendedorId={filterByVendedorId}
+          onFilterByVendedorChange={setFilterByVendedorId}
           vendedores={vendedores}
           assignToVendedorId={assignToVendedorId}
           onAssignToVendedorChange={setAssignToVendedorId}
@@ -376,6 +387,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
             setAssignToVendedorId(null);
             setSelectedLeadIds(new Set());
           }}
+          isAdminCompany={isAdminCompany}
         />
         <SalesLeadsTable
           leads={leads}

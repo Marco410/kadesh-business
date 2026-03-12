@@ -146,27 +146,28 @@ export const TECH_BUSINESS_LEADS_QUERY = gql`
 /** Filtro para la relación status (solo devolver el status de esta company/vendedor). */
 export interface TechStatusBusinessLeadWhereInputFilter {
   AND?: Array<{
-    salesPerson?: { id: { equals: string } };
+    salesPerson?: { id: { equals: string } } | null;
     saasCompany?: { id: { equals: string } };
   }>;
-  salesPerson?: { id: { equals: string } };
+  salesPerson?: { id: { equals: string } } | null;
   saasCompany?: { id: { equals: string } };
 }
 
 export interface TechBusinessLeadsVariables {
   where: {
     id?: { equals: string };
-    salesPerson?: { some: { id: { equals: string } } };
+    /** some: por vendedor; none: {} para leads sin asignar (salesPerson vacío). */
+    salesPerson?: { some: { id: { equals: string } } } | { none: Record<string, never> };
     saasCompany?: { some: { id: { equals: string } } };
     status?: {
       pipelineStatus?: { equals: string | null };
       some?: {
         AND?: Array<{
-          salesPerson?: { id: { equals: string } };
+          salesPerson?: { id: { equals: string } } | null;
           saasCompany?: { id: { equals: string } };
           pipelineStatus?: { equals: string | null };
         }>;
-        salesPerson?: { id: { equals: string } };
+        salesPerson?: { id: { equals: string } } | null;
         saasCompany?: { id: { equals: string } };
       };
     };
@@ -335,18 +336,19 @@ export const TECH_BUSINESS_LEADS_COUNT_QUERY = gql`
 export interface TechBusinessLeadsCountVariables {
   where: {
     id?: { equals: string };
-    salesPerson?: { some: { id: { equals: string } } };
+    /** some: por vendedor o some: {}; none: {} para leads sin asignar (salesPerson vacío). */
+    salesPerson?: { some: { id?: { equals: string } } } | { none: Record<string, never> };
     saasCompany?: { some: { id: { equals: string } } };
     status?: {
       pipelineStatus?: { equals: string | null };
       firstContactDate?: { not: null } | null;
       some?: {
         AND?: Array<{
-          salesPerson?: { id: { equals: string } };
+          salesPerson?: { id: { equals: string } } | null;
           saasCompany?: { id: { equals: string } };
           pipelineStatus?: { equals: string | null };
         }>;
-        salesPerson?: { id: { equals: string } };
+        salesPerson?: { id: { equals: string } } | null;
         saasCompany?: { id: { equals: string } };
       };
     };

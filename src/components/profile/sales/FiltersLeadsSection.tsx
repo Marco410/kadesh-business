@@ -32,6 +32,8 @@ interface FiltersLeadsSectionProps {
   onStateChange: (value: string) => void;
   countryQuery: string;
   onCountryChange: (value: string) => void;
+  filterByVendedorId: string | null;
+  onFilterByVendedorChange: (vendedorId: string | null) => void;
   vendedores?: VendedorOption[];
   assignToVendedorId: string | null;
   onAssignToVendedorChange: (vendedorId: string | null) => void;
@@ -39,6 +41,7 @@ interface FiltersLeadsSectionProps {
   onAssign: () => void;
   isAssigning: boolean;
   onCancelAssign: () => void;
+  isAdminCompany: boolean;
 }
 
 export default function FiltersLeadsSection({
@@ -54,6 +57,8 @@ export default function FiltersLeadsSection({
   onStateChange,
   countryQuery,
   onCountryChange,
+  filterByVendedorId,
+  onFilterByVendedorChange,
   vendedores = [],
   assignToVendedorId,
   onAssignToVendedorChange,
@@ -61,6 +66,7 @@ export default function FiltersLeadsSection({
   onAssign,
   isAssigning,
   onCancelAssign,
+  isAdminCompany,
 }: FiltersLeadsSectionProps) {
   const categoryOptions = GOOGLE_PLACE_CATEGORIES;
   const selectedVendedor = vendedores.find((v) => v.id === assignToVendedorId);
@@ -211,7 +217,31 @@ export default function FiltersLeadsSection({
                 ))}
                 </select>
             </div>
-            
+            {vendedores.length > 0 && hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.ASSIGN_SALES_PERSON) && isAdminCompany && (
+              <div className="flex flex-wrap items-center gap-2">
+                <label
+                  htmlFor="filter-sales-person"
+                  className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0] shrink-0"
+                >
+                  Vendedor
+                </label>
+                <select
+                  id="filter-sales-person"
+                  value={filterByVendedorId ?? ""}
+                  onChange={(e) => onFilterByVendedorChange(e.target.value || null)}
+                  className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-1.5 text-sm text-[#212121] dark:text-[#ffffff] focus:ring-2 focus:ring-orange-500 focus:border-orange-500 min-w-[180px]"
+                  aria-label="Filtrar por vendedor"
+                >
+                  <option value="">Todos los vendedores</option>
+                  {vendedores.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {[v.name, v.lastName].filter(Boolean).join(" ")}
+                    </option>
+                  ))}
+                  <option value="sin_asignar">Sin asignar</option>
+                </select>
+              </div>
+            )}
           </div>
 
           {/* Filtro por pipeline */}
