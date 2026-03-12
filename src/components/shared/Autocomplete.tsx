@@ -46,16 +46,13 @@ export default function Autocomplete({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Get selected option
   const selectedOption = options.find((opt) => opt.id === value);
 
-  // Filter options based on search
   const filteredOptions = options.filter((option) => {
     const searchValue = option[searchKey]?.toLowerCase() || '';
     return searchValue.includes(search.toLowerCase());
   });
 
-  // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -69,7 +66,6 @@ export default function Autocomplete({
     };
   }, []);
 
-  // Update search when value changes externally
   useEffect(() => {
     if (selectedOption) {
       setSearch(selectedOption[displayKey] || '');
@@ -84,7 +80,6 @@ export default function Autocomplete({
     setShowDropdown(true);
     onChange(newSearch);
     
-    // Clear selection if search doesn't match selected option
     if (selectedOption && selectedOption[displayKey] !== newSearch) {
       onSelect({ id: '', label: '' } as AutocompleteOption);
     }
@@ -99,7 +94,7 @@ export default function Autocomplete({
 
   const handleClear = () => {
     setSearch('');
-    setShowDropdown(false);
+    setShowDropdown(true);
     onSelect({ id: '', label: '' } as AutocompleteOption);
     inputRef.current?.focus();
   };
@@ -108,11 +103,6 @@ export default function Autocomplete({
     if (!disabled && !loading && options.length > 0) {
       setShowDropdown(true);
     }
-  };
-
-  const handleBlur = () => {
-    // Delay to allow click on dropdown items
-    setTimeout(() => setShowDropdown(false), 200);
   };
 
   return (
@@ -128,11 +118,10 @@ export default function Autocomplete({
           value={search}
           onChange={handleInputChange}
           onFocus={handleFocus}
-          onBlur={handleBlur}
           placeholder={placeholder}
           disabled={disabled || loading}
           required={required}
-          className={`w-full px-4 py-2 rounded-lg border ${
+          className={`w-full px-2 py-1.5 rounded-lg border ${
             error 
               ? 'border-red-500 dark:border-red-500' 
               : 'border-[#e0e0e0] dark:border-[#3a3a3a]'
@@ -165,7 +154,7 @@ export default function Autocomplete({
         
         {/* Dropdown */}
         {showDropdown && !disabled && !loading && filteredOptions.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-[#121212] border border-[#e0e0e0] dark:border-[#3a3a3a] rounded-lg shadow-lg max-h-60 overflow-y-auto">
+          <div className="absolute z-50 w-full mt-1 bg-white dark:bg-[#121212] border border-[#e0e0e0] dark:border-[#3a3a3a] rounded-lg shadow-lg max-h-60 overflow-y-auto">
             {filteredOptions.map((option) => (
               <button
                 key={option.id}
@@ -185,7 +174,7 @@ export default function Autocomplete({
         
         {/* No results message */}
         {showDropdown && !disabled && !loading && search && filteredOptions.length === 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-[#121212] border border-[#e0e0e0] dark:border-[#3a3a3a] rounded-lg shadow-lg p-4 text-center text-[#616161] dark:text-[#b0b0b0]">
+          <div className="absolute z-50 w-full mt-1 bg-white dark:bg-[#121212] border border-[#e0e0e0] dark:border-[#3a3a3a] rounded-lg shadow-lg p-4 text-center text-[#616161] dark:text-[#b0b0b0]">
             No se encontraron resultados que coincidan con "{search}"
           </div>
         )}

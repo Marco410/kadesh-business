@@ -10,6 +10,7 @@ import {
 } from "kadesh/components/profile/sales/constants";
 import { hasPlanFeature } from "./helpers/plan-features";
 import { useSubscription } from "./SubscriptionContext";
+import { Autocomplete, type AutocompleteOption } from "kadesh/components/shared";
 
 const PIPELINE_VALUES = Object.values(PIPELINE_STATUS);
 
@@ -69,9 +70,33 @@ export default function FiltersLeadsSection({
   isAdminCompany,
 }: FiltersLeadsSectionProps) {
   const categoryOptions = GOOGLE_PLACE_CATEGORIES;
+  const categoryAutocompleteOptions: AutocompleteOption[] = categoryOptions.map(
+    (opt) => ({
+      id: opt.value,
+      label: opt.label,
+    })
+  );
+  const vendedorFilterOptions: AutocompleteOption[] = [
+    { id: "", label: "Todos los vendedores" },
+    ...vendedores.map((v) => ({
+      id: v.id,
+      label: [v.name, v.lastName].filter(Boolean).join(" "),
+    })),
+    { id: "sin_asignar", label: "Sin asignar" },
+  ];
   const selectedVendedor = vendedores.find((v) => v.id === assignToVendedorId);
   const assignMode = assignToVendedorId != null;
   const { subscription } = useSubscription();
+
+  const handleClearFilters = () => {
+    onPipelineChange(null);
+    onCategoryChange(null);
+    onSearchChange("");
+    onCityChange("");
+    onStateChange("");
+    onCountryChange("");
+    onFilterByVendedorChange(null);
+  };
 
   return (
     <div className="flex flex-col gap-3 ">
@@ -196,53 +221,67 @@ export default function FiltersLeadsSection({
               />
             </div>
             <div className="flex flex-wrap items-center gap-2">
-                <label
+              <label
                 htmlFor="filter-category"
                 className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0] shrink-0"
-                >
+              >
                 Categoría
-                </label>
-                <select
+              </label>
+              <Autocomplete
                 id="filter-category"
+                label=""
                 value={selectedCategory ?? ""}
-                onChange={(e) => onCategoryChange(e.target.value || null)}
-                className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-1.5 text-sm text-[#212121] dark:text-[#ffffff] focus:ring-2 focus:ring-orange-500 focus:border-orange-500 min-w-[180px]"
-                aria-label="Filtrar por categoría"
-                >
-                <option value="">Todas las categorías</option>
-                {categoryOptions.map(({ value, label }) => (
-                    <option key={value} value={value}>
-                    {label}
-                    </option>
-                ))}
-                </select>
+                options={categoryAutocompleteOptions}
+                onChange={() => {
+                  // El componente gestiona internamente el texto de búsqueda
+                }}
+                onSelect={(option) => {
+                  onCategoryChange(option.id || null);
+                }}
+                placeholder="Todas las categorías"
+                className="min-w-[200px]"
+              />
             </div>
-            {vendedores.length > 0 && hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.ASSIGN_SALES_PERSON) && isAdminCompany && (
-              <div className="flex flex-wrap items-center gap-2">
-                <label
-                  htmlFor="filter-sales-person"
-                  className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0] shrink-0"
-                >
-                  Vendedor
-                </label>
-                <select
-                  id="filter-sales-person"
-                  value={filterByVendedorId ?? ""}
-                  onChange={(e) => onFilterByVendedorChange(e.target.value || null)}
-                  className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-1.5 text-sm text-[#212121] dark:text-[#ffffff] focus:ring-2 focus:ring-orange-500 focus:border-orange-500 min-w-[180px]"
-                  aria-label="Filtrar por vendedor"
-                >
-                  <option value="">Todos los vendedores</option>
-                  {vendedores.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {[v.name, v.lastName].filter(Boolean).join(" ")}
-                    </option>
-                  ))}
-                  <option value="sin_asignar">Sin asignar</option>
-                </select>
-              </div>
-            )}
+            {vendedores.length > 0 &&
+              hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.ASSIGN_SALES_PERSON) &&
+              isAdminCompany && (
+                <div className="flex flex-wrap items-center gap-2 ">
+                  <label
+                    htmlFor="filter-sales-person"
+                    className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0] shrink-0"
+                  >
+                    Vendedor
+                  </label>
+                  <Autocomplete
+                    id="filter-sales-person"
+                    label=""
+                    value={filterByVendedorId ?? ""}
+                    options={vendedorFilterOptions}
+                    onChange={() => {
+                      // Solo reaccionamos a la selección
+                    }}
+                    onSelect={(option) => {
+                      if (!option.id) {
+                        onFilterByVendedorChange(null);
+                      } else {
+                        onFilterByVendedorChange(option.id);
+                      }
+                    }}
+                    placeholder="Todos los vendedores"
+                    className="min-w-[220px]"
+                  />
+                </div>
+              )}
+
+            <button
+              type="button"
+              onClick={handleClearFilters}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-500 dark:border-gray-500 text-xs sm:text-sm font-medium text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] transition-colors"
+            >
+              Limpiar filtros
+            </button>
           </div>
+
 
           {/* Filtro por pipeline */}
           <div className="flex flex-wrap gap-2">

@@ -8,6 +8,7 @@ import { useSyncLeadsArea } from "kadesh/components/profile/sales/obtener-client
 import CurrentPlanSection from "../CurrentPlanSection";
 import { useUser } from "kadesh/utils/UserContext";
 import { sileo } from "sileo";
+import { Autocomplete, type AutocompleteOption } from "kadesh/components/shared";
 
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
@@ -228,7 +229,7 @@ export default function ObtenerClientesSection() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <CurrentPlanSection />
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-6">
+      <div className="relative z-20 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
           Obtener negocios por zona
         </h2>
@@ -241,21 +242,26 @@ export default function ObtenerClientesSection() {
 
         <div className="flex flex-row sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
           <div className="w-full">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Tipo de negocio
-            </label>
-            <select
+            <Autocomplete
+              id="obtener-clientes-category"
+              label="Tipo de negocio"
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              options={GOOGLE_PLACE_CATEGORIES.map(
+                (opt): AutocompleteOption => ({
+                  id: opt.value,
+                  label: opt.label,
+                })
+              )}
+              onChange={() => {
+                // El componente maneja internamente el texto de búsqueda
+              }}
+              onSelect={(option) => {
+                setCategory(option.id);
+              }}
+              placeholder="Buscar categoría..."
               disabled={isLoading}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-60"
-            >
-              {GOOGLE_PLACE_CATEGORIES.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+              className="w-full"
+            />
           </div>
           <div className="w-full">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -305,7 +311,7 @@ export default function ObtenerClientesSection() {
 
    
 
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 dark:bg-gray-800/50">
+      <div className="relative z-0 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 dark:bg-gray-800/50">
         <div
           ref={mapContainerRef}
           className="w-full h-[550px]"
