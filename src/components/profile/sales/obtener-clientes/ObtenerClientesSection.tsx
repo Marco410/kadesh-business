@@ -1,10 +1,13 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Location01Icon } from "@hugeicons/core-free-icons";
 import { GOOGLE_PLACE_CATEGORIES } from "kadesh/components/profile/sales/constants";
 import { useSyncLeadsArea } from "kadesh/components/profile/sales/obtener-clientes/hooks";
 import CurrentPlanSection from "../CurrentPlanSection";
 import { useUser } from "kadesh/utils/UserContext";
+import { sileo } from "sileo";
 
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
@@ -37,9 +40,9 @@ function loadExternalResource(
   });
 }
 
-// Leaflet loaded from CDN
 interface LeafletMap {
   setView(center: [number, number], zoom: number): LeafletMap;
+  getZoom(): number;
   fitBounds(bounds: unknown, options?: { padding?: [number, number] }): void;
   on(event: string, fn: (e: { latlng: { lat: number; lng: number } }) => void): void;
 }
@@ -78,6 +81,7 @@ export default function ObtenerClientesSection() {
     alreadyInDb: number;
     skippedLowRating: number;
   } | null>(null);
+  const [showZeroResultsHint, setShowZeroResultsHint] = useState(false);
   const [leafletReady, setLeafletReady] = useState(false);
 
   const { syncLeadsArea, loading: isLoading, error: syncError } = useSyncLeadsArea();
@@ -128,8 +132,8 @@ export default function ObtenerClientesSection() {
         }).addTo(map);
       }
 
-      const circle = circleRef.current;
-      if (circle) map.fitBounds(circle.getBounds(), { padding: [20, 20] });
+      const currentZoom = map.getZoom();
+      map.setView([lat, lng], currentZoom);
     },
     []
   );
@@ -167,6 +171,7 @@ export default function ObtenerClientesSection() {
     }
     setMessage(null);
     setStats(null);
+    setShowZeroResultsHint(false);
 
     try {
       const result = await syncLeadsArea({
@@ -186,6 +191,8 @@ export default function ObtenerClientesSection() {
         const created = result.created ?? 0;
         const alreadyInDb = result.alreadyInDb ?? 0;
         const skipped = result.skippedLowRating ?? 0;
+        const syncedLeadsCount = result.syncedLeadsCount ?? 0;
+
         const baseMessage = result.message ?? "Sincronización completada";
         setMessage({
           type: "ok",
@@ -196,6 +203,16 @@ export default function ObtenerClientesSection() {
           alreadyInDb,
           skippedLowRating: skipped,
         });
+        setShowZeroResultsHint(syncedLeadsCount === 0);
+
+        if (syncedLeadsCount > 0) {
+          const categoryLabel = GOOGLE_PLACE_CATEGORIES.find((c) => c.value === category)?.label ?? category;
+          const countText = syncedLeadsCount === 1 ? "1 negocio" : `${syncedLeadsCount} negocios`;
+          sileo.success({
+            title: `¡Éxito! ${countText} de ${categoryLabel} ${syncedLeadsCount === 1 ? "fue agregado" : "fueron agregados"} a tu lista`,
+            description: `Los ${categoryLabel.toLowerCase()} detectados en el área seleccionada ${syncedLeadsCount === 1 ? "ahora está" : "ahora están"} disponibles en tu sección de clientes.`,
+          });
+        }
       } else {
         setMessage({ type: "error", text: result.message ?? "Error al sincronizar" });
       }
@@ -286,10 +303,33 @@ export default function ObtenerClientesSection() {
         </div>
       )}
 
+      {showZeroResultsHint && (
+        <div className="rounded-xl border border-purple-200 dark:border-purple-800/60 bg-purple-50 dark:bg-purple-900/20 p-6">
+          <div className="flex gap-4">
+            <span className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-800/40 flex items-center justify-center">
+              <HugeiconsIcon icon={Location01Icon} size={24} className="text-purple-600 dark:text-purple-400" />
+            </span>
+            <div>
+              <h3 className="font-semibold text-purple-900 dark:text-purple-100 mb-1">
+                No se encontraron negocios en esta zona
+              </h3>
+              <p className="text-sm text-purple-800 dark:text-purple-200/90 mb-3">
+                Prueba ajustar los parámetros o buscar en otro punto del mapa para obtener resultados.
+              </p>
+              <ul className="text-sm text-purple-700 dark:text-purple-300/90 space-y-1 list-disc list-inside">
+                <li><strong>Amplía o reduce el radio</strong> (por ejemplo, más o menos de {radiusKm} km) para cubrir más área.</li>
+                <li><strong>Elige otro tipo de negocio</strong> en el selector; puede haber más oferta en otra categoría.</li>
+                <li><strong>Haz clic en otra zona del mapa</strong> (centro, otra ciudad o colonia) y vuelve a buscar.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 dark:bg-gray-800/50">
         <div
           ref={mapContainerRef}
-          className="w-full h-[500px]"
+          className="w-full h-[550px]"
           style={{ minHeight: 320 }}
         />
       </div>

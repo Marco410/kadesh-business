@@ -10,6 +10,7 @@ export const SYNC_LEADS_FRONT_MUTATION = gql`
       created
       alreadyInDb
       skippedLowRating
+      syncedLeadsCount
     }
   }
 `;
@@ -30,6 +31,7 @@ export interface SyncLeadsFrontResult {
   created: number | null;
   alreadyInDb: number | null;
   skippedLowRating: number | null;
+  syncedLeadsCount: number | null;
 }
 
 export interface SyncLeadsFrontMutationResponse {
