@@ -44,6 +44,7 @@ export const GOOGLE_PLACE_CATEGORIES = [
   { value: "tiendas de mascotas", label: "Tiendas de mascotas" },
   { value: "tiendas de ropa", label: "Tiendas de ropa" },
   { value: "veterinarias", label: "Veterinarias" },
+  { value: "otra", label: "Otra" },
 ] as const;
 
 export const PIPELINE_STATUS = {
@@ -226,6 +227,7 @@ export const PLAN_FEATURE_KEYS = {
   SALES_COMMISSION: "sales_commission",
   UPLOAD_FILES: "upload_files",
   PROJECTS: "projects",
+  ADD_OWN_LEADS: "add_own_leads", 
 } as const;
 
 export type PlanFeatureKey = (typeof PLAN_FEATURE_KEYS)[keyof typeof PLAN_FEATURE_KEYS];
@@ -283,5 +285,9 @@ export const PLAN_FEATURES_MAP: Record<
   [PLAN_FEATURE_KEYS.PROJECTS]: {
     name: "Proyectos",
     description: "Crear y gestionar proyectos",
+  },
+  [PLAN_FEATURE_KEYS.ADD_OWN_LEADS]: {
+    name: "Agregar leads propios",
+    description: "Agregar leads propios",
   },
 };

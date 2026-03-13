@@ -102,10 +102,11 @@ export const TECH_BUSINESS_LEADS_QUERY = gql`
     $where: TechBusinessLeadWhereInput!
     $take: Int
     $skip: Int
+    $orderBy: [TechBusinessLeadOrderByInput!]
     $statusWhere: TechStatusBusinessLeadWhereInput
     $salesPersonWhere2: UserWhereInput!
   ) {
-    techBusinessLeads(where: $where, take: $take, skip: $skip) {
+    techBusinessLeads(where: $where, take: $take, skip: $skip, orderBy: $orderBy) {
       id
       address
       businessName
@@ -182,6 +183,7 @@ export interface TechBusinessLeadsVariables {
   salesPersonWhere2?: UserWhereInput | null;
   take?: number;
   skip?: number;
+  orderBy?: Array<Record<string, "asc" | "desc">>;
 }
 
 export interface UserWhereInput {

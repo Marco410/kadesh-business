@@ -31,11 +31,15 @@ import EmptyCompanySection from "kadesh/components/profile/sales/EmptyCompanySec
 import StatsSection from "./StatsSection";
 import FiltersLeadsSection from "./FiltersLeadsSection";
 import CurrentPlanSection from "./CurrentPlanSection";
-import { SubscriptionProvider } from "./SubscriptionContext";
+import { SubscriptionProvider, useSubscription } from "./SubscriptionContext";
 import { useUser } from "kadesh/utils/UserContext";
 import { Role } from "kadesh/constants/constans";
-import { PIPELINE_STATUS } from "./constants";
+import { PIPELINE_STATUS, PLAN_FEATURE_KEYS } from "./constants";
 import { sileo } from "sileo";
+import { Routes } from "kadesh/core/routes";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Add01Icon } from "@hugeicons/core-free-icons";
+import { hasPlanFeature } from "./helpers/plan-features";
 
 const LEADS_PAGE_SIZE = 10;
 
@@ -74,6 +78,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
   const [assigning, setAssigning] = useState(false);
   const { user, refreshUser } = useUser();
+  const { subscription } = useSubscription();
 
   const page = parsePageParam(searchParams.get("page"));
 
@@ -231,6 +236,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       salesPersonWhere2: salesPersonWhere2 ?? {},
       take: LEADS_PAGE_SIZE,
       skip: (effectivePage - 1) * LEADS_PAGE_SIZE,
+      orderBy: [{ createdAt: "desc" }],
     },
     skip: !userId,
   });
@@ -338,6 +344,8 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       setPageInUrl(totalPages);
   }, [countData, totalPages, page]);
 
+  const hasAddOwnLeadsFeature = hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.ADD_OWN_LEADS);
+
   if (!companyId) {
     return (
       <EmptyCompanySection
@@ -349,7 +357,6 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       />
     );
   }
-
   return (
     <SubscriptionProvider companyId={companyId}>
       <div className="w-full space-y-6">
@@ -359,9 +366,21 @@ export default function SalesSection({ userId }: SalesSectionProps) {
 
       {/* Título + filtros por pipeline + tabla */}
       <div>
-        <h2 className="text-xl font-bold text-[#212121] dark:text-[#ffffff] mb-4">
-          Clientes ({totalCount}) | {userData?.user?.company?.name ?? '--'}
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold text-[#212121] dark:text-[#ffffff] mb-4">
+            Clientes ({totalCount}) | {userData?.user?.company?.name ?? '--'}
+          </h2>
+          {hasAddOwnLeadsFeature && (
+          <button
+            type="button"
+            onClick={() => router.push(Routes.panelAddLead)}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-green-500 hover:bg-green-600 active:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors w-full sm:w-auto"
+          >
+            <HugeiconsIcon icon={Add01Icon} size={18} strokeWidth={2} />
+              Agregar nuevo cliente
+            </button>
+          )}
+        </div>
         <FiltersLeadsSection
           selectedPipeline={selectedPipeline}
           onPipelineChange={setSelectedPipeline}

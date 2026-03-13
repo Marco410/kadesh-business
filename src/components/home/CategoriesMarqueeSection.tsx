@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { GOOGLE_PLACE_CATEGORIES } from "kadesh/components/profile/sales/constants";
 
-const baseCategories = GOOGLE_PLACE_CATEGORIES;
+const baseCategories = GOOGLE_PLACE_CATEGORIES.filter(category => category.value !== "otra");
 const categoriesRowA = [...baseCategories, ...baseCategories];
 const categoriesRowB = [...baseCategories.slice(Math.floor(baseCategories.length / 2)), ...baseCategories];
 

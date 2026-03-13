@@ -37,6 +37,7 @@ import { PLAN_FEATURE_KEYS } from "kadesh/components/profile/sales/constants";
 import { Footer, Navigation } from "kadesh/components/layout";
 import { Role } from "kadesh/constants/constans";
 import FeatureLockedSection from "kadesh/components/profile/sales/FeatureLockedSection";
+import { SubscriptionProvider } from "kadesh/components/profile/sales/SubscriptionContext";
 
 const VALID_TABS = ["inicio", "profile", "ventas", "vendedores", "archivos", "proyectos", "calendar"] as const;
 
@@ -241,92 +242,94 @@ function ProfilePageContent() {
   return (
     <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#0a0a0a]">
       <Navigation />
-      <div className="pt-20 pb-12">
-        <div className="mx-auto px-10 sm:px-10 lg:px-10">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#212121] dark:text-white">
-              Panel de control
-            </h1>
-            <p className="text-[#616161] dark:text-[#b0b0b0] mt-1">
-              Gestiona tu información y ventas
-            </p>
-          </div>
+      <SubscriptionProvider companyId={companyId}>
+        <div className="pt-20 pb-12">
+          <div className="mx-auto px-10 sm:px-10 lg:px-10">
+            {/* Header */}
+            <div className="mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#212121] dark:text-white">
+                Panel de control
+              </h1>
+              <p className="text-[#616161] dark:text-[#b0b0b0] mt-1">
+                Gestiona tu información y ventas
+              </p>
+            </div>
 
-          <div className="flex flex-col lg:flex-row gap-8">
-            <DashboardSidebar
-              selectedTab={selectedTab}
-              onTabChange={handleTabChange}
-              hasVendedorRole={hasVendedorRole}
-              isAdminCompany={isAdminCompany}
-              hasSalesPersonManagement={hasSalesPersonManagement}
-              hasUploadFilesFeature={hasUploadFilesFeature}
-            />
+            <div className="flex flex-col lg:flex-row gap-8">
+              <DashboardSidebar
+                selectedTab={selectedTab}
+                onTabChange={handleTabChange}
+                hasVendedorRole={hasVendedorRole}
+                isAdminCompany={isAdminCompany}
+                hasSalesPersonManagement={hasSalesPersonManagement}
+                hasUploadFilesFeature={hasUploadFilesFeature}
+              />
 
-            <main className="flex-1 min-w-0">
-              {selectedTab === "inicio" && (
-                <div className="space-y-8">
-                  <DashboardWelcome userName={user.name ?? ""} />
-                  <div>
-                    <h3 className="text-lg font-semibold text-[#212121] dark:text-white mb-4">
-                      Acciones rápidas
-                    </h3>
-                    <QuickActions hasVendedorRole={hasVendedorRole} />
+              <main className="flex-1 min-w-0">
+                {selectedTab === "inicio" && (
+                  <div className="space-y-8">
+                    <DashboardWelcome userName={user.name ?? ""} />
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#212121] dark:text-white mb-4">
+                        Acciones rápidas
+                      </h3>
+                      <QuickActions hasVendedorRole={hasVendedorRole} />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {selectedTab === "profile" && (
-                <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8 shadow-sm">
-                  <ProfileData user={user} />
-                </div>
-              )}
+                {selectedTab === "profile" && (
+                  <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8 shadow-sm">
+                    <ProfileData user={user} />
+                  </div>
+                )}
 
-              {selectedTab === "ventas" && hasVendedorRole && (
-                <div className="space-y-6">
-                  <SalesSection userId={user.id} />
-                </div>
-              )}
-
-              {selectedTab === "vendedores" && (
-                isAdminCompany && hasSalesPersonManagement ? (
+                {selectedTab === "ventas" && hasVendedorRole && (
                   <div className="space-y-6">
-                    <VendedoresSection userId={user.id} />
+                    <SalesSection userId={user.id} />
                   </div>
-                ) : (
-                  <FeatureLockedSection sectionName="Vendedores" />
-                )
-              )}
+                )}
 
-              {selectedTab === "archivos" && hasUploadFilesFeature && (
-                <div className="space-y-6">
-                  <ArchivosSection userId={user.id} />
-                </div>
-              )}
+                {selectedTab === "vendedores" && (
+                  isAdminCompany && hasSalesPersonManagement ? (
+                    <div className="space-y-6">
+                      <VendedoresSection userId={user.id} />
+                    </div>
+                  ) : (
+                    <FeatureLockedSection sectionName="Vendedores" />
+                  )
+                )}
 
-              {selectedTab === "proyectos" && (
-                hasProjectsFeature ? (
+                {selectedTab === "archivos" && hasUploadFilesFeature && (
                   <div className="space-y-6">
-                    <ProyectosSection userId={user.id} />
+                    <ArchivosSection userId={user.id} />
                   </div>
-                ) : (
-                  <FeatureLockedSection sectionName="Proyectos" />
-                )
-              )}
+                )}
 
-              {selectedTab === "calendar" && (
-                hasCalendarFeature ? (
-                  <div className="space-y-6">
-                    <VendedoresCalendarioTab userId={user.id} />
-                  </div>
-                ) : (
-                  <FeatureLockedSection sectionName="Calendario" />
-                )
-              )}
-            </main>
+                {selectedTab === "proyectos" && (
+                  hasProjectsFeature ? (
+                    <div className="space-y-6">
+                      <ProyectosSection userId={user.id} />
+                    </div>
+                  ) : (
+                    <FeatureLockedSection sectionName="Proyectos" />
+                  )
+                )}
+
+                {selectedTab === "calendar" && (
+                  hasCalendarFeature ? (
+                    <div className="space-y-6">
+                      <VendedoresCalendarioTab userId={user.id} />
+                    </div>
+                  ) : (
+                    <FeatureLockedSection sectionName="Calendario" />
+                  )
+                )}
+              </main>
+            </div>
           </div>
         </div>
-      </div>
+      </SubscriptionProvider>
       <Footer />
     </div>
   );
