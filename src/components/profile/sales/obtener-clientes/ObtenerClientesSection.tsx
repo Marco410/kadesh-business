@@ -9,6 +9,7 @@ import CurrentPlanSection from "../CurrentPlanSection";
 import { useUser } from "kadesh/utils/UserContext";
 import { sileo } from "sileo";
 import { Autocomplete, type AutocompleteOption } from "kadesh/components/shared";
+import LeadsStatsCards, { type LeadsStatsCardsHandle } from "./LeadsStatsCards";
 
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
@@ -84,9 +85,11 @@ export default function ObtenerClientesSection() {
   } | null>(null);
   const [showZeroResultsHint, setShowZeroResultsHint] = useState(false);
   const [leafletReady, setLeafletReady] = useState(false);
+  const [locatingUser, setLocatingUser] = useState(false);
 
   const { syncLeadsArea, loading: isLoading, error: syncError } = useSyncLeadsArea();
 
+  const statsRef = useRef<LeadsStatsCardsHandle>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const markerRef = useRef<LeafletMarker | null>(null);
@@ -162,19 +165,39 @@ export default function ObtenerClientesSection() {
     if (pin) updateMapOverlays(pin.lat, pin.lng, radiusKm);
   }, [pin, radiusKm, updateMapOverlays]);
 
+  const goToMyLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      sileo.error({ title: "Tu navegador no soporta geolocalización" });
+      return;
+    }
+    setLocatingUser(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setPin({ lat: latitude, lng: longitude });
+        mapRef.current?.setView([latitude, longitude], 15);
+        setLocatingUser(false);
+      },
+      () => {
+        sileo.error({ title: "No se pudo obtener tu ubicación. Verifica los permisos del navegador." });
+        setLocatingUser(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  }, []);
+
   const runSync = async () => {
     if (!pin) {
-      setMessage({
-        type: "error",
-        text: "Haz clic en el mapa para colocar el punto de búsqueda",
-      });
+      sileo.error({ title: "Haz clic en el mapa para colocar el punto de búsqueda" });
       return;
     }
     setMessage(null);
     setStats(null);
     setShowZeroResultsHint(false);
 
-    try {
+    const categoryLabel = GOOGLE_PLACE_CATEGORIES.find((c) => c.value === category)?.label ?? category;
+
+    const fetchData = async () => {
       const result = await syncLeadsArea({
         lat: pin.lat,
         lng: pin.lng,
@@ -184,45 +207,50 @@ export default function ObtenerClientesSection() {
       });
 
       if (!result) {
-        setMessage({ type: "error", text: syncError?.message ?? "Error al sincronizar" });
-        return;
+        throw new Error(syncError?.message ?? "Error al sincronizar");
       }
 
-      if (result.success) {
-        const created = result.created ?? 0;
-        const alreadyInDb = result.alreadyInDb ?? 0;
-        const skipped = result.skippedLowRating ?? 0;
-        const syncedLeadsCount = result.syncedLeadsCount ?? 0;
-
-        const baseMessage = result.message ?? "Sincronización completada";
-        setMessage({
-          type: "ok",
-          text: baseMessage,
-        });
-        setStats({
-          created,
-          alreadyInDb,
-          skippedLowRating: skipped,
-        });
-        setShowZeroResultsHint(syncedLeadsCount === 0);
-
-        if (syncedLeadsCount > 0) {
-          const categoryLabel = GOOGLE_PLACE_CATEGORIES.find((c) => c.value === category)?.label ?? category;
-          const countText = syncedLeadsCount === 1 ? "1 negocio" : `${syncedLeadsCount} negocios`;
-          sileo.success({
-            title: `¡Éxito! ${countText} de ${categoryLabel} ${syncedLeadsCount === 1 ? "fue agregado" : "fueron agregados"} a tu lista`,
-            description: `Los ${categoryLabel.toLowerCase()} detectados en el área seleccionada ${syncedLeadsCount === 1 ? "ahora está" : "ahora están"} disponibles en tu sección de clientes.`,
-          });
-        }
-      } else {
-        setMessage({ type: "error", text: result.message ?? "Error al sincronizar" });
+      if (!result.success) {
+        throw new Error(result.message ?? "Error al sincronizar");
       }
-    } catch (e) {
+
+      const created = result.created ?? 0;
+      const alreadyInDb = result.alreadyInDb ?? 0;
+      const skipped = result.skippedLowRating ?? 0;
+      const syncedLeadsCount = result.syncedLeadsCount ?? 0;
+
       setMessage({
-        type: "error",
-        text: e instanceof Error ? e.message : "Error de red",
+        type: "ok",
+        text: result.message ?? "Sincronización completada",
       });
-    }
+      setStats({ created, alreadyInDb, skippedLowRating: skipped });
+      setShowZeroResultsHint(syncedLeadsCount === 0);
+
+      if (syncedLeadsCount > 0) {
+        statsRef.current?.refetch();
+      }
+
+      return { syncedLeadsCount, categoryLabel };
+    };
+
+    sileo.promise(fetchData(), {
+      loading: { title: `Buscando ${categoryLabel.toLowerCase()} en la zona…` },
+      success: (data) => {
+        const count = data.syncedLeadsCount;
+        if (count === 0) {
+          return { title: "No se encontraron negocios nuevos en esta zona" };
+        }
+        const countText = count === 1 ? "1 negocio" : `${count} negocios`;
+        return {
+          title: `${countText} de ${data.categoryLabel} ${count === 1 ? "agregado" : "agregados"}`,
+          description: `Se han agregado ${countText} de ${data.categoryLabel} a la base de datos`,
+          
+        };
+      },
+      error: (err) => ({
+        title: err instanceof Error ? err.message : "Error al sincronizar",
+      }),
+    });
   };
 
 
@@ -317,6 +345,20 @@ export default function ObtenerClientesSection() {
           className="w-full h-[550px]"
           style={{ minHeight: 320 }}
         />
+        <button
+          type="button"
+          onClick={goToMyLocation}
+          disabled={locatingUser || !leafletReady}
+          className="absolute bottom-4 right-4 z-[1000] flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-[#1e1e1e] border border-gray-300 dark:border-gray-600 shadow-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#2a2a2a] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          title="Usar mi ubicación actual"
+        >
+          <HugeiconsIcon
+            icon={Location01Icon}
+            size={16}
+            className={locatingUser ? "animate-pulse text-orange-500" : "text-gray-500 dark:text-gray-400"}
+          />
+          {locatingUser ? "Localizando…" : "Mi ubicación"}
+        </button>
       </div>
       {!leafletReady && (
         <p className="text-center text-sm text-gray-500 dark:text-gray-400">Cargando mapa…</p>
@@ -343,6 +385,8 @@ export default function ObtenerClientesSection() {
           </div>
         </div>
       )}
+
+      <LeadsStatsCards ref={statsRef} />
     </div>
   );
 }
