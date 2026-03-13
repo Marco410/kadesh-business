@@ -11,11 +11,11 @@ import {
 
 const TESTIMONIALS = [
   {
-    category: "Tours Hernández",
+    category: "Kadesh Tech",
     icon: Home02Icon,
     quote:
-      "Antes tardábamos 2 o 3 días armando listas de hoteles y tour operadores. Ahora en 20 minutos tenemos leads con teléfono listos para llamar.",
-    timeSaved: "~2 días por campaña",
+      "Es impresionante como podemos asignar 80 leads diariamente a los vendedores y seguir el funnel de ventas sin perder nada.",
+    timeSaved: "~10 días ahorrados por semana",
   },
   {
     category: "Juarez & Abogados",
@@ -28,7 +28,7 @@ const TESTIMONIALS = [
     category: "Smile Care Algarin",
     icon: StethoscopeIcon,
     quote:
-      "Buscábamos consultorios y clínicas para alianzas. La exportación a Excel y el CRM nos permiten seguir todo el funnel sin perder nada.",
+      "Buscábamos consultorios y clínicas para alianzas. El CRM nos permitió seguir todo el funnel sin perder nada.",
     timeSaved: "50 % menos tiempo en prospección",
   },
   {

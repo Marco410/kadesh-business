@@ -150,6 +150,7 @@ export default function VendedorDetailModal({
   return (
     <AnimatePresence>
       <motion.div
+        key="vendedor-detail-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -157,6 +158,7 @@ export default function VendedorDetailModal({
         onClick={onClose}
       />
       <motion.div
+        key="vendedor-detail-content"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}

@@ -66,6 +66,11 @@ export default function SalesLeadsTable({
   const to = Math.min(effectivePage * pageSize, totalCount);
   const showPagination = totalCount > pageSize && onPageChange != null;
 
+  const pageSelectorOptions: number[] = [];
+  for (let p = 1; p <= totalPages; p += 1) {
+    pageSelectorOptions.push(p);
+  }
+
   if (leads.length === 0) {
     return (
       <div className="w-full space-y-6 h-[500px]">
@@ -292,15 +297,39 @@ export default function SalesLeadsTable({
           <div className="flex items-center gap-2">
             <button
               type="button"
+              onClick={() => onPageChange(1)}
+              disabled={effectivePage <= 1}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-[#ffffff] hover:bg-[#f5f5f5] dark:hover:bg-[#333] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-[#2a2a2a]"
+            >
+              Ir al inicio
+            </button>
+            <button
+              type="button"
               onClick={() => onPageChange(Math.max(1, effectivePage - 1))}
               disabled={effectivePage <= 1}
               className="px-3 py-1.5 rounded-lg text-sm font-medium border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-[#ffffff] hover:bg-[#f5f5f5] dark:hover:bg-[#333] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-[#2a2a2a]"
             >
               Anterior
             </button>
-            <span className="text-sm text-[#616161] dark:text-[#b0b0b0] px-2">
-              Página {effectivePage} de {totalPages}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                Página
+              </span>
+              <select
+                value={effectivePage}
+                onChange={(e) => onPageChange?.(Number(e.target.value))}
+                className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-2 py-1 text-xs sm:text-sm text-[#212121] dark:text-[#ffffff] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              >
+                {pageSelectorOptions.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+              <span className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                de {totalPages}
+              </span>
+            </div>
             <button
               type="button"
               onClick={() => onPageChange(Math.min(totalPages, effectivePage + 1))}
@@ -308,6 +337,14 @@ export default function SalesLeadsTable({
               className="px-3 py-1.5 rounded-lg text-sm font-medium border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-[#ffffff] hover:bg-[#f5f5f5] dark:hover:bg-[#333] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-[#2a2a2a]"
             >
               Siguiente
+            </button>
+            <button
+              type="button"
+              onClick={() => onPageChange(totalPages)}
+              disabled={effectivePage >= totalPages}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-[#ffffff] hover:bg-[#f5f5f5] dark:hover:bg-[#333] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-[#2a2a2a]"
+            >
+              Ir al final
             </button>
           </div>
         </div>

@@ -132,6 +132,30 @@ export const PROPOSAL_STATUS = {
   COMPRADA: "Comprada",
 } as const;
 
+export const PROJECT_STATUS = {
+  PENDIENTE: "Pendiente",
+  EN_PROCESO: "En proceso",
+  EN_REVISION: "En revisión",
+  FINALIZADO: "Finalizado",
+  CANCELADO: "Cancelado",
+} as const;
+
+export const PROJECT_STATUS_OPTIONS = Object.values(PROJECT_STATUS);
+
+/** Clases para badge de estado del proyecto. */
+export const PROJECT_STATUS_CLASSES: Record<string, string> = {
+  [PROJECT_STATUS.PENDIENTE]:
+    "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200",
+  [PROJECT_STATUS.EN_PROCESO]:
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200",
+  [PROJECT_STATUS.EN_REVISION]:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200",
+  [PROJECT_STATUS.FINALIZADO]:
+    "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200",
+  [PROJECT_STATUS.CANCELADO]:
+    "bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300",
+};
+
 export const FOLLOW_UP_TASK_STATUS = {
   PENDIENTE: "Pendiente",
   COMPLETADO: "Completado",
@@ -201,6 +225,7 @@ export const PLAN_FEATURE_KEYS = {
   CALENDAR_CRM: "calendar_crm",
   SALES_COMMISSION: "sales_commission",
   UPLOAD_FILES: "upload_files",
+  PROJECTS: "projects",
 } as const;
 
 export type PlanFeatureKey = (typeof PLAN_FEATURE_KEYS)[keyof typeof PLAN_FEATURE_KEYS];
@@ -254,5 +279,9 @@ export const PLAN_FEATURES_MAP: Record<
   [PLAN_FEATURE_KEYS.UPLOAD_FILES]: {
     name: "Subir archivos",
     description: "Subir archivos",
+  },
+  [PLAN_FEATURE_KEYS.PROJECTS]: {
+    name: "Proyectos",
+    description: "Crear y gestionar proyectos",
   },
 };

@@ -18,4 +18,5 @@ export interface User {
   birthday?: string | null;
   age?: string | null;
   createdAt: string;
+  salesComission?: number | null;
 }

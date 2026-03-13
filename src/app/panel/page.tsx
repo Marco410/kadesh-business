@@ -15,11 +15,13 @@ import {
   ArrowRight01Icon,
   FileAttachmentIcon,
   FileIcon,
+  FolderIcon,
 } from "@hugeicons/core-free-icons";
 import ProfileData from "kadesh/components/profile/ProfileData";
 import SalesSection from "kadesh/components/profile/sales/SalesSection";
 import VendedoresSection from "kadesh/components/profile/sales/vendedores/VendedoresSection";
 import ArchivosSection from "kadesh/components/profile/sales/archivos/ArchivosSection";
+import { ProyectosSection } from "kadesh/components/profile/sales/proyecto";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
   SUBSCRIPTION_STATUS_QUERY,
@@ -32,8 +34,9 @@ import { hasPlanFeature } from "kadesh/components/profile/sales/helpers/plan-fea
 import { PLAN_FEATURE_KEYS } from "kadesh/components/profile/sales/constants";
 import { Footer, Navigation } from "kadesh/components/layout";
 import { Role } from "kadesh/constants/constans";
+import FeatureLockedSection from "kadesh/components/profile/sales/FeatureLockedSection";
 
-const VALID_TABS = ["inicio", "profile", "ventas", "vendedores", "archivos"] as const;
+const VALID_TABS = ["inicio", "profile", "ventas", "vendedores", "archivos", "proyectos"] as const;
 
 function getValidTab(
   tabFromUrl: string | null,
@@ -48,7 +51,7 @@ function getValidTab(
   if (tabFromUrl === "ventas" && !hasVendedorRole) {
     return "inicio";
   }
-  if (tabFromUrl === "vendedores" && (!isAdminCompany || !hasSalesPersonManagement)) {
+  if (tabFromUrl === "vendedores" && (!isAdminCompany )) {
     return "inicio";
   }
   if (tabFromUrl === "archivos" && (!hasUploadFilesFeature)) {
@@ -61,8 +64,9 @@ const navItems = [
   { key: "inicio" as const, label: "Inicio", icon: DashboardSquare01Icon },
   { key: "profile" as const, label: "Datos del perfil", icon: UserIcon },
   { key: "ventas" as const, label: "Ventas", icon: Chart01Icon, requireVendedor: true },
-  { key: "vendedores" as const, label: "Vendedores", icon: UserIcon, requireAdminCompany: true, requireSalesPersonManagement: true },
+  { key: "vendedores" as const, label: "Vendedores", icon: UserIcon, requireAdminCompany: true, requireSalesPersonManagement: false },
   { key: "archivos" as const, label: "Archivos", icon: FileIcon, requireAdminCompany: false, requireUploadFilesFeature: true },
+  { key: "proyectos" as const, label: "Proyectos", icon: FolderIcon },
 ];
 
 function DashboardSidebar({
@@ -193,6 +197,10 @@ function ProfilePageContent() {
     subscription?.planFeatures ?? null,
     PLAN_FEATURE_KEYS.UPLOAD_FILES
   );
+  const hasProjectsFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.PROJECTS
+  );
   const selectedTab = getValidTab(tabFromUrl, hasVendedorRole, isAdminCompany, hasSalesPersonManagement, hasUploadFilesFeature);
 
   const handleTabChange = (key: string) => {
@@ -270,16 +278,30 @@ function ProfilePageContent() {
                 </div>
               )}
 
-              {selectedTab === "vendedores" && isAdminCompany && hasSalesPersonManagement && (
-                <div className="space-y-6">
-                  <VendedoresSection userId={user.id} />
-                </div>
+              {selectedTab === "vendedores" && (
+                isAdminCompany && hasSalesPersonManagement ? (
+                  <div className="space-y-6">
+                    <VendedoresSection userId={user.id} />
+                  </div>
+                ) : (
+                  <FeatureLockedSection sectionName="Vendedores" />
+                )
               )}
 
               {selectedTab === "archivos" && hasUploadFilesFeature && (
                 <div className="space-y-6">
                   <ArchivosSection userId={user.id} />
                 </div>
+              )}
+
+              {selectedTab === "proyectos" && (
+                hasProjectsFeature ? (
+                  <div className="space-y-6">
+                    <ProyectosSection userId={user.id} />
+                  </div>
+                ) : (
+                  <FeatureLockedSection sectionName="Proyectos" />
+                )
               )}
             </main>
           </div>

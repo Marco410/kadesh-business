@@ -1,13 +1,18 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
 import { useQuery } from "@apollo/client";
 import {
   TECH_PROPOSAL_QUERY,
   type TechProposalVariables,
   type TechProposalResponse,
 } from "kadesh/components/profile/sales/queries";
+import { Routes } from "kadesh/core/routes";
 import { formatDateShort } from "kadesh/utils/format-date";
+import { hasPlanFeature } from "../helpers/plan-features";
+import { PLAN_FEATURE_KEYS } from "../constants";
+import { useSubscription } from "../SubscriptionContext";
 
 interface ProposalDetailModalProps {
   proposalId: string | null;
@@ -20,6 +25,7 @@ export default function ProposalDetailModal({
   isOpen,
   onClose,
 }: ProposalDetailModalProps) {
+  const { subscription } = useSubscription();
   const { data, loading } = useQuery<
     TechProposalResponse,
     TechProposalVariables
@@ -31,6 +37,11 @@ export default function ProposalDetailModal({
   const proposal = data?.techProposal ?? null;
 
   if (!isOpen) return null;
+
+  const hasProjectsFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.PROJECTS
+  ) || false;
 
   return (
     <AnimatePresence>
@@ -104,6 +115,16 @@ export default function ProposalDetailModal({
                     {proposal.status}
                   </p>
                 </div>
+              {proposal.product && (
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                    Producto
+                  </p>
+                  <p className="text-sm text-[#212121] dark:text-[#ffffff] whitespace-pre-wrap">
+                    {proposal.product}
+                  </p>
+                </div>
+              )}
                 {proposal.businessLead && (
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
@@ -114,9 +135,23 @@ export default function ProposalDetailModal({
                     </p>
                   </div>
                 )}
+
+                {proposal.project?.id && hasProjectsFeature && (
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                      Proyecto
+                    </p>
+                    <Link
+                      href={Routes.panelProject(proposal.project.id)}
+                      className="text-sm text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300 font-medium hover:underline"
+                    >
+                      Ver proyecto →
+                    </Link>
+                  </div>
+                )}
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
-                    URL
+                  URL / archivo
                   </p>
                   <p className="text-sm text-[#212121] dark:text-[#ffffff] whitespace-pre-wrap break-all">
                     {proposal.fileOrUrl ? (
@@ -133,6 +168,16 @@ export default function ProposalDetailModal({
                     )}
                   </p>
                 </div>
+              {proposal.notes && (
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                    Notas
+                  </p>
+                  <p className="text-sm text-[#212121] dark:text-[#ffffff] whitespace-pre-wrap">
+                    {proposal.notes}
+                  </p>
+                </div>
+              )}
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
                     Registrado

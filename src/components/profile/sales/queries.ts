@@ -763,6 +763,8 @@ export const TECH_PROPOSALS_QUERY = gql`
       amount
       status
       fileOrUrl
+      product
+      notes
       createdAt
       updatedAt
       approved
@@ -772,6 +774,9 @@ export const TECH_PROPOSALS_QUERY = gql`
         businessName
       }
       assignedSeller {
+        id
+      }
+      project {
         id
       }
     }
@@ -822,12 +827,15 @@ export interface TechProposalsResponse {
     amount: number | null;
     status: string;
     fileOrUrl: string | null;
+    product: string | null;
+    notes: string | null;
     createdAt: string;
     updatedAt: string | null;
     approved: boolean | null;
     paid: boolean | null;
     businessLead: { id: string; businessName: string } | null;
     assignedSeller?: { id: string } | null;
+    project: { id: string } | null;
   }>;
 }
 
@@ -843,11 +851,16 @@ export const TECH_PROPOSAL_QUERY = gql`
       amount
       status
       fileOrUrl
+      product
+      notes
       createdAt
       updatedAt
       businessLead {
         id
         businessName
+      }
+      project {
+        id
       }
     }
   }
@@ -864,9 +877,12 @@ export interface TechProposalResponse {
     amount: number | null;
     status: string;
     fileOrUrl: string | null;
+    product: string | null;
+    notes: string | null;
     createdAt: string;
     updatedAt: string | null;
     businessLead: { id: string; businessName: string } | null;
+    project: { id: string } | null;
   } | null;
 }
 
@@ -878,6 +894,8 @@ export const CREATE_TECH_PROPOSAL_MUTATION = gql`
       amount
       status
       fileOrUrl
+      product
+      notes
       businessLead {
         businessName
       }
@@ -895,6 +913,8 @@ export interface CreateTechProposalVariables {
     amount?: number | null;
     status?: string | null;
     fileOrUrl?: string | null;
+    product?: string | null;
+    notes?: string | null;
     businessLead: { connect: { id: string } };
     assignedSeller: { connect: { id: string } };
   };
@@ -907,6 +927,8 @@ export interface CreateTechProposalMutation {
     amount: number | null;
     status: string;
     fileOrUrl: string | null;
+    product: string | null;
+    notes: string | null;
     businessLead: { businessName: string } | null;
     assignedSeller: { name: string } | null;
     createdAt: string;
@@ -925,6 +947,8 @@ export const UPDATE_TECH_PROPOSAL_MUTATION = gql`
       fileOrUrl
       sentDate
       status
+      product
+      notes
       updatedAt
       businessLead {
         businessName
@@ -940,6 +964,8 @@ export interface UpdateTechProposalVariables {
     amount?: number | null;
     status?: string | null;
     fileOrUrl?: string | null;
+    product?: string | null;
+    notes?: string | null;
     approved?: boolean | null;
     paid?: boolean | null;
   };
@@ -953,6 +979,8 @@ export interface UpdateTechProposalMutation {
     fileOrUrl: string | null;
     sentDate: string;
     status: string;
+    product: string | null;
+    notes: string | null;
     updatedAt: string | null;
     businessLead: { businessName: string } | null;
   };

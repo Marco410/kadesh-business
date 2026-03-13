@@ -31,6 +31,7 @@ export const Routes = {
   // Profile
   panel: '/panel',
   panelLead: (id: string): string => `/panel/ventas/lead/${id}`,
+  panelProject: (id: string): string => `/panel/ventas/proyecto/${id}`,
   panelSyncLeads: '/panel/ventas/obtener-clientes',
   panelAddSalesperson: '/panel/ventas/agregar-vendedor',
   panelPlans: '/panel/ventas/planes',

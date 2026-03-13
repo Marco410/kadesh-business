@@ -14,11 +14,19 @@ import {
   type CreateTechProposalMutation,
   type UpdateTechProposalVariables,
   type UpdateTechProposalMutation,
+  USER_COMPANY_CATEGORIES_QUERY,
+  type UserCompanyCategoriesResponse,
+  type UserCompanyCategoriesVariables,
 } from "kadesh/components/profile/sales/queries";
-import { PROPOSAL_STATUS } from "kadesh/components/profile/sales/constants";
+import { PLAN_FEATURE_KEYS, PROPOSAL_STATUS } from "kadesh/components/profile/sales/constants";
 import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
+import { Routes } from "kadesh/core/routes";
+import Link from "next/link";
 import ProposalDetailModal from "./ProposalDetailModal";
+import CreateProjectModal from "./CreateProjectModal";
+import { hasPlanFeature } from "../helpers/plan-features";
+import { useSubscription } from "../SubscriptionContext";
 
 const PROPOSAL_STATUS_OPTIONS = Object.values(PROPOSAL_STATUS);
 
@@ -47,10 +55,22 @@ export default function RegisterProposalModal({
   leadId,
   userId,
 }: RegisterProposalModalProps) {
+  const { subscription } = useSubscription();
+  const { data: userData } = useQuery<UserCompanyCategoriesResponse, UserCompanyCategoriesVariables>(
+    USER_COMPANY_CATEGORIES_QUERY,
+    {
+      variables: { where: { id: userId } },
+      skip: !userId,
+    },
+  );
+  const salesComission = userData?.user?.salesComission ?? 0;
   const [sentDate, setSentDate] = useState("");
   const [amount, setAmount] = useState<string>("");
   const [status, setStatus] = useState<string>(PROPOSAL_STATUS.ENVIADA);
+  const [product, setProduct] = useState("");
+  const [notes, setNotes] = useState("");
   const [fileOrUrl, setFileOrUrl] = useState("");
+  const [createProjectProposalId, setCreateProjectProposalId] = useState<string | null>(null);
 
   const proposalsWhere: TechProposalsVariables["where"] = {
     AND: [
@@ -61,7 +81,7 @@ export default function RegisterProposalModal({
     ],
   };
 
-  const { data: proposalsData, loading: proposalsLoading } = useQuery<
+  const { data: proposalsData, loading: proposalsLoading, refetch } = useQuery<
     TechProposalsResponse,
     TechProposalsVariables
   >(TECH_PROPOSALS_QUERY, {
@@ -101,12 +121,9 @@ export default function RegisterProposalModal({
 
   useEffect(() => {
     if (isOpen) {
-      setSentDate(formatDateForInput(new Date().toISOString()));
-      setAmount("");
-      setStatus(PROPOSAL_STATUS.ENVIADA);
-      setFileOrUrl("");
-      setSelectedId(null);
-      setEditingProposal(null);
+        resetForm();
+        setSelectedId(null);
+        setEditingProposal(null);
     }
   }, [isOpen]);
 
@@ -117,7 +134,18 @@ export default function RegisterProposalModal({
     setAmount(p.amount != null ? String(p.amount) : "");
     setStatus(p.status);
     setFileOrUrl(p.fileOrUrl ?? "");
+    setProduct(p.product ?? "");
+    setNotes(p.notes ?? "");
   };
+
+  function resetForm() {
+    setSentDate(formatDateForInput(new Date().toISOString()));
+    setAmount("");
+    setStatus(PROPOSAL_STATUS.ENVIADA);
+    setFileOrUrl("");
+    setProduct("");
+    setNotes("");
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,6 +172,8 @@ export default function RegisterProposalModal({
               amount: amountNum,
               status: status || PROPOSAL_STATUS.ENVIADA,
               fileOrUrl: fileOrUrl.trim(),
+              product: product.trim() || null,
+              notes: notes.trim() || null,
             },
           },
         });
@@ -153,6 +183,8 @@ export default function RegisterProposalModal({
         setAmount("");
         setStatus(PROPOSAL_STATUS.ENVIADA);
         setFileOrUrl("");
+        setProduct("");
+        setNotes("");
       } else {
         await createProposal({
           variables: {
@@ -161,6 +193,8 @@ export default function RegisterProposalModal({
               amount: amountNum ?? undefined,
               status: status || PROPOSAL_STATUS.ENVIADA,
               fileOrUrl: fileOrUrl.trim(),
+              product: product.trim() || null,
+              notes: notes.trim() || null,
               businessLead: { connect: { id: leadId } },
               assignedSeller: { connect: { id: userId } },
             },
@@ -169,6 +203,8 @@ export default function RegisterProposalModal({
         sileo.success({ title: "Propuesta registrada" });
         onSuccess?.();
       }
+      resetForm();
+      refetch();
     } catch {
       sileo.error({
         title: isEditing ? "No se pudo actualizar la propuesta" : "No se pudo registrar la propuesta",
@@ -176,6 +212,11 @@ export default function RegisterProposalModal({
       });
     }
   };
+
+  const hasProjectsFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.PROJECTS
+  ) || false;
 
   return (
     <AnimatePresence>
@@ -241,7 +282,7 @@ export default function RegisterProposalModal({
                             Estado
                           </th>
                           <th className="text-left px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap max-w-[160px]">
-                            URL / archivo
+                            Producto
                           </th>
                           <th className="text-right px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap w-[100px]">
                             Acciones
@@ -268,7 +309,7 @@ export default function RegisterProposalModal({
                             }`}
                           >
                             <td className="px-3 py-2 text-[#616161] dark:text-[#b0b0b0] whitespace-nowrap">
-                              {formatDateShort(p.sentDate)}
+                              {formatDateShort(p.sentDate,false)}
                             </td>
                             <td className="px-3 py-2 text-[#212121] dark:text-[#ffffff]">
                               {p.amount != null ? `$${Number(p.amount).toLocaleString("es-MX")}` : "—"}
@@ -276,17 +317,37 @@ export default function RegisterProposalModal({
                             <td className="px-3 py-2 text-[#212121] dark:text-[#ffffff]">
                               {p.status}
                             </td>
-                            <td className="px-3 py-2 text-[#616161] dark:text-[#b0b0b0] max-w-[160px] truncate" title={p.fileOrUrl ?? undefined}>
-                              {p.fileOrUrl ?? "—"}
+                            <td className="px-3 py-2 text-[#616161] dark:text-[#b0b0b0] max-w-[160px] truncate" title={p.product ?? undefined}>
+                              {p.product ?? "—"}
                             </td>
                             <td className="px-3 py-2 text-right" onClick={(e) => e.stopPropagation()}>
-                              <button
-                                type="button"
-                                onClick={() => fillFormForEdit(p)}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-[#ffffff] text-xs font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#333] transition-colors"
-                              >
-                                Editar
-                              </button>
+                              <div className="flex justify-end gap-2">
+                                {p.status === PROPOSAL_STATUS.COMPRADA && hasProjectsFeature && (
+                                  p.project?.id ? (
+                                    <Link
+                                      href={Routes.panelProject(p.project.id)}
+                                      className="inline-flex items-center gap-1 px-2 py-1 rounded border border-orange-500 text-orange-600 dark:text-orange-400 text-xs font-medium hover:bg-orange-50 dark:hover:bg-orange-950/30 transition-colors text-center"
+                                    >
+                                      Ver proyecto
+                                    </Link>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => setCreateProjectProposalId(p.id)}
+                                      className="inline-flex items-center gap-1 px-2 py-1 rounded border border-orange-500 bg-orange-500 text-white text-xs font-medium hover:bg-orange-600 hover:border-orange-600 transition-colors"
+                                    >
+                                      Crear proyecto
+                                    </button>
+                                  )
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => fillFormForEdit(p)}
+                                  className="inline-flex items-center gap-1 px-2 py-1 rounded border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-[#ffffff] text-xs font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#333] transition-colors"
+                                >
+                                  Editar
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -300,6 +361,18 @@ export default function RegisterProposalModal({
                 proposalId={selectedId}
                 isOpen={!!selectedId}
                 onClose={() => setSelectedId(null)}
+              />
+
+              <CreateProjectModal
+                proposalId={createProjectProposalId}
+                leadId={leadId}
+                userId={userId}
+                isOpen={!!createProjectProposalId}
+                onClose={() => setCreateProjectProposalId(null)}
+                onSuccess={() => {
+                  onSuccess?.();
+                  refetch();
+                }}
               />
 
               <div className="border-t border-[#e0e0e0] dark:border-[#3a3a3a] pt-4">
@@ -328,6 +401,23 @@ export default function RegisterProposalModal({
 
                 <div>
                   <label
+                    htmlFor="proposal-product"
+                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                  >
+                    Producto o servicio principal
+                  </label>
+                  <input
+                    id="proposal-product"
+                    type="text"
+                    value={product}
+                    onChange={(e) => setProduct(e.target.value)}
+                    placeholder="Ej. Paquete pro, plan starter, etc."
+                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  />
+                </div>
+
+                <div>
+                  <label
                     htmlFor="proposal-amount"
                     className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
                   >
@@ -342,6 +432,39 @@ export default function RegisterProposalModal({
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="0.00"
                     className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  />
+                  {salesComission > 0 && amount.trim() && !Number.isNaN(Number(amount)) && Number(amount) > 0 && (
+                    <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      Tu comisión estimada con {salesComission}% es{" "}
+                      <span className="font-semibold text-orange-600 dark:text-orange-400">
+                        $
+                        {(
+                          (Number(amount) * salesComission) /
+                          100
+                        ).toLocaleString("es-MX", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </span>
+                      .
+                    </p>
+                  )}
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label
+                    htmlFor="proposal-notes"
+                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                  >
+                    Notas o condiciones de la propuesta
+                  </label>
+                  <textarea
+                    id="proposal-notes"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    rows={3}
+                    placeholder="Plazos, condiciones especiales, alcances y límites de la propuesta..."
+                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
                   />
                 </div>
 
