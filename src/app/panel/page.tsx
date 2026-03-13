@@ -16,12 +16,14 @@ import {
   FileAttachmentIcon,
   FileIcon,
   FolderIcon,
+  CalendarIcon,
 } from "@hugeicons/core-free-icons";
 import ProfileData from "kadesh/components/profile/ProfileData";
 import SalesSection from "kadesh/components/profile/sales/SalesSection";
 import VendedoresSection from "kadesh/components/profile/sales/vendedores/VendedoresSection";
 import ArchivosSection from "kadesh/components/profile/sales/archivos/ArchivosSection";
 import { ProyectosSection } from "kadesh/components/profile/sales/proyecto";
+import VendedoresCalendarioTab from "kadesh/components/profile/sales/vendedores/VendedoresCalendarioTab";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
   SUBSCRIPTION_STATUS_QUERY,
@@ -36,14 +38,14 @@ import { Footer, Navigation } from "kadesh/components/layout";
 import { Role } from "kadesh/constants/constans";
 import FeatureLockedSection from "kadesh/components/profile/sales/FeatureLockedSection";
 
-const VALID_TABS = ["inicio", "profile", "ventas", "vendedores", "archivos", "proyectos"] as const;
+const VALID_TABS = ["inicio", "profile", "ventas", "vendedores", "archivos", "proyectos", "calendar"] as const;
 
 function getValidTab(
   tabFromUrl: string | null,
   hasVendedorRole: boolean,
   isAdminCompany: boolean,
-  hasSalesPersonManagement: boolean,
-  hasUploadFilesFeature: boolean
+  hasUploadFilesFeature: boolean,
+  hasCalendarFeature: boolean
 ): (typeof VALID_TABS)[number] {
   if (!tabFromUrl || !VALID_TABS.includes(tabFromUrl as (typeof VALID_TABS)[number])) {
     return "inicio";
@@ -57,6 +59,9 @@ function getValidTab(
   if (tabFromUrl === "archivos" && (!hasUploadFilesFeature)) {
     return "inicio";
   }
+  if (tabFromUrl === "calendar" && (!hasCalendarFeature)) {
+    return "inicio";
+  }
   return tabFromUrl as (typeof VALID_TABS)[number];
 }
 
@@ -67,6 +72,7 @@ const navItems = [
   { key: "vendedores" as const, label: "Vendedores", icon: UserIcon, requireAdminCompany: true, requireSalesPersonManagement: false },
   { key: "archivos" as const, label: "Archivos", icon: FileIcon, requireAdminCompany: false, requireUploadFilesFeature: true },
   { key: "proyectos" as const, label: "Proyectos", icon: FolderIcon },
+  { key: "calendar" as const, label: "Mi Calendario", icon: CalendarIcon, requireCalendarFeature: true },
 ];
 
 function DashboardSidebar({
@@ -201,7 +207,11 @@ function ProfilePageContent() {
     subscription?.planFeatures ?? null,
     PLAN_FEATURE_KEYS.PROJECTS
   );
-  const selectedTab = getValidTab(tabFromUrl, hasVendedorRole, isAdminCompany, hasSalesPersonManagement, hasUploadFilesFeature);
+  const hasCalendarFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.CALENDAR_CRM
+  );
+  const selectedTab = getValidTab(tabFromUrl, hasVendedorRole, isAdminCompany, hasUploadFilesFeature, hasCalendarFeature);
 
   const handleTabChange = (key: string) => {
     router.replace(`${pathname}?tab=${key}`, { scroll: false });
@@ -301,6 +311,16 @@ function ProfilePageContent() {
                   </div>
                 ) : (
                   <FeatureLockedSection sectionName="Proyectos" />
+                )
+              )}
+
+              {selectedTab === "calendar" && (
+                hasCalendarFeature ? (
+                  <div className="space-y-6">
+                    <VendedoresCalendarioTab userId={user.id} />
+                  </div>
+                ) : (
+                  <FeatureLockedSection sectionName="Calendario" />
                 )
               )}
             </main>

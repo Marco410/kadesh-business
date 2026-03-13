@@ -22,6 +22,7 @@ import { Role } from "kadesh/constants/constans";
 import { EVENT_LABELS } from "kadesh/components/profile/sales/constants";
 import SalesCalendarView, { type CalendarEvent } from "kadesh/components/profile/sales/SalesCalendarView";
 import { COMPANY_VENDEDORES_WITH_STATS_QUERY, type CompanyVendedoresWithStatsResponse, type CompanyVendedoresWithStatsVariables } from "./queries";
+import { useUser } from "kadesh/utils/UserContext";
 
 function toDateKey(iso: string): string {
   return iso.slice(0, 10);
@@ -48,6 +49,10 @@ interface VendedoresCalendarProps {
 }
 
 export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) {
+  const { user } = useUser();
+  const isAdminCompany =
+    user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+
   const { data: userData } = useQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
@@ -68,18 +73,25 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
         roles: { some: { name: { equals: Role.VENDEDOR } } },
       },
     },
-    skip: !companyId,
+    skip: !companyId || !isAdminCompany,
   });
 
   const vendedores = vendedoresData?.users ?? [];
-  const vendedorIds = useMemo(() => vendedores.map((v) => v.id), [vendedores]);
+  const vendedorIds = useMemo(
+    () => (isAdminCompany ? vendedores.map((v) => v.id) : [userId]),
+    [vendedores, isAdminCompany, userId],
+  );
   const sellerIdToName = useMemo(() => {
     const map: Record<string, string> = {};
-    vendedores.forEach((v) => {
-      map[v.id] = formatSellerName(v.name, v.lastName, v.secondLastName);
-    });
+    if (isAdminCompany) {
+      vendedores.forEach((v) => {
+        map[v.id] = formatSellerName(v.name, v.lastName, v.secondLastName);
+      });
+    } else {
+      map[userId] = user?.name ?? "Yo";
+    }
     return map;
-  }, [vendedores]);
+  }, [vendedores, isAdminCompany, userId, user?.name]);
 
   const whereCalendar: TechSalesActivitiesCalendarVariables["where"] = {
     assignedSeller: { id: { in: vendedorIds } },
@@ -185,7 +197,7 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
   return (
     <SalesCalendarView
       eventsByDate={eventsByDate}
-      title="Calendario de vendedores"
+      title={isAdminCompany ? "Calendario de vendedores" : "Mi calendario"}
     />
   );
 }
