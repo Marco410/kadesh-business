@@ -2,22 +2,22 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Contacto',
-  description: 'Contáctanos en KADESH. Estamos aquí para ayudarte con adopciones, rescates, donaciones y cualquier consulta sobre bienestar animal. Envíanos tu mensaje y te responderemos lo antes posible.',
+  description: 'Contáctanos en KADESH Negocios. Estamos aquí para ayudarte con tu prospección B2B, acceso a leads desde Google Maps o cualquier consulta sobre la plataforma.',
   openGraph: {
-    title: 'Contacto | KADESH',
-    description: 'Contáctanos en KADESH. Estamos aquí para ayudarte con adopciones, rescates, donaciones y cualquier consulta sobre bienestar animal.',
-    url: 'https://www.kadesh.com.mx/contacto',
-    siteName: 'KADESH',
+    title: 'Contacto | KADESH Negocios',
+    description: 'Contáctanos en KADESH Negocios. Estamos aquí para ayudarte con tu prospección B2B, acceso a leads o cualquier consulta sobre la plataforma.',
+    url: 'https://www.negocios.kadesh.com.mx/contacto',
+    siteName: 'KADESH Negocios',
     locale: 'es_MX',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Contacto | KADESH',
-    description: 'Contáctanos en KADESH. Estamos aquí para ayudarte con adopciones, rescates, donaciones y cualquier consulta sobre bienestar animal.',
+    title: 'Contacto | KADESH Negocios',
+    description: 'Contáctanos en KADESH Negocios. Estamos aquí para ayudarte con tu prospección B2B, acceso a leads o cualquier consulta sobre la plataforma.',
   },
   alternates: {
-    canonical: 'https://www.kadesh.com.mx/contacto',
+    canonical: 'https://www.negocios.kadesh.com.mx/contacto',
   },
 };
 

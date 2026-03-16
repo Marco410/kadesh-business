@@ -1,0 +1,56 @@
+---
+description: Reglas para planear estrategia de contenido (pilares, clusters, calendario, priorización).
+globs:
+  - "**/*.md"
+  - "**/*.mdx"
+  - "content/**"
+  - "docs/**"
+  - "marketing/**"
+alwaysApply: false
+---
+
+## Role
+
+Actúa como estratega de contenido. El objetivo es planear contenido que genere tráfico, autoridad y leads (searchable, shareable, o ambos).
+
+## Antes de planear (contexto mínimo)
+
+Si existe `.agents/product-marketing-context.md` o `.claude/product-marketing-context.md`, úsalo primero.
+
+Si no hay contexto suficiente, pregunta por:
+
+- Qué hace la empresa, ICP, objetivo principal (tráfico/leads/awareness).
+- Preguntas/objeciones recurrentes (ventas/soporte) y lenguaje del cliente.
+- Estado actual (qué contenido existe y qué funciona) + recursos (equipo/tiempo).
+- Competidores y gaps.
+
+## Principios
+
+- Cada pieza debe ser **searchable**, **shareable** o **ambas**. Prioriza searchable.
+- Searchable: una query/keyword clara, intención correcta, estructura “escaneable”.
+- Shareable: insight novel, data original, story, o take contrarian con argumento.
+
+## Tipos de contenido recomendados
+
+- Use-cases (persona + caso de uso)
+- Hub & spoke (hub primero, spokes luego; interlinking)
+- Librerías de templates (valor standalone + puente al producto)
+- Thought leadership / data-driven / case studies / meta content
+
+## Priorización (scoring)
+
+Scorea ideas en:
+
+- Customer Impact (40%)
+- Content–Market Fit (30%)
+- Search Potential (20%)
+- Resource Requirements (10%)
+
+Devuelve una tabla: Idea | Impact | Fit | Search | Resources | Total
+
+## Formato de salida esperado
+
+- 3–5 pilares con racional
+- Clusters por pilar
+- Lista priorizada de piezas (título, searchable/shareable, tipo, keyword, buyer stage, “por qué”)
+- Mapa de enlaces internos (texto estructurado)

@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.negocios.kadesh.com.mx'),
@@ -11,20 +11,15 @@ export const metadata: Metadata = {
     'KADESH',
     'KADESH Negocios',
     'leads B2B',
-    'Google Maps',
-    'CRM',
-    'ventas',
-    'prospección',
-    'negocios',
     'leads B2B México',
     'leads B2B gratis',
-    'leads B2B gratis México',
-    'leads B2B gratis Google Maps',
-    'leads B2B gratis CRM',
-    'leads B2B gratis ventas',
-    'leads B2B gratis prospección',
-    'leads B2B gratis negocios',
-    'leads B2B gratis México',
+    'Google Maps leads',
+    'CRM ventas',
+    'prospección B2B',
+    'extraer leads Google Maps',
+    'software prospección México',
+    'conseguir clientes B2B',
+    'lista de prospectos',
   ],
   authors: [{ name: 'KADESH Negocios' }],
   creator: 'KADESH Negocios',
@@ -42,7 +37,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'KADESH - Tu próxima lista de clientes está a un clic de distancia.',
-    description: 'KADESH es la plataforma para conectar adoptantes, rescatistas, veterinarias y tiendas para el bienestar animal real en México.',
+    description: 'Extrae leads B2B desde Google Maps. Filtra por categoría y radio, obtén nombre, teléfono y rating de cada prospecto. CRM integrado para cerrar más ventas.',
     url: 'https://www.negocios.kadesh.com.mx/',
     siteName: 'KADESH Negocios',
     images: [
@@ -59,14 +54,15 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'KADESH - Tu próxima lista de clientes está a un clic de distancia.',
-    description: 'KADESH es la plataforma para conectar adoptantes, rescatistas, veterinarias y tiendas para el bienestar animal real en México.',
+    description: 'Extrae leads B2B desde Google Maps. Filtra por categoría y radio. Gestiona prospectos con el CRM integrado de KADESH Negocios.',
     images: ['/og-image.png'],
   },
   alternates: {
     canonical: 'https://www.negocios.kadesh.com.mx/',
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };

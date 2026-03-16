@@ -1,0 +1,62 @@
+---
+description: Reglas para optimizar contenido para citas/visibilidad en LLMs y AI Overviews (AEO/GEO/LLMO).
+globs:
+  - "**/*.md"
+  - "**/*.mdx"
+  - "content/**"
+  - "docs/**"
+  - "marketing/**"
+alwaysApply: false
+---
+
+## Goal
+
+Optimizar para que el contenido sea **descubrible, extraíble y citable** por sistemas tipo Google AI Overviews, ChatGPT (con search), Perplexity, Claude, Gemini, Copilot.
+
+## Antes de optimizar (auditoría rápida)
+
+Si existe `.agents/product-marketing-context.md` o `.claude/product-marketing-context.md`, úsalo primero.
+
+Pregunta/recoge:
+
+- 10–20 queries prioritarias
+- Si hoy aparecen AI answers y quiénes son citados
+- Tipo de contenido, autoridad SEO, schema existente
+- Competidores citados donde tú no
+
+## Principios de optimización (3 pilares)
+
+1. **Structure (extractable)**
+
+- Respuesta directa al inicio de cada sección
+- Bloques autocontenidos; 40–60 palabras para respuestas clave
+- H2/H3 como queries reales
+- Tablas para comparativas; listas numeradas para procesos
+- FAQ con preguntas naturales
+
+2. **Authority (citable)**
+
+- Estadísticas con fuente y fecha
+- Citas de expertos con nombre/título/organización
+- Autor y credenciales; “Last updated”
+- E-E-A-T: experiencia de primera mano, metodología transparente
+
+3. **Presence (where AI looks)**
+
+- Refuerza presencia en terceros (wikipedia/reviews/foros/medios) cuando aplique
+
+## Checklist de “extractabilidad”
+
+- Definición clara en el primer párrafo
+- Bloques Q&A y/o FAQ
+- Tablas para “X vs Y”
+- Datos con fuentes
+- Señales de frescura
+- (Si aplica) schema: Article/BlogPosting, FAQPage, HowTo, Product, Review, Organization
+
+## Entregables esperados
+
+- Diagnóstico por página: Pass/Fail por checklist
+- Lista de cambios concretos (bloques a añadir/reestructurar)
+- Secciones sugeridas (títulos tipo query)
+- Recomendación de schema a implementar (si procede)
