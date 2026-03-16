@@ -38,6 +38,7 @@ export default function CreateProjectModal({
   const [startDate, setStartDate] = useState("");
   const [estimatedEndDate, setEstimatedEndDate] = useState("");
   const [description, setDescription] = useState("");
+  const [urlData, setUrlData] = useState("");
   const [status, setStatus] = useState<string>(PROJECT_STATUS.PENDIENTE);
 
   const { data: userData } = useQuery<
@@ -74,6 +75,7 @@ export default function CreateProjectModal({
     setStartDate("");
     setEstimatedEndDate("");
     setDescription("");
+    setUrlData("");
     setStatus(PROJECT_STATUS.PENDIENTE);
     onClose();
   }
@@ -98,6 +100,7 @@ export default function CreateProjectModal({
           status: status || PROJECT_STATUS.PENDIENTE,
           startDate: startDate || undefined,
           estimatedEndDate: estimatedEndDate || undefined,
+          urlData: urlData.trim() || undefined,
           company: { connect: { id: companyId } },
           businessLead: { connect: { id: leadId } },
           ...(proposalId && { proposal: { connect: { id: proposalId } } }),
@@ -214,6 +217,23 @@ export default function CreateProjectModal({
                 placeholder="Descripción del proyecto o alcance"
                 className={inputClassName}
               />
+            </div>
+
+            <div>
+              <label htmlFor="project-urlData" className={labelClassName}>
+                Enlace a carpeta en la nube
+              </label>
+              <input
+                id="project-urlData"
+                type="url"
+                value={urlData}
+                onChange={(e) => setUrlData(e.target.value)}
+                placeholder="Ej. https://drive.google.com/... o link a Dropbox, OneDrive, etc."
+                className={inputClassName}
+              />
+              <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                Link donde guardas fotos, archivos e información del cliente.
+              </p>
             </div>
 
             <div>

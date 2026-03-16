@@ -90,6 +90,7 @@ export default function ProjectDetailSection() {
   const [serviceType, setServiceType] = useState("");
   const [status, setStatus] = useState("");
   const [description, setDescription] = useState("");
+  const [urlData, setUrlData] = useState("");
   const [startDate, setStartDate] = useState("");
   const [estimatedEndDate, setEstimatedEndDate] = useState("");
 
@@ -109,6 +110,7 @@ export default function ProjectDetailSection() {
     setServiceType(project.serviceType ?? "");
     setStatus(project.status ?? "");
     setDescription(project.description ?? "");
+    setUrlData(project.urlData ?? "");
     setStartDate(toDateInputValue(project.startDate));
     setEstimatedEndDate(toDateInputValue(project.estimatedEndDate));
   }, [project]);
@@ -133,6 +135,7 @@ export default function ProjectDetailSection() {
       setServiceType(project.serviceType ?? "");
       setStatus(project.status ?? "");
       setDescription(project.description ?? "");
+      setUrlData(project.urlData ?? "");
       setStartDate(toDateInputValue(project.startDate));
       setEstimatedEndDate(toDateInputValue(project.estimatedEndDate));
       setIsEditing(true);
@@ -145,6 +148,7 @@ export default function ProjectDetailSection() {
       setServiceType(project.serviceType ?? "");
       setStatus(project.status ?? "");
       setDescription(project.description ?? "");
+      setUrlData(project.urlData ?? "");
       setStartDate(toDateInputValue(project.startDate));
       setEstimatedEndDate(toDateInputValue(project.estimatedEndDate));
     }
@@ -161,6 +165,7 @@ export default function ProjectDetailSection() {
           serviceType: serviceType.trim() || null,
           status: status || null,
           description: description.trim() || null,
+          urlData: urlData.trim() || null,
           startDate: startDate || null,
           estimatedEndDate: estimatedEndDate || null,
         },
@@ -171,7 +176,9 @@ export default function ProjectDetailSection() {
   if (!id) {
     return (
       <main className="max-w-4xl mx-auto px-4 py-8">
-        <p className="text-[#616161] dark:text-[#b0b0b0]">ID de proyecto no válido.</p>
+        <p className="text-[#616161] dark:text-[#b0b0b0]">
+          ID de proyecto no válido.
+        </p>
       </main>
     );
   }
@@ -214,7 +221,11 @@ export default function ProjectDetailSection() {
     <main className="max-w-4xl mx-auto px-4 py-6 sm:py-8 mt-20">
       <div className="mb-6">
         <Link
-          href={project.businessLead?.id ? Routes.panelLead(project.businessLead.id) : "/panel"}
+          href={
+            project.businessLead?.id
+              ? Routes.panelLead(project.businessLead.id)
+              : "/panel"
+          }
           className="inline-flex items-center gap-2 text-sm font-medium text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={18} />
@@ -239,19 +250,29 @@ export default function ProjectDetailSection() {
           {isEditing && (
             <span
               className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
-                PROJECT_STATUS_CLASSES[status] ?? "bg-[#f0f0f0] text-[#616161] dark:bg-[#333] dark:text-[#b0b0b0]"
+                PROJECT_STATUS_CLASSES[status] ??
+                "bg-[#f0f0f0] text-[#616161] dark:bg-[#333] dark:text-[#b0b0b0]"
               }`}
             >
               {status || "—"}
             </span>
           )}
         </div>
-        {(project.serviceType || project.startDate || (isEditing && (serviceType || startDate))) && (
+        {(project.serviceType ||
+          project.startDate ||
+          (isEditing && (serviceType || startDate))) && (
           <p className="mt-2 text-[#616161] dark:text-[#b0b0b0] text-sm">
             {[
               isEditing ? serviceType : project.serviceType,
               (isEditing ? startDate : project.startDate)
-                ? formatDateShort(isEditing ? (startDate ? `${startDate}T12:00:00` : "") : project.startDate ?? "", false)
+                ? formatDateShort(
+                    isEditing
+                      ? startDate
+                        ? `${startDate}T12:00:00`
+                        : ""
+                      : (project.startDate ?? ""),
+                    false,
+                  )
                 : null,
             ]
               .filter(Boolean)
@@ -285,7 +306,10 @@ export default function ProjectDetailSection() {
                 />
               </div>
               <div>
-                <label htmlFor="project-edit-serviceType" className={labelClassName}>
+                <label
+                  htmlFor="project-edit-serviceType"
+                  className={labelClassName}
+                >
                   Tipo de servicio
                 </label>
                 <input
@@ -315,7 +339,10 @@ export default function ProjectDetailSection() {
                 </select>
               </div>
               <div>
-                <label htmlFor="project-edit-description" className={labelClassName}>
+                <label
+                  htmlFor="project-edit-description"
+                  className={labelClassName}
+                >
                   Descripción
                 </label>
                 <textarea
@@ -327,9 +354,28 @@ export default function ProjectDetailSection() {
                   placeholder="Descripción o alcance"
                 />
               </div>
+              <div>
+                <label
+                  htmlFor="project-edit-urlData"
+                  className={labelClassName}
+                >
+                  Enlace a carpeta en la nube
+                </label>
+                <input
+                  id="project-edit-urlData"
+                  type="url"
+                  value={urlData}
+                  onChange={(e) => setUrlData(e.target.value)}
+                  className={inputClassName}
+                  placeholder="https://drive.google.com/... o link a Dropbox, OneDrive, etc."
+                />
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="project-edit-startDate" className={labelClassName}>
+                  <label
+                    htmlFor="project-edit-startDate"
+                    className={labelClassName}
+                  >
                     Fecha de inicio
                   </label>
                   <input
@@ -341,7 +387,10 @@ export default function ProjectDetailSection() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="project-edit-estimatedEndDate" className={labelClassName}>
+                  <label
+                    htmlFor="project-edit-estimatedEndDate"
+                    className={labelClassName}
+                  >
                     Fecha estimada de fin
                   </label>
                   <input
@@ -377,9 +426,27 @@ export default function ProjectDetailSection() {
                 <Field label="Tipo de servicio" value={project.serviceType} />
                 <Field label="Estado" value={project.status} />
                 <Field label="Descripción" value={project.description} />
+                {project.urlData ? (
+                  <Field label="Carpeta en la nube">
+                    <a
+                      href={project.urlData}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300 font-medium text-sm break-all"
+                    >
+                      Abrir carpeta →
+                    </a>
+                  </Field>
+                ) : (
+                  <Field label="Carpeta en la nube" value={null} />
+                )}
                 <Field
                   label="Inicio"
-                  value={project.startDate ? formatDateShort(project.startDate, false) : null}
+                  value={
+                    project.startDate
+                      ? formatDateShort(project.startDate, false)
+                      : null
+                  }
                 />
                 <Field
                   label="Fin estimado"
@@ -408,7 +475,10 @@ export default function ProjectDetailSection() {
         {project.businessLead && (
           <SectionCard title="Cliente / Lead">
             <dl className="space-y-0">
-              <Field label="Negocio" value={project.businessLead.businessName} />
+              <Field
+                label="Negocio"
+                value={project.businessLead.businessName}
+              />
               <Field
                 label="Categoría"
                 value={getCategoryLabel(project.businessLead.category)}
@@ -430,7 +500,10 @@ export default function ProjectDetailSection() {
         {project.proposal && (
           <SectionCard title="Propuesta origen">
             <dl className="space-y-0">
-              <Field label="Monto" value={formatCurrency(project.proposal.amount)} />
+              <Field
+                label="Monto"
+                value={formatCurrency(project.proposal.amount)}
+              />
               <Field label="Estado" value={project.proposal.status} />
               <Field label="Producto" value={project.proposal.product} />
               <Field
@@ -441,7 +514,10 @@ export default function ProjectDetailSection() {
                     : null
                 }
               />
-              <Field label="Vendedor" value={project.proposal.assignedSeller?.name} />
+              <Field
+                label="Vendedor"
+                value={project.proposal.assignedSeller?.name}
+              />
               {project.proposal.fileOrUrl && (
                 <Field label="Archivo / enlace">
                   <a
@@ -463,7 +539,8 @@ export default function ProjectDetailSection() {
       </div>
 
       <div className="mt-6 text-xs text-[#9e9e9e] dark:text-[#666]">
-        Creado: {project.createdAt ? formatDateShort(project.createdAt, true) : "—"}
+        Creado:{" "}
+        {project.createdAt ? formatDateShort(project.createdAt, true) : "—"}
         {project.updatedAt && (
           <> · Actualizado: {formatDateShort(project.updatedAt, true)}</>
         )}

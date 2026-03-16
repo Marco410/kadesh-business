@@ -12,6 +12,7 @@ export const CREATE_SAAS_PROJECT_MUTATION = gql`
       startDate
       estimatedEndDate
       description
+      urlData
       company {
         id
       }
@@ -38,6 +39,7 @@ export interface CreateSaasProjectVariables {
     status?: string | null;
     startDate?: string | null;
     estimatedEndDate?: string | null;
+    urlData?: string | null;
     company?: { connect?: { id: string } } | null;
     businessLead?: { connect?: { id: string } } | null;
     proposal?: { connect?: { id: string } } | null;
@@ -54,6 +56,7 @@ export interface CreateSaasProjectMutation {
     startDate: string | null;
     estimatedEndDate: string | null;
     description: string | null;
+    urlData: string | null;
     company: { id: string } | null;
     businessLead: { id: string } | null;
     proposal: { id: string } | null;
@@ -73,6 +76,7 @@ export const SAAS_PROJECT_QUERY = gql`
       startDate
       estimatedEndDate
       description
+      urlData
       createdAt
       updatedAt
       company {
@@ -163,6 +167,7 @@ export interface SaasProjectQueryResponse {
     startDate: string | null;
     estimatedEndDate: string | null;
     description: string | null;
+    urlData: string | null;
     createdAt: string | null;
     updatedAt: string | null;
     company: { id: string; name: string } | null;
@@ -199,6 +204,7 @@ export const UPDATE_SAAS_PROJECT_MUTATION = gql`
       startDate
       estimatedEndDate
       description
+      urlData
       updatedAt
     }
   }
@@ -213,6 +219,7 @@ export interface UpdateSaasProjectVariables {
     description?: string | null;
     startDate?: string | null;
     estimatedEndDate?: string | null;
+    urlData?: string | null;
   };
 }
 
@@ -225,6 +232,7 @@ export interface UpdateSaasProjectMutation {
     startDate: string | null;
     estimatedEndDate: string | null;
     description: string | null;
+    urlData: string | null;
     updatedAt: string | null;
   };
 }
