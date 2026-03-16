@@ -7,6 +7,16 @@ import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 
 const FAQ_ITEMS = [
   {
+    question: "¿Los leads se repiten?",
+    answer:
+      "No. Antes de agregar un negocio a tu cuenta, el sistema verifica si ya lo tienes registrado. Si el negocio ya existe, no se vuelve a agregar ni consume tu cuota mensual.",
+  },
+  {
+    question: "¿Cada mes obtengo nuevos leads?",
+    answer:
+      "Sí. Cada plan incluye una cuota mensual de leads que se renueva automáticamente, permitiéndote descubrir nuevos negocios continuamente.",
+  },
+  {
     question: "¿De dónde vienen los datos?",
     answer:
       "Los datos se obtienen desde Google Maps en tiempo real: nombres del negocio, teléfonos, dirección, categoría y valoración. Solo eliges un punto en el mapa, la categoría (ej. abogados, dentistas) y el radio; KADESH extrae los leads y los deja listos en tu CRM.",

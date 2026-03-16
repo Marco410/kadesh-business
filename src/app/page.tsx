@@ -2,10 +2,17 @@
 
 import {
   HeroSection,
+  HeroDifferentiatorsBadges,
   CategoriesMarqueeSection,
   InteractiveDemoSection,
+  ContactProspectsSection,
   PowerOfDataSection,
+  GoogleMapsDataSection,
+  UniqueLeadsSection,
   CRMWorkflowSection,
+  OrganizeProspectsSection,
+  NewProspectsMonthlySection,
+  ConvertProspectsSection,
   SocialProofBanner,
   AgencyTestimonialsSection,
   LandingPricingSection,
@@ -55,10 +62,17 @@ export default function HomePage() {
       <main className="min-h-screen">
         <Navigation />
         <HeroSection />
+        <HeroDifferentiatorsBadges />
         <CategoriesMarqueeSection />
         <InteractiveDemoSection />
+        <ContactProspectsSection />
         <PowerOfDataSection />
+        <GoogleMapsDataSection />
+        <UniqueLeadsSection />
         <CRMWorkflowSection />
+        <OrganizeProspectsSection />
+        <NewProspectsMonthlySection />
+        <ConvertProspectsSection />
         <SocialProofBanner />
         <AgencyTestimonialsSection />
         <LandingPricingSection />

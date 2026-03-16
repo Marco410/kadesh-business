@@ -148,7 +148,7 @@ export default function HeroSection() {
               transition={{ duration: 0.6 }}
               className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight"
             >
-              Tu próxima lista de clientes está a un clic de distancia.
+              Encuentra clientes para tu negocio en segundos.
             </motion.h1>
 
             <motion.p
@@ -157,9 +157,8 @@ export default function HeroSection() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-lg sm:text-xl text-white/90 mb-10 leading-relaxed"
             >
-              Extrae leads B2B directamente de Google Maps. Filtra por categoría
-              y radio de acción. Deja de buscar prospectos y empieza a cerrar
-              ventas hoy mismo.
+              Busca negocios desde el mapa, obtén sus datos reales y gestiona
+              tus ventas desde un CRM integrado.
             </motion.p>
 
             <motion.div

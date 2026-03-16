@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect, useId } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@apollo/client";
@@ -20,7 +21,11 @@ import {
 } from "@hugeicons/core-free-icons";
 import { useUser } from "kadesh/utils/UserContext";
 
-function formatPrice(cost: number, currency: string, frequency: string): string {
+function formatPrice(
+  cost: number,
+  currency: string,
+  frequency: string,
+): string {
   const formatter = new Intl.NumberFormat("es-MX", {
     style: "currency",
     currency: currency || "MXN",
@@ -34,8 +39,32 @@ function formatPeriod(frequency: string): string {
 }
 
 function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLSpanElement>(null);
+  const tooltipId = useId();
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside, {
+      passive: true,
+    });
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [open]);
+
   return (
-    <li className="flex items-start gap-3">
+    <li className={cn("flex items-start gap-3", open && "relative z-20")}>
       <span className="mt-0.5 flex-shrink-0" aria-hidden>
         {feature.included ? (
           <HugeiconsIcon
@@ -51,16 +80,29 @@ function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
           />
         )}
       </span>
-      <span className="relative inline group/name">
-        <span
-          className="cursor-help text-sm text-[#616161] dark:text-[#b0b0b0] border-b border-dotted border-[#616161] dark:border-[#b0b0b0]"
+      <span ref={wrapperRef} className="relative inline group/name">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen((v) => !v);
+          }}
+          className="cursor-help text-left text-sm text-[#616161] dark:text-[#b0b0b0] border-b border-dotted border-[#616161] dark:border-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#e0e0e0] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#121212] rounded-sm"
           title={feature.description}
+          aria-expanded={open}
+          aria-describedby={open ? tooltipId : undefined}
         >
           {feature.name}
-        </span>
+        </button>
         <span
+          id={tooltipId}
           role="tooltip"
-          className="pointer-events-none absolute left-0 bottom-full z-10 mb-1.5 max-w-[240px] rounded-lg bg-[#212121] dark:bg-[#2a2a2a] px-3 py-2 text-xs text-white dark:text-[#e0e0e0] shadow-lg opacity-0 transition-opacity duration-150 group-hover/name:opacity-100"
+          className={cn(
+            "absolute left-0 bottom-full z-10 mb-1.5 max-w-[240px] rounded-lg bg-[#212121] dark:bg-[#2a2a2a] px-3 py-2 text-xs text-white dark:text-[#e0e0e0] shadow-lg transition-opacity duration-150",
+            "opacity-0 group-hover/name:opacity-100",
+            open && "opacity-100 pointer-events-none",
+          )}
         >
           {feature.description}
         </span>
@@ -105,7 +147,11 @@ function PlanCard({
         </div>
         {plan.leadLimit != null && (
           <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
-            Hasta <strong className="text-[#212121] dark:text-[#e0e0e0]">{plan.leadLimit}</strong> leads/mes
+            Cada mes puedes extraer{" "}
+            <strong className="text-[#212121] dark:text-[#e0e0e0]">
+              {plan.leadLimit}
+            </strong>{" "}
+            leads
           </p>
         )}
       </div>
@@ -159,7 +205,6 @@ function PlanCard({
         </div>
       )}
 
-
       {isVertical ? (
         headerBlock
       ) : (
@@ -184,7 +229,11 @@ function PlanCard({
               </div>
               {plan.leadLimit != null && (
                 <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
-                  Hasta <strong className="text-[#212121] dark:text-[#e0e0e0]">{plan.leadLimit}</strong> leads/mes
+                  Cada mes puedes extraer{" "}
+                  <strong className="text-[#212121] dark:text-[#e0e0e0]">
+                    {plan.leadLimit}
+                  </strong>{" "}
+                  leads/mes
                 </p>
               )}
               {plan.cost === 0 && (
@@ -193,7 +242,7 @@ function PlanCard({
                 </p>
               )}
             </div>
-          
+
             {isActive && onSubscribe && plan.cost !== 0 && (
               <button
                 type="button"
@@ -204,7 +253,8 @@ function PlanCard({
                   highlighted
                     ? "bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
                     : "border-2 border-orange-500 text-orange-500 hover:bg-orange-500/10 dark:border-orange-500 dark:text-orange-400 dark:hover:bg-orange-500/20",
-                  isCurrentPlan && "hover:bg-orange-500 dark:hover:bg-orange-500",
+                  isCurrentPlan &&
+                    "hover:bg-orange-500 dark:hover:bg-orange-500",
                 )}
               >
                 {isCurrentPlan ? "Plan actual" : "Iniciar suscripción"}
@@ -240,7 +290,8 @@ export default function PlansSection({
 }: PlansSectionProps = {}) {
   const router = useRouter();
   const { subscription } = useSubscription();
-  const { data, loading, error } = useQuery<SaasPlansResponse>(SAAS_PLANS_QUERY);
+  const { data, loading, error } =
+    useQuery<SaasPlansResponse>(SAAS_PLANS_QUERY);
 
   const plans = data?.saasPlans ?? [];
   const currentPlanName = subscription?.planName?.trim() ?? null;
@@ -295,8 +346,6 @@ export default function PlansSection({
 
       {plans.length > 0 && (
         <div className="space-y-8">
-          
-
           {paidPlans.length > 0 && (
             <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {[...paidPlans]
@@ -304,7 +353,8 @@ export default function PlansSection({
                 .map((plan) => {
                   const isCurrentPlan =
                     currentPlanName != null &&
-                    plan.name.trim().toLowerCase() === currentPlanName.toLowerCase();
+                    plan.name.trim().toLowerCase() ===
+                      currentPlanName.toLowerCase();
                   return (
                     <PlanCard
                       key={plan.id}
@@ -325,7 +375,8 @@ export default function PlansSection({
                 onSubscribe={freePlan.active ? handleSubscribe : undefined}
                 isCurrentPlan={
                   currentPlanName != null &&
-                  freePlan.name.trim().toLowerCase() === currentPlanName.toLowerCase()
+                  freePlan.name.trim().toLowerCase() ===
+                    currentPlanName.toLowerCase()
                 }
                 isVertical={false}
               />

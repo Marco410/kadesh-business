@@ -48,53 +48,53 @@ export const GOOGLE_PLACE_CATEGORIES = [
 ] as const;
 
 export const PIPELINE_STATUS = {
-    DETECTADO: "01 - Detectado",
-    SELECCIONADO: "02 - Seleccionado",
-    CONTACTADO: "03 - Contactado",
-    SIN_RESPUESTA: "04 - Sin Respuesta",
-    INTERESADO: "05 - Interesado",
-    CREANDO_PROYECTO_PROPUESTA: "06 - Creando proyecto propuesta",
-    PROPUESTA_ENVIADA: "07 - Propuesta Enviada",
-    SEGUIMIENTO: "08 - Seguimiento",
-    EN_NEGOCIACION: "09 - En Negociación",
-    PROPUESTA_ACEPTADA: "10 - Propuesta Aceptada",
-    PROPUESTA_RECHAZADA: "11 - Propuesta Rechazada",
-    CERRADO_GANADO: "12 - Cerrado Ganado",
-    CERRADO_PERDIDO: "13 - Cerrado Perdido",
-    DESCARTADO: "14 - Descartado",
-  } as const;
-  
-  /** Tailwind classes for pipeline status badge (text + bg). Unknown status falls back to neutral. */
-  export const PIPELINE_STATUS_COLORS: Record<string, string> = {
-    [PIPELINE_STATUS.DETECTADO]:
-      "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
-    [PIPELINE_STATUS.SELECCIONADO]:
-      "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200",
-    [PIPELINE_STATUS.CONTACTADO]:
-      "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200",
-    [PIPELINE_STATUS.SIN_RESPUESTA]:
-      "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200",
-    [PIPELINE_STATUS.INTERESADO]:
-      "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200",
-    [PIPELINE_STATUS.CREANDO_PROYECTO_PROPUESTA]:
-      "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-200",
-    [PIPELINE_STATUS.PROPUESTA_ENVIADA]:
-      "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/50 dark:text-cyan-200",
-    [PIPELINE_STATUS.SEGUIMIENTO]:
-      "bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-200",
-    [PIPELINE_STATUS.EN_NEGOCIACION]:
-      "bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-200",
-    [PIPELINE_STATUS.PROPUESTA_ACEPTADA]:
-      "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200",
-    [PIPELINE_STATUS.PROPUESTA_RECHAZADA]:
-      "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200",
-    [PIPELINE_STATUS.CERRADO_GANADO]:
-      "bg-green-200 text-green-900 dark:bg-green-800 dark:text-green-100 font-semibold",
-    [PIPELINE_STATUS.CERRADO_PERDIDO]:
-      "bg-red-200 text-red-900 dark:bg-red-800 dark:text-red-100 font-semibold",
-    [PIPELINE_STATUS.DESCARTADO]:
-      "bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300",
-  };
+  DETECTADO: "01 - Detectado",
+  SELECCIONADO: "02 - Seleccionado",
+  CONTACTADO: "03 - Contactado",
+  SIN_RESPUESTA: "04 - Sin Respuesta",
+  INTERESADO: "05 - Interesado",
+  CREANDO_PROYECTO_PROPUESTA: "06 - Creando proyecto propuesta",
+  PROPUESTA_ENVIADA: "07 - Propuesta Enviada",
+  SEGUIMIENTO: "08 - Seguimiento",
+  EN_NEGOCIACION: "09 - En Negociación",
+  PROPUESTA_ACEPTADA: "10 - Propuesta Aceptada",
+  PROPUESTA_RECHAZADA: "11 - Propuesta Rechazada",
+  CERRADO_GANADO: "12 - Cerrado Ganado",
+  CERRADO_PERDIDO: "13 - Cerrado Perdido",
+  DESCARTADO: "14 - Descartado",
+} as const;
+
+/** Tailwind classes for pipeline status badge (text + bg). Unknown status falls back to neutral. */
+export const PIPELINE_STATUS_COLORS: Record<string, string> = {
+  [PIPELINE_STATUS.DETECTADO]:
+    "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
+  [PIPELINE_STATUS.SELECCIONADO]:
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200",
+  [PIPELINE_STATUS.CONTACTADO]:
+    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200",
+  [PIPELINE_STATUS.SIN_RESPUESTA]:
+    "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200",
+  [PIPELINE_STATUS.INTERESADO]:
+    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200",
+  [PIPELINE_STATUS.CREANDO_PROYECTO_PROPUESTA]:
+    "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-200",
+  [PIPELINE_STATUS.PROPUESTA_ENVIADA]:
+    "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/50 dark:text-cyan-200",
+  [PIPELINE_STATUS.SEGUIMIENTO]:
+    "bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-200",
+  [PIPELINE_STATUS.EN_NEGOCIACION]:
+    "bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-200",
+  [PIPELINE_STATUS.PROPUESTA_ACEPTADA]:
+    "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200",
+  [PIPELINE_STATUS.PROPUESTA_RECHAZADA]:
+    "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200",
+  [PIPELINE_STATUS.CERRADO_GANADO]:
+    "bg-green-200 text-green-900 dark:bg-green-800 dark:text-green-100 font-semibold",
+  [PIPELINE_STATUS.CERRADO_PERDIDO]:
+    "bg-red-200 text-red-900 dark:bg-red-800 dark:text-red-100 font-semibold",
+  [PIPELINE_STATUS.DESCARTADO]:
+    "bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300",
+};
 
 /** Base classes for pipeline filter ring (apply when selected). */
 export const PIPELINE_RING_BASE =
@@ -216,21 +216,22 @@ export const SUBSCRIPTION_STATUS_CLASSES: Record<string, string> = {
 /** Plan feature keys (secciones/funcionalidades del sistema). Añadir aquí al agregar nuevas. */
 export const PLAN_FEATURE_KEYS = {
   CRM: "crm",
-  LEAD_SYNC: "lead_sync",//ready
-  SALES_PERSON_MANAGEMENT: "sales_person_management",//ready
+  LEAD_SYNC: "lead_sync", //ready
+  SALES_PERSON_MANAGEMENT: "sales_person_management", //ready
   EDIT_LEAD_DATA: "edit_lead_data",
-  SALES_ACTIVITIES: "sales_activities",//ready
-  ASSIGN_SALES_PERSON: "assign_sales_person",//ready
-  FOLLOW_UP_TASKS: "follow_up_tasks",//ready
-  PROPOSALS: "proposals",//ready
+  SALES_ACTIVITIES: "sales_activities", //ready
+  ASSIGN_SALES_PERSON: "assign_sales_person", //ready
+  FOLLOW_UP_TASKS: "follow_up_tasks", //ready
+  PROPOSALS: "proposals", //ready
   CALENDAR_CRM: "calendar_crm",
   SALES_COMMISSION: "sales_commission",
   UPLOAD_FILES: "upload_files",
   PROJECTS: "projects",
-  ADD_OWN_LEADS: "add_own_leads", 
+  ADD_OWN_LEADS: "add_own_leads",
 } as const;
 
-export type PlanFeatureKey = (typeof PLAN_FEATURE_KEYS)[keyof typeof PLAN_FEATURE_KEYS];
+export type PlanFeatureKey =
+  (typeof PLAN_FEATURE_KEYS)[keyof typeof PLAN_FEATURE_KEYS];
 
 /** Metadatos por feature (nombre y descripción para UI). Añadir entradas al agregar funcionalidades. */
 export const PLAN_FEATURES_MAP: Record<

@@ -3,42 +3,41 @@
 import { motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  UserIcon,
   KanbanIcon,
-  FileAttachmentIcon,
-  Calendar03Icon,
-  UserMultiple02Icon,
+  MessageEditIcon,
+  Task01Icon,
 } from "@hugeicons/core-free-icons";
 
 const FEATURES = [
   {
+    icon: UserIcon,
+    title: "Filtrar por vendedor",
+    description: "Asigna y filtra leads por miembro del equipo.",
+  },
+  {
     icon: KanbanIcon,
-    title: "Gestión visual",
-    description:
-      "Pipeline de ventas con estados: Detectado, Contactado, Interesado.",
+    title: "Filtrar por status del pipeline",
+    description: "Detectado, Contactado, Interesado y más.",
   },
   {
-    icon: FileAttachmentIcon,
-    title: "Propuestas y cierre",
-    description:
-      "Control de montos y enlaces a documentos de propuesta. Registra ofertas y cierra tratos desde un solo lugar.",
+    icon: MessageEditIcon,
+    title: "Registrar actividades de venta",
+    description: "Llamadas, reuniones y notas en cada lead.",
   },
   {
-    icon: Calendar03Icon,
-    title: "Calendario de seguimiento",
-    description:
-      "Vista mensual para que nada se escape. Programa recordatorios y seguimientos por lead.",
-  },
-  {
-    icon: UserMultiple02Icon,
-    title: "Equipo y comisiones",
-    description:
-      "Ideal para agencias: asigna leads a vendedores y calcula comisiones automáticamente.",
+    icon: Task01Icon,
+    title: "Crear tareas de seguimiento",
+    description: "Recordatorios y próximos pasos por prospecto.",
   },
 ];
 
-export default function CRMWorkflowSection() {
+export default function OrganizeProspectsSection() {
   return (
-    <section id="crm" className="py-16 sm:py-24 bg-[#f8f8f8] dark:bg-[#0d0d0d]">
+    <section
+      id="organiza-prospectos"
+      className="py-16 sm:py-24 bg-white dark:bg-[#121212]"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -48,11 +47,11 @@ export default function CRMWorkflowSection() {
           className="text-center mb-12"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
-            CRM integrado a tu flujo
+            Organiza tus prospectos fácilmente
           </h2>
-          <p className="text-[#616161] dark:text-[#b0b0b0] max-w-2xl mx-auto">
-            Desde el primer lead hasta el cierre: actividades, propuestas,
-            calendario y comisiones.
+          <p className="text-[#616161] dark:text-[#b0b0b0] max-w-2xl mx-auto text-lg">
+            El CRM integrado te permite gestionar tus leads y ventas sin usar
+            herramientas externas.
           </p>
         </motion.div>
 
@@ -64,7 +63,7 @@ export default function CRMWorkflowSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.4, delay: i * 0.08 }}
-              className="rounded-2xl border border-[#e0e0e0] dark:border-[#2a2a2a] bg-white dark:bg-[#1e1e1e] p-6 hover:border-orange-500/30 dark:hover:border-orange-500/30 transition-colors"
+              className="rounded-2xl border border-[#e0e0e0] dark:border-[#2a2a2a] bg-[#f8f8f8] dark:bg-[#1e1e1e] p-6 hover:border-orange-500/30 dark:hover:border-orange-500/30 transition-colors"
             >
               <span className="inline-flex w-12 h-12 rounded-xl bg-orange-500/10 dark:bg-orange-500/20 items-center justify-center mb-4">
                 <HugeiconsIcon

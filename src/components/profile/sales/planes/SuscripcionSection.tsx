@@ -19,7 +19,10 @@ import { Routes } from "kadesh/core/routes";
 import { useUser } from "kadesh/utils/UserContext";
 import { cn } from "kadesh/utils/cn";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
+import {
+  ArrowLeft01Icon,
+  CheckmarkCircle02Icon,
+} from "@hugeicons/core-free-icons";
 import { useSubscriptionPayment } from "./hooks/useSubscriptionPayment";
 import EmptyCompanySection from "../EmptyCompanySection";
 
@@ -78,15 +81,19 @@ export default function SuscripcionSection() {
   const { user } = useUser();
 
   const cardElementOptions = useMemo(
-    () => (resolvedTheme === "dark" ? cardElementOptionsDark : cardElementOptionsLight),
-    [resolvedTheme]
+    () =>
+      resolvedTheme === "dark"
+        ? cardElementOptionsDark
+        : cardElementOptionsLight,
+    [resolvedTheme],
   );
 
   const [cardName, setCardName] = useState("");
   const [notes, setNotes] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
 
-  const { data, loading, error } = useQuery<SaasPlansResponse>(SAAS_PLANS_QUERY);
+  const { data, loading, error } =
+    useQuery<SaasPlansResponse>(SAAS_PLANS_QUERY);
   const { data: userData } = useQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
@@ -95,21 +102,17 @@ export default function SuscripcionSection() {
     skip: !user?.id,
   });
 
-  const plan = id
-    ? (data?.saasPlans?.find((p) => p.id === id) ?? null)
-    : null;
+  const plan = id ? (data?.saasPlans?.find((p) => p.id === id) ?? null) : null;
   const stripeCustomerId = userData?.user?.stripeCustomerId;
 
-  const { processSubscriptionPayment, loadingPayment, redirecting } = useSubscriptionPayment(
-    user?.id,
-    user?.email,
-    stripeCustomerId,
-  );
+  const { processSubscriptionPayment, loadingPayment, redirecting } =
+    useSubscriptionPayment(user?.id, user?.email, stripeCustomerId);
 
   const handleConfirmSubscription = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!plan?.active || !acceptTerms || !user?.email) return;
-    const nameCard = cardName.trim() || [user.name, user.lastName].filter(Boolean).join(" ");
+    const nameCard =
+      cardName.trim() || [user.name, user.lastName].filter(Boolean).join(" ");
     await processSubscriptionPayment(plan, {
       nameCard: nameCard || "Tarjetahabiente",
       email: user.email,
@@ -130,7 +133,9 @@ export default function SuscripcionSection() {
           Volver a planes
         </Link>
         <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 text-center">
-          <p className="text-[#616161] dark:text-[#b0b0b0]">Identificador de plan no válido.</p>
+          <p className="text-[#616161] dark:text-[#b0b0b0]">
+            Identificador de plan no válido.
+          </p>
           <Link
             href={Routes.panelPlans}
             className="mt-4 inline-block rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
@@ -179,13 +184,12 @@ export default function SuscripcionSection() {
 
   const isActive = plan.active;
 
-
   if (!companyId) {
     return (
       <EmptyCompanySection
         userId={user?.id ?? ""}
         onSuccess={async () => {
-         /*  await refetchUserCompany();
+          /*  await refetchUserCompany();
           await refreshUser(); */
         }}
       />
@@ -238,7 +242,11 @@ export default function SuscripcionSection() {
             </div>
             {plan.leadLimit != null && (
               <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
-                Hasta <strong className="text-[#212121] dark:text-[#e0e0e0]">{plan.leadLimit}</strong> leads por mes
+                Cada mes puedes extraer{" "}
+                <strong className="text-[#212121] dark:text-[#e0e0e0]">
+                  {plan.leadLimit}
+                </strong>{" "}
+                leads
               </p>
             )}
           </div>
@@ -253,7 +261,9 @@ export default function SuscripcionSection() {
                       size={20}
                       className="flex-shrink-0 text-orange-500 dark:text-orange-400"
                     />
-                    <span className="text-[#212121] dark:text-[#e0e0e0]">{f.name}</span>
+                    <span className="text-[#212121] dark:text-[#e0e0e0]">
+                      {f.name}
+                    </span>
                   </li>
                 ))}
             </ul>
@@ -271,9 +281,22 @@ export default function SuscripcionSection() {
         {/* Formulario método de pago */}
         <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8">
           <h3 className="flex items-center gap-2 text-lg font-bold text-[#212121] dark:text-[#ffffff]">
-            <span className="flex size-9 items-center justify-center rounded-lg bg-orange-500/15 dark:bg-orange-500/20 text-orange-500 dark:text-orange-400" aria-hidden>
-              <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            <span
+              className="flex size-9 items-center justify-center rounded-lg bg-orange-500/15 dark:bg-orange-500/20 text-orange-500 dark:text-orange-400"
+              aria-hidden
+            >
+              <svg
+                className="size-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                />
               </svg>
             </span>
             Método de pago
@@ -284,7 +307,10 @@ export default function SuscripcionSection() {
 
           <form onSubmit={handleConfirmSubscription} className="mt-6 space-y-4">
             <div>
-              <label htmlFor="cardName" className="mb-1.5 block text-sm font-medium text-[#212121] dark:text-[#e0e0e0]">
+              <label
+                htmlFor="cardName"
+                className="mb-1.5 block text-sm font-medium text-[#212121] dark:text-[#e0e0e0]"
+              >
                 Nombre en la tarjeta
               </label>
               <input
@@ -292,7 +318,12 @@ export default function SuscripcionSection() {
                 type="text"
                 value={cardName}
                 onChange={(e) => setCardName(e.target.value)}
-                placeholder={user ? [user.name, user.lastName].filter(Boolean).join(" ") || "Juan Pérez" : "Juan Pérez"}
+                placeholder={
+                  user
+                    ? [user.name, user.lastName].filter(Boolean).join(" ") ||
+                      "Juan Pérez"
+                    : "Juan Pérez"
+                }
                 className={inputBase}
                 autoComplete="cc-name"
               />
@@ -306,8 +337,14 @@ export default function SuscripcionSection() {
               </div>
             </div>
             <div>
-              <label htmlFor="notes" className="mb-1.5 block text-sm font-medium text-[#212121] dark:text-[#e0e0e0]">
-                Notas <span className="text-[#9e9e9e] dark:text-[#666]">(opcional)</span>
+              <label
+                htmlFor="notes"
+                className="mb-1.5 block text-sm font-medium text-[#212121] dark:text-[#e0e0e0]"
+              >
+                Notas{" "}
+                <span className="text-[#9e9e9e] dark:text-[#666]">
+                  (opcional)
+                </span>
               </label>
               <input
                 id="notes"
@@ -327,19 +364,28 @@ export default function SuscripcionSection() {
                 className="mt-1 size-4 rounded border-[#e0e0e0] text-orange-500 focus:ring-orange-500 dark:border-[#3a3a3a]"
               />
               <span className="text-sm text-[#616161] dark:text-[#b0b0b0]">
-                Acepto los términos del plan y el cargo recurrente según la frecuencia seleccionada.
+                Acepto los términos del plan y el cargo recurrente según la
+                frecuencia seleccionada.
               </span>
             </label>
 
             <div className="flex flex-col gap-3 pt-2">
               {(loadingPayment || redirecting) && (
                 <p className="text-center text-sm text-[#616161] dark:text-[#b0b0b0]">
-                  {redirecting ? "Redirigiendo a la confirmación…" : "Procesando el pago…"}
+                  {redirecting
+                    ? "Redirigiendo a la confirmación…"
+                    : "Procesando el pago…"}
                 </p>
               )}
               <button
                 type="submit"
-                disabled={!isActive || !acceptTerms || loadingPayment || redirecting || !user?.email}
+                disabled={
+                  !isActive ||
+                  !acceptTerms ||
+                  loadingPayment ||
+                  redirecting ||
+                  !user?.email
+                }
                 className={cn(
                   "w-full rounded-xl px-6 py-3 text-sm font-semibold text-white transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-60",
                   isActive && acceptTerms && user?.email && !redirecting
