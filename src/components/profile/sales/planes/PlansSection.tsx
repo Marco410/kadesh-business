@@ -38,6 +38,41 @@ function formatPeriod(frequency: string): string {
   return f === "monthly" ? "mes" : f === "yearly" ? "año" : frequency || "";
 }
 
+function formatCostPerLead(
+  cost: number,
+  leadLimit: number | null,
+): string | null {
+  if (!leadLimit || leadLimit <= 0) return null;
+  const perLead = cost / leadLimit;
+  return new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: "MXN",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(perLead);
+}
+
+const PLAN_PERSONAS: Record<string, string> = {
+  starter: "Para vendedores independientes y equipos de 1–2 personas",
+  pro: "Para equipos de ventas en crecimiento con múltiples vendedores",
+  agencia: "Para agencias con múltiples carteras de clientes",
+};
+
+const PLAN_CTA: Record<string, string> = {
+  starter: "Empezar con Starter",
+  pro: "Empezar con Pro",
+  agencia: "Contactar para Agencia",
+};
+
+function getPlanPersona(name: string): string | null {
+  return PLAN_PERSONAS[name.trim().toLowerCase()] ?? null;
+}
+
+function getPlanCta(name: string, isCurrentPlan: boolean): string {
+  if (isCurrentPlan) return "Plan actual";
+  return PLAN_CTA[name.trim().toLowerCase()] ?? "Iniciar suscripción";
+}
+
 function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLSpanElement>(null);
@@ -126,12 +161,21 @@ function PlanCard({
   const highlighted = isCurrentPlan === true;
   const { user } = useUser();
 
+  const persona = getPlanPersona(plan.name);
+  const costPerLead = formatCostPerLead(plan.cost, plan.leadLimit);
+  const includedFeatures = plan.planFeatures?.filter((f) => f.included) ?? [];
+
   const headerBlock = (
     <>
       <div className={isVertical ? "text-center" : "text-left"}>
         <h3 className="text-lg font-bold text-[#212121] dark:text-[#ffffff]">
           {plan.name}
         </h3>
+        {persona && (
+          <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+            {persona}
+          </p>
+        )}
         {!isActive && !isCurrentPlan && (
           <span className="mt-1 block text-xs text-[#616161] dark:text-[#b0b0b0]">
             No disponible
@@ -140,6 +184,9 @@ function PlanCard({
         <div className="mt-4">
           <span className="text-4xl font-bold text-[#212121] dark:text-[#ffffff]">
             {formatPrice(plan.cost, plan.currency, plan.frequency)}
+          </span>
+          <span className="text-xs font-medium text-[#9e9e9e] dark:text-[#757575] ml-1">
+            {plan.currency}
           </span>
           <span className="text-[#616161] dark:text-[#b0b0b0]">
             /{formatPeriod(plan.frequency)}
@@ -154,11 +201,16 @@ function PlanCard({
             leads
           </p>
         )}
+        {costPerLead && (
+          <p className="mt-2 text-xs font-medium text-orange-500 dark:text-orange-400">
+            Solo {costPerLead} {plan.currency} por lead
+          </p>
+        )}
       </div>
 
-      {plan.planFeatures != null && plan.planFeatures.length > 0 && (
+      {includedFeatures.length > 0 && (
         <ul className={isVertical ? "mt-8 space-y-3" : "space-y-3"}>
-          {plan.planFeatures.map((f) => (
+          {includedFeatures.map((f) => (
             <FeatureRow key={f.key} feature={f} />
           ))}
         </ul>
@@ -177,7 +229,7 @@ function PlanCard({
             isCurrentPlan && "hover:bg-orange-500 dark:hover:bg-orange-500",
           )}
         >
-          {isCurrentPlan ? "Plan actual" : "Iniciar suscripción"}
+          {getPlanCta(plan.name, isCurrentPlan ?? false)}
         </button>
       )}
     </>
@@ -214,6 +266,11 @@ function PlanCard({
               <h3 className="text-lg font-bold text-[#212121] dark:text-[#ffffff]">
                 {plan.name}
               </h3>
+              {persona && (
+                <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  {persona}
+                </p>
+              )}
               {!isActive && !isCurrentPlan && (
                 <span className="mt-1 block text-xs text-[#616161] dark:text-[#b0b0b0]">
                   No disponible
@@ -222,6 +279,9 @@ function PlanCard({
               <div className="mt-4">
                 <span className="text-4xl font-bold text-[#212121] dark:text-[#ffffff]">
                   {formatPrice(plan.cost, plan.currency, plan.frequency)}
+                </span>
+                <span className="text-xs font-medium text-[#9e9e9e] dark:text-[#757575] ml-1">
+                  {plan.currency}
                 </span>
                 <span className="text-[#616161] dark:text-[#b0b0b0]">
                   /{formatPeriod(plan.frequency)}
@@ -236,8 +296,13 @@ function PlanCard({
                   leads/mes
                 </p>
               )}
+              {costPerLead && (
+                <p className="mt-2 text-xs font-medium text-orange-500 dark:text-orange-400">
+                  Solo {costPerLead} {plan.currency} por lead
+                </p>
+              )}
               {plan.cost === 0 && (
-                <p className="mt-2 text-sm rounded-full bg-green-500 px-4 py-1 text-sm font-bold text-white">
+                <p className="mt-2 inline-block rounded-full bg-green-500 px-4 py-1 text-sm font-bold text-white">
                   Prueba gratuita de 1 mes
                 </p>
               )}
@@ -257,13 +322,13 @@ function PlanCard({
                     "hover:bg-orange-500 dark:hover:bg-orange-500",
                 )}
               >
-                {isCurrentPlan ? "Plan actual" : "Iniciar suscripción"}
+                {getPlanCta(plan.name, isCurrentPlan ?? false)}
               </button>
             )}
           </div>
-          {plan.planFeatures != null && plan.planFeatures.length > 0 && (
+          {includedFeatures.length > 0 && (
             <ul className="flex-1 min-w-0 space-y-3">
-              {plan.planFeatures.map((f) => (
+              {includedFeatures.map((f) => (
                 <FeatureRow key={f.key} feature={f} />
               ))}
             </ul>
