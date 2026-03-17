@@ -8,6 +8,7 @@ export const Routes = {
   auth: {
     login: '/auth/login',
     register: '/auth/register',
+    registerWithReferral: (code: string): string => `/auth/register?referral=${code}`,
   },
   // Home
   home: '/',

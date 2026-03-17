@@ -99,8 +99,8 @@ export const AUTHENTICATE_USER_MUTATION = gql`
 
 /** Backend must implement this mutation (e.g. custom resolver or Keystone auth plugin). */
 export const AUTHENTICATE_USER_WITH_GOOGLE_MUTATION = gql`
-  mutation AuthenticateUserWithGoogle($idToken: String!) {
-    authenticateUserWithGoogle(idToken: $idToken) {
+  mutation AuthenticateUserWithGoogle($idToken: String!, $referrerCode: String) {
+    authenticateUserWithGoogle(idToken: $idToken, referrerCode: $referrerCode) {
       ... on UserAuthenticationWithGoogleSuccess {
         sessionToken
         item {
@@ -127,13 +127,14 @@ export const AUTHENTICATE_USER_WITH_GOOGLE_MUTATION = gql`
   }
 `;
 
-export const CREATE_USER_MUTATION = gql`
-  mutation CreateUser($data: UserCreateInput!) {
-    createUser(data: $data) {
+export const REGISTER_USER_MUTATION = gql`
+  mutation RegisterUser($data: UserCreateInput!, $referrerCode: String) {
+    registerUser(data: $data, referrerCode: $referrerCode) {
       name
       lastName
       email
       phone
+      referralCode
     }
   }
 `;
@@ -233,6 +234,7 @@ export interface AuthenticateUserResponse {
 
 export interface AuthenticateUserWithGoogleVariables {
   idToken: string;
+  referrerCode?: string | null;
 }
 
 export interface AuthenticateUserWithGoogleResponse {
@@ -264,7 +266,7 @@ export interface AuthenticateUserWithGoogleResponse {
     | null;
 }
 
-export interface CreateUserVariables {
+export interface RegisterUserVariables {
   data: {
     name: string;
     lastName: string;
@@ -275,14 +277,16 @@ export interface CreateUserVariables {
     company?: { connect: { id: string } };
     roles?: { connect: Array<{ id: string }> };
   };
+  referrerCode?: string | null;
 }
 
-export interface CreateUserResponse {
-  createUser: {
+export interface RegisterUserResponse {
+  registerUser: {
     name: string;
     lastName: string;
     email: string;
     phone: string | null;
+    referralCode: string | null;
   };
 }
 

@@ -14,6 +14,7 @@ import {
   SocialProofBanner,
   AgencyTestimonialsSection,
   LandingPricingSection,
+  ReferralSection,
   FinalCTASection,
   FAQSection,
 } from "kadesh/components/home";
@@ -74,6 +75,7 @@ export default function HomePage() {
         <SocialProofBanner />
         <AgencyTestimonialsSection />
         <LandingPricingSection />
+        <ReferralSection />
         <FinalCTASection />
         <FAQSection />
         <Footer />

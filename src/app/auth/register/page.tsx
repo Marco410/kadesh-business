@@ -7,9 +7,10 @@ import { redirect } from "next/navigation";
 export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ redirect?: string }>;
+  searchParams: Promise<{ redirect?: string; referral?: string }>;
 }) {
   const params = await searchParams;
   const redirectTo = params.redirect ? `&redirect=${encodeURIComponent(params.redirect)}` : "";
-  redirect(`/auth/login?tab=register${redirectTo}`);
+  const referral = params.referral ? `&referral=${encodeURIComponent(params.referral)}` : "";
+  redirect(`/auth/login?tab=register${redirectTo}${referral}`);
 }

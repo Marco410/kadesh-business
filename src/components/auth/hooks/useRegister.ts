@@ -4,15 +4,15 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQuery } from '@apollo/client';
 import {
-  CREATE_USER_MUTATION,
   CREATE_SAAS_COMPANY_MUTATION,
   AUTHENTICATE_USER_MUTATION,
-  CreateUserVariables,
-  CreateUserResponse,
-  CreateSaasCompanyVariables,
-  CreateSaasCompanyResponse,
-  AuthenticateUserVariables,
-  AuthenticateUserResponse
+  REGISTER_USER_MUTATION,
+  type RegisterUserVariables,
+  type RegisterUserResponse,
+  type CreateSaasCompanyVariables,
+  type CreateSaasCompanyResponse,
+  type AuthenticateUserVariables,
+  type AuthenticateUserResponse,
 } from 'kadesh/utils/queries';
 import {
   ROLES_BY_NAMES_QUERY,
@@ -23,10 +23,12 @@ import { Role } from 'kadesh/constants/constans';
 import { useUser } from 'kadesh/utils/UserContext';
 import { trackCompleteRegistration } from 'kadesh/utils/facebook-pixel';
 import { Routes } from 'kadesh/core/routes';
+import { sileo } from 'sileo';
 
 interface UseRegisterOptions {
   onSuccess?: () => void;
   redirectTo?: string | null;
+  referralCode?: string | null;
 }
 
 export function useRegister(options?: UseRegisterOptions) {
@@ -40,6 +42,7 @@ export function useRegister(options?: UseRegisterOptions) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [referralCode, setReferralCode] = useState(options?.referralCode ?? '');
 
   const [authenticateUser] = useMutation<
     AuthenticateUserResponse,
@@ -61,10 +64,10 @@ export function useRegister(options?: UseRegisterOptions) {
     CreateSaasCompanyVariables
   >(CREATE_SAAS_COMPANY_MUTATION);
 
-  const [createUser, { loading }] = useMutation<
-    CreateUserResponse,
-    CreateUserVariables
-  >(CREATE_USER_MUTATION, {
+  const [registerUser, { loading }] = useMutation<
+    RegisterUserResponse,
+    RegisterUserVariables
+  >(REGISTER_USER_MUTATION, {
     onCompleted: async () => {
       trackCompleteRegistration();
       // Save credentials before clearing form
@@ -72,7 +75,7 @@ export function useRegister(options?: UseRegisterOptions) {
       const savedPassword = password;
       
       // If redirectTo is provided, automatically login after registration
-      if (options?.redirectTo) {
+       if (options?.redirectTo) {
         try {
           // Auto-login with the credentials
           const { data } = await authenticateUser({
@@ -110,7 +113,7 @@ export function useRegister(options?: UseRegisterOptions) {
           console.error('Error auto-logging in:', error);
           // If auto-login fails, just show success message
         }
-      }
+      } 
       
       // Clear form
       setName('');
@@ -121,6 +124,7 @@ export function useRegister(options?: UseRegisterOptions) {
       setPassword('');
       setConfirmPassword('');
       setError('');
+      setReferralCode('');
       
       // Call success callback if provided
       if (options?.onSuccess) {
@@ -128,6 +132,7 @@ export function useRegister(options?: UseRegisterOptions) {
       }
     },
     onError: (error) => {
+      sileo.error({ title: 'Error al registrar usuario', description: error.message || 'Error al registrar usuario' });
       setError(error.message || 'Error al registrar usuario');
     },
   });
@@ -172,7 +177,7 @@ export function useRegister(options?: UseRegisterOptions) {
         return;
       }
 
-      await createUser({
+      await registerUser({
         variables: {
           data: {
             name,
@@ -183,6 +188,7 @@ export function useRegister(options?: UseRegisterOptions) {
             company: { connect: { id: companyId } },
             roles: { connect: roleIds.map((id) => ({ id })) },
           },
+          referrerCode: referralCode || null,
         },
       });
     } catch (err) {
@@ -205,6 +211,8 @@ export function useRegister(options?: UseRegisterOptions) {
     setPassword,
     confirmPassword,
     setConfirmPassword,
+    referralCode,
+    setReferralCode,
     error,
     setError,
     loading,

@@ -76,6 +76,7 @@ function LoginPageContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const redirectPath = searchParams.get("redirect") || null;
+  const referralCodeFromUrl = searchParams.get("referral") || null;
   const tabParam = searchParams.get("tab");
   const initialTab = tabParam === "register" ? "register" : "login";
 
@@ -125,12 +126,14 @@ function LoginPageContent() {
     setPassword: setRegisterPassword,
     confirmPassword: registerConfirmPassword,
     setConfirmPassword: setRegisterConfirmPassword,
+    referralCode: registerReferralCode,
+    setReferralCode: setRegisterReferralCode,
     error: registerError,
     loading: registerLoading,
     handleSubmit: handleRegister,
   } = useRegister({
     onSuccess: () => {
-      if (redirectPath) {
+       if (redirectPath) {
         setSuccessMessage("Registro exitoso. Iniciando sesión...");
       } else {
         setSelectedTab("login");
@@ -138,9 +141,10 @@ function LoginPageContent() {
           "Registro exitoso, ya puedes iniciar sesión con tus credenciales",
         );
         updateUrlForTab("login");
-      }
+      } 
     },
     redirectTo: redirectPath,
+    referralCode: referralCodeFromUrl,
   });
 
   const {
@@ -148,7 +152,7 @@ function LoginPageContent() {
     loading: googleLoading,
     error: googleError,
     setError: setGoogleError,
-  } = useGoogleLogin({ redirectTo: redirectPath });
+  } = useGoogleLogin({ redirectTo: redirectPath, referralCode: referralCodeFromUrl });
 
   return (
     <div className="min-h-screen flex bg-[#f5f5f5] dark:bg-[#0a0a0a] relative">
@@ -307,7 +311,7 @@ function LoginPageContent() {
                     )}
                   </button>
 
-                  <div className="relative my-6">
+                  {/* <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
                       <div className="w-full border-t border-[#e0e0e0] dark:border-[#3a3a3a]"></div>
                     </div>
@@ -327,7 +331,7 @@ function LoginPageContent() {
                     <p className="text-center text-sm text-[#616161] dark:text-[#b0b0b0]">
                       Conectando con Google...
                     </p>
-                  )}
+                  )} */}
                 </form>
               </Tab>
 
@@ -430,6 +434,23 @@ function LoginPageContent() {
                     />
                   </div>
 
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="register-referral"
+                      className="block text-sm font-medium text-[#212121] dark:text-[#ffffff]"
+                    >
+                      Código de referido
+                    </label>
+                    <input
+                      id="register-referral"
+                      type="text"
+                      placeholder="Ej: KBC124 (opcional)"
+                      value={registerReferralCode ?? ""}
+                      onChange={(e) => setRegisterReferralCode(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
+                    />
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label
@@ -505,7 +526,7 @@ function LoginPageContent() {
                     )}
                   </button>
 
-                 <div className="relative my-6">
+                 {/* <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-[#e0e0e0] dark:border-[#3a3a3a]"></div>
                   </div>
@@ -530,7 +551,7 @@ function LoginPageContent() {
                     <div className="p-4 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm font-medium">
                       {googleError}
                     </div>
-                  )}
+                  )} */}
                 </form>
               </Tab>
             </Tabs>

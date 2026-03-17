@@ -50,6 +50,7 @@ declare global {
 
 interface UseGoogleLoginOptions {
   redirectTo?: string | null;
+  referralCode?: string | null;
 }
 
 /** Asigna roles Vendedor y Admin Company al usuario si no los tiene (p. ej. tras login con Google). */
@@ -176,10 +177,13 @@ export function useGoogleLogin(options?: UseGoogleLoginOptions) {
       setError("");
       setLoading(true);
       authenticateWithGoogle({
-        variables: { idToken: response.credential },
+        variables: {
+          idToken: response.credential,
+          referrerCode: options?.referralCode ?? null,
+        },
       });
     },
-    [authenticateWithGoogle],
+    [authenticateWithGoogle, options?.referralCode],
   );
 
   const initAndRenderButton = useCallback(() => {

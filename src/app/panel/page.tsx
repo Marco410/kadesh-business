@@ -17,6 +17,7 @@ import {
   FileIcon,
   FolderIcon,
   CalendarIcon,
+  UserAdd01Icon,
 } from "@hugeicons/core-free-icons";
 import ProfileData from "kadesh/components/profile/ProfileData";
 import SalesSection from "kadesh/components/profile/sales/SalesSection";
@@ -35,11 +36,13 @@ import {
 import { hasPlanFeature } from "kadesh/components/profile/sales/helpers/plan-features";
 import { PLAN_FEATURE_KEYS } from "kadesh/components/profile/sales/constants";
 import { Footer, Navigation } from "kadesh/components/layout";
+import { ReferralSection as PublicReferralSection, ReferralLinkSection } from "kadesh/components/home";
 import { Role } from "kadesh/constants/constans";
 import FeatureLockedSection from "kadesh/components/profile/sales/FeatureLockedSection";
 import { SubscriptionProvider } from "kadesh/components/profile/sales/SubscriptionContext";
+import ReferralDashboardSection from "kadesh/components/profile/referral/ReferralDashboardSection";
 
-const VALID_TABS = ["inicio", "profile", "ventas", "vendedores", "archivos", "proyectos", "calendar"] as const;
+const VALID_TABS = ["inicio", "profile", "ventas", "vendedores", "archivos", "proyectos", "calendar", "referidos"] as const;
 
 function getValidTab(
   tabFromUrl: string | null,
@@ -74,7 +77,9 @@ const navItems = [
   { key: "archivos" as const, label: "Archivos", icon: FileIcon, requireAdminCompany: false, requireUploadFilesFeature: true },
   { key: "proyectos" as const, label: "Proyectos", icon: FolderIcon },
   { key: "calendar" as const, label: "Mi Calendario", icon: CalendarIcon, requireCalendarFeature: true },
+  { key: "referidos" as const, label: "Referidos", icon: UserAdd01Icon },
 ];
+
 
 function DashboardSidebar({
   selectedTab,
@@ -275,6 +280,10 @@ function ProfilePageContent() {
                       </h3>
                       <QuickActions hasVendedorRole={hasVendedorRole} />
                     </div>
+                    <ReferralLinkSection referralCode={userData?.user?.referralCode ?? ""} />
+                    <div className="rounded-2xl overflow-hidden border border-[#e0e0e0] dark:border-[#3a3a3a]">
+                      <PublicReferralSection />
+                    </div>
                   </div>
                 )}
 
@@ -324,6 +333,20 @@ function ProfilePageContent() {
                   ) : (
                     <FeatureLockedSection sectionName="Calendario" />
                   )
+                )}
+
+                {selectedTab === "referidos" && (
+                  <div className="space-y-6">
+                    <div>
+                      <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
+                        Referidos
+                      </h2>
+                      <p className="mt-1 text-sm text-[#616161] dark:text-[#9e9e9e]">
+                        Usuarios que se registraron con tu código y tus comisiones generadas.
+                      </p>
+                    </div>
+                    <ReferralDashboardSection userId={user.id} />
+                  </div>
                 )}
               </main>
             </div>

@@ -71,6 +71,7 @@ export const USER_COMPANY_CATEGORIES_QUERY = gql`
       id
       salesComission
       stripeCustomerId
+      referralCode
       company {
         id
         name
@@ -89,6 +90,7 @@ export interface UserCompanyCategoriesResponse {
     id: string;
     salesComission: number;
     stripeCustomerId: string;
+    referralCode: string | null;
     company: {
       id: string;
       name: string;
@@ -1335,6 +1337,8 @@ export const SAAS_PLANS_QUERY = gql`
       stripeProductId
       bestSeller
       planFeatures
+      referralUpfrontCommissionPct
+      referralRecurringCommissionPct
     }
   }
 `;
@@ -1351,6 +1355,8 @@ export interface SaasPlanItem {
   stripeProductId: string | null;
   bestSeller?: boolean | null;
   planFeatures: PlanFeatureItem[] | null;
+  referralUpfrontCommissionPct: number | null;
+  referralRecurringCommissionPct: number | null;
 }
 
 export interface SaasPlansResponse {
