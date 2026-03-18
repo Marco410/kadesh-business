@@ -607,7 +607,7 @@ export interface CreateTechStatusBusinessLeadVariables {
     opportunityLevel?: string | null;
     pipelineStatus?: string | null;
     productOffered?: string | null;
-    salesPerson?: { connect: { id: string } };
+    salesPerson?: { connect: { id: string } } | { disconnect: boolean };
     saasCompany?: { connect: { id: string } };
   };
 }
