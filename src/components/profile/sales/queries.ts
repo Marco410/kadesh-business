@@ -536,6 +536,11 @@ export const UPDATE_TECH_STATUS_BUSINESS_LEAD_MUTATION = gql`
   }
 `;
 
+type TechStatusSalesPersonRelInput = {
+  connect?: { id: string };
+  disconnect?: boolean;
+};
+
 export interface UpdateTechStatusBusinessLeadVariables {
   where: { id: string };
   data: {
@@ -546,7 +551,7 @@ export interface UpdateTechStatusBusinessLeadVariables {
     opportunityLevel?: string | null;
     pipelineStatus?: string | null;
     productOffered?: string | null;
-    salesPerson?: { connect: { id: string } } | { disconnect: true };
+    salesPerson?: TechStatusSalesPersonRelInput;
     saasCompany?: { connect: { id: string } };
   };
 }
@@ -607,7 +612,7 @@ export interface CreateTechStatusBusinessLeadVariables {
     opportunityLevel?: string | null;
     pipelineStatus?: string | null;
     productOffered?: string | null;
-    salesPerson?: { connect: { id: string } } | { disconnect: boolean };
+    salesPerson?: TechStatusSalesPersonRelInput;
     saasCompany?: { connect: { id: string } };
   };
 }
