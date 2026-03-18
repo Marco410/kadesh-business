@@ -53,7 +53,7 @@ export default function VendedoresListTab({ userId }: VendedoresListTabProps) {
 
   const companyId = userData?.user?.company?.id ?? null;
 
-  const { data: vendedoresData, loading, error } = useQuery<
+  const { data: vendedoresData, loading, error, refetch } = useQuery<
     CompanyVendedoresWithStatsResponse,
     CompanyVendedoresWithStatsVariables
   >(COMPANY_VENDEDORES_WITH_STATS_QUERY, {
@@ -167,7 +167,10 @@ export default function VendedoresListTab({ userId }: VendedoresListTabProps) {
       <VendedorDetailModal
         vendedorId={selectedVendedorId}
         isOpen={selectedVendedorId != null}
-        onClose={() => setSelectedVendedorId(null)}
+        onClose={() => {
+          setSelectedVendedorId(null);
+          void refetch();
+        }}
       />
     </>
   );

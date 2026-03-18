@@ -499,7 +499,9 @@ export interface UpdateTechBusinessLeadVariables {
     xTwitter?: string | null;
     hasWebsite?: boolean | null;
     websiteUrl?: string | null;
-    salesPerson?: { connect: Array<{ id: string }> };
+    salesPerson?:
+      | { connect: Array<{ id: string }> }
+      | { disconnect: Array<{ id: string }> };
   };
 }
 
@@ -544,7 +546,7 @@ export interface UpdateTechStatusBusinessLeadVariables {
     opportunityLevel?: string | null;
     pipelineStatus?: string | null;
     productOffered?: string | null;
-    salesPerson?: { connect: { id: string } };
+    salesPerson?: { connect: { id: string } } | { disconnect: true };
     saasCompany?: { connect: { id: string } };
   };
 }
@@ -560,6 +562,22 @@ export interface UpdateTechStatusBusinessLeadMutation {
     pipelineStatus: string | null;
     productOffered: string | null;
   };
+}
+
+export const DELETE_TECH_STATUS_BUSINESS_LEAD_MUTATION = gql`
+  mutation DeleteTechStatusBusinessLead($where: TechStatusBusinessLeadWhereUniqueInput!) {
+    deleteTechStatusBusinessLead(where: $where) {
+      id
+    }
+  }
+`;
+
+export interface DeleteTechStatusBusinessLeadVariables {
+  where: { id: string };
+}
+
+export interface DeleteTechStatusBusinessLeadMutation {
+  deleteTechStatusBusinessLead: { id: string };
 }
 
 export const CREATE_TECH_STATUS_BUSINESS_LEAD_MUTATION = gql`

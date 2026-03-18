@@ -12,8 +12,14 @@ import {
   UPDATE_TECH_PROPOSAL_MUTATION,
   type UpdateTechProposalVariables,
   type UpdateTechProposalMutation,
+  DELETE_TECH_STATUS_BUSINESS_LEAD_MUTATION,
+  type DeleteTechStatusBusinessLeadVariables,
+  type DeleteTechStatusBusinessLeadMutation,
+  UPDATE_TECH_BUSINESS_LEAD_MUTATION,
+  type UpdateTechBusinessLeadVariables,
+  type UpdateTechBusinessLeadMutation,
 } from "kadesh/components/profile/sales/queries";
-import { PIPELINE_STATUS_COLORS, PROPOSAL_STATUS } from "kadesh/components/profile/sales/constants";
+import { PIPELINE_STATUS_COLORS, PLAN_FEATURE_KEYS, PROPOSAL_STATUS } from "kadesh/components/profile/sales/constants";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -26,7 +32,12 @@ import {
   Calendar03Icon,
   FileAttachmentIcon,
   Task01Icon,
+  UserRemove01Icon,
 } from "@hugeicons/core-free-icons";
+import { hasPlanFeature } from "../helpers/plan-features";
+import { useSubscription } from "../SubscriptionContext";
+import { useUser } from "kadesh/utils/UserContext";
+import { Role } from "kadesh/constants/constans";
 
 interface VendedorDetailModalProps {
   vendedorId: string | null;
@@ -93,6 +104,9 @@ export default function VendedorDetailModal({
   isOpen,
   onClose,
 }: VendedorDetailModalProps) {
+  const { user: currentUser, refreshUser } = useUser();
+  const { subscription } = useSubscription();
+
   const { data, loading } = useQuery<
     UserVendedorDetailResponse,
     UserVendedorDetailVariables
@@ -113,7 +127,57 @@ export default function VendedorDetailModal({
     ],
   });
 
+  const refetchVendedorDetail = {
+    query: USER_VENDEDOR_DETAIL_QUERY,
+    variables: { where: { id: vendedorId ?? "" } },
+  } as const;
+
+  const [updateTechBusinessLead] = useMutation<
+    UpdateTechBusinessLeadMutation,
+    UpdateTechBusinessLeadVariables
+  >(UPDATE_TECH_BUSINESS_LEAD_MUTATION);
+
+  const [deleteTechStatusBusinessLead] = useMutation<
+    DeleteTechStatusBusinessLeadMutation,
+    DeleteTechStatusBusinessLeadVariables
+  >(DELETE_TECH_STATUS_BUSINESS_LEAD_MUTATION, {
+    awaitRefetchQueries: true,
+    refetchQueries: [refetchVendedorDetail],
+  });
+
+  const isAdminCompany = currentUser?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+
   const [updatingProposalId, setUpdatingProposalId] = useState<string | null>(null);
+  const [unassigningLeadId, setUnassigningLeadId] = useState<string | null>(null);
+
+  const handleUnassignLead = async (
+    techStatusId: string,
+    salesPersons: Array<{ id: string }> | { id: string } | null,
+    techBusinessLeadId: string | undefined,
+  ) => {
+    const spArray = Array.isArray(salesPersons)
+      ? salesPersons
+      : salesPersons
+        ? [salesPersons]
+        : [];
+    if (!vendedorId || !spArray.some((sp) => sp.id === vendedorId)) return;
+    setUnassigningLeadId(techStatusId);
+    try {
+      if (techBusinessLeadId) {
+        await updateTechBusinessLead({
+          variables: {
+            where: { id: techBusinessLeadId },
+            data: { salesPerson: { disconnect: [{ id: vendedorId }] } },
+          },
+        });
+      }
+      await deleteTechStatusBusinessLead({
+        variables: { where: { id: techStatusId } },
+      });
+    } finally {
+      setUnassigningLeadId(null);
+    }
+  };
 
   const handleApprovedChange = async (proposalId: string, approved: boolean) => {
     setUpdatingProposalId(proposalId);
@@ -275,25 +339,42 @@ export default function VendedorDetailModal({
                       {user.techStatusBusinessLeads.map((s) => (
                         <li
                           key={s.id}
-                          className="flex flex-wrap items-center gap-2 py-2 border-b border-[#e8e8e8] dark:border-[#333] last:border-0"
+                          className="flex items-center gap-2 py-2 border-b border-[#e8e8e8] dark:border-[#333] last:border-0"
                         >
-                          <span className="font-medium text-[#212121] dark:text-white text-sm">
-                            {s.businessLead?.businessName ?? "—"}
-                          </span>
-                          {s.pipelineStatus && (
-                            <span
-                              className={`text-xs px-2 py-0.5 rounded-full ${
-                                PIPELINE_STATUS_COLORS[s.pipelineStatus] ??
-                                "bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200"
-                              }`}
-                            >
-                              {s.pipelineStatus}
+                          <div className="flex-1 min-w-0 flex flex-wrap items-center gap-2">
+                            <span className="font-medium text-[#212121] dark:text-white text-sm">
+                              {s.businessLead?.businessName ?? "—"}
                             </span>
-                          )}
-                          {s.opportunityLevel && (
-                            <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">
-                              {s.opportunityLevel}
-                            </span>
+                            {s.pipelineStatus && (
+                              <span
+                                className={`text-xs px-2 py-0.5 rounded-full ${
+                                  PIPELINE_STATUS_COLORS[s.pipelineStatus] ??
+                                  "bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200"
+                                }`}
+                              >
+                                {s.pipelineStatus}
+                              </span>
+                            )}
+                            {s.opportunityLevel && (
+                              <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                                {s.opportunityLevel}
+                              </span>
+                            )}
+                          </div>
+                          {hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.ASSIGN_SALES_PERSON) && isAdminCompany && (
+                          <button
+                            type="button"
+                            onClick={() => handleUnassignLead(s.id, s.salesPerson, s.businessLead?.id)}
+                            disabled={unassigningLeadId === s.id}
+                            title="Desasignar vendedor"
+                            className="shrink-0 flex items-center justify-center rounded-lg p-1.5 text-[#9e9e9e] hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          >
+                            {unassigningLeadId === s.id ? (
+                              <span className="size-4 block animate-spin rounded-full border-2 border-red-400 border-t-transparent" />
+                            ) : (
+                                <HugeiconsIcon icon={UserRemove01Icon} size={16} />
+                              )}
+                            </button>
                           )}
                         </li>
                       ))}

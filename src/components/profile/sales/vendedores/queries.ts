@@ -115,6 +115,10 @@ export const USER_VENDEDOR_DETAIL_QUERY = gql`
         nextFollowUpDate
         notes
         productOffered
+        salesPerson {
+          id
+          name
+        }
         businessLead {
           id
           businessName
@@ -183,6 +187,7 @@ export interface UserVendedorDetailResponse {
       nextFollowUpDate: string | null;
       notes: string | null;
       productOffered: string | null;
+      salesPerson: Array<{ id: string; name: string }> | { id: string; name: string } | null;
       businessLead: { id: string; businessName: string } | null;
     }>;
   } | null;
