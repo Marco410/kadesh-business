@@ -151,11 +151,13 @@ function PlanCard({
   onSubscribe,
   isCurrentPlan,
   isVertical = true,
+  showBtnStart = true,
 }: {
   plan: SaasPlanItem;
   onSubscribe?: (plan: SaasPlanItem) => void;
   isCurrentPlan?: boolean;
   isVertical?: boolean;
+  showBtnStart?: boolean;
 }) {
   const isActive = plan.active;
   const highlighted = isCurrentPlan === true;
@@ -216,7 +218,7 @@ function PlanCard({
         </ul>
       )}
 
-      {isActive && onSubscribe && plan.cost !== 0 && user?.id && (
+      {isActive && onSubscribe && plan.cost !== 0 && user?.id && showBtnStart && (
         <button
           type="button"
           onClick={() => onSubscribe(plan)}
@@ -346,12 +348,14 @@ export interface PlansSectionProps {
   sectionTitle?: string;
   /** Override section subtitle. */
   sectionSubtitle?: string;
+  showBtnStart?: boolean;
 }
 
 export default function PlansSection({
   hideBackLink = false,
   sectionTitle = "Planes y precios",
   sectionSubtitle = "Planes a la medida de tu empresa",
+  showBtnStart = true,
 }: PlansSectionProps = {}) {
   const router = useRouter();
   const { subscription } = useSubscription();
@@ -427,6 +431,7 @@ export default function PlansSection({
                       onSubscribe={plan.active ? handleSubscribe : undefined}
                       isCurrentPlan={isCurrentPlan}
                       isVertical={true}
+                      showBtnStart={showBtnStart}
                     />
                   );
                 })}
@@ -444,6 +449,7 @@ export default function PlansSection({
                     currentPlanName.toLowerCase()
                 }
                 isVertical={false}
+                showBtnStart={showBtnStart}
               />
             </div>
           )}

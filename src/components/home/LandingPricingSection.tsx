@@ -15,6 +15,7 @@ export default function LandingPricingSection() {
             hideBackLink
             sectionTitle="Planes"
             sectionSubtitle="Elige el plan que mejor se adapte a tu negocio. Free, Starter, Pro o Agencia."
+            showBtnStart={false}
           />
         </SubscriptionProvider>
       </div>
