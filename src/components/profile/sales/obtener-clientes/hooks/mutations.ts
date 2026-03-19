@@ -21,6 +21,8 @@ export interface SyncLeadsFrontInput {
   lng: number | null;
   maxResults: number | null;
   radius: number | null;
+  minRating: number | null;
+  minReviews: number | null;
 }
 
 export interface SyncLeadsFrontResult {

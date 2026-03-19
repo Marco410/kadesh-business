@@ -13,6 +13,8 @@ export interface SyncLeadsAreaParams {
   radiusKm: number;
   category: string;
   maxResults?: number;
+  minRating?: number | null;
+  minReviews?: number | null;
 }
 
 export function useSyncLeadsArea() {
@@ -27,6 +29,8 @@ export function useSyncLeadsArea() {
       lng: params.lng,
       maxResults: params.maxResults ?? 60,
       radius: params.radiusKm,
+      minRating: params.minRating ?? null,
+      minReviews: params.minReviews ?? null,
     };
     const result = await mutate({ variables: { input } });
     return result.data?.syncLeadsFront ?? null;
