@@ -43,6 +43,61 @@ import { hasPlanFeature } from "./helpers/plan-features";
 
 const LEADS_PAGE_SIZE = 10;
 
+/** Claves de query usadas solo por la sección de leads (no borrar otras como `tab`). */
+const SALES_LEADS_URL_KEYS = [
+  "pipeline",
+  "category",
+  "vendedor",
+  "q",
+  "city",
+  "estado",
+  "country",
+  "page",
+] as const;
+
+interface SalesLeadsUrlFilters {
+  selectedPipeline: string | null;
+  selectedCategory: string | null;
+  filterByVendedorId: string | null;
+  debouncedSearch: string;
+  debouncedCity: string;
+  debouncedState: string;
+  debouncedCountry: string;
+  page: number;
+}
+
+function parseSalesFiltersFromSearchParams(
+  sp: Pick<URLSearchParams, "get">
+): SalesLeadsUrlFilters {
+  return {
+    selectedPipeline: sp.get("pipeline"),
+    selectedCategory: sp.get("category"),
+    filterByVendedorId: sp.get("vendedor"),
+    debouncedSearch: sp.get("q") ?? "",
+    debouncedCity: sp.get("city") ?? "",
+    debouncedState: sp.get("estado") ?? "",
+    debouncedCountry: sp.get("country") ?? "",
+    page: parsePageParam(sp.get("page")),
+  };
+}
+
+function applySalesFiltersToUrlSearchParams(
+  params: URLSearchParams,
+  state: SalesLeadsUrlFilters
+) {
+  for (const k of SALES_LEADS_URL_KEYS) {
+    params.delete(k);
+  }
+  if (state.page > 1) params.set("page", String(state.page));
+  if (state.selectedPipeline) params.set("pipeline", state.selectedPipeline);
+  if (state.selectedCategory) params.set("category", state.selectedCategory);
+  if (state.filterByVendedorId) params.set("vendedor", state.filterByVendedorId);
+  if (state.debouncedSearch) params.set("q", state.debouncedSearch);
+  if (state.debouncedCity) params.set("city", state.debouncedCity);
+  if (state.debouncedState) params.set("estado", state.debouncedState);
+  if (state.debouncedCountry) params.set("country", state.debouncedCountry);
+}
+
 interface SalesSectionProps {
   userId: string;
 }
@@ -63,17 +118,24 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [selectedPipeline, setSelectedPipeline] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [filterByVendedorId, setFilterByVendedorId] = useState<string | null>(null);
-  const [searchInput, setSearchInput] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [cityInput, setCityInput] = useState("");
-  const [debouncedCity, setDebouncedCity] = useState("");
-  const [stateInput, setStateInput] = useState("");
-  const [debouncedState, setDebouncedState] = useState("");
-  const [countryInput, setCountryInput] = useState("");
-  const [debouncedCountry, setDebouncedCountry] = useState("");
+  const initialFromUrl = parseSalesFiltersFromSearchParams(searchParams);
+  const [selectedPipeline, setSelectedPipeline] = useState<string | null>(
+    initialFromUrl.selectedPipeline
+  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    initialFromUrl.selectedCategory
+  );
+  const [filterByVendedorId, setFilterByVendedorId] = useState<string | null>(
+    initialFromUrl.filterByVendedorId
+  );
+  const [searchInput, setSearchInput] = useState(initialFromUrl.debouncedSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialFromUrl.debouncedSearch);
+  const [cityInput, setCityInput] = useState(initialFromUrl.debouncedCity);
+  const [debouncedCity, setDebouncedCity] = useState(initialFromUrl.debouncedCity);
+  const [stateInput, setStateInput] = useState(initialFromUrl.debouncedState);
+  const [debouncedState, setDebouncedState] = useState(initialFromUrl.debouncedState);
+  const [countryInput, setCountryInput] = useState(initialFromUrl.debouncedCountry);
+  const [debouncedCountry, setDebouncedCountry] = useState(initialFromUrl.debouncedCountry);
   const [assignToVendedorId, setAssignToVendedorId] = useState<string | null>(null);
   const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
   const [assigning, setAssigning] = useState(false);
@@ -81,6 +143,30 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const { subscription } = useSubscription();
 
   const page = parsePageParam(searchParams.get("page"));
+
+  /** Atrás/adelante o cambios externos a la URL: rehidratar filtros sin el primer paint duplicado. */
+  const lastSyncedSearchParamsRef = useRef<string | null>(null);
+  useEffect(() => {
+    const serialized = searchParams.toString();
+    if (lastSyncedSearchParamsRef.current === null) {
+      lastSyncedSearchParamsRef.current = serialized;
+      return;
+    }
+    if (lastSyncedSearchParamsRef.current === serialized) return;
+    lastSyncedSearchParamsRef.current = serialized;
+    const f = parseSalesFiltersFromSearchParams(searchParams);
+    setSelectedPipeline(f.selectedPipeline);
+    setSelectedCategory(f.selectedCategory);
+    setFilterByVendedorId(f.filterByVendedorId);
+    setSearchInput(f.debouncedSearch);
+    setDebouncedSearch(f.debouncedSearch);
+    setCityInput(f.debouncedCity);
+    setDebouncedCity(f.debouncedCity);
+    setStateInput(f.debouncedState);
+    setDebouncedState(f.debouncedState);
+    setCountryInput(f.debouncedCountry);
+    setDebouncedCountry(f.debouncedCountry);
+  }, [searchParams]);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchInput.trim()), 300);
@@ -183,13 +269,35 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     }),
   };
 
-  const setPageInUrl = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (newPage <= 1) params.delete("page");
-    else params.set("page", String(newPage));
-    const q = params.toString();
-    router.replace(q ? `${pathname}?${q}` : pathname, { scroll: false });
-  };
+  const setPageInUrl = useCallback(
+    (newPage: number) => {
+      const params = new URLSearchParams(searchParams.toString());
+      applySalesFiltersToUrlSearchParams(params, {
+        selectedPipeline,
+        selectedCategory,
+        filterByVendedorId,
+        debouncedSearch,
+        debouncedCity,
+        debouncedState,
+        debouncedCountry,
+        page: newPage,
+      });
+      const q = params.toString();
+      router.replace(q ? `${pathname}?${q}` : pathname, { scroll: false });
+    },
+    [
+      searchParams,
+      pathname,
+      router,
+      selectedPipeline,
+      selectedCategory,
+      filterByVendedorId,
+      debouncedSearch,
+      debouncedCity,
+      debouncedState,
+      debouncedCountry,
+    ]
+  );
 
   const isFirstMount = useRef(true);
   useEffect(() => {
@@ -198,7 +306,16 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       return;
     }
     setPageInUrl(1);
-  }, [selectedPipeline, selectedCategory, filterByVendedorId, debouncedSearch, debouncedCity, debouncedState, debouncedCountry]);
+  }, [
+    selectedPipeline,
+    selectedCategory,
+    filterByVendedorId,
+    debouncedSearch,
+    debouncedCity,
+    debouncedState,
+    debouncedCountry,
+    setPageInUrl,
+  ]);
 
   const { data: countData } = useQuery<
     TechBusinessLeadsCountResponse,
@@ -342,7 +459,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   useEffect(() => {
     if (countData != null && totalPages >= 1 && page > totalPages)
       setPageInUrl(totalPages);
-  }, [countData, totalPages, page]);
+  }, [countData, totalPages, page, setPageInUrl]);
 
   const hasAddOwnLeadsFeature = hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.ADD_OWN_LEADS);
 
