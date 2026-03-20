@@ -51,6 +51,13 @@ function formatCurrency(value: number | null | undefined): string {
   }).format(value);
 }
 
+function whatsappDigitsFromPhone(raw: string): string | null {
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return null;
+  if (digits.length === 10) return `52${digits}`;
+  return digits;
+}
+
 function Field({
   label,
   value,
@@ -249,12 +256,13 @@ export default function DetailLeadSection() {
         <p className="text-red-600 dark:text-red-400">
           No se pudo cargar el lead o no existe.
         </p>
-        <Link
-          href={`${Routes.panel}?tab=ventas`}
+        <button
+          type="button"
+          onClick={() => router.back()}
           className="mt-4 inline-block text-orange-500 dark:text-orange-400 hover:underline"
         >
           Volver a Ventas
-        </Link>
+        </button>
       </div>
     );
   }
@@ -266,6 +274,10 @@ export default function DetailLeadSection() {
     lead.topReview4,
     lead.topReview5,
   ].filter(Boolean) as string[];
+
+  const leadWhatsappDigits = lead.phone
+    ? whatsappDigitsFromPhone(lead.phone)
+    : null;
 
   const saving = savingLead || savingStatus || creatingStatus;
 
@@ -326,13 +338,14 @@ export default function DetailLeadSection() {
     <div className="w-full max-w-[1920px] mx-auto px-15 pt-20 pb-8">
       <div className="flex flex-wrap items-center gap-3 mb-4 justify-between">
         <div className="flex flex-row gap-2">
-          <Link
-            href={`${Routes.panel}?tab=ventas`}
+          <button
+            type="button"
+            onClick={() => router.back()}
             className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
             Volver a Ventas
-          </Link>
+          </button>
           <h1 className="text-lg font-bold text-[#212121] dark:text-[#ffffff] truncate">
             {lead.businessName || "Lead sin nombre"}
           </h1>
@@ -352,12 +365,24 @@ export default function DetailLeadSection() {
             <Field label="Categoría">{getCategoryLabel(lead.category)}</Field>
             <Field label="Teléfono">
               {lead.phone ? (
-                <a
-                  href={`tel:${lead.phone.replace(/\s/g, "")}`}
-                  className="text-orange-500 dark:text-orange-400 hover:underline"
-                >
-                  {lead.phone}
-                </a>
+                <div className="flex flex-col gap-1.5">
+                  <a
+                    href={`tel:${lead.phone.replace(/\s/g, "")}`}
+                    className="text-orange-500 dark:text-orange-400 hover:underline w-fit"
+                  >
+                    {lead.phone}
+                  </a>
+                  {leadWhatsappDigits ? (
+                    <a
+                      href={`https://wa.me/${leadWhatsappDigits}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex w-fit items-center gap-1 text-sm font-medium text-[#25D366] hover:text-[#1ebe57] hover:underline"
+                    >
+                      Abrir en WhatsApp
+                    </a>
+                  ) : null}
+                </div>
               ) : (
                 "—"
               )}

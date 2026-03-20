@@ -43,7 +43,6 @@ import { hasPlanFeature } from "./helpers/plan-features";
 
 const LEADS_PAGE_SIZE = 10;
 
-/** Claves de query usadas solo por la sección de leads (no borrar otras como `tab`). */
 const SALES_LEADS_URL_KEYS = [
   "pipeline",
   "category",
