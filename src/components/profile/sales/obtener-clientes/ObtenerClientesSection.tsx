@@ -505,19 +505,7 @@ export default function ObtenerClientesSection() {
             </p>
           )}
         </div>
-
-        {message && (
-          <div
-            className={`rounded-lg p-4 ${
-              message.type === "error"
-                ? "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300"
-                : "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300"
-            }`}
-          >
-            {message.text}
-          </div>
-        )}
-          </div>
+        </div>
           <div className="w-full">
             <div className="relative z-0 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 dark:bg-gray-800/50">
             <div
@@ -544,34 +532,46 @@ export default function ObtenerClientesSection() {
           {!leafletReady && (
             <p className="text-center text-sm text-gray-500 dark:text-gray-400">Cargando mapa…</p>
           )}
-            {showZeroResultsHint && (
-            <div className="rounded-xl border border-purple-200 dark:border-purple-800/60 bg-purple-50 dark:bg-purple-900/20 p-6">
-              <div className="flex gap-4">
-                <span className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-800/40 flex items-center justify-center">
-                  <HugeiconsIcon icon={Location01Icon} size={24} className="text-purple-600 dark:text-purple-400" />
-                </span>
-                <div>
-                  <h3 className="font-semibold text-purple-900 dark:text-purple-100 mb-1">
-                    No se encontraron negocios en esta zona
-                  </h3>
-                  <p className="text-sm text-purple-800 dark:text-purple-200/90 mb-3">
-                    Prueba ajustar los parámetros o buscar en otro punto del mapa para obtener resultados.
-                  </p>
-                  <ul className="text-sm text-purple-700 dark:text-purple-300/90 space-y-1 list-disc list-inside">
-                    <li><strong>Amplía o reduce el radio</strong> (por ejemplo, más o menos de {radiusKm} km) para cubrir más área.</li>
-                    <li><strong>Elige otro tipo de negocio</strong> en el selector; puede haber más oferta en otra categoría.</li>
-                    <li><strong>Haz clic en otra zona del mapa</strong> (centro, otra ciudad o colonia) y vuelve a buscar.</li>
-                  </ul>
-                </div>
+           
+          </div>
+        </div>
+
+        {message && !showZeroResultsHint && (
+          <div
+            className={`rounded-lg p-4 mt-4 ${
+              message.type === "error"
+                ? "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300"
+                : "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
+
+        {showZeroResultsHint && (
+          <div className="rounded-xl border border-purple-200 dark:border-purple-800/60 bg-purple-50 dark:bg-purple-900/20 p-6 mt-4">
+            <div className="flex gap-4">
+              <span className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-800/40 flex items-center justify-center">
+                <HugeiconsIcon icon={Location01Icon} size={24} className="text-purple-600 dark:text-purple-400" />
+              </span>
+              <div>
+                <h3 className="font-semibold text-purple-900 dark:text-purple-100 mb-1">
+                  No se encontraron negocios en esta zona
+                </h3>
+                <p className="text-sm text-purple-800 dark:text-purple-200/90 mb-3">
+                  Prueba ajustar los parámetros o buscar en otro punto del mapa para obtener resultados.
+                </p>
+                <ul className="text-sm text-purple-700 dark:text-purple-300/90 space-y-1 list-disc list-inside">
+                  <li><strong>Amplía o reduce el radio</strong> (por ejemplo, más o menos de {radiusKm} km) para cubrir más área.</li>
+                  <li><strong>Elige otro tipo de negocio</strong> en el selector; puede haber más oferta en otra categoría.</li>
+                  <li><strong>Haz clic en otra zona del mapa</strong> (centro, otra ciudad o colonia) y vuelve a buscar.</li>
+                </ul>
               </div>
             </div>
-          )}
-
           </div>
-        </div>      
+        )}
 
-    </div>
-
+      </div>
       <LeadsStatsCards ref={statsRef} />
     </div>
   );
