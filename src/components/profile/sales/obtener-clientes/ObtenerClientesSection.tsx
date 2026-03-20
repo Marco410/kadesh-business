@@ -6,8 +6,11 @@ import { Location01Icon, Search01Icon } from "@hugeicons/core-free-icons";
 import { GOOGLE_PLACE_CATEGORIES } from "kadesh/components/profile/sales/constants";
 import { useSyncLeadsArea } from "kadesh/components/profile/sales/obtener-clientes/hooks";
 import CurrentPlanSection from "../CurrentPlanSection";
+import RoleAccessDeniedSection from "../RoleAccessDeniedSection";
 import { useUser } from "kadesh/utils/UserContext";
+import { isAdminCompanyUser } from "kadesh/utils/user-roles";
 import { sileo } from "sileo";
+import { Routes } from "kadesh/core/routes";
 import { Autocomplete, InfoTooltip, type AutocompleteOption } from "kadesh/components/shared";
 import LeadsStatsCards, { type LeadsStatsCardsHandle } from "./LeadsStatsCards";
 
@@ -80,7 +83,6 @@ declare global {
 }
 
 export default function ObtenerClientesSection() {
-  const { user } = useUser();
   const [category, setCategory] = useState<string>(GOOGLE_PLACE_CATEGORIES[0].value);
   const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
   const [minRating, setMinRating] = useState<number>(3);
@@ -100,6 +102,7 @@ export default function ObtenerClientesSection() {
   const [locatingUser, setLocatingUser] = useState(false);
 
   const { syncLeadsArea, loading: isLoading, error: syncError } = useSyncLeadsArea();
+  const { user, loading: userLoading } = useUser();
 
   const statsRef = useRef<LeadsStatsCardsHandle>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -272,6 +275,30 @@ export default function ObtenerClientesSection() {
   const step1Done = Boolean(pin);
   const step2Done = Boolean(pin);
   const step3Done = hasSearched;
+
+  if (userLoading) {
+    return (
+      <div className="max-w-7xl mx-auto flex justify-center py-20">
+        <span
+          className="size-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"
+          aria-hidden
+        />
+      </div>
+    );
+  }
+
+  if (!isAdminCompanyUser(user)) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-6">
+        <RoleAccessDeniedSection
+          title="No tienes acceso a Obtener clientes"
+          description="Esta herramienta está pensada para el equipo comercial. Como vendedor no puedes importar negocios desde el mapa."
+          backHref={`${Routes.panel}?tab=ventas`}
+          backLabel="Volver a Ventas"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">

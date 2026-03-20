@@ -26,9 +26,11 @@ import { useUser } from "kadesh/utils/UserContext";
 import { sileo } from "sileo";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon, Edit02Icon } from "@hugeicons/core-free-icons";
+import { isAdminCompanyUser } from "kadesh/utils/user-roles";
+import RoleAccessDeniedSection from "../RoleAccessDeniedSection";
 
 export default function AgregarVendedorSection() {
-  const { user } = useUser();
+  const { user, loading: userLoading } = useUser();
   const userId = user?.id ?? "";
 
   const [name, setName] = useState("");
@@ -267,6 +269,31 @@ export default function AgregarVendedorSection() {
       (!creating ||
       !updating)
   );
+
+
+  if (userLoading) {
+    return (
+      <div className="max-w-7xl mx-auto flex justify-center py-20">
+        <span
+          className="size-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"
+          aria-hidden
+        />
+      </div>
+    );
+  }
+
+  if (!isAdminCompanyUser(user)) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-6">
+        <RoleAccessDeniedSection
+          title="No tienes acceso a Agregar vendedor"
+          description="Esta herramienta está pensada para el equipo comercial. Como vendedor no puedes agregar vendedores."
+          backHref={`${Routes.panel}?tab=ventas`}
+          backLabel="Volver a Ventas"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-8">
