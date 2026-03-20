@@ -38,10 +38,12 @@ import { PIPELINE_STATUS, PLAN_FEATURE_KEYS } from "./constants";
 import { sileo } from "sileo";
 import { Routes } from "kadesh/core/routes";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Add01Icon } from "@hugeicons/core-free-icons";
+import { Add01Icon, Download04Icon } from "@hugeicons/core-free-icons";
 import { hasPlanFeature } from "./helpers/plan-features";
+import { downloadLeadsExcel } from "./exportLeadsExcel";
 
 const LEADS_PAGE_SIZE = 10;
+const MAX_LEADS_EXPORT = 10_000;
 
 const SALES_LEADS_URL_KEYS = [
   "pipeline",
@@ -163,6 +165,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const [assignToVendedorId, setAssignToVendedorId] = useState<string | null>(null);
   const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
   const [assigning, setAssigning] = useState(false);
+  const [exportingExcel, setExportingExcel] = useState(false);
   const { user, refreshUser } = useUser();
   const { subscription } = useSubscription();
 
@@ -409,6 +412,67 @@ export default function SalesSection({ userId }: SalesSectionProps) {
 
   const client = useApolloClient();
 
+  const exportLeadsContextRef = useRef({
+    where,
+    statusWhere,
+    salesPersonWhere2,
+    totalCount,
+  });
+  exportLeadsContextRef.current = { where, statusWhere, salesPersonWhere2, totalCount };
+
+  const handleExportExcel = useCallback(async () => {
+    if (!userId) return;
+    const ctx = exportLeadsContextRef.current;
+    if (ctx.totalCount === 0) {
+      sileo.error({
+        title: "Sin datos",
+        description: "No hay clientes para exportar con los filtros actuales.",
+      });
+      return;
+    }
+    setExportingExcel(true);
+    try {
+      const take = Math.min(ctx.totalCount, MAX_LEADS_EXPORT);
+      const { data: exportData, error: exportError } = await client.query<
+        TechBusinessLeadsResponse,
+        TechBusinessLeadsVariables
+      >({
+        query: TECH_BUSINESS_LEADS_QUERY,
+        variables: {
+          where: ctx.where,
+          statusWhere: ctx.statusWhere ?? {},
+          salesPersonWhere2: ctx.salesPersonWhere2 ?? {},
+          take,
+          skip: 0,
+          orderBy: [{ createdAt: "desc" }],
+        },
+        fetchPolicy: "network-only",
+      });
+      if (exportError) throw exportError;
+      const allLeads = exportData?.techBusinessLeads ?? [];
+      downloadLeadsExcel(allLeads, isAdminCompany);
+      if (ctx.totalCount > MAX_LEADS_EXPORT) {
+        sileo.warning({
+          title: "Exportación parcial",
+          description: `Solo se exportaron los primeros ${MAX_LEADS_EXPORT} de ${ctx.totalCount} clientes. Ajusta los filtros para exportar el resto.`,
+        });
+      } else {
+        sileo.success({
+          title: "Exportación lista",
+          description: `Se descargaron ${allLeads.length} cliente(s) (CSV para Excel o Numbers).`,
+        });
+      }
+    } catch (e) {
+      sileo.error({
+        title: "Error al exportar",
+        description:
+          e instanceof Error ? e.message : "No se pudo generar el archivo.",
+      });
+    } finally {
+      setExportingExcel(false);
+    }
+  }, [client, isAdminCompany, userId]);
+
   const [updateLead] = useMutation<
     UpdateTechBusinessLeadMutation,
     UpdateTechBusinessLeadVariables
@@ -509,6 +573,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   }, [countData, totalPages, page]);
 
   const hasAddOwnLeadsFeature = hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.ADD_OWN_LEADS);
+  const hasExportLeadsFeature = hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.EXPORT_EXCEL);
 
   if (!companyId) {
     return (
@@ -528,22 +593,40 @@ export default function SalesSection({ userId }: SalesSectionProps) {
 
         <StatsSection userId={userId} companyId={companyId} isAdminCompany={isAdminCompany} salesComission={userData?.user?.salesComission ?? 0} />
 
-      {/* Título + filtros por pipeline + tabla */}
       <div>
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-[#212121] dark:text-[#ffffff] mb-4">
-            Clientes ({totalCount}) | {userData?.user?.company?.name ?? '--'}
-          </h2>
-          {hasAddOwnLeadsFeature && (
-          <button
-            type="button"
-            onClick={() => router.push(Routes.panelAddLead)}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-green-500 hover:bg-green-600 active:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors w-full sm:w-auto"
-          >
-            <HugeiconsIcon icon={Add01Icon} size={18} strokeWidth={2} />
-              Agregar nuevo cliente
-            </button>
-          )}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+          <div className="flex flex-row items-center gap-5">
+            <h2 className="text-xl font-bold text-[#212121] dark:text-[#ffffff]">
+              Clientes ({totalCount}) | {userData?.user?.company?.name ?? '--'}
+            </h2>
+            {hasExportLeadsFeature && (
+              <button
+                type="button"
+                onClick={() => void handleExportExcel()}
+                disabled={totalCount === 0 || loading || exportingExcel}
+                className="inline-flex items-center justify-center gap-2 px-4 py-1 rounded-lg text-sm font-semibold border border-green-200 dark:border-green-800/80 bg-green-50 dark:bg-green-950/50 text-green-800 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-900/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-50 dark:disabled:hover:bg-green-950/50"
+              >
+                {exportingExcel ? (
+                  <span className="size-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin shrink-0" />
+                ) : (
+                  <HugeiconsIcon icon={Download04Icon} size={16} strokeWidth={2} />
+                )}
+                Exportar a Excel
+              </button>
+            )}
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto shrink-0">
+            {hasAddOwnLeadsFeature && (
+              <button
+                type="button"
+                onClick={() => router.push(Routes.panelAddLead)}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-green-500 hover:bg-green-600 active:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors w-full sm:w-auto"
+              >
+                <HugeiconsIcon icon={Add01Icon} size={18} strokeWidth={2} />
+                Agregar nuevo cliente
+              </button>
+            )}
+          </div>
         </div>
         <FiltersLeadsSection
           selectedPipeline={selectedPipeline}

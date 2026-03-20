@@ -340,6 +340,7 @@ export const PLAN_FEATURE_KEYS = {
   UPLOAD_FILES: "upload_files",
   PROJECTS: "projects",
   ADD_OWN_LEADS: "add_own_leads",
+  EXPORT_EXCEL: "export_excel",
 } as const;
 
 export type PlanFeatureKey =
@@ -402,5 +403,9 @@ export const PLAN_FEATURES_MAP: Record<
   [PLAN_FEATURE_KEYS.ADD_OWN_LEADS]: {
     name: "Agregar leads propios",
     description: "Agregar leads propios",
+  },
+  [PLAN_FEATURE_KEYS.EXPORT_EXCEL]: {
+    name: "Exportar a Excel",
+    description: "Exportar leads a Excel",
   },
 };
