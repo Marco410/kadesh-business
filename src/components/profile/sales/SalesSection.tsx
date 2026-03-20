@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useApolloClient } from "@apollo/client";
 import {
@@ -98,6 +98,31 @@ function applySalesFiltersToUrlSearchParams(
   if (state.debouncedCountry) params.set("country", state.debouncedCountry);
 }
 
+/** True si los filtros en estado ya coinciden con la query (sin mirar `page`). Evita replace(…page=1) tras atrás/adelante. */
+function salesFilterFieldsMatchUrl(
+  sp: Pick<URLSearchParams, "get">,
+  s: {
+    selectedPipeline: string | null;
+    selectedCategory: string | null;
+    filterByVendedorId: string | null;
+    debouncedSearch: string;
+    debouncedCity: string;
+    debouncedState: string;
+    debouncedCountry: string;
+  }
+): boolean {
+  const f = parseSalesFiltersFromSearchParams(sp);
+  return (
+    f.selectedPipeline === s.selectedPipeline &&
+    f.selectedCategory === s.selectedCategory &&
+    f.filterByVendedorId === s.filterByVendedorId &&
+    f.debouncedSearch === s.debouncedSearch &&
+    f.debouncedCity === s.debouncedCity &&
+    f.debouncedState === s.debouncedState &&
+    f.debouncedCountry === s.debouncedCountry
+  );
+}
+
 interface SalesSectionProps {
   userId: string;
 }
@@ -144,9 +169,9 @@ export default function SalesSection({ userId }: SalesSectionProps) {
 
   const page = parsePageParam(searchParams.get("page"));
 
-  /** Atrás/adelante o cambios externos a la URL: rehidratar filtros sin el primer paint duplicado. */
+
   const lastSyncedSearchParamsRef = useRef<string | null>(null);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const serialized = searchParams.toString();
     if (lastSyncedSearchParamsRef.current === null) {
       lastSyncedSearchParamsRef.current = serialized;
@@ -269,8 +294,9 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     }),
   };
 
-  const setPageInUrl = useCallback(
-    (newPage: number) => {
+
+  const navigateLeadsUrl = useCallback(
+    (newPage: number, replace: boolean) => {
       const params = new URLSearchParams(searchParams.toString());
       applySalesFiltersToUrlSearchParams(params, {
         selectedPipeline,
@@ -283,7 +309,9 @@ export default function SalesSection({ userId }: SalesSectionProps) {
         page: newPage,
       });
       const q = params.toString();
-      router.replace(q ? `${pathname}?${q}` : pathname, { scroll: false });
+      const href = q ? `${pathname}?${q}` : pathname;
+      if (replace) router.replace(href, { scroll: false });
+      else router.push(href, { scroll: false });
     },
     [
       searchParams,
@@ -299,14 +327,35 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     ]
   );
 
+  const navigateLeadsUrlRef = useRef(navigateLeadsUrl);
+  navigateLeadsUrlRef.current = navigateLeadsUrl;
+
+  const pushLeadsPage = useCallback((newPage: number) => {
+    navigateLeadsUrlRef.current(newPage, false);
+  }, []);
+
   const isFirstMount = useRef(true);
   useEffect(() => {
     if (isFirstMount.current) {
       isFirstMount.current = false;
       return;
     }
-    setPageInUrl(1);
+    if (
+      salesFilterFieldsMatchUrl(searchParams, {
+        selectedPipeline,
+        selectedCategory,
+        filterByVendedorId,
+        debouncedSearch,
+        debouncedCity,
+        debouncedState,
+        debouncedCountry,
+      })
+    ) {
+      return;
+    }
+    navigateLeadsUrlRef.current(1, true);
   }, [
+    searchParams,
     selectedPipeline,
     selectedCategory,
     filterByVendedorId,
@@ -314,7 +363,6 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     debouncedCity,
     debouncedState,
     debouncedCountry,
-    setPageInUrl,
   ]);
 
   const { data: countData } = useQuery<
@@ -458,8 +506,8 @@ export default function SalesSection({ userId }: SalesSectionProps) {
 
   useEffect(() => {
     if (countData != null && totalPages >= 1 && page > totalPages)
-      setPageInUrl(totalPages);
-  }, [countData, totalPages, page, setPageInUrl]);
+      navigateLeadsUrlRef.current(totalPages, true);
+  }, [countData, totalPages, page]);
 
   const hasAddOwnLeadsFeature = hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.ADD_OWN_LEADS);
 
@@ -536,7 +584,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
           totalCount={totalCount}
           pageSize={LEADS_PAGE_SIZE}
           currentPage={effectivePage}
-          onPageChange={setPageInUrl}
+          onPageChange={pushLeadsPage}
           isAdminCompany={isAdminCompany}
         />
       </div>
