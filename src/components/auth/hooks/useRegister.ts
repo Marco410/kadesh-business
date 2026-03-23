@@ -24,6 +24,7 @@ import { useUser } from 'kadesh/utils/UserContext';
 import { trackCompleteRegistration } from 'kadesh/utils/facebook-pixel';
 import { Routes } from 'kadesh/core/routes';
 import { sileo } from 'sileo';
+import { useTouchUserLastLogin } from './useTouchUserLastLogin';
 
 interface UseRegisterOptions {
   onSuccess?: () => void;
@@ -33,6 +34,7 @@ interface UseRegisterOptions {
 
 export function useRegister(options?: UseRegisterOptions) {
   const router = useRouter();
+  const touchUserLastLoginAt = useTouchUserLastLogin();
   const { refreshUser } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState('');
@@ -88,6 +90,7 @@ export function useRegister(options?: UseRegisterOptions) {
 
           if (data?.authenticateUserWithPassword?.__typename === 'UserAuthenticationWithPasswordSuccess') {
             const sessionToken = data.authenticateUserWithPassword.sessionToken;
+            const loggedInUser = data.authenticateUserWithPassword.item;
             if (sessionToken && typeof window !== 'undefined') {
               localStorage.setItem('keystonejs-session-token', sessionToken);
               const expires = new Date();
@@ -95,7 +98,9 @@ export function useRegister(options?: UseRegisterOptions) {
               const isSecure = window.location.protocol === 'https:';
               document.cookie = `keystonejs-session=${sessionToken}; expires=${expires.toUTCString()}; path=/; SameSite=Lax${isSecure ? '; Secure' : ''}`;
             }
-            
+            if (loggedInUser?.id) {
+              await touchUserLastLoginAt(loggedInUser.id);
+            }
             await refreshUser();
             router.push(Routes.panel);
             

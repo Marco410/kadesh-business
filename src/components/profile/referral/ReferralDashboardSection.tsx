@@ -138,6 +138,11 @@ function ReferredUsersTab({ userId }: { userId: string }) {
               <p className="text-xs text-[#616161] dark:text-[#9e9e9e] truncate">{user.email}</p>
             </div>
             <p className="text-xs text-[#9e9e9e] dark:text-[#616161] shrink-0 whitespace-nowrap">
+              Último inicio de sesión: 
+              {formatDate(user.lastLoginAt)}
+            </p>
+            <p className="text-xs text-[#9e9e9e] dark:text-[#616161] shrink-0 whitespace-nowrap">
+              Registrado el: 
               {formatDate(user.createdAt)}
             </p>
           </div>

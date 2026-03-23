@@ -6,6 +6,7 @@ export const REFERRED_USERS_QUERY = gql`
       name
       email
       createdAt
+      lastLoginAt
     }
   }
 `;
@@ -14,6 +15,7 @@ export interface ReferredUser {
   name: string;
   email: string;
   createdAt: string;
+  lastLoginAt: string;
 }
 
 export interface ReferredUsersResponse {

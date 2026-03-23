@@ -11,6 +11,7 @@ import {
 import { useUser } from "kadesh/utils/UserContext";
 import { Routes } from "kadesh/core/routes";
 import type { AuthenticatedItem } from "kadesh/utils/types";
+import { useTouchUserLastLogin } from "./useTouchUserLastLogin";
 
 interface UseLoginOptions {
   redirectTo?: string | null;
@@ -18,6 +19,7 @@ interface UseLoginOptions {
 
 export function useLogin(options?: UseLoginOptions) {
   const router = useRouter();
+  const touchUserLastLoginAt = useTouchUserLastLogin();
   const { refreshUser, setUser } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,13 +41,13 @@ export function useLogin(options?: UseLoginOptions) {
       ) {
         const { sessionToken, item } = data.authenticateUserWithPassword;
         if (sessionToken && typeof window !== "undefined") {
-          console.log("sessionToken", sessionToken);
           localStorage.setItem("keystonejs-session-token", sessionToken);
           const expires = new Date();
           expires.setTime(expires.getTime() + 30 * 24 * 60 * 60 * 1000);
           const isSecure = window.location.protocol === "https:";
           document.cookie = `keystonejs-session=${sessionToken}; expires=${expires.toUTCString()}; path=/; SameSite=Lax${isSecure ? "; Secure" : ""}`;
         }
+        await touchUserLastLoginAt(item.id);
         const userFromLogin: AuthenticatedItem = {
           ...item,
           roles: item.roles ?? null,
