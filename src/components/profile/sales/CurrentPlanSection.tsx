@@ -9,6 +9,13 @@ import {
   SUBSCRIPTION_STATUS_CLASSES,
 } from "./constants";
 
+/** Soporte humano: mismo número para llamada o WhatsApp */
+const SUPPORT_PHONE = {
+  display: "+52 1 443 938 2330",
+  tel: "tel:+5214439382330",
+  whatsapp: "https://wa.me/5214439382330",
+} as const;
+
 function PlanMetric({
   label,
   value,
@@ -25,6 +32,27 @@ function PlanMetric({
       </span>
       <span className={`text-base font-semibold ${valueClassName}`}>{value}</span>
     </div>
+  );
+}
+
+const supportLinkClass =
+  "underline decoration-[#c4c4c4]/80 underline-offset-2 hover:decoration-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/40 focus-visible:rounded-sm dark:decoration-[#525252] dark:hover:decoration-[#757575]";
+
+function SupportHelpFooter({ className }: { className?: string }) {
+  return (
+    <p
+      className={`text-[11px] leading-relaxed text-[#9e9e9e] dark:text-[#6f6f6f] ${className ?? ""}`}
+    >
+      ¿Necesitas ayuda con tu plan, facturación o el uso de la plataforma?{" "}
+      <a
+        href={SUPPORT_PHONE.whatsapp}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={supportLinkClass}
+      >
+        WhatsApp
+      </a>
+    </p>
   );
 }
 
@@ -55,6 +83,7 @@ export default function CurrentPlanSection() {
         >
           Ver planes
         </button>
+        <SupportHelpFooter className="w-full max-w-md pt-3 mt-1 text-center sm:text-left" />
       </div>
     );
   }
@@ -107,6 +136,7 @@ export default function CurrentPlanSection() {
               ?.label ?? "Inactivo"}
           </span>
         </div>
+        <SupportHelpFooter className="mt-4 pt-3 border-t border-[#f5f5f5] dark:border-white/[0.06]" />
       </div>
     </div>
   );
