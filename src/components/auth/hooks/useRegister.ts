@@ -34,6 +34,7 @@ interface UseRegisterOptions {
 export function useRegister(options?: UseRegisterOptions) {
   const router = useRouter();
   const { refreshUser } = useUser();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState('');
   const [lastName, setLastName] = useState('');
   const [companyName, setCompanyName] = useState('');
@@ -139,6 +140,7 @@ export function useRegister(options?: UseRegisterOptions) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setError('');
 
     if (!name || !lastName || !companyName?.trim() || !email || !password || !confirmPassword) {
@@ -156,6 +158,7 @@ export function useRegister(options?: UseRegisterOptions) {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const { data: companyData } = await createSaasCompany({
         variables: {
@@ -193,6 +196,8 @@ export function useRegister(options?: UseRegisterOptions) {
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al registrar. Intenta de nuevo.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -215,7 +220,7 @@ export function useRegister(options?: UseRegisterOptions) {
     setReferralCode,
     error,
     setError,
-    loading,
+    loading: loading || isSubmitting,
     handleSubmit,
   };
 }
