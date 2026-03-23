@@ -83,7 +83,6 @@ export const GOOGLE_PLACE_CATEGORIES = [
   { value: "florerías", label: "Florerías" },
   { value: "ferreterías", label: "Ferreterías" },
   { value: "electrónica", label: "Electrónica" },
-  { value: "ópticas", label: "Ópticas" },
   { value: "tiendas de deportes", label: "Tiendas de deportes" },
   { value: "tiendas de celulares", label: "Tiendas de celulares" },
   { value: "papelerías", label: "Papelerías" },
