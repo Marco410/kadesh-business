@@ -356,7 +356,7 @@ export default function ObtenerClientesSection() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="w-full">
             <div className="space-y-4 h-full">
               <div className="mt-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 sm:p-5 shadow-sm">
