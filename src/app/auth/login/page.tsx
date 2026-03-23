@@ -11,6 +11,7 @@ import {
   useRegister,
   useGoogleLogin,
 } from "../../../components/auth/hooks";
+import { getRegisterPasswordStrength } from "kadesh/utils/register-password-strength";
 
 /** Panel visual del sistema: mapa + leads (sin imagen externa). */
 function AuthPageVisual() {
@@ -100,6 +101,11 @@ function LoginPageContent() {
   };
   const [successMessage, setSuccessMessage] = useState("");
   const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showReferralField, setShowReferralField] = useState(false);
+
+  useEffect(() => {
+    if (referralCodeFromUrl) setShowReferralField(true);
+  }, [referralCodeFromUrl]);
 
   const {
     email: loginEmail,
@@ -153,6 +159,8 @@ function LoginPageContent() {
     error: googleError,
     setError: setGoogleError,
   } = useGoogleLogin({ redirectTo: redirectPath, referralCode: referralCodeFromUrl });
+
+  const passwordStrength = getRegisterPasswordStrength(registerPassword);
 
   return (
     <div className="min-h-screen flex bg-[#f5f5f5] dark:bg-[#0a0a0a] relative">
@@ -343,6 +351,97 @@ function LoginPageContent() {
                     </div>
                   )}
 
+                  {/* 1. Correo — primero para reducir abandono */}
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="register-email"
+                      className="block text-sm font-medium text-[#212121] dark:text-[#ffffff]"
+                    >
+                      Correo electrónico <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="register-email"
+                      type="email"
+                      placeholder="tu@kadesh.com.mx"
+                      value={registerEmail}
+                      onChange={(e) => setRegisterEmail(e.target.value)}
+                      required
+                      autoComplete="email"
+                      className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
+                    />
+                  </div>
+
+                  {/* 2–3. Contraseñas + fortaleza */}
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="register-password"
+                      className="block text-sm font-medium text-[#212121] dark:text-[#ffffff]"
+                    >
+                      Contraseña <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="register-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={registerPassword}
+                      onChange={(e) => setRegisterPassword(e.target.value)}
+                      required
+                      autoComplete="new-password"
+                      minLength={8}
+                      className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
+                    />
+                    {registerPassword.length > 0 && (
+                      <div className="space-y-1.5 pt-0.5" aria-live="polite">
+                        <div className="flex gap-1" role="presentation">
+                          {[1, 2, 3].map((segment) => (
+                            <div
+                              key={segment}
+                              className={`h-1.5 flex-1 rounded-full transition-colors ${
+                                segment <= passwordStrength.filled
+                                  ? passwordStrength.barClass
+                                  : "bg-[#e8e8e8] dark:bg-[#333]"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <p
+                          className={`text-xs font-medium ${
+                            passwordStrength.level === "weak"
+                              ? "text-red-600 dark:text-red-400"
+                              : passwordStrength.level === "medium"
+                                ? "text-amber-700 dark:text-amber-400"
+                                : "text-emerald-700 dark:text-emerald-400"
+                          }`}
+                        >
+                          {passwordStrength.label} — {passwordStrength.hint}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="register-confirm-password"
+                      className="block text-sm font-medium text-[#212121] dark:text-[#ffffff]"
+                    >
+                      Confirmar contraseña{" "}
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="register-confirm-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={registerConfirmPassword}
+                      onChange={(e) =>
+                        setRegisterConfirmPassword(e.target.value)
+                      }
+                      required
+                      autoComplete="new-password"
+                      minLength={8}
+                      className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
+                    />
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label
@@ -358,6 +457,7 @@ function LoginPageContent() {
                         value={registerName}
                         onChange={(e) => setRegisterName(e.target.value)}
                         required
+                        autoComplete="given-name"
                         className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
                       />
                     </div>
@@ -376,6 +476,7 @@ function LoginPageContent() {
                         value={registerLastName}
                         onChange={(e) => setRegisterLastName(e.target.value)}
                         required
+                        autoComplete="family-name"
                         className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
                       />
                     </div>
@@ -395,24 +496,7 @@ function LoginPageContent() {
                       value={registerCompanyName}
                       onChange={(e) => setRegisterCompanyName(e.target.value)}
                       required
-                      className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="register-email"
-                      className="block text-sm font-medium text-[#212121] dark:text-[#ffffff]"
-                    >
-                      Correo electrónico <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="register-email"
-                      type="email"
-                      placeholder="tu@kadesh.com.mx"
-                      value={registerEmail}
-                      onChange={(e) => setRegisterEmail(e.target.value)}
-                      required
+                      autoComplete="organization"
                       className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
                     />
                   </div>
@@ -422,109 +506,108 @@ function LoginPageContent() {
                       htmlFor="register-phone"
                       className="block text-sm font-medium text-[#212121] dark:text-[#ffffff]"
                     >
-                      Teléfono
+                      Teléfono <span className="text-[#9e9e9e] font-normal">(opcional)</span>
                     </label>
                     <input
                       id="register-phone"
                       type="tel"
-                      placeholder="+52 55 1234 5678 (opcional)"
+                      placeholder="+52 55 1234 5678"
                       value={registerPhone}
                       onChange={(e) => setRegisterPhone(e.target.value)}
+                      autoComplete="tel"
                       className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
                     />
+                  </div>
+
+                  {/* Código referido colapsable */}
+                  <div className="space-y-2">
+                    {!showReferralField ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowReferralField(true)}
+                        className="text-sm text-orange-600 dark:text-orange-400 font-medium hover:underline underline-offset-2 text-left w-full"
+                      >
+                        ¿Tienes un código de referido?{" "}
+                        <span className="text-[#616161] dark:text-[#9e9e9e] font-normal">
+                          Haz clic para agregarlo
+                        </span>
+                      </button>
+                    ) : (
+                      <>
+                        <div className="flex items-center justify-between gap-2">
+                          <label
+                            htmlFor="register-referral"
+                            className="block text-sm font-medium text-[#212121] dark:text-[#ffffff]"
+                          >
+                            Código de referido{" "}
+                            <span className="text-[#9e9e9e] font-normal">(opcional)</span>
+                          </label>
+                          {!referralCodeFromUrl && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowReferralField(false);
+                                setRegisterReferralCode("");
+                              }}
+                              className="text-xs text-[#9e9e9e] hover:text-[#616161] dark:hover:text-[#bdbdbd] shrink-0"
+                            >
+                              Ocultar
+                            </button>
+                          )}
+                        </div>
+                        <input
+                          id="register-referral"
+                          type="text"
+                          placeholder="Ej: KBC124"
+                          value={registerReferralCode ?? ""}
+                          onChange={(e) => setRegisterReferralCode(e.target.value)}
+                          className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
+                        />
+                      </>
+                    )}
                   </div>
 
                   <div className="space-y-2">
-                    <label
-                      htmlFor="register-referral"
-                      className="block text-sm font-medium text-[#212121] dark:text-[#ffffff]"
+                    <button
+                      type="submit"
+                      disabled={registerLoading}
+                      className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-semibold text-base min-h-12 py-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:bg-orange-500 dark:disabled:hover:bg-orange-500"
                     >
-                      Código de referido
-                    </label>
-                    <input
-                      id="register-referral"
-                      type="text"
-                      placeholder="Ej: KBC124 (opcional)"
-                      value={registerReferralCode ?? ""}
-                      onChange={(e) => setRegisterReferralCode(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
-                    />
+                      {registerLoading ? (
+                        <>
+                          <svg
+                            className="animate-spin h-5 w-5 text-white shrink-0"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          <span>Creando tu cuenta…</span>
+                        </>
+                      ) : (
+                        <>
+                          Crear cuenta gratis
+                          <span aria-hidden>→</span>
+                        </>
+                      )}
+                    </button>
+                    <p className="text-center text-xs text-[#9e9e9e] dark:text-[#616161] leading-relaxed px-1">
+                      Sin tarjeta de crédito · Cancela cuando quieras
+                    </p>
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="register-password"
-                        className="block text-sm font-medium text-[#212121] dark:text-[#ffffff]"
-                      >
-                        Contraseña <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        id="register-password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={registerPassword}
-                        onChange={(e) => setRegisterPassword(e.target.value)}
-                        required
-                        className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="register-confirm-password"
-                        className="block text-sm font-medium text-[#212121] dark:text-[#ffffff]"
-                      >
-                        Confirmar contraseña{" "}
-                        <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        id="register-confirm-password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={registerConfirmPassword}
-                        onChange={(e) =>
-                          setRegisterConfirmPassword(e.target.value)
-                        }
-                        required
-                        className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={registerLoading}
-                    className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600 text-white font-semibold text-base h-12 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:bg-orange-500 dark:disabled:hover:bg-orange-500"
-                  >
-                    {registerLoading ? (
-                      <>
-                        <svg
-                          className="animate-spin h-5 w-5 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        <span>Registrando...</span>
-                      </>
-                    ) : (
-                      "Registrarse"
-                    )}
-                  </button>
 
                  {/* <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
