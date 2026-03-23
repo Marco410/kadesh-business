@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { UserIcon, Chart01Icon, UserAdd01Icon } from "@hugeicons/core-free-icons";
@@ -25,8 +25,19 @@ function formatCurrency(amount: number, currency: string): string {
   }).format(amount) + " MXN";
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("es-MX", {
+/**
+ * Fecha legible en es-MX. Evita mostrar epoch (31 dic 1969) cuando el backend envía null/0/vacío.
+ */
+function formatDate(
+  dateStr: string | null | undefined,
+  options?: { emptyLabel?: string },
+): string {
+  const empty = options?.emptyLabel ?? "—";
+  if (dateStr == null || String(dateStr).trim() === "") return empty;
+  const d = new Date(dateStr);
+  const t = d.getTime();
+  if (Number.isNaN(t) || t <= 0) return empty;
+  return d.toLocaleDateString("es-MX", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -90,12 +101,27 @@ function SummaryCard({ label, amount, currency, highlight, color, className }: S
 }
 
 function ReferredUsersTab({ userId }: { userId: string }) {
+  const [page, setPage] = useState(1);
+
   const { data, loading } = useQuery<ReferredUsersResponse>(REFERRED_USERS_QUERY, {
     variables: { where: { referredBy: { id: { equals: userId } } } },
     skip: !userId,
   });
 
   const users = data?.users ?? [];
+  const totalPages = Math.max(1, Math.ceil(users.length / REFERRED_USERS_PAGE_SIZE));
+  const paginatedUsers = users.slice(
+    (page - 1) * REFERRED_USERS_PAGE_SIZE,
+    page * REFERRED_USERS_PAGE_SIZE,
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [userId]);
+
+  useEffect(() => {
+    setPage((p) => Math.min(p, totalPages));
+  }, [totalPages]);
 
   if (loading) {
     return (
@@ -122,37 +148,89 @@ function ReferredUsersTab({ userId }: { userId: string }) {
   return (
     <div className="space-y-3">
       <p className="text-sm text-[#616161] dark:text-[#9e9e9e]">
-        {users.length}{" "}
+        <span className="font-medium text-[#424242] dark:text-[#e0e0e0]">{users.length}</span>{" "}
         {users.length === 1 ? "usuario registrado" : "usuarios registrados"} con tu código
+        <span className="text-[#9e9e9e] dark:text-[#616161]"> · más recientes primero</span>
       </p>
-      <div className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a] rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden">
-        {users.map((user, i) => (
-          <div key={i} className="flex items-center gap-4 px-5 py-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f5f5f5] dark:bg-[#2a2a2a] text-[#9e9e9e]">
-              <HugeiconsIcon icon={UserIcon} size={16} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[#212121] dark:text-white truncate">
-                {user.name}
-              </p>
-              <p className="text-xs text-[#616161] dark:text-[#9e9e9e] truncate">{user.email}</p>
-            </div>
-            <p className="text-xs text-[#9e9e9e] dark:text-[#616161] shrink-0 whitespace-nowrap">
-              Último inicio de sesión: 
-              {formatDate(user.lastLoginAt)}
+      <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden">
+        <div className="hidden sm:grid sm:grid-cols-[minmax(0,1fr)_auto_auto] gap-4 px-5 py-2.5 border-b border-[#f0f0f0] dark:border-[#2a2a2a] bg-[#fafafa] dark:bg-[#161616] text-[10px] font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#616161]">
+          <span>Referido</span>
+          <span className="text-right sm:text-left whitespace-nowrap">Último acceso</span>
+          <span className="text-right sm:text-left whitespace-nowrap">Registro</span>
+        </div>
+        <ul className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+          {paginatedUsers.map((user) => (
+            <li key={user.id}>
+              <div className="flex flex-col gap-3 px-5 py-4 sm:grid sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:gap-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f5f5f5] dark:bg-[#2a2a2a] text-[#9e9e9e]">
+                    <HugeiconsIcon icon={UserIcon} size={18} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-[#212121] dark:text-white truncate">
+                      {user.name?.trim() || "Sin nombre"}
+                    </p>
+                    <p className="text-xs text-[#616161] dark:text-[#9e9e9e] truncate">{user.email}</p>
+                  </div>
+                </div>
+                <div className="flex sm:contents flex-wrap gap-4 pl-[52px] sm:pl-0">
+                  <div className="min-w-[8.5rem]">
+                    <p className="text-[10px] font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#616161] sm:hidden">
+                      Último acceso
+                    </p>
+                    <p className="text-sm text-[#424242] dark:text-[#e0e0e0] tabular-nums">
+                      {formatDate(user.lastLoginAt, { emptyLabel: "Sin ingresos aún" })}
+                    </p>
+                  </div>
+                  <div className="min-w-[8.5rem]">
+                    <p className="text-[10px] font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#616161] sm:hidden">
+                      Registro
+                    </p>
+                    <p className="text-sm text-[#424242] dark:text-[#e0e0e0] tabular-nums">
+                      {formatDate(user.createdAt)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+        {totalPages > 1 && (
+          <div className="flex flex-col gap-2 border-t border-[#f0f0f0] dark:border-[#2a2a2a] px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-[#9e9e9e] dark:text-[#616161]">
+              {(page - 1) * REFERRED_USERS_PAGE_SIZE + 1}–
+              {Math.min(page * REFERRED_USERS_PAGE_SIZE, users.length)} de {users.length}
             </p>
-            <p className="text-xs text-[#9e9e9e] dark:text-[#616161] shrink-0 whitespace-nowrap">
-              Registrado el: 
-              {formatDate(user.createdAt)}
-            </p>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-3 py-1.5 text-xs font-medium text-[#424242] dark:text-[#bdbdbd] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                ← Anterior
+              </button>
+              <span className="px-2 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                {page} / {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-3 py-1.5 text-xs font-medium text-[#424242] dark:text-[#bdbdbd] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Siguiente →
+              </button>
+            </div>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
 }
 
 const PAGE_SIZE = 15;
+const REFERRED_USERS_PAGE_SIZE = 10;
 
 function CommissionsTab({ userId }: { userId: string }) {
   const [page, setPage] = useState(1);

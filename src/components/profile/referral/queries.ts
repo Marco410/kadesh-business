@@ -2,7 +2,8 @@ import { gql } from "@apollo/client";
 
 export const REFERRED_USERS_QUERY = gql`
   query ReferredUsers($where: UserWhereInput!) {
-    users(where: $where) {
+    users(where: $where, orderBy: [{ createdAt: desc }]) {
+      id
       name
       email
       createdAt
@@ -12,10 +13,11 @@ export const REFERRED_USERS_QUERY = gql`
 `;
 
 export interface ReferredUser {
+  id: string;
   name: string;
   email: string;
   createdAt: string;
-  lastLoginAt: string;
+  lastLoginAt: string | null;
 }
 
 export interface ReferredUsersResponse {
