@@ -5,13 +5,24 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Tabs, Tab } from "@heroui/tabs";
 import Logo from "kadesh/components/shared/Logo";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { EyeIcon, ViewOffIcon, StarIcon } from "@hugeicons/core-free-icons";
+import {
+  EyeIcon,
+  ViewOffIcon,
+  StarIcon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons";
 import {
   useLogin,
   useRegister,
   useGoogleLogin,
 } from "../../../components/auth/hooks";
 import { getRegisterPasswordStrength } from "kadesh/utils/register-password-strength";
+
+const REGISTER_TRUST_POINTS = [
+  "Sin tarjeta de crédito",
+  "50 leads gratis",
+  "Cancela cuando quieras",
+] as const;
 
 /** Panel visual del sistema: mapa + leads (sin imagen externa). */
 function AuthPageVisual() {
@@ -604,9 +615,41 @@ function LoginPageContent() {
                         </>
                       )}
                     </button>
-                    <p className="text-center text-xs text-[#9e9e9e] dark:text-[#616161] leading-relaxed px-1">
-                      Sin tarjeta de crédito · Cancela cuando quieras
-                    </p>
+                    <div className="mt-4 border-t border-[#f0f0f0] pt-4 dark:border-[#2a2a2a]">
+                      <p
+                        id="register-trust-strip-label"
+                        className="mb-2.5 text-center text-[11px] text-[#8a8a8a] dark:text-[#6b6b6b]"
+                      >
+                        Incluido al registrarte
+                      </p>
+                      <ul
+                        className="flex flex-col items-center gap-2 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-y-1.5 sm:px-0"
+                        aria-labelledby="register-trust-strip-label"
+                      >
+                        {REGISTER_TRUST_POINTS.map((label, i) => (
+                          <li
+                            key={label}
+                            className="flex max-w-[min(100%,20rem)] items-center justify-center gap-1.5 text-center text-xs leading-snug text-[#525252] dark:text-[#b8b8b8] sm:max-w-none sm:text-left"
+                          >
+                            {i > 0 ? (
+                              <span
+                                aria-hidden
+                                className="hidden shrink-0 px-2.5 text-base leading-none text-[#d4d4d4] dark:text-[#404040] sm:inline"
+                              >
+                                ·
+                              </span>
+                            ) : null}
+                            <HugeiconsIcon
+                              icon={Tick02Icon}
+                              size={14}
+                              className="shrink-0 text-orange-500 dark:text-orange-400"
+                              aria-hidden
+                            />
+                            <span>{label}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
 
                  {/* <div className="relative my-6">
