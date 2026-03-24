@@ -29,7 +29,7 @@ const FAQ_ITEMS = [
   {
     question: "¿Puedo exportar a Excel?",
     answer:
-      "No. Por el momento no contamos con la funcionalidad de exportar a Excel. Sin embargo, estamos trabajando en una solución para ello.",
+      "Sí. Puedes exportar los leads a Excel desde la sección de leads en tu CRM desde el plan Pro.",
   },
   {
     question: "¿Qué tipo de negocios puedo encontrar?",
