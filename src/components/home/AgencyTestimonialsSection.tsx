@@ -7,6 +7,7 @@ import {
   Briefcase01Icon,
   StethoscopeIcon,
   Home02Icon,
+  User02Icon,
 } from "@hugeicons/core-free-icons";
 
 const TESTIMONIALS = [
@@ -38,6 +39,13 @@ const TESTIMONIALS = [
       "Listas de desarrolladores, arquitectos y proveedores por zona en minutos. El ahorro de tiempo nos permite enfocarnos en cerrar tratos.",
     timeSaved: "~3 horas diarias ahorradas",
   },
+  {
+    category: "Alejandra Garcia",
+    icon: User02Icon,
+    quote:
+      "Había probado CRM y bases de datos con contactos incompletos. Con KADESH encontré negocios reales, activos y listos para contactar, así que ahora me enfoco en conversar y cerrar ventas.",
+    timeSaved: "más de 35 horas ahorradas por semana",
+  },
 ];
 
 export default function AgencyTestimonialsSection() {
@@ -62,7 +70,7 @@ export default function AgencyTestimonialsSection() {
           </p>
         </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {TESTIMONIALS.map((item, index) => (
             <motion.article
               key={item.category}

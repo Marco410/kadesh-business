@@ -17,7 +17,6 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        {/* Meta Pixel Code - test_event_code: usar NEXT_PUBLIC_META_PIXEL_TEST_EVENT_CODE=TEST75748 para "Probar eventos" */}
         <Script
           id="facebook-pixel"
           strategy="afterInteractive"
