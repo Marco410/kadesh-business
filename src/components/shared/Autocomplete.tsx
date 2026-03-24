@@ -2,6 +2,14 @@
 
 import { useState, useRef, useEffect } from 'react';
 
+/** Lowercase + sin acentos (fab → fábricas). */
+function normalizeForSearch(text: string): string {
+  return String(text)
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase();
+}
+
 export interface AutocompleteOption {
   id: string;
   label: string;
@@ -48,9 +56,13 @@ export default function Autocomplete({
 
   const selectedOption = options.find((opt) => opt.id === value);
 
+  const normalizedQuery = normalizeForSearch(search);
+
   const filteredOptions = options.filter((option) => {
-    const searchValue = option[searchKey]?.toLowerCase() || '';
-    return searchValue.includes(search.toLowerCase());
+    const raw = option[searchKey];
+    const searchValue =
+      typeof raw === 'string' ? raw : raw != null ? String(raw) : '';
+    return normalizeForSearch(searchValue).includes(normalizedQuery);
   });
 
   useEffect(() => {

@@ -83,7 +83,7 @@ declare global {
 }
 
 export default function ObtenerClientesSection() {
-  const [category, setCategory] = useState<string>(GOOGLE_PLACE_CATEGORIES[0].value);
+  const [category, setCategory] = useState<string>("");
   const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
   const [minRating, setMinRating] = useState<number>(3);
   const [minReviews, setMinReviews] = useState<number>(20);
