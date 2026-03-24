@@ -106,8 +106,13 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
       return;
     }
     const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
     if (!trimmedTitle) {
       sileo.warning({ title: "El nombre del archivo es obligatorio." });
+      return;
+    }
+    if (!trimmedDescription) {
+      sileo.warning({ title: "La descripción es obligatoria." });
       return;
     }
     if (!selectedFile) {
@@ -120,7 +125,7 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
         variables: {
           data: {
             title: trimmedTitle,
-            description: description.trim() || null,
+            description: trimmedDescription,
             category: category || TECH_FILE_CATEGORIES[0].value,
             file: { upload: selectedFile },
             company: { connect: { id: companyId } },
@@ -225,7 +230,7 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
               </div>
               <div className="sm:col-span-2">
                 <label htmlFor="archivo-description" className="block text-sm font-medium text-[#374151] dark:text-[#e5e5e5] mb-2">
-                  Descripción (opcional)
+                  Descripción <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   id="archivo-description"
@@ -234,6 +239,7 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   disabled={uploading}
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-[#e5e5e5] dark:border-[#404040] bg-white dark:bg-[#0f0f0f] text-[#1a1a1a] dark:text-white placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all disabled:opacity-60 resize-none"
                 />
               </div>
@@ -322,56 +328,61 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
               </p>
             </div>
           ) : (
-            <ul className="space-y-3">
+            <ul className="grid grid-cols-[repeat(auto-fit,minmax(260px,320px))] gap-4">
               {files.map((file) => (
                 <li
                   key={file.id}
-                  className="flex flex-wrap items-center gap-4 rounded-xl border border-[#e5e5e5] dark:border-[#333] bg-[#fafafa] dark:bg-[#222] p-4 hover:border-[#d1d5db] dark:hover:border-[#404040] transition-colors"
+                  className="w-full rounded-xl border border-[#e5e5e5] dark:border-[#333] bg-[#fafafa] dark:bg-[#222] p-4 hover:border-[#d1d5db] dark:hover:border-[#404040] transition-colors"
                 >
-                  <span className="flex-shrink-0 w-11 h-11 rounded-xl bg-orange-500/10 dark:bg-orange-500/20 flex items-center justify-center">
-                    <HugeiconsIcon icon={FileAttachmentIcon} size={22} className="text-orange-500 dark:text-orange-400" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-[#1a1a1a] dark:text-white truncate">{file.title}</p>
-                    <div className="flex flex-wrap items-center gap-2 mt-1">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-[#e5e7eb] dark:bg-[#333] text-[#4b5563] dark:text-[#a0a0a0] capitalize">
-                        {TECH_FILE_CATEGORIES.find((opt) => opt.value === file.category)?.label ?? file.category}
-                      </span>
-                      {file.description && (
-                        <span className="text-xs text-[#6b7280] dark:text-[#6b7280] truncate max-w-[200px] sm:max-w-none">
-                          {file.description}
+                  <div className="flex flex-col h-full">
+                    <span className="flex-shrink-0 w-14 h-14 rounded-xl bg-orange-500/10 dark:bg-orange-500/20 flex items-center justify-center mb-4">
+                      <HugeiconsIcon icon={FileAttachmentIcon} size={30} className="text-orange-500 dark:text-orange-400" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-[#1a1a1a] dark:text-white truncate">{file.title}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-[#e5e7eb] dark:bg-[#333] text-[#4b5563] dark:text-[#a0a0a0] capitalize">
+                          {TECH_FILE_CATEGORIES.find((opt) => opt.value === file.category)?.label ?? file.category}
                         </span>
+                      </div>
+                      {file.description && (
+                        <p title={file.description} className="text-xs text-[#6b7280] dark:text-[#6b7280] mt-2 line-clamp-3">
+                          {file.description}
+                        </p>
+                      )}
+                      <p className="text-[11px] text-[#9ca3af] dark:text-[#6b7280] mt-2">
+                        {formatDate(file.createdAt)}
+                      </p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-[#e5e5e5] dark:border-[#333] flex items-center gap-2">
+                      {file.file?.url && (
+                        <a
+                          href={file.file.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-[#333] border border-[#e5e5e5] dark:border-[#404040] text-sm font-medium text-[#1a1a1a] dark:text-white hover:bg-[#f9fafb] dark:hover:bg-[#404040] transition-colors"
+                        >
+                          Ver
+                          <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
+                        </a>
+                      )}
+                      {isAdminCompany && (
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(file.id)}
+                          disabled={deletingId === file.id}
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50"
+                          aria-label="Eliminar archivo"
+                        >
+                          {deletingId === file.id ? (
+                            <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          ) : (
+                            <HugeiconsIcon icon={Delete02Icon} size={16} />
+                          )}
+                          Eliminar
+                        </button>
                       )}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {file.file?.url && (
-                      <a
-                        href={file.file.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white dark:bg-[#333] border border-[#e5e5e5] dark:border-[#404040] text-sm font-medium text-[#1a1a1a] dark:text-white hover:bg-[#f9fafb] dark:hover:bg-[#404040] transition-colors"
-                      >
-                        Ver
-                        <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
-                      </a>
-                    )}
-                    {isAdminCompany && (
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(file.id)}
-                        disabled={deletingId === file.id}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50"
-                        aria-label="Eliminar archivo"
-                      >
-                        {deletingId === file.id ? (
-                          <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                        ) : (
-                          <HugeiconsIcon icon={Delete02Icon} size={16} />
-                        )}
-                        Eliminar
-                      </button>
-                    )}
                   </div>
                 </li>
               ))}
