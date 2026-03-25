@@ -165,14 +165,25 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
+              className="flex flex-col items-center lg:items-start gap-4"
             >
-              <Link
-                href={Routes.auth.register}
-                className="inline-flex items-center justify-center px-8 py-4 bg-white text-orange-600 font-bold text-lg rounded-2xl shadow-xl hover:bg-orange-50 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-orange-500 transition-all duration-300"
-              >
-                Empieza gratis ahora (50 leads incluidos)
-              </Link>
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full">
+                <Link
+                  href={Routes.auth.register}
+                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-orange-600 font-bold text-lg rounded-2xl shadow-xl hover:bg-orange-50 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-orange-500 transition-all duration-300"
+                >
+                  Empieza gratis ahora (50 leads incluidos)
+                </Link>
+              </div>
+              <p className="text-sm sm:text-base text-white/85 text-center lg:text-left max-w-md">
+                ¿Prefieres verlo antes?{" "}
+                <Link
+                  href="/#agendar-demo"
+                  className="font-semibold text-white underline underline-offset-4 decoration-white/70 hover:decoration-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-orange-500 rounded-sm"
+                >
+                  Agenda una demo en vivo (15 min)
+                </Link>
+              </p>
             </motion.div>
           </div>
 

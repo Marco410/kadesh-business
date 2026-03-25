@@ -1,4 +1,5 @@
 export { default as HeroSection } from './HeroSection';
+export { default as ScheduleDemoSection } from './ScheduleDemoSection';
 export { default as HeroDifferentiatorsBadges } from './HeroDifferentiatorsBadges';
 export { default as CategoriesMarqueeSection } from './CategoriesMarqueeSection';
 export { default as InteractiveDemoSection } from './InteractiveDemoSection';

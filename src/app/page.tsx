@@ -1,5 +1,6 @@
 import {
   HeroSection,
+  ScheduleDemoSection,
   HeroDifferentiatorsBadges,
   CategoriesMarqueeSection,
   InteractiveDemoSection,
@@ -70,6 +71,7 @@ export default function HomePage() {
         <UniqueLeadsSection />
         <CRMWorkflowSection />
         <OrganizeProspectsSection />
+        <ScheduleDemoSection />
         <NewProspectsMonthlySection />
         <ConvertProspectsSection />
         <SocialProofBanner />
