@@ -153,7 +153,7 @@ function QuickActions({ hasVendedorRole }: { hasVendedorRole: boolean }) {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {actions.map((action) => (
         <Link
           key={action.href}
@@ -280,7 +280,18 @@ function ProfilePageContent() {
                       </h3>
                       <QuickActions hasVendedorRole={hasVendedorRole} />
                     </div>
-                    <ReferralLinkSection referralCode={userData?.user?.referralCode ?? ""} />
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#212121] dark:text-white mb-4">
+                        Referidos y comisiones
+                      </h3>
+                      <ReferralLinkSection
+                        userId={user.id}
+                        referralCode={userData?.user?.referralCode ?? ""}
+                        bank={userData?.user?.bank}
+                        clabe={userData?.user?.clabe}
+                        cardNumber={userData?.user?.cardNumber}
+                      />
+                    </div>
                     <div className="rounded-2xl overflow-hidden border border-[#e0e0e0] dark:border-[#3a3a3a]">
                       <PublicReferralSection />
                     </div>
@@ -336,8 +347,8 @@ function ProfilePageContent() {
                 )}
 
                 {selectedTab === "referidos" && (
-                  <div className="space-y-6">
-                    <div>
+                  <div className="flex flex-col gap-5">
+                    <div className="max-w-none">
                       <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
                         Referidos
                       </h2>

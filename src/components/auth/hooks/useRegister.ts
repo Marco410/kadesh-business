@@ -26,6 +26,43 @@ import { Routes } from 'kadesh/core/routes';
 import { sileo } from 'sileo';
 import { useTouchUserLastLogin } from './useTouchUserLastLogin';
 
+/** Texto crudo de error (GraphQL + mensaje) para detectar patrones sin filtrar al usuario. */
+function collectRegisterErrorText(err: unknown): string {
+  if (!err) return '';
+  if (err instanceof Error) {
+    const withGql = err as Error & {
+      graphQLErrors?: ReadonlyArray<{ message?: string }>;
+    };
+    const gql = withGql.graphQLErrors?.map((g) => g.message ?? '').join(' ') ?? '';
+    return [gql, err.message].filter(Boolean).join(' ');
+  }
+  return String(err);
+}
+
+/**
+ * Convierte errores de API/Prisma en mensajes claros en español (sin filtrar detalles internos).
+ */
+export function mapRegisterErrorToUserMessage(err: unknown): string {
+  const lower = collectRegisterErrorText(err).toLowerCase();
+
+  if (lower.includes('unique constraint') && lower.includes('email')) {
+    return 'Ya existe una cuenta con este correo. Inicia sesión o usa otro correo electrónico.';
+  }
+  if (
+    lower.includes('unique constraint') &&
+    (lower.includes('username') || lower.includes('user'))
+  ) {
+    return 'Ese usuario ya está registrado. Inicia sesión o usa otros datos.';
+  }
+  if (lower.includes('unique constraint')) {
+    return 'Parte de la información ya está registrada. Revisa el formulario o inicia sesión.';
+  }
+  if (lower.includes('prisma')) {
+    return 'No se pudo completar el registro. Verifica tus datos e intenta de nuevo.';
+  }
+  return 'No se pudo completar el registro. Intenta de nuevo.';
+}
+
 interface UseRegisterOptions {
   onSuccess?: () => void;
   redirectTo?: string | null;
@@ -137,10 +174,6 @@ export function useRegister(options?: UseRegisterOptions) {
         options.onSuccess();
       }
     },
-    onError: (error) => {
-      sileo.error({ title: 'Error al registrar usuario', description: error.message || 'Error al registrar usuario' });
-      setError(error.message || 'Error al registrar usuario');
-    },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -200,7 +233,9 @@ export function useRegister(options?: UseRegisterOptions) {
         },
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al registrar. Intenta de nuevo.');
+      const friendly = mapRegisterErrorToUserMessage(err);
+      setError(friendly);
+      sileo.error({ title: 'Error al registrar usuario', description: friendly });
     } finally {
       setIsSubmitting(false);
     }

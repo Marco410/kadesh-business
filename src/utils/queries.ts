@@ -166,6 +166,9 @@ export const UPDATE_USER_MUTATION = gql`
       phone
       birthday
       lastLoginAt
+      bank
+      clabe
+      cardNumber
       profileImage {
         url
       }
@@ -182,6 +185,9 @@ export interface UpdateUserVariables {
     phone?: string | null;
     birthday?: string | null;
     lastLoginAt?: string | null;
+    bank?: string | null;
+    clabe?: string | null;
+    cardNumber?: string | null;
     profileImage?: { upload: File } | { disconnect?: boolean };
     company?: { connect: { id: string } };
     roles?: { connect: Array<{ id: string }> };
@@ -197,6 +203,9 @@ export interface UpdateUserResponse {
     phone: string | null;
     birthday: string | null;
     lastLoginAt: string | null;
+    bank: string | null;
+    clabe: string | null;
+    cardNumber: string | null;
     profileImage: { url: string } | null;
   } | null;
 }

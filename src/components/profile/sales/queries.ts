@@ -72,6 +72,9 @@ export const USER_COMPANY_CATEGORIES_QUERY = gql`
       salesComission
       stripeCustomerId
       referralCode
+      bank
+      clabe
+      cardNumber
       company {
         id
         name
@@ -91,6 +94,9 @@ export interface UserCompanyCategoriesResponse {
     salesComission: number;
     stripeCustomerId: string;
     referralCode: string | null;
+    bank: string | null;
+    clabe: string | null;
+    cardNumber: string | null;
     company: {
       id: string;
       name: string;

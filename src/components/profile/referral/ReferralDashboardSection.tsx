@@ -455,23 +455,35 @@ export default function ReferralDashboardSection({ userId }: ReferralDashboardSe
     });
 
   return (
-    <div className="space-y-6">
-      <ReferralLinkSection referralCode={userData?.user?.referralCode ?? ""} />
+    <div className="flex flex-col gap-5">
+      <ReferralLinkSection
+        userId={userId}
+        referralCode={userData?.user?.referralCode ?? ""}
+        bank={userData?.user?.bank}
+        clabe={userData?.user?.clabe}
+        cardNumber={userData?.user?.cardNumber}
+      />
 
-      <div className="inline-flex rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-1 gap-1">
+      <div
+        className="flex w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-1 gap-1 shadow-sm"
+        role="tablist"
+        aria-label="Vista de referidos"
+      >
         {subTabs.map((tab) => (
           <button
             key={tab.key}
             type="button"
+            role="tab"
+            aria-selected={activeSubTab === tab.key}
             onClick={() => setActiveSubTab(tab.key)}
-            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 ${
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 min-w-0 ${
               activeSubTab === tab.key
                 ? "bg-orange-500 text-white shadow-sm"
                 : "text-[#616161] dark:text-[#9e9e9e] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
             }`}
           >
-            <HugeiconsIcon icon={tab.icon} size={16} />
-            {tab.label}
+            <HugeiconsIcon icon={tab.icon} size={16} className="shrink-0" />
+            <span className="truncate">{tab.label}</span>
           </button>
         ))}
       </div>
