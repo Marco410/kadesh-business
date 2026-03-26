@@ -110,7 +110,7 @@ function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
           <HugeiconsIcon
             icon={CheckmarkCircle02Icon}
             size={20}
-            className="text-orange-500 dark:text-orange-400"
+            className="text-orange-700 dark:text-orange-400"
           />
         ) : (
           <HugeiconsIcon
@@ -192,7 +192,7 @@ function PlanCard({
           <span className="text-4xl font-bold text-[#212121] dark:text-[#ffffff]">
             {formatPrice(plan.cost, plan.currency, plan.frequency)}
           </span>
-          <span className="text-xs font-medium text-[#9e9e9e] dark:text-[#757575] ml-1">
+          <span className="text-xs font-medium text-[#616161] dark:text-[#757575] ml-1">
             {plan.currency}
           </span>
           <span className="text-[#616161] dark:text-[#b0b0b0]">
@@ -209,7 +209,7 @@ function PlanCard({
           </p>
         )}
         {costPerLead && (
-          <p className="mt-2 text-xs font-medium text-orange-500 dark:text-orange-400">
+          <p className="mt-2 text-xs font-semibold text-orange-700 dark:text-orange-400">
             Solo {costPerLead} {plan.currency} por lead
           </p>
         )}
@@ -232,7 +232,7 @@ function PlanCard({
             "mt-8 w-full rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-60",
             highlighted
               ? "bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
-              : "border-2 border-orange-500 text-orange-500 hover:bg-orange-500/10 dark:border-orange-500 dark:text-orange-400 dark:hover:bg-orange-500/20",
+              : "border-2 border-orange-600 text-orange-700 hover:bg-orange-500/10 dark:border-orange-500 dark:text-orange-400 dark:hover:bg-orange-500/20",
             isCurrentPlan && "hover:bg-orange-500 dark:hover:bg-orange-500",
           )}
         >
@@ -287,7 +287,7 @@ function PlanCard({
                 <span className="text-4xl font-bold text-[#212121] dark:text-[#ffffff]">
                   {formatPrice(plan.cost, plan.currency, plan.frequency)}
                 </span>
-                <span className="text-xs font-medium text-[#9e9e9e] dark:text-[#757575] ml-1">
+                <span className="text-xs font-medium text-[#616161] dark:text-[#757575] ml-1">
                   {plan.currency}
                 </span>
                 <span className="text-[#616161] dark:text-[#b0b0b0]">
@@ -304,7 +304,7 @@ function PlanCard({
                 </p>
               )}
               {costPerLead && (
-                <p className="mt-2 text-xs font-medium text-orange-500 dark:text-orange-400">
+                <p className="mt-2 text-xs font-semibold text-orange-700 dark:text-orange-400">
                   Solo {costPerLead} {plan.currency} por lead
                 </p>
               )}
@@ -324,7 +324,7 @@ function PlanCard({
                   "mt-6 w-full rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto",
                   highlighted
                     ? "bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
-                    : "border-2 border-orange-500 text-orange-500 hover:bg-orange-500/10 dark:border-orange-500 dark:text-orange-400 dark:hover:bg-orange-500/20",
+                    : "border-2 border-orange-600 text-orange-700 hover:bg-orange-500/10 dark:border-orange-500 dark:text-orange-400 dark:hover:bg-orange-500/20",
                   isCurrentPlan &&
                     "hover:bg-orange-500 dark:hover:bg-orange-500",
                 )}
@@ -383,7 +383,7 @@ export default function PlansSection({
         <div className="mb-6">
           <Link
             href={`${Routes.panel}?tab=ventas`}
-            className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
+            className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-700 dark:hover:text-orange-400"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
             Volver a Ventas

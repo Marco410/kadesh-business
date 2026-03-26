@@ -13,7 +13,7 @@ export default function CategoriesMarqueeSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-md">
-            <p className="text-sm font-medium uppercase tracking-[0.18em] text-orange-500 dark:text-orange-400 mb-1">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-700 dark:text-orange-400 mb-1">
               Categorías de negocios
             </p>
             <h2 className="text-xl sm:text-2xl font-semibold text-[#212121] dark:text-white">
@@ -33,7 +33,7 @@ export default function CategoriesMarqueeSection() {
               {categoriesRowA.map((cat, index) => (
                 <span
                   key={`rowA-${cat.value}-${index}`}
-                  className="inline-flex items-center px-3 py-1.5 rounded-full border border-orange-500/50 dark:border-orange-500/40 bg-orange-500/15 dark:bg-orange-500/10 text-xs sm:text-sm text-orange-800 dark:text-orange-100 hover:bg-orange-500/25 dark:hover:bg-orange-500/20 transition-colors"
+                  className="inline-flex items-center px-3 py-1.5 rounded-full border border-orange-600/50 dark:border-orange-500/40 bg-orange-500/15 dark:bg-orange-500/10 text-xs sm:text-sm text-orange-900 dark:text-orange-100 hover:bg-orange-500/25 dark:hover:bg-orange-500/20 transition-colors"
                 >
                   {cat.label}
                 </span>
@@ -47,7 +47,7 @@ export default function CategoriesMarqueeSection() {
               {categoriesRowB.map((cat, index) => (
                 <span
                   key={`rowB-${cat.value}-${index}`}
-                  className="inline-flex items-center px-3 py-1.5 rounded-full border border-orange-500/40 dark:border-orange-500/35 bg-orange-500/10 dark:bg-orange-500/5 text-xs sm:text-sm text-orange-700 dark:text-orange-100/90 hover:bg-orange-500/20 dark:hover:bg-orange-500/15 transition-colors"
+                  className="inline-flex items-center px-3 py-1.5 rounded-full border border-orange-600/45 dark:border-orange-500/35 bg-orange-500/10 dark:bg-orange-500/5 text-xs sm:text-sm text-orange-800 dark:text-orange-100/90 hover:bg-orange-500/20 dark:hover:bg-orange-500/15 transition-colors"
                 >
                   {cat.label}
                 </span>

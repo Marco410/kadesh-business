@@ -96,7 +96,7 @@ export default function RootLayout({
         />
         <Script
           id="facebook-pixel"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
 !function(f,b,e,v,n,t,s)
