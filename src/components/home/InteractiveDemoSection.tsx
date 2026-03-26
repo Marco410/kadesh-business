@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CallIcon, StarIcon } from "@hugeicons/core-free-icons";
-import { GOOGLE_PLACE_CATEGORIES } from "kadesh/components/profile/sales/constants";
+import { GOOGLE_PLACE_CATEGORIES } from "kadesh/constants/constans";
 
 const MOCK_LEADS = [
   { name: "Bufete Legal García", phone: "+52 55 1234 5678", rating: 4.8, category: "Abogados" },

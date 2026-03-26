@@ -8,7 +8,7 @@ import {
   type CreateSaasProjectVariables,
   type CreateSaasProjectMutation,
 } from "kadesh/components/profile/sales/proyecto/queries";
-import { PROJECT_STATUS, PROJECT_STATUS_OPTIONS } from "kadesh/components/profile/sales/constants";
+import { PROJECT_STATUS, PROJECT_STATUS_OPTIONS } from "kadesh/constants/constans";
 import { sileo } from "sileo";
 import { COMPANY_VENDEDORES_QUERY, CompanyVendedoresResponse, CompanyVendedoresVariables, USER_COMPANY_CATEGORIES_QUERY, UserCompanyCategoriesResponse, UserCompanyCategoriesVariables } from "../queries";
 

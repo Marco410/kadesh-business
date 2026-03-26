@@ -1,4 +1,4 @@
-import { GOOGLE_PLACE_CATEGORIES } from "../constants";
+import { GOOGLE_PLACE_CATEGORIES } from "kadesh/constants/constans";
 
 export function getCategoryLabel(value: string | null | undefined): string {
     if (!value) return "—";

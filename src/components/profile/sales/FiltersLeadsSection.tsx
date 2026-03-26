@@ -7,7 +7,7 @@ import {
   PIPELINE_RING_BASE,
   GOOGLE_PLACE_CATEGORIES,
   PLAN_FEATURE_KEYS,
-} from "kadesh/components/profile/sales/constants";
+} from "kadesh/constants/constans";
 import { hasPlanFeature } from "./helpers/plan-features";
 import { useSubscription } from "./SubscriptionContext";
 import { Autocomplete, type AutocompleteOption } from "kadesh/components/shared";

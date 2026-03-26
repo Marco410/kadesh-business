@@ -9,7 +9,7 @@ import Logo from '../shared/Logo';
 import Link from 'next/link';
 import { Routes } from 'kadesh/core/routes';
 import { useUser } from 'kadesh/utils/UserContext';
-import { NICHE_TARGET_MAPPING } from 'kadesh/components/profile/sales/constants';
+import { NICHE_TARGET_MAPPING } from 'kadesh/constants/constans';
 
 interface DropdownLink {
   label: string;

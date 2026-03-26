@@ -7,7 +7,7 @@ import {
   type UserCompanyCategoriesResponse,
   type UserCompanyCategoriesVariables,
 } from "kadesh/components/profile/sales/queries";
-import { GOOGLE_PLACE_CATEGORIES } from "kadesh/components/profile/sales/constants";
+import { GOOGLE_PLACE_CATEGORIES } from "kadesh/constants/constans";
 import { useUser } from "kadesh/utils/UserContext";
 import { getCategoryLabel } from "../helpers/category";
 

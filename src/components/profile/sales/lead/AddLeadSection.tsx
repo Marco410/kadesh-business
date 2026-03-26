@@ -8,7 +8,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
 
-import { GOOGLE_PLACE_CATEGORIES, PLAN_FEATURE_KEYS } from "kadesh/components/profile/sales/constants";
+import { GOOGLE_PLACE_CATEGORIES, PLAN_FEATURE_KEYS } from "kadesh/constants/constans";
 import { Autocomplete, type AutocompleteOption } from "kadesh/components/shared";
 import LocationPicker from "kadesh/components/shared/LocationPicker";
 import { Routes } from "kadesh/core/routes";

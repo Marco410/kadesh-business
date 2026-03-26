@@ -7,7 +7,7 @@ import { useSubscription } from "./SubscriptionContext";
 import {
   SUBSCRIPTION_STATUS_OPTIONS,
   SUBSCRIPTION_STATUS_CLASSES,
-} from "./constants";
+} from "kadesh/constants/constans";
 
 /** Soporte humano: mismo número para llamada o WhatsApp */
 const SUPPORT_PHONE = {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { EVENT_COLORS } from "kadesh/components/profile/sales/constants";
+import { EVENT_COLORS } from "kadesh/constants/constans";
 import ActivityDetailModal from "kadesh/components/profile/sales/detail_lead/ActivityDetailModal";
 import ProposalDetailModal from "kadesh/components/profile/sales/detail_lead/ProposalDetailModal";
 import FollowUpDetailModal from "kadesh/components/profile/sales/detail_lead/FollowUpDetailModal";

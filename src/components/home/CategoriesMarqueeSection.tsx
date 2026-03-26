@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { GOOGLE_PLACE_CATEGORIES } from "kadesh/components/profile/sales/constants";
+import { GOOGLE_PLACE_CATEGORIES } from "kadesh/constants/constans";
 
 const baseCategories = GOOGLE_PLACE_CATEGORIES.filter(category => category.value !== "otra");
 const categoriesRowA = [...baseCategories, ...baseCategories];

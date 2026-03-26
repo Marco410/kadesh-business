@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Location01Icon, Search01Icon } from "@hugeicons/core-free-icons";
-import { GOOGLE_PLACE_CATEGORIES } from "kadesh/components/profile/sales/constants";
+import { GOOGLE_PLACE_CATEGORIES } from "kadesh/constants/constans";
 import { useSyncLeadsArea } from "kadesh/components/profile/sales/obtener-clientes/hooks";
 import CurrentPlanSection from "../CurrentPlanSection";
 import RoleAccessDeniedSection from "../RoleAccessDeniedSection";

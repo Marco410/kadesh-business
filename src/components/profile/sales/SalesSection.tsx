@@ -34,7 +34,7 @@ import CurrentPlanSection from "./CurrentPlanSection";
 import { SubscriptionProvider, useSubscription } from "./SubscriptionContext";
 import { useUser } from "kadesh/utils/UserContext";
 import { Role } from "kadesh/constants/constans";
-import { PIPELINE_STATUS, PLAN_FEATURE_KEYS } from "./constants";
+import { PIPELINE_STATUS, PLAN_FEATURE_KEYS } from "kadesh/constants/constans";
 import { sileo } from "sileo";
 import { Routes } from "kadesh/core/routes";
 import { HugeiconsIcon } from "@hugeicons/react";

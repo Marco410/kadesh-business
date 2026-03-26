@@ -19,7 +19,7 @@ import {
   type UpdateTechBusinessLeadVariables,
   type UpdateTechBusinessLeadMutation,
 } from "kadesh/components/profile/sales/queries";
-import { PIPELINE_STATUS_COLORS, PLAN_FEATURE_KEYS, PROPOSAL_STATUS } from "kadesh/components/profile/sales/constants";
+import { PIPELINE_STATUS_COLORS, PLAN_FEATURE_KEYS, PROPOSAL_STATUS } from "kadesh/constants/constans";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {

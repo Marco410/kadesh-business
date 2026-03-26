@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { NICHE_TARGET_MAPPING } from "kadesh/components/profile/sales/constants";
+import { NICHE_TARGET_MAPPING } from "kadesh/constants/constans";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://kadesh.com.mx";

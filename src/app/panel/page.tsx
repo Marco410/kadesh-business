@@ -34,10 +34,9 @@ import {
   type SubscriptionStatusVariables,
 } from "kadesh/components/profile/sales/queries";
 import { hasPlanFeature } from "kadesh/components/profile/sales/helpers/plan-features";
-import { PLAN_FEATURE_KEYS } from "kadesh/components/profile/sales/constants";
 import { Footer, Navigation } from "kadesh/components/layout";
 import { ReferralSection as PublicReferralSection, ReferralLinkSection } from "kadesh/components/home";
-import { Role } from "kadesh/constants/constans";
+import { PLAN_FEATURE_KEYS, Role } from "kadesh/constants/constans";
 import FeatureLockedSection from "kadesh/components/profile/sales/FeatureLockedSection";
 import { SubscriptionProvider } from "kadesh/components/profile/sales/SubscriptionContext";
 import ReferralDashboardSection from "kadesh/components/profile/referral/ReferralDashboardSection";

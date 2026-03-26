@@ -11,7 +11,7 @@ import {
 import { Routes } from "kadesh/core/routes";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { hasPlanFeature } from "../helpers/plan-features";
-import { PLAN_FEATURE_KEYS } from "../constants";
+import { PLAN_FEATURE_KEYS } from "kadesh/constants/constans";
 import { useSubscription } from "../SubscriptionContext";
 
 interface ProposalDetailModalProps {

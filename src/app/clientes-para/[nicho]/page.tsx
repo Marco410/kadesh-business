@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import {
   GOOGLE_PLACE_CATEGORIES,
   NICHE_TARGET_MAPPING,
-} from "kadesh/components/profile/sales/constants";
+} from "kadesh/constants/constans";
 import { Footer, Navigation } from "kadesh/components/layout";
 
 const WHATSAPP_E164 = "5214439382330";

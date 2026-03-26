@@ -25,7 +25,7 @@ import {
   PIPELINE_STATUS,
   PIPELINE_STATUS_COLORS,
   PLAN_FEATURE_KEYS,
-} from "kadesh/components/profile/sales/constants";
+} from "kadesh/constants/constans";
 import { Routes } from "kadesh/core/routes";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";

@@ -22,7 +22,7 @@ import {
   type TechFollowUpTasksVariables,
   type TechFollowUpTasksCountResponse,
 } from "kadesh/components/profile/sales/queries";
-import { EVENT_COLORS, PLAN_FEATURE_KEYS } from "../constants";
+import { EVENT_COLORS, PLAN_FEATURE_KEYS } from "kadesh/constants/constans";
 import { hasPlanFeature } from "../helpers/plan-features";
 import { useSubscription } from "../SubscriptionContext";
 

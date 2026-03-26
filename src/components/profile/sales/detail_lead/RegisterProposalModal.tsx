@@ -18,7 +18,7 @@ import {
   type UserCompanyCategoriesResponse,
   type UserCompanyCategoriesVariables,
 } from "kadesh/components/profile/sales/queries";
-import { PLAN_FEATURE_KEYS, PROPOSAL_STATUS } from "kadesh/components/profile/sales/constants";
+import { PLAN_FEATURE_KEYS, PROPOSAL_STATUS } from "kadesh/constants/constans";
 import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { Routes } from "kadesh/core/routes";

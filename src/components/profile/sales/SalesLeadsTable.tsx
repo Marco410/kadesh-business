@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import type { TechBusinessLeadsResponse } from "kadesh/components/profile/sales/queries";
 import {
   PIPELINE_STATUS_COLORS,
-  GOOGLE_PLACE_CATEGORIES,
-} from "kadesh/components/profile/sales/constants";
+} from "kadesh/constants/constans";
 import { Routes } from "kadesh/core/routes";
 import { getCategoryLabel } from "./helpers/category";
 import { ApolloError } from "@apollo/client";

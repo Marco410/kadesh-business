@@ -19,7 +19,7 @@ import {
   type TechFollowUpTasksCalendarVariables,
 } from "kadesh/components/profile/sales/queries";
 import { Role } from "kadesh/constants/constans";
-import { EVENT_LABELS } from "kadesh/components/profile/sales/constants";
+import { EVENT_LABELS } from "kadesh/constants/constans";
 import SalesCalendarView, { type CalendarEvent } from "kadesh/components/profile/sales/SalesCalendarView";
 import { COMPANY_VENDEDORES_WITH_STATS_QUERY, type CompanyVendedoresWithStatsResponse, type CompanyVendedoresWithStatsVariables } from "./queries";
 import { useUser } from "kadesh/utils/UserContext";

@@ -15,7 +15,7 @@ import {
 import {
   PROJECT_STATUS_CLASSES,
   PROJECT_STATUS_OPTIONS,
-} from "kadesh/components/profile/sales/constants";
+} from "kadesh/constants/constans";
 import { Routes } from "kadesh/core/routes";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { HugeiconsIcon } from "@hugeicons/react";

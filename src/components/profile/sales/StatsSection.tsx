@@ -12,7 +12,7 @@ import {
   type TechProposalsResponse,
   type TechProposalsBySellerVariables,
 } from "kadesh/components/profile/sales/queries";
-import { PIPELINE_STATUS, PLAN_FEATURE_KEYS, PROPOSAL_STATUS } from "./constants";
+import { PIPELINE_STATUS, PLAN_FEATURE_KEYS, PROPOSAL_STATUS } from "kadesh/constants/constans";
 import { formatCurrency } from "kadesh/utils/format-currency";
 import { Routes } from "kadesh/core/routes";
 import { useRouter } from "next/navigation";

@@ -13,7 +13,7 @@ import {
   type TechFollowUpTasksVariables,
   type TechFollowUpTasksResponse,
 } from "kadesh/components/profile/sales/queries";
-import { EVENT_LABELS } from "../constants";
+import { EVENT_LABELS } from "kadesh/constants/constans";
 import SalesCalendarView, { type CalendarEvent } from "../SalesCalendarView";
 
 function toDateKey(iso: string): string {

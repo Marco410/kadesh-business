@@ -12,7 +12,7 @@ import {
   type CreateTechSalesActivityVariables,
   type CreateTechSalesActivityMutation,
 } from "kadesh/components/profile/sales/queries";
-import { SALES_ACTIVITY_TYPE } from "kadesh/components/profile/sales/constants";
+import { SALES_ACTIVITY_TYPE } from "kadesh/constants/constans";
 import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
 import ActivityDetailModal from "./ActivityDetailModal";

@@ -18,7 +18,7 @@ import {
 import {
   FOLLOW_UP_TASK_STATUS,
   TASK_PRIORITY,
-} from "kadesh/components/profile/sales/constants";
+} from "kadesh/constants/constans";
 import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
 import FollowUpDetailModal from "./FollowUpDetailModal";
