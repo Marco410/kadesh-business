@@ -1,20 +1,36 @@
-import { MetadataRoute } from 'next';
-
-const BASE_URL = 'https://www.kadesh.com.mx';
+import type { MetadataRoute } from "next";
+import { NICHE_TARGET_MAPPING } from "kadesh/components/profile/sales/constants";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
+  const baseUrl = "https://kadesh.com.mx";
+
+  const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: BASE_URL,
+      url: `${baseUrl}/`,
       lastModified: new Date(),
-      changeFrequency: 'weekly',
+      changeFrequency: "weekly",
       priority: 1,
     },
     {
-      url: `${BASE_URL}/contacto`,
+      url: `${baseUrl}/auth/login`,
       lastModified: new Date(),
-      changeFrequency: 'monthly',
+      changeFrequency: "monthly",
       priority: 0.5,
     },
+    {
+      url: `${baseUrl}/auth/register`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
   ];
+
+  const nicheRoutes: MetadataRoute.Sitemap = Object.keys(NICHE_TARGET_MAPPING).map((key) => ({
+    url: `${baseUrl}/clientes-para-${key}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.8,
+  }));
+
+  return [...staticRoutes, ...nicheRoutes];
 }
