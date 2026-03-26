@@ -1,5 +1,3 @@
-"use client";
-
 import Link from 'next/link';
 import Logo from '../shared/Logo';
 import { NICHE_TARGET_MAPPING } from 'kadesh/components/profile/sales/constants';

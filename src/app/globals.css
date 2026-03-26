@@ -41,7 +41,7 @@
   --color-brown-900: #0A0603;
 
   /* Font Family */
-  --font-family-sans: 'Poppins', 'Inter', sans-serif;
+  --font-family-sans: var(--font-poppins), var(--font-inter), sans-serif;
 }
 
 @layer base {
@@ -56,7 +56,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins', 'Inter', sans-serif;
+    font-family: var(--font-poppins), var(--font-inter), sans-serif;
   }
 
   html.dark,

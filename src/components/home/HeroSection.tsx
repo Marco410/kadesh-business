@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { Routes } from "kadesh/core/routes";
 import { HugeiconsIcon } from "@hugeicons/react";

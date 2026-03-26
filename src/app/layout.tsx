@@ -1,13 +1,24 @@
 import "./globals.css";
-import '@fontsource/poppins/400.css';
-import '@fontsource/poppins/700.css';
-import '@fontsource/inter/400.css';
-import '@fontsource/inter/700.css';
+import { Inter, Poppins } from "next/font/google";
 import ClientProviders from './ClientProviders';
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
 
 export { metadata, viewport } from './metadata';
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+  variable: "--font-poppins",
+});
 
 const globalGeoJsonLd = {
   '@context': 'https://schema.org',
@@ -89,6 +100,8 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://connect.facebook.net" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://connect.facebook.net" />
         <script
           id="kadesh-geo-core-jsonld"
           type="application/ld+json"
@@ -123,7 +136,9 @@ fbq('track', 'PageView'${process.env.NEXT_PUBLIC_META_PIXEL_TEST_EVENT_CODE ? `,
         </noscript>
         {/* End Meta Pixel Code */}
       </head>
-      <body className="font-sans bg-[#ffffff] dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] transition-colors duration-200">
+      <body
+        className={`${poppins.variable} ${inter.variable} font-sans bg-[#ffffff] dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] transition-colors duration-200`}
+      >
         <ClientProviders>
           {children}
         </ClientProviders>
