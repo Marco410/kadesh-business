@@ -1,12 +1,12 @@
 import { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.negocios.kadesh.com.mx'),
+  metadataBase: new URL('https://kadesh.com.mx'),
   title: {
     default: 'KADESH - Tu próxima lista de clientes está a un clic de distancia.',
     template: '%s | KADESH',
   },
-  description: 'Extrae leads B2B directamente de Google Maps. Filtra por categoría y radio de acción. Deja de buscar prospectos y empieza a cerrar ventas hoy mismo.',
+  description: 'Plataforma SaaS B2B para extraer clientes potenciales reales de Google Maps con teléfono y CRM integrado. Kadesh ofrece prueba gratuita de 7 días con 50 leads gratis.',
   keywords: [
     'KADESH',
     'KADESH Negocios',
@@ -37,9 +37,9 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'KADESH - Tu próxima lista de clientes está a un clic de distancia.',
-    description: 'Extrae leads B2B desde Google Maps. Filtra por categoría y radio, obtén nombre, teléfono y rating de cada prospecto. CRM integrado para cerrar más ventas.',
-    url: 'https://www.negocios.kadesh.com.mx/',
-    siteName: 'KADESH Negocios',
+    description: 'Plataforma SaaS B2B para extraer clientes potenciales de Google Maps con teléfono y CRM integrado. Prueba gratuita de 7 días con 50 leads gratis.',
+    url: 'https://kadesh.com.mx/',
+    siteName: 'Kadesh',
     images: [
       {
         url: '/og-image.png',
@@ -54,11 +54,11 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'KADESH - Tu próxima lista de clientes está a un clic de distancia.',
-    description: 'Extrae leads B2B desde Google Maps. Filtra por categoría y radio. Gestiona prospectos con el CRM integrado de KADESH Negocios.',
+    description: 'Extrae clientes potenciales de Google Maps con teléfono y CRM integrado. Prueba gratuita de 7 días con 50 leads gratis.',
     images: ['/og-image.png'],
   },
   alternates: {
-    canonical: 'https://www.negocios.kadesh.com.mx/',
+    canonical: 'https://kadesh.com.mx/',
   },
 };
 

@@ -18,10 +18,25 @@ const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
 
 const DEFAULT_CENTER = { lat: 19.4326, lng: -99.1332 };
-const DEFAULT_ZOOM = 12;
+const DEFAULT_ZOOM = 5;
 const DEFAULT_RADIUS_KM = 5;
 const MIN_RADIUS_KM = 1;
-const MAX_RADIUS_KM = 50;
+const MAX_RADIUS_KM = 20;
+const CUSTOM_SEARCH_MIN_LENGTH = 2;
+const CUSTOM_SEARCH_MAX_LENGTH = 80;
+
+function sanitizeBusinessSearchTerm(value: string): string {
+  return value
+    .replace(/[^\p{L}\p{N}\s&.,\-]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, CUSTOM_SEARCH_MAX_LENGTH);
+}
+
+function isBusinessSearchTermValid(value: string): boolean {
+  if (value.length < CUSTOM_SEARCH_MIN_LENGTH) return false;
+  return /[\p{L}\p{N}]/u.test(value);
+}
 
 function loadExternalResource(
   tag: "link" | "script",
@@ -83,7 +98,9 @@ declare global {
 }
 
 export default function ObtenerClientesSection() {
+  const [searchMode, setSearchMode] = useState<"category" | "custom">("category");
   const [category, setCategory] = useState<string>("");
+  const [customSearch, setCustomSearch] = useState("");
   const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
   const [minRating, setMinRating] = useState<number>(3);
   const [minReviews, setMinReviews] = useState<number>(20);
@@ -211,18 +228,36 @@ export default function ObtenerClientesSection() {
     setStats(null);
     setShowZeroResultsHint(false);
 
-    const categoryLabel = GOOGLE_PLACE_CATEGORIES.find((c) => c.value === category)?.label ?? category;
+    const activeSearchTerm = searchMode === "custom" ? sanitizeBusinessSearchTerm(customSearch) : category;
+    if (!activeSearchTerm) {
+      sileo.error({ title: "Selecciona una categoría o escribe una búsqueda válida" });
+      return;
+    }
+    if (searchMode === "custom" && !isBusinessSearchTermValid(activeSearchTerm)) {
+      sileo.error({
+        title: "Búsqueda no válida",
+        description: `Escribe al menos ${CUSTOM_SEARCH_MIN_LENGTH} caracteres usando letras.`,
+      });
+      return;
+    }
+
+    const categoryLabel =
+      searchMode === "custom"
+        ? activeSearchTerm
+        : GOOGLE_PLACE_CATEGORIES.find((c) => c.value === category)?.label ?? category;
 
     const fetchData = async () => {
       const result = await syncLeadsArea({
         lat: pin.lat,
         lng: pin.lng,
         radiusKm,
-        category,
+        category: activeSearchTerm,
         maxResults: 60,
         minRating: minRating > 0 ? minRating : null,
         minReviews: minReviews > 0 ? minReviews : null,
       });
+
+      console.log("result", result);
 
       if (!result) {
         throw new Error(syncError?.message ?? "Error al sincronizar");
@@ -275,6 +310,8 @@ export default function ObtenerClientesSection() {
   const step1Done = Boolean(pin);
   const step2Done = Boolean(pin);
   const step3Done = hasSearched;
+  const radiusPercent =
+    ((radiusKm - MIN_RADIUS_KM) / (MAX_RADIUS_KM - MIN_RADIUS_KM)) * 100;
 
   if (userLoading) {
     return (
@@ -317,7 +354,7 @@ export default function ObtenerClientesSection() {
             {[
               { n: 1, label: "Clic en el mapa" },
               { n: 2, label: "Radio (km)" },
-              { n: 3, label: "Categoría y buscar" },
+                { n: 3, label: "Filtro y buscar" },
             ].map((s) => {
               const status =
                 s.n === 1
@@ -369,35 +406,95 @@ export default function ObtenerClientesSection() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2  gap-4 items-end">
-              <div className="w-full">
-                <Autocomplete
-                  id="obtener-clientes-category"
-                  label="Tipo de negocio"
-                  value={category}
-                  options={GOOGLE_PLACE_CATEGORIES.map(
-                    (opt): AutocompleteOption => ({
-                      id: opt.value,
-                      label: opt.label,
-                    })
-                  )}
-                  onChange={() => {
-                    // El componente maneja internamente el texto de búsqueda
-                  }}
-                  onSelect={(option) => {
-                    setCategory(option.id);
-                  }}
-                  placeholder="Buscar categoría..."
-                  disabled={isLoading}
-                  className="w-full"
-                />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+              <div className="w-full lg:col-span-4">
+                <label className="block text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
+                  Tipo de búsqueda
+                </label>
+                <div className="inline-flex w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] p-1 bg-white dark:bg-[#121212]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchMode("category");
+                      setCustomSearch("");
+                    }}
+                    className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold transition-colors ${
+                      searchMode === "category"
+                        ? "bg-orange-500 text-white"
+                        : "text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#252525]"
+                    }`}
+                  >
+                    Categoría
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchMode("custom");
+                      setCategory("");
+                    }}
+                    className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold transition-colors ${
+                      searchMode === "custom"
+                        ? "bg-orange-500 text-white"
+                        : "text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#252525]"
+                    }`}
+                  >
+                    Búsqueda libre
+                  </button>
+                </div>
               </div>
 
-              <div className="w-full">
+              <div className="w-full lg:col-span-8">
+                {searchMode === "category" ? (
+                  <Autocomplete
+                    id="obtener-clientes-category"
+                    label="Tipo de negocio"
+                    value={category}
+                    options={GOOGLE_PLACE_CATEGORIES.map(
+                      (opt): AutocompleteOption => ({
+                        id: opt.value,
+                        label: opt.label,
+                      })
+                    )}
+                    onChange={() => {}}
+                    onSelect={(option) => {
+                      setCategory(option.id);
+                    }}
+                    placeholder="Buscar categoría..."
+                    disabled={isLoading}
+                    className="w-full"
+                  />
+                ) : (
+                  <>
+                    <label
+                      htmlFor="obtener-clientes-custom-search"
+                      className="block text-sm font-medium text-[#212121] dark:text-white mb-2"
+                    >
+                      Empresa, categoría o negocio
+                    </label>
+                    <input
+                      id="obtener-clientes-custom-search"
+                      type="text"
+                      value={customSearch}
+                      onChange={(e) => setCustomSearch(sanitizeBusinessSearchTerm(e.target.value))}
+                      disabled={isLoading}
+                      placeholder="Ej. taquería, despacho legal, farmacia guadalajara"
+                      className="w-full px-4 py-2.5 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+                      maxLength={CUSTOM_SEARCH_MAX_LENGTH}
+                    />
+                    <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      Usa texto simple ({CUSTOM_SEARCH_MIN_LENGTH}-{CUSTOM_SEARCH_MAX_LENGTH} caracteres), solo letras,
+                      números y signos básicos.
+                    </p>
+                  </>
+                )}
+              </div>
+
+              <div className="w-full lg:col-span-12">
                 <label className="block text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
                   Radio: {radiusKm} km
                 </label>
                 <input
+                  aria-label="Radio de búsqueda en kilómetros"
                   type="range"
                   min={MIN_RADIUS_KM}
                   max={MAX_RADIUS_KM}
@@ -408,8 +505,15 @@ export default function ObtenerClientesSection() {
                     setRadiusTouched(true);
                   }}
                   disabled={isLoading}
-                  className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-gray-700 accent-orange-500"
+                  style={{
+                    background: `linear-gradient(to right, #f97316 0%, #f97316 ${radiusPercent}%, #e5e7eb ${radiusPercent}%, #e5e7eb 100%)`,
+                  }}
+                  className="kadesh-range w-full h-5 appearance-none cursor-pointer rounded-full"
                 />
+                <div className="mt-2 flex items-center justify-between text-[11px] text-[#757575] dark:text-[#9ca3af]">
+                  <span>{MIN_RADIUS_KM} km</span>
+                  <span>{MAX_RADIUS_KM} km</span>
+                </div>
               </div>
 
       
@@ -600,6 +704,54 @@ export default function ObtenerClientesSection() {
 
       </div>
       <LeadsStatsCards ref={statsRef} />
+      <style jsx>{`
+        .kadesh-range::-webkit-slider-runnable-track {
+          height: 14px;
+          border-radius: 9999px;
+        }
+        .kadesh-range::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          margin-top: -7px;
+          width: 28px;
+          height: 28px;
+          border-radius: 9999px;
+          border: 2px solid #f97316;
+          background:
+            radial-gradient(circle at center, #fff7ed 0 26%, transparent 27%),
+            #f97316;
+          box-shadow: 0 8px 20px rgba(249, 115, 22, 0.35);
+          transition: transform 0.15s ease;
+        }
+        .kadesh-range:hover::-webkit-slider-thumb {
+          transform: scale(1.05);
+        }
+        .kadesh-range:disabled::-webkit-slider-thumb {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+        .kadesh-range::-moz-range-track {
+          height: 14px;
+          border-radius: 9999px;
+          background: #e5e7eb;
+        }
+        .kadesh-range::-moz-range-progress {
+          height: 14px;
+          border-radius: 9999px;
+          background: #f97316;
+        }
+        .kadesh-range::-moz-range-thumb {
+          width: 28px;
+          height: 28px;
+          border-radius: 9999px;
+          border: 2px solid #f97316;
+          background:
+            radial-gradient(circle at center, #fff7ed 0 26%, transparent 27%),
+            #f97316;
+          box-shadow: 0 8px 20px rgba(249, 115, 22, 0.35);
+          transition: transform 0.15s ease;
+        }
+      `}</style>
     </div>
   );
 }

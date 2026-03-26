@@ -38,6 +38,11 @@ function formatPeriod(frequency: string): string {
   return f === "monthly" ? "mes" : f === "yearly" ? "año" : frequency || "";
 }
 
+function getPriceAriaLabel(plan: SaasPlanItem): string {
+  const monthly = formatPrice(plan.cost, plan.currency, plan.frequency);
+  return `Precio del plan ${plan.name} de Kadesh: ${monthly} al ${formatPeriod(plan.frequency)} en pesos mexicanos`;
+}
+
 function formatCostPerLead(
   cost: number,
   leadLimit: number | null,
@@ -183,7 +188,7 @@ function PlanCard({
             No disponible
           </span>
         )}
-        <div className="mt-4">
+        <p className="mt-4" aria-label={getPriceAriaLabel(plan)}>
           <span className="text-4xl font-bold text-[#212121] dark:text-[#ffffff]">
             {formatPrice(plan.cost, plan.currency, plan.frequency)}
           </span>
@@ -193,7 +198,7 @@ function PlanCard({
           <span className="text-[#616161] dark:text-[#b0b0b0]">
             /{formatPeriod(plan.frequency)}
           </span>
-        </div>
+        </p>
         {plan.leadLimit != null && (
           <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
             Cada mes puedes extraer{" "}
@@ -278,7 +283,7 @@ function PlanCard({
                   No disponible
                 </span>
               )}
-              <div className="mt-4">
+              <p className="mt-4" aria-label={getPriceAriaLabel(plan)}>
                 <span className="text-4xl font-bold text-[#212121] dark:text-[#ffffff]">
                   {formatPrice(plan.cost, plan.currency, plan.frequency)}
                 </span>
@@ -288,8 +293,8 @@ function PlanCard({
                 <span className="text-[#616161] dark:text-[#b0b0b0]">
                   /{formatPeriod(plan.frequency)}
                 </span>
-              </div>
-              {plan.leadLimit != null && (
+              </p>
+              {plan.leadLimit != null && plan.cost !== 0 && (
                 <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
                   Cada mes puedes extraer{" "}
                   <strong className="text-[#212121] dark:text-[#e0e0e0]">
@@ -305,7 +310,7 @@ function PlanCard({
               )}
               {plan.cost === 0 && (
                 <p className="mt-2 inline-block rounded-full bg-green-500 px-4 py-1 text-sm font-bold text-white">
-                  Prueba gratuita de 1 mes
+                  Prueba gratuita de 7 días
                 </p>
               )}
             </div>

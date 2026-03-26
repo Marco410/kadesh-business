@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-const BASE_URL = 'https://www.negocios.kadesh.com.mx';
+const BASE_URL = 'https://www.kadesh.com.mx';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [

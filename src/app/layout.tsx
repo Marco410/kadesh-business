@@ -9,6 +9,78 @@ import { Analytics } from '@vercel/analytics/next';
 
 export { metadata, viewport } from './metadata';
 
+const globalGeoJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      name: 'Kadesh',
+      legalName: 'Kadesh',
+      url: 'https://kadesh.com.mx',
+      logo: 'https://kadesh.com.mx/logo.png',
+      email: 'contacto@kadesh.com.mx',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Morelia',
+        addressRegion: 'Michoacán',
+        addressCountry: 'MX',
+      },
+      areaServed: {
+        '@type': 'Country',
+        name: 'México',
+      },
+    },
+    {
+      '@type': 'SoftwareApplication',
+      name: 'Kadesh',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      url: 'https://kadesh.com.mx',
+      areaServed: 'MX',
+      offers: [
+        {
+          '@type': 'Offer',
+          name: 'Plan Starter',
+          price: 799,
+          priceCurrency: 'MXN',
+          category: 'SaaS B2B',
+          url: 'https://kadesh.com.mx/#precios',
+        },
+        {
+          '@type': 'Offer',
+          name: 'Plan Pro',
+          price: 1699,
+          priceCurrency: 'MXN',
+          category: 'SaaS B2B',
+          url: 'https://kadesh.com.mx/#precios',
+        },
+        {
+          '@type': 'Offer',
+          name: 'Plan Agencia',
+          price: 3499,
+          priceCurrency: 'MXN',
+          category: 'SaaS B2B',
+          url: 'https://kadesh.com.mx/#precios',
+        },
+      ],
+      description:
+        'Plataforma SaaS B2B para extraer clientes potenciales de Google Maps con teléfono y CRM integrado. Kadesh ofrece prueba gratuita de 7 días con 50 leads gratis.',
+      featureList: [
+        'Extracción de leads reales desde Google Maps',
+        'Teléfonos y datos de contacto',
+        'CRM integrado para seguimiento comercial',
+        'Prueba gratuita de 7 días con 50 leads gratis',
+      ],
+      trialAvailability: 'Prueba gratuita de 7 días con 50 leads gratis',
+      provider: {
+        '@type': 'Organization',
+        name: 'Kadesh',
+        url: 'https://kadesh.com.mx',
+      },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -17,6 +89,11 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
+        <script
+          id="kadesh-geo-core-jsonld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(globalGeoJsonLd) }}
+        />
         <Script
           id="facebook-pixel"
           strategy="afterInteractive"

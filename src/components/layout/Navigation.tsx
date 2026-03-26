@@ -9,6 +9,7 @@ import Logo from '../shared/Logo';
 import Link from 'next/link';
 import { Routes } from 'kadesh/core/routes';
 import { useUser } from 'kadesh/utils/UserContext';
+import { NICHE_TARGET_MAPPING } from 'kadesh/components/profile/sales/constants';
 
 interface DropdownLink {
   label: string;
@@ -16,13 +17,27 @@ interface DropdownLink {
   anchor: string | null;
 }
 
+interface NicheDropdownLink {
+  label: string;
+  href: string;
+}
+
 const DROPDOWN_LINKS: DropdownLink[] = [
   { label: 'Home', href: Routes.home, anchor: null },
 ];
 
+const NICHE_DROPDOWN_LINKS: NicheDropdownLink[] = Object.entries(NICHE_TARGET_MAPPING).map(
+  ([slug, data]) => ({
+    label: data.title,
+    href: `/clientes-para-${slug}`,
+  })
+);
+
 export default function Navigation() {
   const [opened, setOpened] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [nicheDropdownOpen, setNicheDropdownOpen] = useState(false);
+  const [nicheMobileOpen, setNicheMobileOpen] = useState(false);
   const [avatarDropdownOpen, setAvatarDropdownOpen] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -31,6 +46,7 @@ export default function Navigation() {
   const router = useRouter();
   const { user, setUser } = useUser();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const nicheDropdownRef = useRef<HTMLDivElement>(null);
   const avatarDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -61,6 +77,9 @@ export default function Navigation() {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false);
+      }
+      if (nicheDropdownRef.current && !nicheDropdownRef.current.contains(event.target as Node)) {
+        setNicheDropdownOpen(false);
       }
       if (avatarDropdownRef.current && !avatarDropdownRef.current.contains(event.target as Node)) {
         setAvatarDropdownOpen(false);
@@ -143,42 +162,48 @@ export default function Navigation() {
         
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-6">
-          {/* Inicio Dropdown */}
-          <div className="relative" ref={dropdownRef}>
+        
+           {/* Inicio Link */}
+           <Link
+            href={Routes.home}
+            className={`font-semibold text-sm ${navLinkClass}`}
+          >
+            Inicio
+          </Link>
+
+          {/* Clientes para Dropdown */}
+          <div className="relative" ref={nicheDropdownRef}>
             <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
+              onClick={() => setNicheDropdownOpen(!nicheDropdownOpen)}
               className={`font-semibold text-sm flex items-center gap-1 ${navLinkClass}`}
             >
-              Inicio
-              <svg 
-                className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
-                fill="none" 
-                stroke="currentColor" 
+              Clientes para
+              <svg
+                className={`w-4 h-4 transition-transform ${nicheDropdownOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
             <AnimatePresence>
-              {dropdownOpen && (
+              {nicheDropdownOpen && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute top-full left-0 mt-2 bg-white dark:bg-[#1e1e1e] rounded-lg shadow-lg py-2 min-w-[200px] z-50"
+                  className="absolute top-full left-0 mt-2 bg-white dark:bg-[#1e1e1e] rounded-lg shadow-lg py-2 min-w-[260px] max-h-[340px] overflow-y-auto z-50"
                 >
-                  {DROPDOWN_LINKS.map((link: DropdownLink) => (
-                    <a
-                      key={link.label}
-                      href={link.anchor ? `${Routes.home}${link.anchor}` : link.href}
-                      onClick={(e) => {
-                        handleLinkClick(e, link.href, link.anchor);
-                        setDropdownOpen(false);
-                      }}
+                  {NICHE_DROPDOWN_LINKS.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setNicheDropdownOpen(false)}
                       className="block px-4 py-2 text-sm text-[#212121] dark:text-[#ffffff] hover:bg-orange-500/10 dark:hover:bg-white/10 transition-colors"
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   ))}
                 </motion.div>
               )}
@@ -359,52 +384,14 @@ export default function Navigation() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">
-                  {/* Inicio Dropdown Mobile */}
-                  <div>
-                    <button
-                      onClick={() => setDropdownOpen(!dropdownOpen)}
-                      className="w-full text-left text-white font-semibold text-lg opacity-92 hover:opacity-100 py-4 px-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all flex items-center justify-between"
-                    >
-                      Inicio
-                      <svg 
-                        className={`w-5 h-5 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                    <AnimatePresence>
-                      {dropdownOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="pl-4 pt-2 flex flex-col gap-2">
-                            {DROPDOWN_LINKS.map((link: DropdownLink, index: number) => (
-                              <motion.a
-                                key={link.label}
-                                href={link.anchor ? `${Routes.home}${link.anchor}` : link.href}
-                                onClick={(e) => {
-                                  handleLinkClick(e, link.href, link.anchor);
-                                  setDropdownOpen(false);
-                                }}
-                                className="text-white font-medium text-base opacity-80 hover:opacity-100 py-2 px-4 rounded-lg bg-white/5 hover:bg-white/10 transition-all"
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: index * 0.05 }}
-                              >
-                                {link.label}
-                              </motion.a>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
+                  {/* Inicio Mobile */}
+                  <Link
+                    href={Routes.home}
+                    onClick={() => setOpened(false)}
+                    className="text-white font-semibold text-lg no-underline opacity-92 hover:opacity-100 py-4 px-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all"
+                  >
+                    Inicio
+                  </Link>
 
                   {/* Contacto Link Mobile */}
                   <Link
@@ -414,6 +401,56 @@ export default function Navigation() {
                   >
                     Contacto
                   </Link>
+
+                  {/* Clientes para Mobile Dropdown */}
+                  <div>
+                    <button
+                      onClick={() => setNicheMobileOpen(!nicheMobileOpen)}
+                      className="w-full text-left text-white font-semibold text-lg opacity-92 hover:opacity-100 py-4 px-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all flex items-center justify-between"
+                    >
+                      Clientes para
+                      <svg
+                        className={`w-5 h-5 transition-transform ${nicheMobileOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    <AnimatePresence>
+                      {nicheMobileOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="pl-4 pt-2 flex flex-col gap-2 max-h-[280px] overflow-y-auto">
+                            {NICHE_DROPDOWN_LINKS.map((link, index: number) => (
+                              <motion.div
+                                key={link.href}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.03 }}
+                              >
+                                <Link
+                                  href={link.href}
+                                  onClick={() => {
+                                    setOpened(false);
+                                    setNicheMobileOpen(false);
+                                  }}
+                                  className="block text-white font-medium text-base opacity-80 hover:opacity-100 py-2 px-4 rounded-lg bg-white/5 hover:bg-white/10 transition-all"
+                                >
+                                  {link.label}
+                                </Link>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
 
                   {/* Planes Link Mobile */}
                   {user?.id ? (<Link

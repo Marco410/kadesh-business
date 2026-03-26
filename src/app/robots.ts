@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/panel/', '/auth/'],
       },
     ],
-    sitemap: 'https://www.negocios.kadesh.com.mx/sitemap.xml',
+    sitemap: 'https://www.kadesh.com.mx/sitemap.xml',
   };
 }

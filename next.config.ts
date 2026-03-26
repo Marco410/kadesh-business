@@ -17,6 +17,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/clientes-para-:nicho",
+        destination: "/clientes-para/:nicho",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
