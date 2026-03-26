@@ -62,9 +62,6 @@ function getValidTab(
   if (tabFromUrl === "archivos" && (!hasUploadFilesFeature)) {
     return "inicio";
   }
-  if (tabFromUrl === "calendar" && (!hasCalendarFeature)) {
-    return "inicio";
-  }
   return tabFromUrl as (typeof VALID_TABS)[number];
 }
 
@@ -75,7 +72,7 @@ const navItems = [
   { key: "vendedores" as const, label: "Vendedores", icon: UserIcon, requireAdminCompany: true, requireSalesPersonManagement: false },
   { key: "archivos" as const, label: "Archivos", icon: FileIcon, requireAdminCompany: false, requireUploadFilesFeature: true },
   { key: "proyectos" as const, label: "Proyectos", icon: FolderIcon },
-  { key: "calendar" as const, label: "Mi Calendario", icon: CalendarIcon, requireCalendarFeature: true },
+  { key: "calendar" as const, label: "Mi Calendario", icon: CalendarIcon },
   { key: "referidos" as const, label: "Referidos", icon: UserAdd01Icon },
 ];
 
@@ -200,6 +197,7 @@ function ProfilePageContent() {
     skip: !companyId,
   });
   const subscription = subscriptionData?.subscriptionStatus?.subscription ?? null;
+  const hasAdminRole = user?.roles?.some((r) => r.name === Role.ADMIN) ?? false;
   const hasSalesPersonManagement = hasPlanFeature(
     subscription?.planFeatures ?? null,
     PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT
@@ -294,6 +292,17 @@ function ProfilePageContent() {
                     <div className="rounded-2xl overflow-hidden border border-[#e0e0e0] dark:border-[#3a3a3a]">
                       <PublicReferralSection />
                     </div>
+
+                    {hasAdminRole && (
+                      <div className="pt-2 flex justify-center">
+                        <Link
+                          href="/panel/ventas/admin"
+                          className="text-xs text-[#616161] dark:text-[#b0b0b0] underline decoration-dotted opacity-70 hover:opacity-100 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+                        >
+                          Admin: verificar suscripciones (debug)
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 )}
 
