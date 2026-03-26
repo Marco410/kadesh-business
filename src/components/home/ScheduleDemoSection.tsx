@@ -16,10 +16,10 @@ const WEEKDAYS = [
 ] as const;
 
 const TIME_SLOTS = [
-  { id: "11:00", label: "11:00 a. m." },
+  { id: "09:00", label: "9:00 a. m." },
+  { id: "09:30", label: "9:30 a. m." },
   { id: "11:30", label: "11:30 a. m." },
   { id: "12:00", label: "12:00 p. m." },
-  { id: "15:00", label: "3:00 p. m." },
   { id: "15:30", label: "3:30 p. m." },
   { id: "16:00", label: "4:00 p. m." },
   { id: "16:30", label: "4:30 p. m." },

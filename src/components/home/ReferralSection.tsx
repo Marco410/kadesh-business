@@ -66,35 +66,35 @@ export default function ReferralSection() {
   const comboMonthly = starterRecurring * 4 + proRecurring * 4 + agenciaRecurring * 2;
 
   return (
-    <section className="bg-[#0b0b0f] text-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
+    <section className="bg-[#f8f8f8] text-[#212121] dark:bg-[#0b0b0f] dark:text-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl sm:text-4xl font-bold mb-4">
           Programa de referidos KADESH
         </h2>
-        <p className="text-sm sm:text-base text-white/70 mb-4 max-w-3xl">
+        <p className="text-sm sm:text-base text-[#616161] dark:text-white/70 mb-4 max-w-3xl">
           Gana comisiones recurrentes por cada negocio que refieras a KADESH. Te
           pagamos por el primer pago y también mes a mes mientras tus referidos
           sigan activos.
         </p>
         {loading && (
-          <p className="text-xs text-white/60 mb-6">
+          <p className="text-xs text-[#757575] dark:text-white/60 mb-6">
             Calculando comisiones con los precios actuales de los planes...
           </p>
         )}
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Starter */}
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-300 flex items-center gap-1 mb-1">
+          <div className="rounded-2xl border border-[#e0e0e0] dark:border-white/10 bg-white dark:bg-white/5 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300 flex items-center gap-1 mb-1">
               💰 Starter{" "}
               {starter && (
-                <span className="font-normal text-white/80">
+                <span className="font-normal text-[#616161] dark:text-white/80">
                   – {formatCurrency(starter.cost, starterCurrency)} / mes
                 </span>
               )}
             </p>
             <h3 className="text-lg font-semibold mb-3">Plan Starter</h3>
-            <ul className="space-y-1.5 text-sm text-white/80 mb-4">
+            <ul className="space-y-1.5 text-sm text-[#424242] dark:text-white/80 mb-4">
               <li>
                 <strong>Primer pago ({Math.round(starterUpfrontRate * 100)}%)</strong>: ganas{" "}
                 <span className="font-semibold">
@@ -110,9 +110,9 @@ export default function ReferralSection() {
                 mientras el cliente siga activo (hasta {MONTHS_RECURRING} meses).
               </li>
             </ul>
-            <div className="rounded-xl bg-white/5 border border-white/10 p-4 text-sm">
+            <div className="rounded-xl bg-[#fafafa] dark:bg-white/5 border border-[#e0e0e0] dark:border-white/10 p-4 text-sm">
               <p className="font-semibold mb-1">Ejemplo</p>
-              <p className="text-white/80">
+              <p className="text-[#424242] dark:text-white/80">
                 Si vendes <strong>10 planes Starter</strong>:
               </p>
               <p className="mt-1">
@@ -128,17 +128,17 @@ export default function ReferralSection() {
           </div>
 
           {/* Pro */}
-          <div className="rounded-2xl border border-amber-300/60 bg-gradient-to-b from-amber-500/10 to-transparent p-6">
-            <p className="text-xs font-semibold uppercase tracking-wide text-amber-300 flex items-center gap-1 mb-1">
+          <div className="rounded-2xl border border-amber-400/50 dark:border-amber-300/60 bg-gradient-to-b from-amber-200/35 to-white dark:from-amber-500/10 dark:to-transparent p-6">
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 flex items-center gap-1 mb-1">
               ⭐ Pro{" "}
               {pro && (
-                <span className="font-normal text-white/80">
+                <span className="font-normal text-[#616161] dark:text-white/80">
                   – {formatCurrency(pro.cost, proCurrency)} / mes (más vendido)
                 </span>
               )}
             </p>
             <h3 className="text-lg font-semibold mb-3">Plan Pro</h3>
-            <ul className="space-y-1.5 text-sm text-white/80 mb-4">
+            <ul className="space-y-1.5 text-sm text-[#424242] dark:text-white/80 mb-4">
               <li>
                 <strong>Primer pago ({Math.round(proUpfrontRate * 100)}%)</strong>: ganas{" "}
                 <span className="font-semibold">
@@ -154,9 +154,9 @@ export default function ReferralSection() {
                 .
               </li>
             </ul>
-            <div className="rounded-2xl bg-black/20 border border-amber-300/40 p-4 text-sm">
+            <div className="rounded-2xl bg-white/70 dark:bg-black/20 border border-amber-400/40 dark:border-amber-300/40 p-4 text-sm">
               <p className="font-semibold mb-1">Ejemplo</p>
-              <p className="text-white/80">
+              <p className="text-[#424242] dark:text-white/80">
                 Si vendes <strong>10 planes Pro</strong>:
               </p>
               <p className="mt-1">
@@ -172,17 +172,17 @@ export default function ReferralSection() {
           </div>
 
           {/* Agencia */}
-          <div className="rounded-2xl border border-sky-300/50 bg-sky-500/5 p-6">
-            <p className="text-xs font-semibold uppercase tracking-wide text-sky-300 flex items-center gap-1 mb-1">
+          <div className="rounded-2xl border border-sky-300/70 dark:border-sky-300/50 bg-sky-50 dark:bg-sky-500/5 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-300 flex items-center gap-1 mb-1">
               🚀 Agencia{" "}
               {agencia && (
-                <span className="font-normal text-white/80">
+                <span className="font-normal text-[#616161] dark:text-white/80">
                   – {formatCurrency(agencia.cost, agenciaCurrency)} / mes
                 </span>
               )}
             </p>
             <h3 className="text-lg font-semibold mb-3">Plan Agencia</h3>
-            <ul className="space-y-1.5 text-sm text-white/80 mb-4">
+            <ul className="space-y-1.5 text-sm text-[#424242] dark:text-white/80 mb-4">
               <li>
                 <strong>Primer pago ({Math.round(agenciaUpfrontRate * 100)}%)</strong>: ganas{" "}
                 <span className="font-semibold">
@@ -198,9 +198,9 @@ export default function ReferralSection() {
                 .
               </li>
             </ul>
-            <div className="rounded-2xl bg-sky-500/10 border border-sky-300/40 p-4 text-sm">
+            <div className="rounded-2xl bg-sky-100/60 dark:bg-sky-500/10 border border-sky-300/60 dark:border-sky-300/40 p-4 text-sm">
               <p className="font-semibold mb-1">Ejemplo</p>
-              <p className="text-white/80">
+              <p className="text-[#424242] dark:text-white/80">
                 Si vendes <strong>5 planes Agencia</strong>:
               </p>
               <p className="mt-1">
@@ -217,18 +217,18 @@ export default function ReferralSection() {
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1.2fr_1fr] items-start">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+          <div className="rounded-2xl border border-[#e0e0e0] dark:border-white/10 bg-white dark:bg-white/5 p-6">
             <h3 className="text-lg font-semibold mb-3">
               📈 Ejemplo real de ingresos de un vendedor
             </h3>
-            <p className="text-sm text-white/80 mb-3">Si en un mes vendes:</p>
-            <ul className="text-sm text-white/80 space-y-1.5 mb-4">
+            <p className="text-sm text-[#424242] dark:text-white/80 mb-3">Si en un mes vendes:</p>
+            <ul className="text-sm text-[#424242] dark:text-white/80 space-y-1.5 mb-4">
               <li>• 4 planes Starter</li>
               <li>• 4 planes Pro</li>
               <li>• 2 planes Agencia</li>
             </ul>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-xl bg-black/30 border border-white/10 p-4 text-sm">
+              <div className="rounded-xl bg-[#fafafa] dark:bg-black/30 border border-[#e0e0e0] dark:border-white/10 p-4 text-sm">
                 <p className="font-semibold mb-1">Ingresos primer mes</p>
                 <p>
                   Starter: 4 × {formatCurrency(starterFirst, starterCurrency)} ={" "}
@@ -242,11 +242,11 @@ export default function ReferralSection() {
                   Agencia: 2 × {formatCurrency(agenciaFirst, agenciaCurrency)} ={" "}
                   <strong>{formatCurrency(agenciaFirst * 2, agenciaCurrency)}</strong>
                 </p>
-                <p className="mt-2 text-emerald-300 font-semibold">
+                <p className="mt-2 text-emerald-700 dark:text-emerald-300 font-semibold">
                   Total primer mes: {formatCurrency(comboFirstMonth, starterCurrency)}
                 </p>
               </div>
-              <div className="rounded-xl bg-emerald-500/10 border-emerald-400/40 p-4 text-sm">
+              <div className="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-400/40 p-4 text-sm">
                 <p className="font-semibold mb-1">Ingreso recurrente mensual</p>
                 <p>
                   Starter: 4 × {formatCurrency(starterRecurring, starterCurrency)} ={" "}
@@ -260,17 +260,17 @@ export default function ReferralSection() {
                   Agencia: 2 × {formatCurrency(agenciaRecurring, agenciaCurrency)} ={" "}
                   <strong>{formatCurrency(agenciaRecurring * 2, agenciaCurrency)}</strong>
                 </p>
-                <p className="mt-2 text-emerald-300 font-semibold">
+                <p className="mt-2 text-emerald-700 dark:text-emerald-300 font-semibold">
                   Total mensual: {formatCurrency(comboMonthly, starterCurrency)}
                 </p>
-                <p className="text-xs text-emerald-100/80 mt-1">
+                <p className="text-xs text-emerald-800/80 dark:text-emerald-100/80 mt-1">
                   Mientras los clientes sigan activos durante {MONTHS_RECURRING} meses.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-white/85">
+          <div className="rounded-2xl border border-[#e0e0e0] dark:border-white/10 bg-white dark:bg-white/5 p-6 text-sm text-[#424242] dark:text-white/85">
             <h3 className="text-lg font-semibold mb-3">💡 Potencial de ingresos</h3>
             <p className="mb-3">
               Con los precios actuales de los planes, un vendedor que mantenga{" "}
@@ -291,7 +291,7 @@ export default function ReferralSection() {
               </strong>{" "}
               solo en comisiones recurrentes, además de las comisiones por nuevas ventas.
             </p>
-            <p className="text-xs text-white/60">
+            <p className="text-xs text-[#757575] dark:text-white/60">
               Las comisiones se calculan sobre el precio listado del plan y se pagan
               mientras la suscripción del cliente se mantenga activa y al corriente
               (hasta {MONTHS_RECURRING} meses por cliente).
