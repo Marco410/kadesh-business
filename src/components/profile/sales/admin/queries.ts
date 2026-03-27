@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const ADMIN_COMPANY_USERS_QUERY = gql`
   query AdminCompanyUsers($where: UserWhereInput!) {
-    users(where: $where, orderBy: [{ name: asc }]) {
+    users(where: $where, orderBy: [{ createdAt: asc }]) {
       id
       name
       lastName
