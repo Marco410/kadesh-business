@@ -40,6 +40,9 @@ export const USER_QUERY = gql`
       profileImage {
         url
       }
+      roles {
+        name
+      }
       secondLastName
       username
       verified
@@ -47,8 +50,38 @@ export const USER_QUERY = gql`
   }
 `;
 
+/** Empresa del usuario (perfil admin empresa). Separado para no pedir company a vendedores. */
+export const PROFILE_USER_COMPANY_QUERY = gql`
+  query ProfileUserCompany($where: UserWhereUniqueInput!) {
+    user(where: $where) {
+      id
+      company {
+        id
+        name
+        logo {
+          url
+        }
+        onboardingMainOffer
+        onboardingIdealCustomer
+        onboardingAvgTicketValue
+        onboardingSalesPain
+      }
+    }
+  }
+`;
+
 export interface UserQueryVariables {
   where: { id: string };
+}
+
+export interface UserCompanyProfile {
+  id: string;
+  name: string;
+  logo: { url: string } | null;
+  onboardingMainOffer: string | null;
+  onboardingIdealCustomer: string | null;
+  onboardingAvgTicketValue: string | null;
+  onboardingSalesPain: string | null;
 }
 
 export interface UserQueryResponse {
@@ -65,7 +98,54 @@ export interface UserQueryResponse {
     birthday: string | null;
     age: number | null;
     createdAt: string;
+    roles?: { name: string }[] | null;
   } | null;
+}
+
+export interface ProfileUserCompanyVariables {
+  where: { id: string };
+}
+
+export interface ProfileUserCompanyResponse {
+  user: {
+    id: string;
+    company: UserCompanyProfile | null;
+  } | null;
+}
+
+export const UPDATE_SAAS_COMPANY_MUTATION = gql`
+  mutation UpdateSaasCompany(
+    $where: SaasCompanyWhereUniqueInput!
+    $data: SaasCompanyUpdateInput!
+  ) {
+    updateSaasCompany(where: $where, data: $data) {
+      id
+      name
+      logo {
+        url
+      }
+      onboardingMainOffer
+      onboardingIdealCustomer
+      onboardingAvgTicketValue
+      onboardingSalesPain
+    }
+  }
+`;
+
+export interface UpdateSaasCompanyVariables {
+  where: { id: string };
+  data: {
+    name?: string;
+    onboardingMainOffer?: string | null;
+    onboardingIdealCustomer?: string | null;
+    onboardingAvgTicketValue?: string | null;
+    onboardingSalesPain?: string | null;
+    logo?: { upload: File };
+  };
+}
+
+export interface UpdateSaasCompanyResponse {
+  updateSaasCompany: UserCompanyProfile | null;
 }
 
 export const AUTHENTICATE_USER_MUTATION = gql`

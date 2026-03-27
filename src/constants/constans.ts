@@ -656,6 +656,7 @@ export const PLAN_FEATURE_KEYS = {
   PROJECTS: "projects",
   ADD_OWN_LEADS: "add_own_leads",
   EXPORT_EXCEL: "export_excel",
+  QUOTATIONS: "quotations",
 } as const;
 
 export type PlanFeatureKey =
@@ -722,5 +723,9 @@ export const PLAN_FEATURES_MAP: Record<
   [PLAN_FEATURE_KEYS.EXPORT_EXCEL]: {
     name: "Exportar a Excel",
     description: "Exportar leads a Excel",
+  },
+  [PLAN_FEATURE_KEYS.QUOTATIONS]: {
+    name: "Cotizaciones",
+    description: "Crear y gestionar cotizaciones",
   },
 };

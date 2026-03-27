@@ -24,6 +24,7 @@ import SalesSection from "kadesh/components/profile/sales/SalesSection";
 import VendedoresSection from "kadesh/components/profile/sales/vendedores/VendedoresSection";
 import ArchivosSection from "kadesh/components/profile/sales/archivos/ArchivosSection";
 import { ProyectosSection } from "kadesh/components/profile/sales/proyecto";
+import { QuotationsSection } from "kadesh/components/profile/sales/quotations";
 import VendedoresCalendarioTab from "kadesh/components/profile/sales/vendedores/VendedoresCalendarioTab";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
@@ -41,7 +42,7 @@ import FeatureLockedSection from "kadesh/components/profile/sales/FeatureLockedS
 import { SubscriptionProvider } from "kadesh/components/profile/sales/SubscriptionContext";
 import ReferralDashboardSection from "kadesh/components/profile/referral/ReferralDashboardSection";
 
-const VALID_TABS = ["inicio", "profile", "ventas", "vendedores", "archivos", "proyectos", "calendar", "referidos"] as const;
+const VALID_TABS = ["inicio", "profile", "ventas", "vendedores", "archivos", "proyectos", "cotizaciones", "calendar", "referidos"] as const;
 
 function getValidTab(
   tabFromUrl: string | null,
@@ -72,6 +73,7 @@ const navItems = [
   { key: "vendedores" as const, label: "Vendedores", icon: UserIcon, requireAdminCompany: true, requireSalesPersonManagement: false },
   { key: "archivos" as const, label: "Archivos", icon: FileIcon, requireAdminCompany: false, requireUploadFilesFeature: true },
   { key: "proyectos" as const, label: "Proyectos", icon: FolderIcon },
+  { key: "cotizaciones" as const, label: "Cotizaciones", icon: FileIcon },
   { key: "calendar" as const, label: "Mi Calendario", icon: CalendarIcon },
   { key: "referidos" as const, label: "Referidos", icon: UserAdd01Icon },
 ];
@@ -210,6 +212,10 @@ function ProfilePageContent() {
     subscription?.planFeatures ?? null,
     PLAN_FEATURE_KEYS.PROJECTS
   );
+  const hasQuotationsFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.QUOTATIONS
+  );
   const hasCalendarFeature = hasPlanFeature(
     subscription?.planFeatures ?? null,
     PLAN_FEATURE_KEYS.CALENDAR_CRM
@@ -341,6 +347,16 @@ function ProfilePageContent() {
                     </div>
                   ) : (
                     <FeatureLockedSection sectionName="Proyectos" />
+                  )
+                )}
+
+                {selectedTab === "cotizaciones" && (
+                  hasQuotationsFeature ? (
+                    <div className="space-y-6">
+                      <QuotationsSection userId={user.id} />
+                    </div>
+                  ) : (
+                    <FeatureLockedSection sectionName="Cotizaciones" />
                   )
                 )}
 

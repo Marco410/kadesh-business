@@ -5,10 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  InformationCircleIcon,
-  Edit01Icon,
-} from "@hugeicons/core-free-icons";
+import { Edit01Icon } from "@hugeicons/core-free-icons";
 import {
   UPDATE_USER_MUTATION,
   USER_QUERY,
@@ -19,6 +16,8 @@ import {
 } from "kadesh/utils/queries";
 import { useUser } from "kadesh/utils/UserContext";
 import { Routes } from "kadesh/core/routes";
+import { Role } from "kadesh/constants/constans";
+import ProfileCompanySection from "./ProfileCompanySection";
 import type { AuthenticatedItem } from "kadesh/utils/types";
 
 const INPUT_CLASS =
@@ -26,9 +25,6 @@ const INPUT_CLASS =
 
 const DISABLED_FIELD_CLASS =
   "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a] text-[#616161] dark:text-[#b0b0b0]";
-
-const CONTACT_MESSAGE =
-  'Si necesitas actualizar este campo, envía un mensaje en contacto.';
 
 function toDateInputValue(isoOrNull: string | null | undefined): string {
   if (!isoOrNull) return "";
@@ -41,12 +37,16 @@ interface SaveChangesButtonProps {
   isDirty: boolean;
   saving: boolean;
   onSave: () => void;
+  label?: string;
+  savingLabel?: string;
 }
 
 function SaveChangesButton({
   isDirty,
   saving,
   onSave,
+  label = "Guardar cambios",
+  savingLabel = "Guardando...",
 }: SaveChangesButtonProps) {
   if (!isDirty) return null;
   return (
@@ -59,10 +59,10 @@ function SaveChangesButton({
       {saving ? (
         <>
           <span className="animate-spin size-4 border-2 border-white border-t-transparent rounded-full" />
-          Guardando...
+          {savingLabel}
         </>
       ) : (
-        "Guardar cambios"
+        label
       )}
     </button>
   );
@@ -117,6 +117,11 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
     (secondLastName || "") !== (user.secondLastName ?? "") ||
     (phone || "") !== (user.phone ?? "") ||
     (birthday || "") !== currentBirthdayIso;
+
+  const isAdminCompany =
+    (data?.user?.roles ?? userProp.roles)?.some(
+      (r) => r.name === Role.ADMIN_COMPANY,
+    ) ?? false;
 
   const [updateUser, { loading: saving }] = useMutation<
     UpdateUserResponse,
@@ -199,25 +204,28 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
   }
 
   return (
-    <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 sm:p-8 border border-[#e0e0e0] dark:border-[#3a3a3a] shadow-md dark:shadow-lg">
-      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-        <h2 className="text-2xl font-bold text-[#212121] dark:text-[#ffffff]">
-          Información Personal
-        </h2>
-        <SaveChangesButton
-          isDirty={isDirty}
-          saving={saving}
-          onSave={handleSave}
-        />
-      </div>
-
-      {saveError && (
-        <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm font-medium">
-          {saveError}
+    <div
+      className={`grid grid-cols-1 gap-6${isAdminCompany ? " xl:grid-cols-2" : ""}`}
+    >
+      <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 sm:p-8 border border-[#e0e0e0] dark:border-[#3a3a3a] shadow-md dark:shadow-lg">
+        <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+          <h2 className="text-2xl font-bold text-[#212121] dark:text-[#ffffff]">
+            Información Personal
+          </h2>
+          <SaveChangesButton
+            isDirty={isDirty}
+            saving={saving}
+            onSave={handleSave}
+          />
         </div>
-      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {saveError && (
+          <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm font-medium">
+            {saveError}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Avatar con botón editar */}
         <div className="md:col-span-2 flex items-center gap-6 mb-4 pb-6 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
           <div className="flex flex-col items-start gap-1">
@@ -454,7 +462,12 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
             onSave={handleSave}
           />
         </div>
+        </div>
       </div>
+
+      {isAdminCompany && user.id ? (
+        <ProfileCompanySection userId={user.id} />
+      ) : null}
     </div>
   );
 }
