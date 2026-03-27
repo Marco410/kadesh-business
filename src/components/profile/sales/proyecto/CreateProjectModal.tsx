@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQuery, useMutation } from "@apollo/client";
 import {
@@ -8,13 +8,22 @@ import {
   type CreateSaasProjectVariables,
   type CreateSaasProjectMutation,
 } from "kadesh/components/profile/sales/proyecto/queries";
-import { PROJECT_STATUS, PROJECT_STATUS_OPTIONS } from "kadesh/constants/constans";
+import { PROJECT_STATUS, PROJECT_STATUS_OPTIONS, Role } from "kadesh/constants/constans";
 import { sileo } from "sileo";
-import { COMPANY_VENDEDORES_QUERY, CompanyVendedoresResponse, CompanyVendedoresVariables, USER_COMPANY_CATEGORIES_QUERY, UserCompanyCategoriesResponse, UserCompanyCategoriesVariables } from "../queries";
+import {
+  TECH_BUSINESS_LEADS_QUERY,
+  USER_COMPANY_CATEGORIES_QUERY,
+  type TechBusinessLeadsResponse,
+  type TechBusinessLeadsVariables,
+  type UserCompanyCategoriesResponse,
+  type UserCompanyCategoriesVariables,
+} from "../queries";
+import { buildClientLeadsQueryVariables } from "../helpers/client-leads-query";
+import { useUser } from "kadesh/utils/UserContext";
+import Autocomplete, { type AutocompleteOption } from "kadesh/components/shared/Autocomplete";
 
 interface CreateProjectModalProps {
   proposalId: string | null;
-  leadId: string;
   userId: string;
   isOpen: boolean;
   onClose: () => void;
@@ -27,12 +36,13 @@ const labelClassName = "block text-sm font-medium text-[#616161] dark:text-[#b0b
 
 export default function CreateProjectModal({
   proposalId,
-  leadId,
   userId,
   isOpen,
   onClose,
   onSuccess,
 }: CreateProjectModalProps) {
+  const { user } = useUser();
+  const isAdminCompany = user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
   const [name, setName] = useState("");
   const [serviceType, setServiceType] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -40,6 +50,8 @@ export default function CreateProjectModal({
   const [description, setDescription] = useState("");
   const [urlData, setUrlData] = useState("");
   const [status, setStatus] = useState<string>(PROJECT_STATUS.PENDIENTE);
+  const [clientSearch, setClientSearch] = useState("");
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
 
   const { data: userData } = useQuery<
     UserCompanyCategoriesResponse,
@@ -51,8 +63,50 @@ export default function CreateProjectModal({
 
   const companyId = userData?.user?.company?.id ?? null;
 
+  const clientsWhere = useMemo<TechBusinessLeadsVariables["where"]>(
+    () => ({
+      ...(companyId ? { saasCompany: { some: { id: { equals: companyId } } } } : {}),
+      ...(!isAdminCompany ? { salesPerson: { some: { id: { equals: userId } } } } : {}),
+    }),
+    [companyId, isAdminCompany, userId],
+  );
+
+  const clientsQueryVariables = useMemo(
+    () =>
+      buildClientLeadsQueryVariables({
+        where: clientsWhere,
+        companyId,
+        isAdminCompany,
+        userId,
+        take: 500,
+        orderBy: [{ createdAt: "desc" }],
+      }),
+    [clientsWhere, companyId, isAdminCompany, userId],
+  );
+
+  const { data: clientsData, loading: loadingClients } = useQuery<
+    TechBusinessLeadsResponse,
+    TechBusinessLeadsVariables
+  >(TECH_BUSINESS_LEADS_QUERY, {
+    variables: clientsQueryVariables,
+    skip: !isOpen || !companyId || !userId,
+    fetchPolicy: "network-only",
+  });
+
+  const clients = clientsData?.techBusinessLeads ?? [];
+  const clientOptions = useMemo<AutocompleteOption[]>(
+    () =>
+      clients.map((c) => ({
+        id: c.id,
+        label: c.businessName,
+      })),
+    [clients],
+  );
+
   useEffect(() => {
     if (!isOpen) return;
+    setClientSearch("");
+    setSelectedLeadId(null);
   }, [isOpen, userId]);
 
   const [createProject, { loading: creating }] = useMutation<
@@ -77,6 +131,8 @@ export default function CreateProjectModal({
     setDescription("");
     setUrlData("");
     setStatus(PROJECT_STATUS.PENDIENTE);
+    setClientSearch("");
+    setSelectedLeadId(null);
     onClose();
   }
 
@@ -88,6 +144,10 @@ export default function CreateProjectModal({
     }
     if (!companyId) {
       sileo.error({ title: "No se pudo obtener la empresa." });
+      return;
+    }
+    if (!selectedLeadId) {
+      sileo.error({ title: "Selecciona un cliente para crear el proyecto." });
       return;
     }
 
@@ -102,7 +162,7 @@ export default function CreateProjectModal({
           estimatedEndDate: estimatedEndDate || undefined,
           urlData: urlData.trim() || undefined,
           company: { connect: { id: companyId } },
-          businessLead: { connect: { id: leadId } },
+          businessLead: { connect: { id: selectedLeadId } },
           ...(proposalId && { proposal: { connect: { id: proposalId } } }),
           ...(userId && { responsible: { connect: { id: userId } } }),
         },
@@ -119,7 +179,7 @@ export default function CreateProjectModal({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 z-[95] flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/50 z-[70] flex items-center justify-center p-4"
         onClick={handleClose}
       />
       <motion.div
@@ -128,7 +188,7 @@ export default function CreateProjectModal({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none"
+        className="fixed inset-0 z-[80] flex items-center justify-center p-4 pointer-events-none"
       >
         <div
           className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-hidden pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a] flex flex-col"
@@ -159,10 +219,27 @@ export default function CreateProjectModal({
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ej. Sitio web cliente X, venta de productos, etc."
+                placeholder="Ej. Sitio web cliente X"
                 className={inputClassName}
               />
             </div>
+
+            <Autocomplete
+              id="project-client"
+              label="Cliente"
+              value={selectedLeadId ?? ""}
+              options={clientOptions}
+              onChange={(value) => setClientSearch(value)}
+              onSelect={(option) => {
+                const id = option?.id ?? "";
+                setSelectedLeadId(id || null);
+                if (id) setClientSearch(option.label ?? "");
+              }}
+              placeholder="Buscar cliente por nombre"
+              required
+              loading={loadingClients}
+              className="mb-1"
+            />
 
             <div>
               <label htmlFor="project-serviceType" className={labelClassName}>
@@ -264,7 +341,7 @@ export default function CreateProjectModal({
               </button>
               <button
                 type="submit"
-                disabled={creating || !name.trim()}
+                disabled={creating || !name.trim() || !selectedLeadId}
                 className="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium hover:bg-orange-600 disabled:opacity-50 disabled:pointer-events-none"
               >
                 {creating ? "Creando…" : "Crear proyecto"}

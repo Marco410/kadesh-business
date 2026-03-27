@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useQuery } from "@apollo/client";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
@@ -18,9 +19,10 @@ import {
 import { Routes } from "kadesh/core/routes";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon, FolderIcon } from "@hugeicons/core-free-icons";
+import { Add01Icon, ArrowRight01Icon, FolderIcon } from "@hugeicons/core-free-icons";
 import { useUser } from "kadesh/utils/UserContext";
 import { Role } from "kadesh/constants/constans";
+import CreateProjectModal from "./CreateProjectModal";
 
 interface ProyectosSectionProps {
   userId: string;
@@ -30,6 +32,7 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
   const { user } = useUser();
   const isAdminCompany =
     user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
 
   const { data: userData } = useQuery<
     UserCompanyCategoriesResponse,
@@ -51,7 +54,7 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
             responsible: { id: { equals: userId } },
           };
 
-  const { data: projectsData, loading } = useQuery<
+  const { data: projectsData, loading, refetch: refetchProjects } = useQuery<
     SaasProjectsListResponse,
     SaasProjectsListVariables
   >(SAAS_PROJECTS_LIST_QUERY, {
@@ -101,6 +104,16 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
           {projects.length} {projects.length === 1 ? "proyecto" : "proyectos"}
         </span>
       </div>
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setIsCreateProjectOpen(true)}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 transition-colors"
+        >
+          <HugeiconsIcon icon={Add01Icon} size={16} />
+          Crear proyecto
+        </button>
+      </div>
 
       {projects.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[#d0d0d0] dark:border-[#444] bg-white dark:bg-[#1e1e1e] p-8 sm:p-12 shadow-sm text-center">
@@ -117,7 +130,7 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {projects.map((p) => {
             const statusClass =
               PROJECT_STATUS_CLASSES[p.status ?? ""] ??
@@ -183,6 +196,17 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
           })}
         </div>
       )}
+
+      <CreateProjectModal
+        proposalId={null}
+        userId={userId}
+        isOpen={isCreateProjectOpen}
+        onClose={() => setIsCreateProjectOpen(false)}
+        onSuccess={async () => {
+          await refetchProjects();
+          setIsCreateProjectOpen(false);
+        }}
+      />
     </div>
   );
 }

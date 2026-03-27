@@ -422,6 +422,13 @@ export const TECH_BUSINESS_LEAD_QUERY = gql`
           name
         }
       }
+      projects {
+        id
+        name
+        description
+        status
+        createdAt
+      }
     }
   }
 `;
@@ -475,6 +482,13 @@ export interface TechBusinessLeadResponse {
         id: string;
         name: string;
       } | null;
+    }> | null;
+    projects: Array<{
+      id: string;
+      name: string;
+      description: string | null;
+      status: string | null;
+      createdAt: string;
     }> | null;
   } | null;
 }

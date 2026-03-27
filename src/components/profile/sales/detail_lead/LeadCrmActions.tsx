@@ -120,29 +120,29 @@ export default function LeadCrmActions({
           Acciones
         </p>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm">
-            <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+        <div className="rounded-xl border border-orange-200/80 dark:border-orange-500/25 bg-gradient-to-br from-orange-500/12 to-transparent dark:from-orange-500/15 dark:to-transparent p-4 shadow-sm ring-1 ring-inset ring-orange-500/10 dark:ring-orange-400/10">
+          <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
             Actividades registradas
-            </p>
-            <p className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] mt-1">
-              {activitiesCount}
-            </p>
+          </p>
+          <p className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] mt-1">
+            {activitiesCount}
+          </p>
         </div>
-        <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm">
-            <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+        <div className="rounded-xl border border-blue-200/80 dark:border-blue-500/25 bg-gradient-to-br from-blue-500/12 to-transparent dark:from-blue-500/15 dark:to-transparent p-4 shadow-sm ring-1 ring-inset ring-blue-500/10 dark:ring-blue-400/10">
+          <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
             Propuestas
-            </p>
-            <p className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] mt-1">
-              {proposalsCount}
-            </p>
+          </p>
+          <p className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] mt-1">
+            {proposalsCount}
+          </p>
         </div>
-        <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm">
-            <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+        <div className="rounded-xl border border-green-200/80 dark:border-green-500/25 bg-gradient-to-br from-green-500/12 to-transparent dark:from-green-500/15 dark:to-transparent p-4 shadow-sm ring-1 ring-inset ring-green-500/10 dark:ring-green-400/10">
+          <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
             Seguimientos programados
-            </p>
-            <p className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] mt-1">
-              {followUpCount}
-            </p>
+          </p>
+          <p className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] mt-1">
+            {followUpCount}
+          </p>
         </div>
       </div>
       <div className="">

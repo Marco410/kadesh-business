@@ -41,6 +41,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon, Download04Icon } from "@hugeicons/core-free-icons";
 import { hasPlanFeature } from "./helpers/plan-features";
 import { downloadLeadsExcel } from "./exportLeadsExcel";
+import { buildClientLeadsQueryVariables } from "./helpers/client-leads-query";
 
 const LEADS_PAGE_SIZE = 10;
 const MAX_LEADS_EXPORT = 10_000;
@@ -379,32 +380,21 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const totalPages = Math.max(1, Math.ceil(totalCount / LEADS_PAGE_SIZE));
   const effectivePage = totalCount > 0 ? Math.min(page, totalPages) : page;
 
-  const statusWhere =
-    companyId != null
-      ? isAdminCompany
-        ? { saasCompany: { id: { equals: companyId } } }
-        : {
-            AND: [
-              { saasCompany: { id: { equals: companyId } } },
-              { salesPerson: { id: { equals: userId } } },
-            ],
-          }
-      : undefined;
-  const salesPersonWhere2 =
-    companyId != null ? { company: { id: { equals: companyId } } } : undefined;
+  const leadsQueryVariables = buildClientLeadsQueryVariables({
+    where,
+    companyId,
+    isAdminCompany,
+    userId,
+    take: LEADS_PAGE_SIZE,
+    skip: (effectivePage - 1) * LEADS_PAGE_SIZE,
+    orderBy: [{ createdAt: "desc" }],
+  });
 
   const { data, loading, error, refetch: refetchLeads } = useQuery<
     TechBusinessLeadsResponse,
     TechBusinessLeadsVariables
   >(TECH_BUSINESS_LEADS_QUERY, {
-    variables: {
-      where,
-      statusWhere: statusWhere ?? {},
-      salesPersonWhere2: salesPersonWhere2 ?? {},
-      take: LEADS_PAGE_SIZE,
-      skip: (effectivePage - 1) * LEADS_PAGE_SIZE,
-      orderBy: [{ createdAt: "desc" }],
-    },
+    variables: leadsQueryVariables,
     skip: !userId,
   });
 
@@ -414,11 +404,16 @@ export default function SalesSection({ userId }: SalesSectionProps) {
 
   const exportLeadsContextRef = useRef({
     where,
-    statusWhere,
-    salesPersonWhere2,
+    statusWhere: leadsQueryVariables.statusWhere,
+    salesPersonWhere2: leadsQueryVariables.salesPersonWhere2,
     totalCount,
   });
-  exportLeadsContextRef.current = { where, statusWhere, salesPersonWhere2, totalCount };
+  exportLeadsContextRef.current = {
+    where,
+    statusWhere: leadsQueryVariables.statusWhere,
+    salesPersonWhere2: leadsQueryVariables.salesPersonWhere2,
+    totalCount,
+  };
 
   const handleExportExcel = useCallback(async () => {
     if (!userId) return;

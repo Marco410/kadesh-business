@@ -485,6 +485,44 @@ export const PIPELINE_STATUS_COLORS: Record<string, string> = {
     "bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300",
 };
 
+/**
+ * Cabecera tipo tarjeta (degradado + anillo) alineada al tono de {@link PIPELINE_STATUS_COLORS}.
+ * Para SectionCard / bloques donde el pipeline tiñe el encabezado.
+ */
+export const PIPELINE_STATUS_SECTION_HEADER: Record<string, string> = {
+  [PIPELINE_STATUS.DETECTADO]:
+    "border-slate-200 dark:border-slate-500/50 bg-gradient-to-br from-slate-500/26 to-slate-200/50 dark:from-slate-500/32 dark:to-slate-800/40 ring-1 ring-inset ring-slate-400/25 dark:ring-slate-500/35 text-slate-700 dark:text-slate-200",
+  [PIPELINE_STATUS.SELECCIONADO]:
+    "border-blue-200/90 dark:border-blue-500/25 bg-gradient-to-br from-blue-500/12 to-transparent dark:from-blue-500/15 dark:to-transparent ring-1 ring-inset ring-blue-500/10 dark:ring-blue-400/10 text-blue-800 dark:text-blue-200",
+  [PIPELINE_STATUS.CONTACTADO]:
+    "border-indigo-200/90 dark:border-indigo-500/25 bg-gradient-to-br from-indigo-500/12 to-transparent dark:from-indigo-500/15 dark:to-transparent ring-1 ring-inset ring-indigo-500/10 dark:ring-indigo-400/10 text-indigo-800 dark:text-indigo-200",
+  [PIPELINE_STATUS.SIN_RESPUESTA]:
+    "border-amber-200/90 dark:border-amber-500/25 bg-gradient-to-br from-amber-500/12 to-transparent dark:from-amber-500/15 dark:to-transparent ring-1 ring-inset ring-amber-500/10 dark:ring-amber-400/10 text-amber-800 dark:text-amber-200",
+  [PIPELINE_STATUS.INTERESADO]:
+    "border-emerald-200/90 dark:border-emerald-500/25 bg-gradient-to-br from-emerald-500/12 to-transparent dark:from-emerald-500/15 dark:to-transparent ring-1 ring-inset ring-emerald-500/10 dark:ring-emerald-400/10 text-emerald-800 dark:text-emerald-200",
+  [PIPELINE_STATUS.CREANDO_PROYECTO_PROPUESTA]:
+    "border-sky-200/90 dark:border-sky-500/25 bg-gradient-to-br from-sky-500/12 to-transparent dark:from-sky-500/15 dark:to-transparent ring-1 ring-inset ring-sky-500/10 dark:ring-sky-400/10 text-sky-800 dark:text-sky-200",
+  [PIPELINE_STATUS.PROPUESTA_ENVIADA]:
+    "border-cyan-200/90 dark:border-cyan-500/25 bg-gradient-to-br from-cyan-500/12 to-transparent dark:from-cyan-500/15 dark:to-transparent ring-1 ring-inset ring-cyan-500/10 dark:ring-cyan-400/10 text-cyan-800 dark:text-cyan-200",
+  [PIPELINE_STATUS.SEGUIMIENTO]:
+    "border-violet-200/90 dark:border-violet-500/25 bg-gradient-to-br from-violet-500/12 to-transparent dark:from-violet-500/15 dark:to-transparent ring-1 ring-inset ring-violet-500/10 dark:ring-violet-400/10 text-violet-800 dark:text-violet-200",
+  [PIPELINE_STATUS.EN_NEGOCIACION]:
+    "border-orange-200/90 dark:border-orange-500/25 bg-gradient-to-br from-orange-500/12 to-transparent dark:from-orange-500/15 dark:to-transparent ring-1 ring-inset ring-orange-500/10 dark:ring-orange-400/10 text-orange-800 dark:text-orange-200",
+  [PIPELINE_STATUS.PROPUESTA_ACEPTADA]:
+    "border-green-200/90 dark:border-green-500/25 bg-gradient-to-br from-green-500/12 to-transparent dark:from-green-500/15 dark:to-transparent ring-1 ring-inset ring-green-500/10 dark:ring-green-400/10 text-green-800 dark:text-green-200",
+  [PIPELINE_STATUS.PROPUESTA_RECHAZADA]:
+    "border-red-200/90 dark:border-red-500/25 bg-gradient-to-br from-red-500/12 to-transparent dark:from-red-500/15 dark:to-transparent ring-1 ring-inset ring-red-500/10 dark:ring-red-400/10 text-red-800 dark:text-red-200",
+  [PIPELINE_STATUS.CERRADO_GANADO]:
+    "border-green-300/80 dark:border-green-500/30 bg-gradient-to-br from-green-600/15 to-transparent dark:from-green-600/22 dark:to-transparent ring-1 ring-inset ring-green-500/15 dark:ring-green-400/15 text-green-900 dark:text-green-100 font-semibold",
+  [PIPELINE_STATUS.CERRADO_PERDIDO]:
+    "border-red-300/80 dark:border-red-500/30 bg-gradient-to-br from-red-600/15 to-transparent dark:from-red-600/22 dark:to-transparent ring-1 ring-inset ring-red-500/15 dark:ring-red-400/15 text-red-900 dark:text-red-100 font-semibold",
+  [PIPELINE_STATUS.DESCARTADO]:
+    "border-neutral-200/90 dark:border-neutral-500/25 bg-gradient-to-br from-neutral-500/10 to-transparent dark:from-neutral-500/18 dark:to-transparent ring-1 ring-inset ring-neutral-400/12 dark:ring-neutral-500/20 text-neutral-600 dark:text-neutral-300",
+};
+
+export const DEFAULT_PIPELINE_SECTION_HEADER =
+  "border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-neutral-500/10 to-transparent dark:from-neutral-500/15 dark:to-transparent ring-1 ring-inset ring-neutral-400/10 dark:ring-neutral-500/18 text-[#616161] dark:text-[#b0b0b0]";
+
 /** Base classes for pipeline filter ring (apply when selected). */
 export const PIPELINE_RING_BASE =
   "ring-2 ring-offset-2 dark:ring-offset-[#1e1e1e]";

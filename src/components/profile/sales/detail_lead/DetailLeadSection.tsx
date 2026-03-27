@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
 import { useQuery, useMutation } from "@apollo/client";
 import {
   TECH_BUSINESS_LEAD_QUERY,
@@ -22,15 +21,17 @@ import {
   type UserCompanyCategoriesVariables,
 } from "kadesh/components/profile/sales/queries";
 import {
-  PIPELINE_STATUS,
-  PIPELINE_STATUS_COLORS,
+  DEFAULT_PIPELINE_SECTION_HEADER,
+  PIPELINE_STATUS_SECTION_HEADER,
   PLAN_FEATURE_KEYS,
 } from "kadesh/constants/constans";
 import { Routes } from "kadesh/core/routes";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { ArrowLeft01Icon, ArrowRight01Icon, FolderIcon } from "@hugeicons/core-free-icons";
 import LeadCrmActions from "./LeadCrmActions";
 import LeadDetailCalendar from "./LeadDetailCalendar";
+import LeadPipelineNotesFields from "./LeadPipelineNotesFields";
+import LeadProjectsModal from "./LeadProjectsModal";
 import { getCategoryLabel } from "../helpers/category";
 import { sileo } from "sileo";
 import { useUser } from "kadesh/utils/UserContext";
@@ -38,18 +39,6 @@ import { formatDateShort } from "kadesh/utils/format-date";
 import { Role } from "kadesh/constants/constans";
 import { hasPlanFeature } from "../helpers/plan-features";
 import { useSubscription } from "../SubscriptionContext";
-
-const PIPELINE_OPTIONS = Object.values(PIPELINE_STATUS);
-const DEFAULT_PIPELINE_HEADER =
-  "bg-[#f5f5f5] dark:bg-[#2a2a2a] text-[#616161] dark:text-[#b0b0b0]";
-
-function formatCurrency(value: number | null | undefined): string {
-  if (value == null) return "—";
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-  }).format(value);
-}
 
 function whatsappDigitsFromPhone(raw: string): string | null {
   const digits = raw.replace(/\D/g, "");
@@ -82,18 +71,31 @@ function Field({
 function SectionCard({
   title,
   headerClassName,
+  headerPipelineStatus,
   children,
 }: {
   title: string;
   headerClassName?: string;
+  /** Encabezado con degradado en el mismo tono que el pipeline del lead. */
+  headerPipelineStatus?: string;
   children: React.ReactNode;
 }) {
+  const baseHeader =
+    "px-3 py-2 text-xs font-semibold uppercase tracking-wide border-b";
+
   const headerClasses =
-    headerClassName ??
-    "px-3 py-2 text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] bg-[#f5f5f5] dark:bg-[#2a2a2a] border-b border-[#e0e0e0] dark:border-[#3a3a3a]";
+    headerPipelineStatus !== undefined
+      ? `${baseHeader} ${
+          headerPipelineStatus && PIPELINE_STATUS_SECTION_HEADER[headerPipelineStatus]
+            ? PIPELINE_STATUS_SECTION_HEADER[headerPipelineStatus]
+            : DEFAULT_PIPELINE_SECTION_HEADER
+        }`
+      : (headerClassName ??
+        `${baseHeader} text-[#616161] dark:text-[#b0b0b0] bg-[#f5f5f5] dark:bg-[#2a2a2a] border-[#e0e0e0] dark:border-[#3a3a3a]`);
+
   return (
     <div className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden">
-      <h2 className={`${headerClasses}`}>{title}</h2>
+      <h2 className={headerClasses}>{title}</h2>
       <div className="px-3 py-2">{children}</div>
     </div>
   );
@@ -158,7 +160,7 @@ export default function DetailLeadSection() {
     statusWhere: statusWhere ?? null,
   };
 
-  const { data, loading, error } = useQuery<
+  const { data, loading, error, refetch: refetchLead } = useQuery<
     TechBusinessLeadResponse,
     TechBusinessLeadVariables
   >(TECH_BUSINESS_LEAD_QUERY, {
@@ -188,6 +190,9 @@ export default function DetailLeadSection() {
   });
 
   const lead = data?.techBusinessLead ?? null;
+  const projectsList = lead?.projects ?? [];
+  const projectsCount = projectsList.length;
+  const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
   const statusRaw = lead?.status;
   const statuses = Array.isArray(statusRaw)
     ? statusRaw
@@ -356,9 +361,7 @@ export default function DetailLeadSection() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <SectionCard
           title="Información de la empresa"
-          headerClassName={`px-3 py-2 text-xs font-semibold uppercase tracking-wide border-b border-[#e0e0e0] dark:border-[#3a3a3a] ${
-            PIPELINE_STATUS_COLORS[pipelineStatus] ?? DEFAULT_PIPELINE_HEADER
-          }`}
+          headerPipelineStatus={pipelineStatus}
         >
           <dl className="space-y-0">
             <Field label="Empresa" value={lead.businessName} />
@@ -423,12 +426,7 @@ export default function DetailLeadSection() {
           </dl>
         </SectionCard>
 
-        <SectionCard
-          title="Info de Google"
-          headerClassName={`px-3 py-2 text-xs font-semibold uppercase tracking-wide border-b border-[#e0e0e0] dark:border-[#3a3a3a] ${
-            PIPELINE_STATUS_COLORS[pipelineStatus] ?? DEFAULT_PIPELINE_HEADER
-          }`}
-        >
+        <SectionCard title="Info de Google" headerPipelineStatus={pipelineStatus}>
           <dl className="space-y-0">
             {lead.googleMapsUrl && (
               <Field label="Mapa">
@@ -461,12 +459,7 @@ export default function DetailLeadSection() {
           </dl>
         </SectionCard>
 
-        <SectionCard
-          title="Redes sociales"
-          headerClassName={`px-3 py-2 text-xs font-semibold uppercase tracking-wide border-b border-[#e0e0e0] dark:border-[#3a3a3a] ${
-            PIPELINE_STATUS_COLORS[pipelineStatus] ?? DEFAULT_PIPELINE_HEADER
-          }`}
-        >
+        <SectionCard title="Redes sociales" headerPipelineStatus={pipelineStatus}>
           <div className="space-y-0">
             <div className="grid grid-cols-[100px_1fr] gap-2 py-1.5 text-sm border-b border-[#e8e8e8] dark:border-[#333] last:border-0 items-center">
               <label
@@ -535,12 +528,7 @@ export default function DetailLeadSection() {
           </div>
         </SectionCard>
 
-        <SectionCard
-          title="Fechas"
-          headerClassName={`px-3 py-2 text-xs font-semibold uppercase tracking-wide border-b border-[#e0e0e0] dark:border-[#3a3a3a] ${
-            PIPELINE_STATUS_COLORS[pipelineStatus] ?? DEFAULT_PIPELINE_HEADER
-          }`}
-        >
+        <SectionCard title="Fechas" headerPipelineStatus={pipelineStatus}>
           <dl className="space-y-0">
             <div className="grid grid-cols-[100px_1fr] gap-2 py-1.5 text-sm border-b border-[#e8e8e8] dark:border-[#333] last:border-0 items-center">
               <label
@@ -573,56 +561,64 @@ export default function DetailLeadSection() {
 
       <div className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden">
         <h2
-          className={`px-4 py-3 text-sm font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] bg-[#f5f5f5] dark:bg-[#2a2a2a] border-b border-[#e0e0e0] dark:border-[#3a3a3a] ${
-            PIPELINE_STATUS_COLORS[pipelineStatus] ?? DEFAULT_PIPELINE_HEADER
+          className={`px-4 py-3 text-sm font-semibold uppercase tracking-wide border-b ${
+            pipelineStatus && PIPELINE_STATUS_SECTION_HEADER[pipelineStatus]
+              ? PIPELINE_STATUS_SECTION_HEADER[pipelineStatus]
+              : DEFAULT_PIPELINE_SECTION_HEADER
           }`}
         >
-          Acciones y edición
+          Acciones, proyectos y edición
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#e0e0e0] dark:divide-[#3a3a3a]">
-          <div className="p-4 space-y-6">
-            <div>
-              <label
-                htmlFor="lead-pipeline"
-                className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-6 p-5 lg:gap-8 lg:items-start">
+            <LeadPipelineNotesFields
+              pipelineStatus={pipelineStatus}
+              onPipelineStatusChange={setPipelineStatus}
+              notes={notes}
+              onNotesChange={setNotes}
+              className="min-w-0 p-0 lg:pr-2"
+            />
+            <aside
+              className="flex flex-col gap-2 justify-center lg:justify-end lg:pt-1"
+              aria-label={`${projectsCount} ${projectsCount === 1 ? "proyecto" : "proyectos"} vinculados a este lead`}
+            >
+              <div className="w-full max-w-[200px] lg:w-40 lg:max-w-none rounded-2xl border border-yellow-200/80 dark:border-yellow-500/25 bg-gradient-to-br from-yellow-500/12 to-transparent dark:from-yellow-500/15 dark:to-transparent px-4 py-4 text-center shadow-sm ring-1 ring-inset ring-yellow-500/10 dark:ring-yellow-400/10">
+                <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/20 text-yellow-600 dark:text-yellow-400">
+                  <HugeiconsIcon icon={FolderIcon} size={22} />
+                </div>
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0]">
+                  Proyectos
+                </p>
+                <p className="mt-1 tabular-nums text-3xl font-bold tracking-tight text-[#212121] dark:text-white">
+                  {projectsCount}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsProjectsModalOpen(true)}
+                className="inline-flex w-full max-w-[200px] lg:max-w-none items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white/80 dark:bg-[#2a2a2a]/80 px-3 py-2.5 text-sm font-semibold text-[#212121] dark:text-white shadow-sm hover:border-orange-400/60 dark:hover:border-orange-500/40 hover:bg-orange-500/[0.08] dark:hover:bg-orange-500/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors"
               >
-                Estatus
-              </label>
-              <select
-                id="lead-pipeline"
-                value={pipelineStatus}
-                onChange={(e) => setPipelineStatus(e.target.value)}
-                className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                aria-label="Estado del pipeline"
-              >
-                <option value="">—</option>
-                {PIPELINE_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label
-                htmlFor="lead-notes"
-                className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
-              >
-                Notas
-              </label>
-              <textarea
-                id="lead-notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-                placeholder="Notas del lead..."
-                className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-y min-h-[80px]"
-              />
-            </div>
+                Ver proyectos
+                <HugeiconsIcon icon={ArrowRight01Icon} size={16} className="opacity-70" />
+              </button>
+            </aside>
           </div>
           <LeadCrmActions leadId={id} userId={user?.id ?? ""} />
         </div>
       </div>
+
+      <LeadProjectsModal
+        isOpen={isProjectsModalOpen}
+        onClose={() => setIsProjectsModalOpen(false)}
+        projects={projectsList}
+        leadBusinessName={lead?.businessName}
+        leadId={id}
+        userId={user?.id ?? ""}
+        onProjectCreated={() => {
+          void refetchLead();
+        }}
+      />
+
       <SaveLeadButton saving={saving} handleSaveLead={handleSaveLead} />
 
       {hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.CALENDAR_CRM) && (
