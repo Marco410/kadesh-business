@@ -30,6 +30,7 @@ import {
 import {
   PLAN_FEATURE_KEYS,
   QUOTATION_CURRENCY_OPTIONS,
+  QUOTATION_DISCOUNT_TYPE_OPTIONS,
   QUOTATION_STATUS_COLORS,
   QUOTATION_STATUS_OPTIONS,
   QuotationStatus,
@@ -41,6 +42,9 @@ import FeatureLockedSection from "../FeatureLockedSection";
 import { useDeleteSaasQuotationProduct } from "./hooks";
 import { formatMoney } from "kadesh/utils/format-currency";
 import { formatDateShort } from "kadesh/utils/format-date";
+import { buildPublicQuotationSlug } from "kadesh/utils/quotation-public-link";
+import { exportQuotationPdf } from "kadesh/utils/export-quotation-pdf";
+import { Routes } from "kadesh/core/routes";
 
 const inputClassName =
   "w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
@@ -108,6 +112,19 @@ function relPatch(
   return undefined;
 }
 
+function formatRowDiscount(
+  type: string | null | undefined,
+  value: number | null | undefined,
+  currency: string,
+): string {
+  if (type == null || value == null || Number.isNaN(value)) return "—";
+  const normalized = type.trim().toLowerCase();
+  if (!normalized || normalized === "none") return "—";
+  if (normalized === "percent") return `${value}%`;
+  if (normalized === "amount") return formatMoney(value, currency);
+  return String(value);
+}
+
 export default function QuotationDetail() {
   const router = useRouter();
   const params = useParams<{ id?: string }>();
@@ -124,6 +141,7 @@ export default function QuotationDetail() {
   const [validUntil, setValidUntil] = useState("");
   const [sentAt, setSentAt] = useState("");
   const [acceptedAt, setAcceptedAt] = useState("");
+  const [showDiscount, setShowDiscount] = useState(false);
   const [leadId, setLeadId] = useState("");
   const [assignedSellerId, setAssignedSellerId] = useState("");
   const [projectId, setProjectId] = useState("");
@@ -140,6 +158,7 @@ export default function QuotationDetail() {
     useState<SaasQuotationProductRow | null>(null);
   const [productPendingDelete, setProductPendingDelete] =
     useState<SaasQuotationProductRow | null>(null);
+  const [exportingPdf, setExportingPdf] = useState(false);
 
   const { data, loading, error, refetch } = useQuery<
     SaasQuotationDetailResponse,
@@ -168,6 +187,7 @@ export default function QuotationDetail() {
     setCurrency(detail.currency ?? "");
     setNotes(detail.notes ?? "");
     setTerms(detail.terms?? detail.company?.termsQuotation ?? "");
+    setShowDiscount(Boolean(detail.showDiscount));
     setValidUntil(toDateOnly(detail.validUntil));
 
     const lid = detail.lead?.id ?? "";
@@ -234,6 +254,7 @@ export default function QuotationDetail() {
       exchangeRate: 1,
       notes: notes.trim() || null,
       terms: terms.trim() || null,
+      showDiscount: Boolean(showDiscount),
       validUntil: fromDateOnlyToCalendarDay(validUntil),
       sentAt: localDateTimeMinuteToDateTimeIso(sentAt),
       acceptedAt: localDateTimeMinuteToDateTimeIso(acceptedAt),
@@ -282,6 +303,50 @@ export default function QuotationDetail() {
     });
   }
 
+  function handleCopyPublicLink() {
+    const url = getPublicQuotationUrl();
+    if (!url) {
+      sileo.error({ title: "No se pudo generar el enlace publico." });
+      return;
+    }
+    void navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        sileo.success({ title: "Enlace publico copiado." });
+      })
+      .catch(() => {
+        sileo.info({ title: url });
+      });
+  }
+
+  function getPublicQuotationUrl(): string | null {
+    const id = detail?.id?.trim();
+    const folio = detail?.quotationNumber?.trim();
+    if (!id || !folio) {
+      return null;
+    }
+    const slug = buildPublicQuotationSlug(folio, id);
+    const path = Routes.publicQuotation(slug);
+    return `${window.location.origin}${path}`;
+  }
+
+  async function handleExportPublicPdf() {
+    if (!detail) {
+      sileo.error({ title: "No se pudo generar el PDF." });
+      return;
+    }
+    try {
+      setExportingPdf(true);
+      await exportQuotationPdf(detail);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "No se pudo generar el PDF.";
+      sileo.error({ title: message });
+    } finally {
+      setExportingPdf(false);
+    }
+  }
+
   const cc = detail?.currency?.trim() || "MXN";
   const products = detail?.quotationProducts ?? [];
 
@@ -304,7 +369,7 @@ export default function QuotationDetail() {
 
   return (
     <>
-      <div className="mx-auto w-full max-w-5xl px-4 py-6 space-y-6 mt-10">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 space-y-6 mt-10">
         <div className="mt-8">
             <div
                 onClick={() => router.back()}
@@ -322,6 +387,23 @@ export default function QuotationDetail() {
             <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
               ID: <span className="font-mono">{quotationId}</span>
             </p>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+            <button
+              type="button"
+              onClick={handleCopyPublicLink}
+              className="inline-flex items-center justify-center rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-3 py-2 text-sm font-medium text-[#212121] dark:text-white hover:bg-[#f5f5f5] dark:hover:bg-[#333]"
+              >
+              Copiar link para cliente
+            </button>
+            <button
+              type="button"
+              onClick={handleExportPublicPdf}
+              disabled={exportingPdf}
+              className="inline-flex items-center justify-center rounded-lg bg-red-400 px-3 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50 disabled:pointer-events-none"
+              >
+              {exportingPdf ? "Generando PDF..." : "Exportar PDF"}
+            </button>
           </div>
         </div>
 
@@ -485,6 +567,21 @@ export default function QuotationDetail() {
                         placeholder="Buscar proyecto por nombre"
                       />
                     </div>
+                    <div className="flex items-end">
+                      <label
+                        htmlFor="qd-show-discount"
+                        className="inline-flex items-center gap-2 text-sm text-[#616161] dark:text-[#b0b0b0]"
+                      >
+                        <input
+                          id="qd-show-discount"
+                          type="checkbox"
+                          checked={showDiscount}
+                          onChange={(e) => setShowDiscount(e.target.checked)}
+                          className="h-4 w-4 rounded border-[#d1d5db] text-orange-500 focus:ring-orange-500"
+                        />
+                        Mostrar descuento en la cotización
+                      </label>
+                    </div>
                   </div>
 
                   <div>
@@ -506,7 +603,7 @@ export default function QuotationDetail() {
                     </label>
                     <textarea
                       id="qd-terms"
-                      rows={3}
+                      rows={6}
                       value={terms}
                       onChange={(e) => setTerms(e.target.value)}
                       className={inputClassName}
@@ -540,8 +637,8 @@ export default function QuotationDetail() {
                   </div>
 
                   <div className={quotationTableWrapClass}>
-                    <div className="overflow-x-auto max-h-[280px] overflow-y-auto">
-                      <table className="w-full min-w-[720px] border-collapse">
+                    <div className="overflow-x-auto max-h-[680px] overflow-y-auto">
+                      <table className="w-full min-w-[920px] border-collapse">
                         <thead className="sticky top-0 z-[1]">
                           <tr>
                             <th className={quotationThClass}>Descripción</th>
@@ -553,6 +650,12 @@ export default function QuotationDetail() {
                             </th>
                             <th className={`${quotationThClass} text-right`}>
                               IVA %
+                            </th>
+                            <th className={`${quotationThClass} text-right`}>
+                              Tipo desc.
+                            </th>
+                            <th className={`${quotationThClass} text-right`}>
+                              Descuento
                             </th>
                             <th className={`${quotationThClass} text-right`}>
                               Subtotal línea
@@ -571,7 +674,7 @@ export default function QuotationDetail() {
                           {products.length === 0 ? (
                             <tr>
                               <td
-                                colSpan={7}
+                                colSpan={9}
                                 className={`${quotationTdClass} text-center py-8 text-[#616161] dark:text-[#9e9e9e]`}
                               >
                                 No hay conceptos. Usa “Agregar línea”.
@@ -599,6 +702,16 @@ export default function QuotationDetail() {
                                   className={`${quotationTdClass} text-right tabular-nums`}
                                 >
                                   {row.taxRate ?? "—"}
+                                </td>
+                                <td
+                                  className={`${quotationTdClass} text-right tabular-nums`}
+                                >
+                                  {QUOTATION_DISCOUNT_TYPE_OPTIONS.find(opt => opt.value === row.discountType)?.label ?? "—"}
+                                </td>
+                                <td
+                                  className={`${quotationTdClass} text-right tabular-nums`}
+                                >
+                                  {formatRowDiscount(row.discountType, row.discountValue, cc)}
                                 </td>
                                 <td
                                   className={`${quotationTdClass} text-right tabular-nums`}

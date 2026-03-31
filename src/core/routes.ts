@@ -34,6 +34,7 @@ export const Routes = {
   panelLead: (id: string): string => `/panel/ventas/lead/${id}`,
   panelProject: (id: string): string => `/panel/ventas/proyecto/${id}`,
   panelQuotation: (id: string): string => `/panel/cotizacion/${id}`,
+  publicQuotation: (slug: string): string => `/cotizacion/${slug}`,
   panelAddLead: '/panel/ventas/lead/agregar',
   panelSyncLeads: '/panel/ventas/obtener-clientes',
   panelAddSalesperson: '/panel/ventas/agregar-vendedor',

@@ -52,6 +52,7 @@ export const SAAS_QUOTATION_DETAIL_QUERY = gql`
       discountTotal
       taxTotal
       total
+      showDiscount
       validUntil
       notes
       terms
@@ -62,10 +63,15 @@ export const SAAS_QUOTATION_DETAIL_QUERY = gql`
       lead {
         id
         businessName
+        address
       }
       assignedSeller {
         id
         name
+        lastName
+        secondLastName
+        email
+        phone
       }
       project {
         id
@@ -73,6 +79,14 @@ export const SAAS_QUOTATION_DETAIL_QUERY = gql`
       }
       company {
         id
+        name
+        colorPrimary
+        colorSecondary
+        contactEmail
+        contactPhone
+        logo {
+          url
+        }
         termsQuotation
       }
       quotationProducts {
@@ -95,6 +109,68 @@ export const SAAS_QUOTATION_DETAIL_QUERY = gql`
   }
 `;
 
+export const PUBLIC_SAAS_QUOTATION_DETAIL_QUERY = gql`
+  query PublicSaasQuotationDetail($where: SaasQuotationWhereUniqueInput!) {
+    saasQuotation(where: $where) {
+      id
+      quotationNumber
+      status
+      currency
+      subtotal
+      discountTotal
+      taxTotal
+      total
+      showDiscount
+      validUntil
+      notes
+      terms
+      sentAt
+      acceptedAt
+      createdAt
+      lead {
+        id
+        businessName
+        address
+      }
+      assignedSeller {
+        id
+        name
+        lastName
+        email
+        phone
+        secondLastName
+      }
+      project {
+        id
+        name
+      }
+      company {
+        id
+        name
+        colorPrimary
+        colorSecondary
+        contactEmail
+        contactPhone
+        logo {
+          url
+        }
+        termsQuotation
+      }
+      quotationProducts {
+        id
+        description
+        quantity
+        unitPrice
+        taxRate
+        lineSubtotal
+        lineTotal
+        discountType
+        discountValue
+      }
+    }
+  }
+`;
+
 export const UPDATE_SAAS_QUOTATION_MUTATION = gql`
   mutation UpdateSaasQuotation(
     $where: SaasQuotationWhereUniqueInput!
@@ -110,6 +186,7 @@ export const UPDATE_SAAS_QUOTATION_MUTATION = gql`
       discountTotal
       taxTotal
       total
+      showDiscount
       validUntil
       notes
       terms
@@ -214,6 +291,7 @@ export interface SaasQuotationRow {
   status: string | null;
   currency: string | null;
   total: number | null;
+  showDiscount: boolean | null;
   validUntil: string | null;
   createdAt: string;
   updatedAt: string;
@@ -281,6 +359,7 @@ export interface SaasQuotationDetail {
   discountTotal: number | null;
   taxTotal: number | null;
   total: number | null;
+  showDiscount: boolean | null;
   validUntil: string | null;
   notes: string | null;
   terms: string | null;
@@ -288,10 +367,19 @@ export interface SaasQuotationDetail {
   acceptedAt: string | null;
   createdAt: string;
   updatedAt: string;
-  lead: { id: string; businessName: string | null } | null;
-  assignedSeller: { id: string; name: string | null } | null;
+  lead: { id: string; businessName: string | null, address: string | null } | null;
+  assignedSeller: { id: string; name: string | null; lastName: string | null, secondLastName: string | null, email: string | null, phone: string | null } | null;
   project: { id: string; name: string | null } | null;
-  company: { id: string; termsQuotation: string | null } | null;
+  company: {
+    id: string;
+    name: string | null;
+    colorPrimary: string | null;
+    colorSecondary: string | null;
+    contactEmail: string | null;
+    contactPhone: string | null;
+    logo: { url: string } | null;
+    termsQuotation: string | null;
+  } | null;
   quotationProducts: SaasQuotationProductRow[];
 }
 
@@ -315,6 +403,7 @@ export interface UpdateSaasQuotationResponse {
     | "discountTotal"
     | "taxTotal"
     | "total"
+    | "showDiscount"
     | "validUntil"
     | "notes"
     | "terms"

@@ -58,6 +58,10 @@ export const PROFILE_USER_COMPANY_QUERY = gql`
       company {
         id
         name
+        colorPrimary
+        colorSecondary
+        contactEmail
+        contactPhone
         logo {
           url
         }
@@ -78,6 +82,10 @@ export interface UserQueryVariables {
 export interface UserCompanyProfile {
   id: string;
   name: string;
+  colorPrimary: string | null;
+  colorSecondary: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
   logo: { url: string } | null;
   onboardingMainOffer: string | null;
   onboardingIdealCustomer: string | null;
@@ -123,6 +131,10 @@ export const UPDATE_SAAS_COMPANY_MUTATION = gql`
     updateSaasCompany(where: $where, data: $data) {
       id
       name
+      colorPrimary
+      colorSecondary
+      contactEmail
+      contactPhone
       logo {
         url
       }
@@ -139,6 +151,10 @@ export interface UpdateSaasCompanyVariables {
   where: { id: string };
   data: {
     name?: string;
+    colorPrimary?: string | null;
+    colorSecondary?: string | null;
+    contactEmail?: string | null;
+    contactPhone?: string | null;
     onboardingMainOffer?: string | null;
     onboardingIdealCustomer?: string | null;
     onboardingAvgTicketValue?: string | null;

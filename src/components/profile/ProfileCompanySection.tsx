@@ -23,6 +23,15 @@ const TEXTAREA_CLASS =
   "w-full min-h-[100px] px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed resize-y";
 
 const COMPANY_LOGO_PX = 500;
+const DEFAULT_PRIMARY = "#F7945E";
+const DEFAULT_SECONDARY = "#E07C3A";
+
+function normalizeHexColor(raw: string): string | null {
+  const t = raw.trim().toUpperCase();
+  if (!t) return null;
+  if (/^#[0-9A-F]{6}$/.test(t)) return t;
+  return null;
+}
 
 async function validateCompanyLogoDimensions(
   file: File,
@@ -104,6 +113,10 @@ export default function ProfileCompanySection({
   const [onboardingIdealCustomer, setOnboardingIdealCustomer] = useState("");
   const [onboardingAvgTicketValue, setOnboardingAvgTicketValue] = useState("");
   const [onboardingSalesPain, setOnboardingSalesPain] = useState("");
+  const [colorPrimary, setColorPrimary] = useState(DEFAULT_PRIMARY);
+  const [colorSecondary, setColorSecondary] = useState(DEFAULT_SECONDARY);
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
   const [companyLogoFile, setCompanyLogoFile] = useState<File | null>(null);
   const [companyLogoError, setCompanyLogoError] = useState("");
   const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
@@ -127,6 +140,10 @@ export default function ProfileCompanySection({
       setOnboardingIdealCustomer("");
       setOnboardingAvgTicketValue("");
       setOnboardingSalesPain("");
+      setColorPrimary(DEFAULT_PRIMARY);
+      setColorSecondary(DEFAULT_SECONDARY);
+      setContactEmail("");
+      setContactPhone("");
       setCompanyLogoFile(null);
       setCompanyLogoError("");
       return;
@@ -137,6 +154,10 @@ export default function ProfileCompanySection({
     setOnboardingIdealCustomer(savedCompany.onboardingIdealCustomer ?? "");
     setOnboardingAvgTicketValue(savedCompany.onboardingAvgTicketValue ?? "");
     setOnboardingSalesPain(savedCompany.onboardingSalesPain ?? "");
+    setColorPrimary(savedCompany.colorPrimary ?? DEFAULT_PRIMARY);
+    setColorSecondary(savedCompany.colorSecondary ?? DEFAULT_SECONDARY);
+    setContactEmail(savedCompany.contactEmail ?? "");
+    setContactPhone(savedCompany.contactPhone ?? "");
     setCompanyLogoFile(null);
     setCompanyLogoError("");
   }, [
@@ -147,6 +168,10 @@ export default function ProfileCompanySection({
     savedCompany?.onboardingIdealCustomer,
     savedCompany?.onboardingAvgTicketValue,
     savedCompany?.onboardingSalesPain,
+    savedCompany?.colorPrimary,
+    savedCompany?.colorSecondary,
+    savedCompany?.contactEmail,
+    savedCompany?.contactPhone,
     savedCompany?.logo?.url,
   ]);
 
@@ -163,6 +188,12 @@ export default function ProfileCompanySection({
           (savedCompany.onboardingAvgTicketValue ?? "") ||
         (onboardingSalesPain || "") !==
           (savedCompany.onboardingSalesPain ?? "") ||
+        (normalizeHexColor(colorPrimary) ?? "") !==
+          ((savedCompany.colorPrimary ?? "").toUpperCase()) ||
+        (normalizeHexColor(colorSecondary) ?? "") !==
+          ((savedCompany.colorSecondary ?? "").toUpperCase()) ||
+        contactEmail.trim() !== (savedCompany.contactEmail ?? "").trim() ||
+        contactPhone.trim() !== (savedCompany.contactPhone ?? "").trim() ||
         companyLogoFile !== null),
   );
 
@@ -212,12 +243,22 @@ export default function ProfileCompanySection({
       setCompanySaveError("El nombre de la empresa es obligatorio.");
       return;
     }
+    const primary = normalizeHexColor(colorPrimary);
+    const secondary = normalizeHexColor(colorSecondary);
+    if (!primary || !secondary) {
+      setCompanySaveError("Selecciona colores válidos en formato #RRGGBB.");
+      return;
+    }
     setCompanySaveError("");
     await updateCompany({
       variables: {
         where: { id: savedCompany.id },
         data: {
           name: trimmedName,
+          colorPrimary: primary,
+          colorSecondary: secondary,
+          contactEmail: contactEmail.trim() || null,
+          contactPhone: contactPhone.trim() || null,
           onboardingMainOffer: onboardingMainOffer.trim() || null,
           onboardingIdealCustomer: onboardingIdealCustomer.trim() || null,
           onboardingAvgTicketValue: onboardingAvgTicketValue.trim() || null,
@@ -340,6 +381,84 @@ export default function ProfileCompanySection({
             />
             <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
               Nombre de la compañía u organización.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-3">
+              Personalización y contacto (opcional)
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+                  Color primario (hex)
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={normalizeHexColor(colorPrimary) ?? DEFAULT_PRIMARY}
+                    onChange={(e) => setColorPrimary(e.target.value.toUpperCase())}
+                    className="h-11 w-14 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] p-1 cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={colorPrimary}
+                    onChange={(e) => setColorPrimary(e.target.value)}
+                    placeholder="#F7945E"
+                    className={INPUT_CLASS}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+                  Color secundario (hex)
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={normalizeHexColor(colorSecondary) ?? DEFAULT_SECONDARY}
+                    onChange={(e) => setColorSecondary(e.target.value.toUpperCase())}
+                    className="h-11 w-14 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] p-1 cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={colorSecondary}
+                    onChange={(e) => setColorSecondary(e.target.value)}
+                    placeholder="#E07C3A"
+                    className={INPUT_CLASS}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+                  Email de contacto
+                </label>
+                <input
+                  type="email"
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  placeholder="ventas@tuempresa.com"
+                  className={INPUT_CLASS}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+                  Teléfono de contacto
+                </label>
+                <input
+                  type="text"
+                  value={contactPhone}
+                  onChange={(e) => setContactPhone(e.target.value)}
+                  placeholder="+52 999 999 9999"
+                  className={INPUT_CLASS}
+                />
+              </div>
+            </div>
+            <p className="mt-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              Los colores se guardan como hexadecimal en formato #RRGGBB.
             </p>
           </div>
 
