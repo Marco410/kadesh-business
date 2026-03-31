@@ -21,7 +21,7 @@ interface AutocompleteProps {
   label: string;
   value: string;
   options: AutocompleteOption[];
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   onSelect: (option: AutocompleteOption) => void;
   placeholder?: string;
   required?: boolean;
@@ -90,7 +90,7 @@ export default function Autocomplete({
     const newSearch = e.target.value;
     setSearch(newSearch);
     setShowDropdown(true);
-    onChange(newSearch);
+    onChange?.(newSearch);
     
     if (selectedOption && selectedOption[displayKey] !== newSearch) {
       onSelect({ id: '', label: '' } as AutocompleteOption);

@@ -3,9 +3,19 @@ export { default as Logo } from './Logo';
 export { default as Avatar } from './Avatar';
 export { default as Autocomplete } from './Autocomplete';
 export type { AutocompleteOption } from './Autocomplete';
+export { default as ClientLeadAutocomplete } from './ClientLeadAutocomplete';
+export type { ClientLeadAutocompleteProps } from './ClientLeadAutocomplete';
+export { default as ClientProjectAutocomplete } from './ClientProjectAutocomplete';
+export type { ClientProjectAutocompleteProps } from './ClientProjectAutocomplete';
 export { default as ConfirmModal } from './ConfirmModal';
 export { default as InfoTooltip } from './InfoTooltip';
 export { default as UserInfo } from './UserInfo';
 export { default as StatusDatePicker } from './StatusDatePicker';
 export type { StatusDatePickerProps } from './StatusDatePicker';
 export { dateToCalendarDateTime, calendarDateTimeToStr } from './StatusDatePicker';
+export { default as DatePickerField } from './DatePickerField';
+export type {
+  HeroUIDatePickerFieldProps,
+  HeroUIDatePickerGranularity,
+} from './DatePickerField';
+export { calendarDateToDateOnlyString } from './DatePickerField';

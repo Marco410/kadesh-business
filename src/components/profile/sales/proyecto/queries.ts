@@ -145,6 +145,29 @@ export interface SaasProjectsListVariables {
   };
 }
 
+/** Lista mínima para autocompletar proyectos (id + nombre). */
+export const SAAS_PROJECTS_FOR_SELECT_QUERY = gql`
+  query SaasProjectsForSelect($where: SaasProjectWhereInput!, $take: Int) {
+    saasProjects(
+      where: $where
+      orderBy: [{ updatedAt: desc }]
+      take: $take
+    ) {
+      id
+      name
+    }
+  }
+`;
+
+export interface SaasProjectsForSelectVariables {
+  where: SaasProjectsListVariables["where"];
+  take?: number;
+}
+
+export interface SaasProjectsForSelectResponse {
+  saasProjects: Array<{ id: string; name: string | null }>;
+}
+
 export interface SaasProjectsListResponse {
   saasProjects: Array<{
     id: string;

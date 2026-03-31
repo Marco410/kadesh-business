@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQuery, useMutation } from "@apollo/client";
 import {
@@ -8,19 +8,14 @@ import {
   type CreateSaasProjectVariables,
   type CreateSaasProjectMutation,
 } from "kadesh/components/profile/sales/proyecto/queries";
-import { PROJECT_STATUS, PROJECT_STATUS_OPTIONS, Role } from "kadesh/constants/constans";
+import { PROJECT_STATUS, PROJECT_STATUS_OPTIONS } from "kadesh/constants/constans";
 import { sileo } from "sileo";
+import ClientLeadAutocomplete from "kadesh/components/shared/ClientLeadAutocomplete";
 import {
-  TECH_BUSINESS_LEADS_QUERY,
   USER_COMPANY_CATEGORIES_QUERY,
-  type TechBusinessLeadsResponse,
-  type TechBusinessLeadsVariables,
   type UserCompanyCategoriesResponse,
   type UserCompanyCategoriesVariables,
 } from "../queries";
-import { buildClientLeadsQueryVariables } from "../helpers/client-leads-query";
-import { useUser } from "kadesh/utils/UserContext";
-import Autocomplete, { type AutocompleteOption } from "kadesh/components/shared/Autocomplete";
 
 interface CreateProjectModalProps {
   proposalId: string | null;
@@ -41,8 +36,6 @@ export default function CreateProjectModal({
   onClose,
   onSuccess,
 }: CreateProjectModalProps) {
-  const { user } = useUser();
-  const isAdminCompany = user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
   const [name, setName] = useState("");
   const [serviceType, setServiceType] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -50,7 +43,6 @@ export default function CreateProjectModal({
   const [description, setDescription] = useState("");
   const [urlData, setUrlData] = useState("");
   const [status, setStatus] = useState<string>(PROJECT_STATUS.PENDIENTE);
-  const [clientSearch, setClientSearch] = useState("");
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
 
   const { data: userData } = useQuery<
@@ -63,49 +55,8 @@ export default function CreateProjectModal({
 
   const companyId = userData?.user?.company?.id ?? null;
 
-  const clientsWhere = useMemo<TechBusinessLeadsVariables["where"]>(
-    () => ({
-      ...(companyId ? { saasCompany: { some: { id: { equals: companyId } } } } : {}),
-      ...(!isAdminCompany ? { salesPerson: { some: { id: { equals: userId } } } } : {}),
-    }),
-    [companyId, isAdminCompany, userId],
-  );
-
-  const clientsQueryVariables = useMemo(
-    () =>
-      buildClientLeadsQueryVariables({
-        where: clientsWhere,
-        companyId,
-        isAdminCompany,
-        userId,
-        take: 500,
-        orderBy: [{ createdAt: "desc" }],
-      }),
-    [clientsWhere, companyId, isAdminCompany, userId],
-  );
-
-  const { data: clientsData, loading: loadingClients } = useQuery<
-    TechBusinessLeadsResponse,
-    TechBusinessLeadsVariables
-  >(TECH_BUSINESS_LEADS_QUERY, {
-    variables: clientsQueryVariables,
-    skip: !isOpen || !companyId || !userId,
-    fetchPolicy: "network-only",
-  });
-
-  const clients = clientsData?.techBusinessLeads ?? [];
-  const clientOptions = useMemo<AutocompleteOption[]>(
-    () =>
-      clients.map((c) => ({
-        id: c.id,
-        label: c.businessName,
-      })),
-    [clients],
-  );
-
   useEffect(() => {
     if (!isOpen) return;
-    setClientSearch("");
     setSelectedLeadId(null);
   }, [isOpen, userId]);
 
@@ -131,7 +82,6 @@ export default function CreateProjectModal({
     setDescription("");
     setUrlData("");
     setStatus(PROJECT_STATUS.PENDIENTE);
-    setClientSearch("");
     setSelectedLeadId(null);
     onClose();
   }
@@ -224,20 +174,14 @@ export default function CreateProjectModal({
               />
             </div>
 
-            <Autocomplete
+            <ClientLeadAutocomplete
               id="project-client"
-              label="Cliente"
-              value={selectedLeadId ?? ""}
-              options={clientOptions}
-              onChange={(value) => setClientSearch(value)}
-              onSelect={(option) => {
-                const id = option?.id ?? "";
-                setSelectedLeadId(id || null);
-                if (id) setClientSearch(option.label ?? "");
-              }}
+              userId={userId}
+              enabled={isOpen}
+              selectedLeadId={selectedLeadId}
+              onSelectedLeadIdChange={setSelectedLeadId}
               placeholder="Buscar cliente por nombre"
               required
-              loading={loadingClients}
               className="mb-1"
             />
 
