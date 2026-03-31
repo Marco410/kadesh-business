@@ -65,6 +65,7 @@ export const PROFILE_USER_COMPANY_QUERY = gql`
         onboardingIdealCustomer
         onboardingAvgTicketValue
         onboardingSalesPain
+        termsQuotation
       }
     }
   }
@@ -82,6 +83,7 @@ export interface UserCompanyProfile {
   onboardingIdealCustomer: string | null;
   onboardingAvgTicketValue: string | null;
   onboardingSalesPain: string | null;
+  termsQuotation: string | null;
 }
 
 export interface UserQueryResponse {
@@ -128,6 +130,7 @@ export const UPDATE_SAAS_COMPANY_MUTATION = gql`
       onboardingIdealCustomer
       onboardingAvgTicketValue
       onboardingSalesPain
+      termsQuotation
     }
   }
 `;
@@ -141,7 +144,8 @@ export interface UpdateSaasCompanyVariables {
     onboardingAvgTicketValue?: string | null;
     onboardingSalesPain?: string | null;
     logo?: { upload: File };
-  };
+    termsQuotation?: string | null;
+    };
 }
 
 export interface UpdateSaasCompanyResponse {

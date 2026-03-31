@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Carga tailwind.config.ts: plugin HeroUI, content de @heroui/theme (estilos y motion del DatePicker, etc.) */
+@config "../../tailwind.config.ts";
+
 /* Configurar dark mode para Tailwind v4 */
 @variant dark (.dark &);
 
@@ -329,4 +332,13 @@ html.dark .status-date-picker-popover [data-slot="cell"] > span[data-disabled="t
 html.dark .add-log-date-picker-popover [data-slot="cell"] > span[data-outside-month="true"],
 html.dark .status-date-picker-popover [data-slot="cell"] > span[data-outside-month="true"] {
   color: #606060;
+}
+
+[data-sileo-viewport] {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+button[data-sileo-toast] {
+  background: transparent !important;
 }

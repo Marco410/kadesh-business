@@ -99,6 +99,7 @@ export default function ProfileCompanySection({
   const savedCompany = data?.user?.company ?? null;
 
   const [companyName, setCompanyName] = useState("");
+  const [termsQuotation, settermsQuotation] = useState("");
   const [onboardingMainOffer, setOnboardingMainOffer] = useState("");
   const [onboardingIdealCustomer, setOnboardingIdealCustomer] = useState("");
   const [onboardingAvgTicketValue, setOnboardingAvgTicketValue] = useState("");
@@ -121,6 +122,7 @@ export default function ProfileCompanySection({
   useEffect(() => {
     if (!savedCompany) {
       setCompanyName("");
+      settermsQuotation("");
       setOnboardingMainOffer("");
       setOnboardingIdealCustomer("");
       setOnboardingAvgTicketValue("");
@@ -130,6 +132,7 @@ export default function ProfileCompanySection({
       return;
     }
     setCompanyName(savedCompany.name ?? "");
+    settermsQuotation(savedCompany.termsQuotation ?? "");
     setOnboardingMainOffer(savedCompany.onboardingMainOffer ?? "");
     setOnboardingIdealCustomer(savedCompany.onboardingIdealCustomer ?? "");
     setOnboardingAvgTicketValue(savedCompany.onboardingAvgTicketValue ?? "");
@@ -139,6 +142,7 @@ export default function ProfileCompanySection({
   }, [
     savedCompany?.id,
     savedCompany?.name,
+    savedCompany?.termsQuotation,
     savedCompany?.onboardingMainOffer,
     savedCompany?.onboardingIdealCustomer,
     savedCompany?.onboardingAvgTicketValue,
@@ -148,7 +152,9 @@ export default function ProfileCompanySection({
 
   const isCompanyDirty = Boolean(
     savedCompany &&
-      (companyName.trim() !== (savedCompany.name ?? "").trim() ||
+      (companyName.trim() !== (savedCompany.name ?? "").trim() || 
+        (termsQuotation || "") !==
+          (savedCompany.termsQuotation ?? "") ||
         (onboardingMainOffer || "") !==
           (savedCompany.onboardingMainOffer ?? "") ||
         (onboardingIdealCustomer || "") !==
@@ -216,6 +222,7 @@ export default function ProfileCompanySection({
           onboardingIdealCustomer: onboardingIdealCustomer.trim() || null,
           onboardingAvgTicketValue: onboardingAvgTicketValue.trim() || null,
           onboardingSalesPain: onboardingSalesPain.trim() || null,
+          termsQuotation: termsQuotation.trim() || null,
           ...(companyLogoFile ? { logo: { upload: companyLogoFile } } : {}),
         },
       },
@@ -337,7 +344,24 @@ export default function ProfileCompanySection({
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">Información de la empresa</h3>
+            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2 flex items-center gap-1.5">
+              <HugeiconsIcon
+                icon={InformationCircleIcon}
+                className="size-4 shrink-0 text-orange-500 dark:text-orange-400"
+              />
+              Términos y condiciones en la cotización
+            </label>
+            <textarea
+              value={termsQuotation}
+              onChange={(e) => settermsQuotation(e.target.value)}
+              placeholder="Estos terminos y condiciones se mostrarán en la cotización para el cliente. Se pueden editar en cada cotización."
+              className={TEXTAREA_CLASS}
+              rows={3}
+            />
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">Información</h3>
             <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mb-5">
               Esta información se usará para personalizar el onboarding de tus clientes en una futura versión de Kadesh.
             </p>

@@ -13,6 +13,10 @@ import {
   type UpdateSaasQuotationProductResponse,
   type UpdateSaasQuotationProductVariables,
 } from "./queries";
+import {
+  QUOTATION_DISCOUNT_TYPE,
+  QUOTATION_DISCOUNT_TYPE_OPTIONS,
+} from "kadesh/constants/constans";
 
 const inputClassName =
   "w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
@@ -47,7 +51,9 @@ export default function QuotationProductFormModal({
   const [unitPrice, setUnitPrice] = useState("");
   const [quantity, setQuantity] = useState("");
   const [taxRate, setTaxRate] = useState("");
-  const [discountType, setDiscountType] = useState("");
+  const [discountType, setDiscountType] = useState<string>(
+    QUOTATION_DISCOUNT_TYPE.NONE,
+  );
   const [discountValue, setDiscountValue] = useState("");
 
   useEffect(() => {
@@ -60,7 +66,9 @@ export default function QuotationProductFormModal({
       );
       setQuantity(product.quantity != null ? String(product.quantity) : "");
       setTaxRate(product.taxRate != null ? String(product.taxRate) : "");
-      setDiscountType(product.discountType ?? "");
+      setDiscountType(
+        product.discountType?.trim() || QUOTATION_DISCOUNT_TYPE.NONE,
+      );
       setDiscountValue(
         product.discountValue != null ? String(product.discountValue) : "",
       );
@@ -70,7 +78,7 @@ export default function QuotationProductFormModal({
       setUnitPrice("");
       setQuantity("");
       setTaxRate("");
-      setDiscountType("");
+      setDiscountType(QUOTATION_DISCOUNT_TYPE.NONE);
       setDiscountValue("");
     }
   }, [isOpen, mode, product, presetQuotationId]);
@@ -116,8 +124,9 @@ export default function QuotationProductFormModal({
     const up = parseNum(unitPrice);
     const qty = parseNum(quantity);
     const tax = parseNum(taxRate);
-    const discVal = parseNum(discountValue);
-    const discType = discountType.trim() || null;
+    const isNoDiscount = discountType === QUOTATION_DISCOUNT_TYPE.NONE;
+    const discVal = isNoDiscount ? null : parseNum(discountValue);
+    const discType = isNoDiscount ? null : discountType.trim() || null;
 
     if (mode === "create") {
       const qid = (presetQuotationId?.trim() || quotationId.trim());
@@ -217,41 +226,6 @@ export default function QuotationProductFormModal({
             onSubmit={handleSubmit}
             className="p-4 overflow-y-auto space-y-4 flex-1"
           >
-            {mode === "create" && presetQuotationId?.trim() && (
-              <div>
-                <span className={labelClassName}>Cotización</span>
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0] font-mono break-all">
-                  {presetQuotationId.trim()}
-                </p>
-              </div>
-            )}
-
-            {mode === "create" && !presetQuotationId?.trim() && (
-              <div>
-                <label htmlFor="qp-quotation-id" className={labelClassName}>
-                  ID de cotización <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="qp-quotation-id"
-                  type="text"
-                  value={quotationId}
-                  onChange={(e) => setQuotationId(e.target.value)}
-                  placeholder="Pega el ID de la cotización padre"
-                  className={inputClassName}
-                  required
-                />
-              </div>
-            )}
-
-            {mode === "edit" && quotationId && (
-              <div>
-                <span className={labelClassName}>Cotización (ID)</span>
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0] font-mono break-all">
-                  {quotationId}
-                </p>
-              </div>
-            )}
-
             <div>
               <label htmlFor="qp-description" className={labelClassName}>
                 Descripción
@@ -318,14 +292,32 @@ export default function QuotationProductFormModal({
                 <label htmlFor="qp-discount-type" className={labelClassName}>
                   Tipo de descuento
                 </label>
-                <input
+                <select
                   id="qp-discount-type"
-                  type="text"
-                  value={discountType}
+                  value={
+                    QUOTATION_DISCOUNT_TYPE_OPTIONS.some(
+                      (o) => o.value === discountType,
+                    )
+                      ? discountType
+                      : discountType || QUOTATION_DISCOUNT_TYPE.NONE
+                  }
                   onChange={(e) => setDiscountType(e.target.value)}
-                  placeholder="Ej. PERCENTAGE, FIXED"
                   className={inputClassName}
-                />
+                >
+                  {discountType &&
+                  !QUOTATION_DISCOUNT_TYPE_OPTIONS.some(
+                    (o) => o.value === discountType,
+                  ) ? (
+                    <option value={discountType}>
+                      {discountType} (valor en sistema)
+                    </option>
+                  ) : null}
+                  {QUOTATION_DISCOUNT_TYPE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 

@@ -37,7 +37,8 @@
     "sileo": "^0.1.5"
   },
   "resolutions": {
-    "@internationalized/date": "^3.10.0"
+    "@internationalized/date": "^3.10.0",
+    "@react-aria/i18n": "3.12.15"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",

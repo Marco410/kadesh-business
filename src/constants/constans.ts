@@ -729,3 +729,60 @@ export const PLAN_FEATURES_MAP: Record<
     description: "Crear y gestionar cotizaciones",
   },
 };
+
+
+export const QUOTATION_STATUS = {
+  DRAFT: "draft",
+  SENT: "sent",
+  ACCEPTED: "accepted",
+  REJECTED: "rejected",
+  EXPIRED: "expired",
+} as const;
+
+export type QuotationStatus =
+  (typeof QUOTATION_STATUS)[keyof typeof QUOTATION_STATUS];
+
+export const QUOTATION_STATUS_OPTIONS = [
+  { label: "Borrador", value: QUOTATION_STATUS.DRAFT },
+  { label: "Enviada", value: QUOTATION_STATUS.SENT },
+  { label: "Aceptada", value: QUOTATION_STATUS.ACCEPTED },
+  { label: "Rechazada", value: QUOTATION_STATUS.REJECTED },
+  { label: "Expirada", value: QUOTATION_STATUS.EXPIRED },
+] as const;
+
+export const QUOTATION_STATUS_COLORS = {
+  [QUOTATION_STATUS.DRAFT]: "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-white",
+  [QUOTATION_STATUS.SENT]: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200",
+  [QUOTATION_STATUS.ACCEPTED]: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200",
+  [QUOTATION_STATUS.REJECTED]: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200",
+  [QUOTATION_STATUS.EXPIRED]: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200",
+} as const satisfies Record<QuotationStatus, string>;
+
+export const QUOTATION_DISCOUNT_TYPE = {
+  NONE: "none",
+  PERCENT: "percent",
+  AMOUNT: "amount",
+} as const;
+
+export type QuotationDiscountType =
+  (typeof QUOTATION_DISCOUNT_TYPE)[keyof typeof QUOTATION_DISCOUNT_TYPE];
+
+export const QUOTATION_DISCOUNT_TYPE_OPTIONS = [
+  { label: "Sin descuento", value: QUOTATION_DISCOUNT_TYPE.NONE },
+  { label: "Porcentaje", value: QUOTATION_DISCOUNT_TYPE.PERCENT },
+  { label: "Monto fijo", value: QUOTATION_DISCOUNT_TYPE.AMOUNT },
+] as const;
+
+/** Monedas comunes para cotizaciones (códigos ISO 4217). */
+export const QUOTATION_CURRENCY_OPTIONS = [
+  { label: "MXN — Peso mexicano", value: "MXN" },
+  { label: "USD — Dólar estadounidense", value: "USD" },
+  { label: "EUR — Euro", value: "EUR" },
+  { label: "CAD — Dólar canadiense", value: "CAD" },
+  { label: "GBP — Libra esterlina", value: "GBP" },
+  { label: "COP — Peso colombiano", value: "COP" },
+  { label: "ARS — Peso argentino", value: "ARS" },
+  { label: "BRL — Real brasileño", value: "BRL" },
+  { label: "CLP — Peso chileno", value: "CLP" },
+  { label: "PEN — Sol peruano", value: "PEN" },
+] as const;

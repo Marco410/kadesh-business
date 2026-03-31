@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Add01Icon, Edit01Icon } from "@hugeicons/core-free-icons";
+import { Add01Icon, ArrowLeft01Icon, Delete02Icon, Edit01Icon } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
+import { useParams, useRouter } from "next/navigation";
 import {
   SAAS_QUOTATION_DETAIL_QUERY,
   UPDATE_SAAS_QUOTATION_MUTATION,
@@ -21,13 +21,54 @@ import {
   quotationThClass,
   quotationTdClass,
 } from "./quotation-table-classes";
-import { ClientLeadAutocomplete } from "kadesh/components/shared";
+import {
+  ClientLeadAutocomplete,
+  ClientProjectAutocomplete,
+  ConfirmModal,
+  DatePickerField,
+} from "kadesh/components/shared";
+import {
+  PLAN_FEATURE_KEYS,
+  QUOTATION_CURRENCY_OPTIONS,
+  QUOTATION_STATUS_COLORS,
+  QUOTATION_STATUS_OPTIONS,
+  QuotationStatus,
+} from "kadesh/constants/constans";
+import { useUser } from "kadesh/utils/UserContext";
+import { hasPlanFeature } from "../helpers/plan-features";
+import { useSubscription } from "../SubscriptionContext";
+import FeatureLockedSection from "../FeatureLockedSection";
+import { useDeleteSaasQuotationProduct } from "./hooks";
+import { formatMoney } from "kadesh/utils/format-currency";
+import { formatDateShort } from "kadesh/utils/format-date";
 
 const inputClassName =
   "w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 const labelClassName = "block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5";
 
-function toDatetimeLocal(iso: string | null | undefined): string {
+function toDateOnly(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/** ISO 8601 full-date (`YYYY-MM-DD`) para escalares GraphQL tipo CalendarDay. */
+function fromDateOnlyToCalendarDay(val: string): string | null {
+  const t = val.trim();
+  if (!t) return null;
+  const dayPart = t.includes("T") ? t.slice(0, 10) : t;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dayPart)) return null;
+  const [y, m, d] = dayPart.split("-").map((x) => Number(x));
+  if (!y || !m || !d) return null;
+  const parsed = new Date(y, m - 1, d);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return dayPart;
+}
+
+/** `YYYY-MM-DDTHH:mm` (hora local) desde un valor ISO/DateTime del servidor. */
+function isoLikeToLocalDateTimeMinute(iso: string | null | undefined): string {
   if (!iso) return "";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
@@ -35,19 +76,23 @@ function toDatetimeLocal(iso: string | null | undefined): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-function fromDatetimeLocal(val: string): string | null {
-  const t = val.trim();
-  if (!t) return null;
-  const d = new Date(t);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toISOString();
-}
-
-function parseNum(raw: string): number | null {
-  const t = raw.trim();
-  if (!t) return null;
-  const n = Number(t.replace(",", "."));
-  return Number.isFinite(n) ? n : null;
+/** ISO 8601 completo (UTC) para escalares GraphQL DateTime; vacío → `null`. */
+function localDateTimeMinuteToDateTimeIso(val: string): string | null {
+  const raw = val.trim();
+  if (!raw) return null;
+  const normalized = /^\d{4}-\d{2}-\d{2}$/.test(raw) ? `${raw}T00:00` : raw;
+  const m = normalized.match(
+    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/,
+  );
+  if (!m) return null;
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const day = Number(m[3]);
+  const h = Number(m[4]);
+  const mi = Number(m[5]);
+  const dt = new Date(y, mo - 1, day, h, mi, 0, 0);
+  if (Number.isNaN(dt.getTime())) return null;
+  return dt.toISOString();
 }
 
 function relPatch(
@@ -63,46 +108,17 @@ function relPatch(
   return undefined;
 }
 
-function formatMoney(
-  n: number | null | undefined,
-  currency = "MXN",
-): string {
-  if (n == null || Number.isNaN(n)) return "—";
-  const code = currency?.trim() || "MXN";
-  try {
-    return new Intl.NumberFormat("es-MX", {
-      style: "currency",
-      currency: code,
-    }).format(n);
-  } catch {
-    return new Intl.NumberFormat("es-MX", {
-      style: "currency",
-      currency: "MXN",
-    }).format(n);
-  }
-}
-
-export interface QuotationDetailModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  quotationId: string | null;
-  userId: string;
-  onUpdated?: () => void;
-}
-
-export default function QuotationDetailModal({
-  isOpen,
-  onClose,
-  quotationId,
-  userId,
-  onUpdated,
-}: QuotationDetailModalProps) {
+export default function QuotationDetail() {
+  const router = useRouter();
+  const params = useParams<{ id?: string }>();
+  const quotationId = params?.id ?? null;
+  const { user } = useUser();
+  const userId = user?.id ?? "";
   const skipHydrationRef = useRef(false);
 
   const [quotationNumber, setQuotationNumber] = useState("");
   const [status, setStatus] = useState("");
   const [currency, setCurrency] = useState("");
-  const [exchangeRate, setExchangeRate] = useState("");
   const [notes, setNotes] = useState("");
   const [terms, setTerms] = useState("");
   const [validUntil, setValidUntil] = useState("");
@@ -122,15 +138,18 @@ export default function QuotationDetailModal({
   );
   const [editingProduct, setEditingProduct] =
     useState<SaasQuotationProductRow | null>(null);
+  const [productPendingDelete, setProductPendingDelete] =
+    useState<SaasQuotationProductRow | null>(null);
 
   const { data, loading, error, refetch } = useQuery<
     SaasQuotationDetailResponse,
     SaasQuotationDetailVariables
   >(SAAS_QUOTATION_DETAIL_QUERY, {
-    skip: !isOpen || !quotationId,
+    skip: !quotationId,
     variables: quotationId ? { where: { id: quotationId } } : undefined,
     fetchPolicy: "network-only",
   });
+
 
   const detail = data?.saasQuotation;
 
@@ -139,13 +158,7 @@ export default function QuotationDetailModal({
   }, [quotationId]);
 
   useEffect(() => {
-    if (!isOpen) {
-      skipHydrationRef.current = false;
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen || !quotationId) return;
+    if (!quotationId) return;
     if (!detail || detail.id !== quotationId) return;
     if (skipHydrationRef.current) return;
     skipHydrationRef.current = true;
@@ -153,14 +166,9 @@ export default function QuotationDetailModal({
     setQuotationNumber(detail.quotationNumber ?? "");
     setStatus(detail.status ?? "");
     setCurrency(detail.currency ?? "");
-    setExchangeRate(
-      detail.exchangeRate != null ? String(detail.exchangeRate) : "",
-    );
     setNotes(detail.notes ?? "");
-    setTerms(detail.terms ?? "");
-    setValidUntil(toDatetimeLocal(detail.validUntil));
-    setSentAt(toDatetimeLocal(detail.sentAt));
-    setAcceptedAt(toDatetimeLocal(detail.acceptedAt));
+    setTerms(detail.terms?? detail.company?.termsQuotation ?? "");
+    setValidUntil(toDateOnly(detail.validUntil));
 
     const lid = detail.lead?.id ?? "";
     const sid = detail.assignedSeller?.id ?? "";
@@ -171,7 +179,20 @@ export default function QuotationDetailModal({
     setInitialLeadId(lid);
     setInitialSellerId(sid);
     setInitialProjectId(pid);
-  }, [isOpen, quotationId, detail]);
+  }, [quotationId, detail]);
+
+  /** Fuera del “hydrate once”: tras refetch/mutación el servidor puede traer sentAt/acceptedAt nuevos. */
+  useEffect(() => {
+    if (!quotationId || !detail || detail.id !== quotationId) return;
+    setSentAt(isoLikeToLocalDateTimeMinute(detail.sentAt));
+    setAcceptedAt(isoLikeToLocalDateTimeMinute(detail.acceptedAt));
+  }, [
+    quotationId,
+    detail?.id,
+    detail?.sentAt,
+    detail?.acceptedAt,
+    detail?.updatedAt,
+  ]);
 
   const [updateQuotation, { loading: savingQuotation }] = useMutation<
     UpdateSaasQuotationResponse,
@@ -180,7 +201,6 @@ export default function QuotationDetailModal({
     onCompleted: () => {
       sileo.success({ title: "Cotización actualizada." });
       void refetch();
-      onUpdated?.();
     },
     onError: (err) => {
       sileo.error({
@@ -189,25 +209,34 @@ export default function QuotationDetailModal({
     },
   });
 
-  function handleClose() {
-    onClose();
-  }
+  const { deleteQuotationProduct, loading: deletingProduct } =
+    useDeleteSaasQuotationProduct();
+
+  const { subscription } = useSubscription();
+
+  const color = status
+  ? QUOTATION_STATUS_COLORS[status as QuotationStatus]
+  : "bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-200";
+
+  const hasQuotationsFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.QUOTATIONS
+  );
 
   function handleSaveQuotation(e: React.FormEvent) {
     e.preventDefault();
     if (!quotationId) return;
 
-    const ex = parseNum(exchangeRate);
     const payload: Record<string, unknown> = {
       quotationNumber: quotationNumber.trim(),
       status: status.trim() || null,
       currency: currency.trim() || null,
-      exchangeRate: ex,
+      exchangeRate: 1,
       notes: notes.trim() || null,
       terms: terms.trim() || null,
-      validUntil: fromDatetimeLocal(validUntil),
-      sentAt: fromDatetimeLocal(sentAt),
-      acceptedAt: fromDatetimeLocal(acceptedAt),
+      validUntil: fromDateOnlyToCalendarDay(validUntil),
+      sentAt: localDateTimeMinuteToDateTimeIso(sentAt),
+      acceptedAt: localDateTimeMinuteToDateTimeIso(acceptedAt),
     };
 
     const lp = relPatch(leadId, initialLeadId, "lead");
@@ -237,54 +266,67 @@ export default function QuotationDetailModal({
     setProductModalOpen(true);
   }
 
+  function openDeleteProductConfirm(row: SaasQuotationProductRow) {
+    setProductPendingDelete(row);
+  }
+
+  function handleCloseDeleteConfirm() {
+    if (!deletingProduct) setProductPendingDelete(null);
+  }
+
+  function handleConfirmDeleteProduct() {
+    if (!productPendingDelete) return;
+    deleteQuotationProduct(productPendingDelete.id, {
+      quotationDetailId: quotationId,
+      onCompleted: () => setProductPendingDelete(null),
+    });
+  }
+
   const cc = detail?.currency?.trim() || "MXN";
   const products = detail?.quotationProducts ?? [];
 
-  if (!isOpen || !quotationId) return null;
+  if (!quotationId) {
+    return (
+      <div className="mx-auto w-full max-w-5xl px-4 py-6">
+        <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+          Falta el ID de la cotización.
+        </p>
+      </div>
+    );
+  }
+
+
+  if (!hasQuotationsFeature) {
+    return (
+      <FeatureLockedSection sectionName="Cotizaciones" />
+    );
+  }
 
   return (
-    <AnimatePresence>
-      <motion.div
-        key="qd-backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 z-[80] flex items-center justify-center p-4"
-        onClick={handleClose}
-      />
-      <motion.div
-        key="qd-content"
-        initial={{ opacity: 0, scale: 0.97 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.97 }}
-        transition={{ type: "spring", damping: 26, stiffness: 320 }}
-        className="fixed inset-0 z-[82] flex items-center justify-center p-4 pointer-events-none"
-      >
-        <div
-          className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] overflow-hidden pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a] flex flex-col"
-          onClick={(e) => e.stopPropagation()}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="quotation-detail-title"
-        >
-          <div className="flex justify-between items-center p-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a] shrink-0">
-            <h4
-              id="quotation-detail-title"
-              className="text-lg font-bold text-[#212121] dark:text-[#ffffff]"
+    <>
+      <div className="mx-auto w-full max-w-5xl px-4 py-6 space-y-6 mt-10">
+        <div className="mt-8">
+            <div
+                onClick={() => router.back()}
+                className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400 transition-colors cursor-pointer"
             >
+                <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
+                Atrás
+            </div>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h1 className="text-xl font-bold text-[#212121] dark:text-white">
               Cotización {detail?.quotationNumber ?? ""}
-            </h4>
-            <button
-              type="button"
-              onClick={handleClose}
-              className="text-2xl font-bold text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#ffffff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#e5e5e5] dark:hover:bg-[#333]"
-              aria-label="Cerrar"
-            >
-              ×
-            </button>
+            </h1>
+            <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+              ID: <span className="font-mono">{quotationId}</span>
+            </p>
           </div>
+        </div>
 
-          <div className="p-4 overflow-y-auto flex-1 space-y-6">
+        <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] shadow-sm">
+          <div className="p-4 space-y-6">
             {loading && !detail ? (
               <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
                 Cargando…
@@ -299,9 +341,9 @@ export default function QuotationDetailModal({
               </p>
             ) : (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] p-3 text-sm">
+                <div className={`grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] p-3 text-sm ${color}`}>
                   <div>
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <p className="text-md text-[#616161] dark:text-[#b0b0b0]">
                       Subtotal
                     </p>
                     <p className="font-medium tabular-nums">
@@ -309,7 +351,7 @@ export default function QuotationDetailModal({
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <p className="text-md text-[#616161] dark:text-[#b0b0b0]">
                       Descuento
                     </p>
                     <p className="font-medium tabular-nums">
@@ -317,7 +359,7 @@ export default function QuotationDetailModal({
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <p className="text-md text-[#616161] dark:text-[#b0b0b0]">
                       Impuestos
                     </p>
                     <p className="font-medium tabular-nums">
@@ -325,7 +367,7 @@ export default function QuotationDetailModal({
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <p className="text-md text-[#616161] dark:text-[#b0b0b0]">
                       Total
                     </p>
                     <p className="font-semibold tabular-nums">
@@ -343,6 +385,7 @@ export default function QuotationDetailModal({
                       <input
                         id="qd-number"
                         type="text"
+                        readOnly
                         value={quotationNumber}
                         onChange={(e) => setQuotationNumber(e.target.value)}
                         className={inputClassName}
@@ -352,77 +395,70 @@ export default function QuotationDetailModal({
                       <label htmlFor="qd-status" className={labelClassName}>
                         Estado
                       </label>
-                      <input
+                      <select
                         id="qd-status"
-                        type="text"
                         value={status}
                         onChange={(e) => setStatus(e.target.value)}
                         className={inputClassName}
-                        placeholder="Ej. DRAFT, SENT"
-                      />
+                      >
+                        <option value="">—</option>
+                        {QUOTATION_STATUS_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label htmlFor="qd-currency" className={labelClassName}>
                         Moneda
                       </label>
-                      <input
+                      <select
                         id="qd-currency"
-                        type="text"
                         value={currency}
                         onChange={(e) => setCurrency(e.target.value)}
                         className={inputClassName}
-                        placeholder="MXN"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="qd-rate" className={labelClassName}>
-                        Tipo de cambio
-                      </label>
-                      <input
-                        id="qd-rate"
-                        type="text"
-                        inputMode="decimal"
-                        value={exchangeRate}
-                        onChange={(e) => setExchangeRate(e.target.value)}
-                        className={inputClassName}
-                      />
+                      >
+                        <option value="">—</option>
+                        {currency.trim() &&
+                        !QUOTATION_CURRENCY_OPTIONS.some(
+                          (opt) => opt.value === currency.trim(),
+                        ) ? (
+                          <option value={currency.trim()}>
+                            {currency.trim()} (actual)
+                          </option>
+                        ) : null}
+                        {QUOTATION_CURRENCY_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label htmlFor="qd-valid" className={labelClassName}>
                         Válida hasta
                       </label>
-                      <input
+                      <DatePickerField
                         id="qd-valid"
-                        type="datetime-local"
+                        ariaLabel="Válida hasta"
                         value={validUntil}
-                        onChange={(e) => setValidUntil(e.target.value)}
-                        className={inputClassName}
+                        onChange={setValidUntil}
+                        granularity="day"
                       />
                     </div>
-                    <div>
+                    {sentAt && (<div>
                       <label htmlFor="qd-sent" className={labelClassName}>
                         Enviada
                       </label>
-                      <input
-                        id="qd-sent"
-                        type="datetime-local"
-                        value={sentAt}
-                        onChange={(e) => setSentAt(e.target.value)}
-                        className={inputClassName}
-                      />
-                    </div>
-                    <div>
+                      <p className="text-md text-[#616161] dark:text-[#b0b0b0]">{formatDateShort(sentAt)}</p>
+                    </div>)}
+                    {acceptedAt && (<div>
                       <label htmlFor="qd-accepted" className={labelClassName}>
                         Aceptada
                       </label>
-                      <input
-                        id="qd-accepted"
-                        type="datetime-local"
-                        value={acceptedAt}
-                        onChange={(e) => setAcceptedAt(e.target.value)}
-                        className={inputClassName}
-                      />
-                    </div>
+                      <p className="text-md text-[#616161] dark:text-[#b0b0b0]">{formatDateShort(acceptedAt)}</p>
+                    </div>)}
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -430,7 +466,7 @@ export default function QuotationDetailModal({
                     <ClientLeadAutocomplete
                         id="qd-lead"
                         userId={userId}
-                        enabled={isOpen}
+                        enabled={true}
                         selectedLeadId={leadId || null}
                         onSelectedLeadIdChange={(id) => setLeadId(id ?? "")}
                         placeholder="Buscar cliente por nombre"
@@ -438,38 +474,16 @@ export default function QuotationDetailModal({
                       />
                     </div>
                     <div>
-                      <label htmlFor="qd-seller" className={labelClassName}>
-                        Vendedor (ID)
-                      </label>
-                      <input
-                        id="qd-seller"
-                        type="text"
-                        value={assignedSellerId}
-                        onChange={(e) => setAssignedSellerId(e.target.value)}
-                        className={inputClassName}
-                      />
-                      {detail.assignedSeller?.name ? (
-                        <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
-                          {detail.assignedSeller.name}
-                        </p>
-                      ) : null}
-                    </div>
-                    <div>
-                      <label htmlFor="qd-project" className={labelClassName}>
-                        Proyecto (ID)
-                      </label>
-                      <input
+                      <ClientProjectAutocomplete
                         id="qd-project"
-                        type="text"
-                        value={projectId}
-                        onChange={(e) => setProjectId(e.target.value)}
-                        className={inputClassName}
+                        userId={userId}
+                        enabled={true}
+                        selectedProjectId={projectId || null}
+                        onSelectedProjectIdChange={(id) =>
+                          setProjectId(id ?? "")
+                        }
+                        placeholder="Buscar proyecto por nombre"
                       />
-                      {detail.project?.name ? (
-                        <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
-                          {detail.project.name}
-                        </p>
-                      ) : null}
                     </div>
                   </div>
 
@@ -500,13 +514,6 @@ export default function QuotationDetailModal({
                   </div>
 
                   <div className="flex justify-end gap-2 pt-2">
-                    <button
-                      type="button"
-                      onClick={handleClose}
-                      className="px-4 py-2 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-[#ffffff] text-sm font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#333]"
-                    >
-                      Cerrar
-                    </button>
                     <button
                       type="submit"
                       disabled={savingQuotation}
@@ -554,7 +561,7 @@ export default function QuotationDetailModal({
                               Total línea
                             </th>
                             <th
-                              className={`${quotationThClass} text-right w-24`}
+                              className={`${quotationThClass} text-right min-w-[8.5rem]`}
                             >
                               Acciones
                             </th>
@@ -606,14 +613,32 @@ export default function QuotationDetailModal({
                                 <td
                                   className={`${quotationTdClass} text-right`}
                                 >
-                                  <button
-                                    type="button"
-                                    onClick={() => openEditProduct(row)}
-                                    className="inline-flex items-center gap-1 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-2 py-1 text-xs font-medium text-[#212121] dark:text-white hover:bg-[#f5f5f5] dark:hover:bg-[#333]"
-                                  >
-                                    <HugeiconsIcon icon={Edit01Icon} size={14} />
-                                    Editar
-                                  </button>
+                                  <div className="inline-flex flex-wrap items-center justify-end gap-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => openEditProduct(row)}
+                                      disabled={deletingProduct}
+                                      className="inline-flex items-center gap-1 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-2 py-1 text-xs font-medium text-[#212121] dark:text-white hover:bg-[#f5f5f5] dark:hover:bg-[#333] disabled:opacity-50 disabled:pointer-events-none"
+                                    >
+                                      <HugeiconsIcon
+                                        icon={Edit01Icon}
+                                        size={14}
+                                      />
+                                      Editar
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => openDeleteProductConfirm(row)}
+                                      disabled={deletingProduct}
+                                      className="inline-flex items-center gap-1 rounded-lg border border-red-200 dark:border-red-900/60 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 disabled:opacity-50 disabled:pointer-events-none"
+                                    >
+                                      <HugeiconsIcon
+                                        icon={Delete02Icon}
+                                        size={14}
+                                      />
+                                      Eliminar
+                                    </button>
+                                  </div>
                                 </td>
                               </tr>
                             ))
@@ -627,7 +652,6 @@ export default function QuotationDetailModal({
             )}
           </div>
         </div>
-      </motion.div>
 
       <QuotationProductFormModal
         isOpen={productModalOpen}
@@ -639,6 +663,25 @@ export default function QuotationDetailModal({
           productModalMode === "create" ? quotationId : null
         }
       />
-    </AnimatePresence>
+
+      <ConfirmModal
+        isOpen={!!productPendingDelete}
+        onClose={handleCloseDeleteConfirm}
+        onConfirm={handleConfirmDeleteProduct}
+        title="Eliminar concepto"
+        message={
+          productPendingDelete
+            ? `¿Eliminar «${
+                productPendingDelete.description?.trim() || "este concepto"
+              }»? Esta acción no se puede deshacer.`
+            : ""
+        }
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        isLoading={deletingProduct}
+        confirmButtonColor="red"
+      />
+      </div>
+    </>
   );
 }

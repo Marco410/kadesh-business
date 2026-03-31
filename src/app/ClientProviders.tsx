@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import ApolloProviderWrapper from '../providers/ApolloProviderWrapper';
 import { ThemeProvider } from '../providers/ThemeProvider';
 import { SpeedInsights } from "@vercel/speed-insights/next"
@@ -11,12 +13,21 @@ import { useTheme } from "next-themes";
 
 function ThemedToaster() {
   const { resolvedTheme } = useTheme();
-  return (
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const toaster = (
     <Toaster
       position="top-right"
       theme={(resolvedTheme === "dark" ? "dark" : "light") as "dark" | "light"}
     />
   );
+
+  if (!mounted) return null;
+  return createPortal(toaster, document.body);
 }
 
 export default function ClientProviders({
@@ -26,7 +37,7 @@ export default function ClientProviders({
 }) {
   return (
     <ThemeProvider>
-      <HeroUIProvider>
+      <HeroUIProvider locale="es-MX">
         <ApolloProviderWrapper>
           <UserProvider>
             {children}

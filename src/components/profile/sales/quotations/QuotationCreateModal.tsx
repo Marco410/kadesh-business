@@ -9,6 +9,9 @@ import {
   type CreateSaasQuotationResponse,
   type CreateSaasQuotationVariables,
 } from "./queries";
+import { ClientLeadAutocomplete } from "kadesh/components/shared";
+import { useRouter } from "next/navigation";
+import { Routes } from "kadesh/core/routes";
 
 const inputClassName =
   "w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
@@ -29,14 +32,13 @@ export default function QuotationCreateModal({
   companyId,
   userId,
 }: QuotationCreateModalProps) {
-  const [quotationNumber, setQuotationNumber] = useState("");
   const [leadId, setLeadId] = useState("");
   const [validUntil, setValidUntil] = useState("");
   const [notes, setNotes] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     if (!isOpen) return;
-    setQuotationNumber("");
     setLeadId("");
     setValidUntil("");
     setNotes("");
@@ -46,8 +48,18 @@ export default function QuotationCreateModal({
     CreateSaasQuotationResponse,
     CreateSaasQuotationVariables
   >(CREATE_SAAS_QUOTATION_MUTATION, {
-    onCompleted: () => {
-      sileo.success({ title: "Cotización creada." });
+    onCompleted: (data) => {
+      const id = data.createSaasQuotation?.id;
+      if (!id) {
+        sileo.error({
+          title: "La cotización se creó pero no se recibió el ID. Revisa la lista.",
+        });
+        onSuccess?.();
+        onClose();
+        return;
+      }
+      sileo.success({ title: "Cotización creada.", description: "Redirigiendo a la cotización..." });
+      router.push(Routes.panelQuotation(id));
       onSuccess?.();
       onClose();
     },
@@ -64,11 +76,8 @@ export default function QuotationCreateModal({
           company: { connect: { id: companyId } },
           createdBy: { connect: { id: userId } },
           assignedSeller: { connect: { id: userId } },
+          lead: { connect: { id: leadId.trim() } },
           currency: "MXN",
-          ...(quotationNumber.trim()
-            ? { quotationNumber: quotationNumber.trim() }
-            : {}),
-          ...(leadId.trim() ? { lead: { connect: { id: leadId.trim() } } } : {}),
           ...(validUntil.trim() ? { validUntil: validUntil.trim() } : {}),
           ...(notes.trim() ? { notes: notes.trim() } : {}),
         },
@@ -125,7 +134,7 @@ export default function QuotationCreateModal({
             className="p-4 overflow-y-auto space-y-4 flex-1"
           >
 
-              <div>
+            <div>
               <label htmlFor="qc-valid-until" className={labelClassName}>
                 Válida hasta
               </label>
@@ -135,6 +144,18 @@ export default function QuotationCreateModal({
                 value={validUntil}
                 onChange={(e) => setValidUntil(e.target.value)}
                 className={inputClassName}
+              />
+            </div>
+
+            <div>
+              <ClientLeadAutocomplete
+                id="qc-lead"
+                userId={userId}
+                enabled={isOpen}
+                selectedLeadId={leadId || null}
+                onSelectedLeadIdChange={(id) => setLeadId(id ?? "")}
+                placeholder="Buscar cliente por nombre"
+                required
               />
             </div>
 

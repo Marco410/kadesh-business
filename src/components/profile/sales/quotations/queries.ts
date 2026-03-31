@@ -73,6 +73,7 @@ export const SAAS_QUOTATION_DETAIL_QUERY = gql`
       }
       company {
         id
+        termsQuotation
       }
       quotationProducts {
         id
@@ -197,6 +198,16 @@ export const UPDATE_SAAS_QUOTATION_PRODUCT_MUTATION = gql`
   }
 `;
 
+export const DELETE_SAAS_QUOTATION_PRODUCT_MUTATION = gql`
+  mutation DeleteSaasQuotationProduct(
+    $where: SaasQuotationProductWhereUniqueInput!
+  ) {
+    deleteSaasQuotationProduct(where: $where) {
+      id
+    }
+  }
+`;
+
 export interface SaasQuotationRow {
   id: string;
   quotationNumber: string;
@@ -280,7 +291,7 @@ export interface SaasQuotationDetail {
   lead: { id: string; businessName: string | null } | null;
   assignedSeller: { id: string; name: string | null } | null;
   project: { id: string; name: string | null } | null;
-  company: { id: string } | null;
+  company: { id: string; termsQuotation: string | null } | null;
   quotationProducts: SaasQuotationProductRow[];
 }
 
@@ -364,4 +375,12 @@ export interface UpdateSaasQuotationProductVariables {
     discountType?: string | null;
     discountValue?: number | null;
   };
+}
+
+export interface DeleteSaasQuotationProductResponse {
+  deleteSaasQuotationProduct: { id: string } | null;
+}
+
+export interface DeleteSaasQuotationProductVariables {
+  where: { id: string };
 }

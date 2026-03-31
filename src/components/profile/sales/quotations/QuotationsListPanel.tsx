@@ -6,41 +6,27 @@ import { Add01Icon, Edit01Icon } from "@hugeicons/core-free-icons";
 import { useQuotationsList } from "./hooks";
 import { formatDateShort } from "kadesh/utils/format-date";
 import QuotationCreateModal from "./QuotationCreateModal";
-import QuotationDetailModal from "./QuotationDetailModal";
+import { Routes } from "kadesh/core/routes";
+import { useRouter } from "next/navigation";
 import {
   quotationTableWrapClass,
   quotationThClass,
   quotationTdClass,
 } from "./quotation-table-classes";
-
-function formatMoney(
-  n: number | null | undefined,
-  currency = "MXN",
-): string {
-  if (n == null || Number.isNaN(n)) return "—";
-  const code = currency?.trim() || "MXN";
-  try {
-    return new Intl.NumberFormat("es-MX", {
-      style: "currency",
-      currency: code,
-    }).format(n);
-  } catch {
-    return new Intl.NumberFormat("es-MX", {
-      style: "currency",
-      currency: "MXN",
-    }).format(n);
-  }
-}
+import {
+  QUOTATION_STATUS_COLORS,
+  QUOTATION_STATUS_OPTIONS,
+  type QuotationStatus,
+} from "kadesh/constants/constans";
+import { formatMoney } from "kadesh/utils/format-currency";
 
 export interface QuotationsListPanelProps {
   userId: string;
 }
 
 export default function QuotationsListPanel({ userId }: QuotationsListPanelProps) {
+  const router = useRouter();
   const [createOpen, setCreateOpen] = useState(false);
-  const [detailQuotationId, setDetailQuotationId] = useState<string | null>(
-    null,
-  );
   const {
     companyId,
     isAdminCompany,
@@ -156,13 +142,30 @@ export default function QuotationsListPanel({ userId }: QuotationsListPanelProps
                       {formatMoney(row.total, row.currency ?? "MXN")}
                     </td>
                     <td className={quotationTdClass}>
-                      <span className="text-xs font-medium">{row.status ?? "—"}</span>
+                      {(() => {
+                        const status = row.status as QuotationStatus | null;
+                        const color = status
+                          ? QUOTATION_STATUS_COLORS[status]
+                          : "bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-200";
+                        const label =
+                          QUOTATION_STATUS_OPTIONS.find(
+                            (opt) => opt.value === row.status,
+                          )?.label ?? "—";
+
+                        return (
+                          <span
+                            className={`inline-flex items-center rounded-xl px-3 py-2 text-xs font-medium ${color}`}
+                          >
+                            {label}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className={`${quotationTdClass} text-right`}>
                       <button
                         type="button"
-                        onClick={() => setDetailQuotationId(row.id)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-2.5 py-1.5 text-xs font-medium text-[#212121] dark:text-white hover:bg-[#f5f5f5] dark:hover:bg-[#333]"
+                        onClick={() => router.push(Routes.panelQuotation(row.id))}
+                        className="inline-flex items-center gap-1 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-2.5 py-1.5 text-xs font-medium text-[#212121] dark:text-white hover:bg-[#f5f5f5] dark:hover:bg-[#333] cursor-pointer"
                       >
                         <HugeiconsIcon icon={Edit01Icon} size={14} />
                         Ver / editar
@@ -209,14 +212,6 @@ export default function QuotationsListPanel({ userId }: QuotationsListPanelProps
         onSuccess={handleCreated}
         companyId={companyId}
         userId={userId}
-      />
-
-      <QuotationDetailModal
-        isOpen={detailQuotationId != null}
-        quotationId={detailQuotationId}
-        userId={userId}
-        onClose={() => setDetailQuotationId(null)}
-        onUpdated={() => void refetch()}
       />
     </div>
   );

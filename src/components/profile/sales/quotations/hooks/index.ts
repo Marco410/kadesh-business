@@ -3,3 +3,4 @@ export {
   QUOTATIONS_LIST_PAGE_SIZE,
   type UseQuotationsListOptions,
 } from "./useQuotationsList";
+export { useDeleteSaasQuotationProduct } from "./useDeleteSaasQuotationProduct";
