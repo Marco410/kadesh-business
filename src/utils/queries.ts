@@ -12,6 +12,8 @@ export const AUTHENTICATED_ITEM_QUERY = gql(`
         email
         verified
         phone
+        businessEmail
+        businessPhone
         profileImage {
           url
         }
@@ -31,6 +33,8 @@ export const USER_QUERY = gql`
     user(where: $where) {
       age
       birthday
+      businessEmail
+      businessPhone
       createdAt
       email
       id
@@ -104,6 +108,8 @@ export interface UserQueryResponse {
     email: string;
     verified: boolean;
     phone: string | null;
+    businessEmail: string | null;
+    businessPhone: string | null;
     profileImage: { url: string } | null;
     birthday: string | null;
     age: number | null;
@@ -264,6 +270,8 @@ export const UPDATE_USER_MUTATION = gql`
       lastName
       secondLastName
       phone
+      businessEmail
+      businessPhone
       birthday
       lastLoginAt
       bank
@@ -283,6 +291,8 @@ export interface UpdateUserVariables {
     lastName?: string;
     secondLastName?: string | null;
     phone?: string | null;
+    businessEmail?: string | null;
+    businessPhone?: string | null;
     birthday?: string | null;
     lastLoginAt?: string | null;
     bank?: string | null;
@@ -301,6 +311,8 @@ export interface UpdateUserResponse {
     lastName: string;
     secondLastName: string | null;
     phone: string | null;
+    businessEmail: string | null;
+    businessPhone: string | null;
     birthday: string | null;
     lastLoginAt: string | null;
     bank: string | null;

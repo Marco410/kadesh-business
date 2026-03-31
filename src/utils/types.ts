@@ -7,6 +7,8 @@ export interface User {
   secondLastName?: string | null;
   username: string;
   email: string;
+  businessEmail?: string | null;
+  businessPhone?: string | null;
   verified: boolean;
   phone?: string | null;
   profileImage?: {

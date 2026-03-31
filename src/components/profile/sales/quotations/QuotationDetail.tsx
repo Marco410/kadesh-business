@@ -142,6 +142,7 @@ export default function QuotationDetail() {
   const [sentAt, setSentAt] = useState("");
   const [acceptedAt, setAcceptedAt] = useState("");
   const [showDiscount, setShowDiscount] = useState(false);
+  const [showNotes, setShowNotes] = useState(true);
   const [leadId, setLeadId] = useState("");
   const [assignedSellerId, setAssignedSellerId] = useState("");
   const [projectId, setProjectId] = useState("");
@@ -188,6 +189,7 @@ export default function QuotationDetail() {
     setNotes(detail.notes ?? "");
     setTerms(detail.terms?? detail.company?.termsQuotation ?? "");
     setShowDiscount(Boolean(detail.showDiscount));
+    setShowNotes(detail.showNotes ?? true);
     setValidUntil(toDateOnly(detail.validUntil));
 
     const lid = detail.lead?.id ?? "";
@@ -255,6 +257,7 @@ export default function QuotationDetail() {
       notes: notes.trim() || null,
       terms: terms.trim() || null,
       showDiscount: Boolean(showDiscount),
+      showNotes: Boolean(showNotes),
       validUntil: fromDateOnlyToCalendarDay(validUntil),
       sentAt: localDateTimeMinuteToDateTimeIso(sentAt),
       acceptedAt: localDateTimeMinuteToDateTimeIso(acceptedAt),
@@ -543,7 +546,7 @@ export default function QuotationDetail() {
                     </div>)}
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
                     <ClientLeadAutocomplete
                         id="qd-lead"
@@ -580,6 +583,21 @@ export default function QuotationDetail() {
                           className="h-4 w-4 rounded border-[#d1d5db] text-orange-500 focus:ring-orange-500"
                         />
                         Mostrar descuento en la cotización
+                      </label>
+                    </div>
+                    <div className="flex items-end">
+                      <label
+                        htmlFor="qd-show-notes"
+                        className="inline-flex items-center gap-2 text-sm text-[#616161] dark:text-[#b0b0b0]"
+                      >
+                        <input
+                          id="qd-show-notes"
+                          type="checkbox"
+                          checked={showNotes}
+                          onChange={(e) => setShowNotes(e.target.checked)}
+                          className="h-4 w-4 rounded border-[#d1d5db] text-orange-500 focus:ring-orange-500"
+                        />
+                        Mostrar notas en la cotización
                       </label>
                     </div>
                   </div>

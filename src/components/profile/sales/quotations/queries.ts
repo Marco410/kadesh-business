@@ -53,6 +53,7 @@ export const SAAS_QUOTATION_DETAIL_QUERY = gql`
       taxTotal
       total
       showDiscount
+      showNotes
       validUntil
       notes
       terms
@@ -70,6 +71,8 @@ export const SAAS_QUOTATION_DETAIL_QUERY = gql`
         name
         lastName
         secondLastName
+        businessEmail
+        businessPhone
         email
         phone
       }
@@ -121,6 +124,7 @@ export const PUBLIC_SAAS_QUOTATION_DETAIL_QUERY = gql`
       taxTotal
       total
       showDiscount
+      showNotes
       validUntil
       notes
       terms
@@ -136,6 +140,8 @@ export const PUBLIC_SAAS_QUOTATION_DETAIL_QUERY = gql`
         id
         name
         lastName
+        businessEmail
+        businessPhone
         email
         phone
         secondLastName
@@ -187,6 +193,7 @@ export const UPDATE_SAAS_QUOTATION_MUTATION = gql`
       taxTotal
       total
       showDiscount
+      showNotes
       validUntil
       notes
       terms
@@ -292,6 +299,7 @@ export interface SaasQuotationRow {
   currency: string | null;
   total: number | null;
   showDiscount: boolean | null;
+  showNotes: boolean | null;
   validUntil: string | null;
   createdAt: string;
   updatedAt: string;
@@ -360,6 +368,7 @@ export interface SaasQuotationDetail {
   taxTotal: number | null;
   total: number | null;
   showDiscount: boolean | null;
+  showNotes: boolean | null;
   validUntil: string | null;
   notes: string | null;
   terms: string | null;
@@ -368,7 +377,16 @@ export interface SaasQuotationDetail {
   createdAt: string;
   updatedAt: string;
   lead: { id: string; businessName: string | null, address: string | null } | null;
-  assignedSeller: { id: string; name: string | null; lastName: string | null, secondLastName: string | null, email: string | null, phone: string | null } | null;
+  assignedSeller: {
+    id: string;
+    name: string | null;
+    lastName: string | null;
+    secondLastName: string | null;
+    businessEmail: string | null;
+    businessPhone: string | null;
+    email: string | null;
+    phone: string | null;
+  } | null;
   project: { id: string; name: string | null } | null;
   company: {
     id: string;
@@ -404,6 +422,7 @@ export interface UpdateSaasQuotationResponse {
     | "taxTotal"
     | "total"
     | "showDiscount"
+    | "showNotes"
     | "validUntil"
     | "notes"
     | "terms"

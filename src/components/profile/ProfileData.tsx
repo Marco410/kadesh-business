@@ -92,17 +92,23 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
     user.secondLastName ?? "",
   );
   const [phone, setPhone] = useState(user.phone ?? "");
+  const [businessEmail, setBusinessEmail] = useState(user.businessEmail ?? "");
+  const [businessPhone, setBusinessPhone] = useState(user.businessPhone ?? "");
   const [birthday, setBirthday] = useState(
     toDateInputValue((user as { birthday?: string | null }).birthday),
   );
   const [imageUploading, setImageUploading] = useState(false);
   const [imageError, setImageError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{ phone?: string }>({});
 
   useEffect(() => {
     setName(user.name ?? "");
     setLastName(user.lastName ?? "");
     setSecondLastName(user.secondLastName ?? "");
     setPhone(user.phone ?? "");
+    setBusinessEmail(user.businessEmail ?? "");
+    setBusinessPhone(user.businessPhone ?? "");
+    setFieldErrors({});
     setBirthday(
       toDateInputValue((user as { birthday?: string | null }).birthday),
     );
@@ -116,6 +122,8 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
     lastName !== (user.lastName ?? "") ||
     (secondLastName || "") !== (user.secondLastName ?? "") ||
     (phone || "") !== (user.phone ?? "") ||
+    (businessEmail || "") !== (user.businessEmail ?? "") ||
+    (businessPhone || "") !== (user.businessPhone ?? "") ||
     (birthday || "") !== currentBirthdayIso;
 
   const isAdminCompany =
@@ -140,6 +148,19 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
 
   const handleSave = async () => {
     if (!isDirty || !user.id) return;
+    const trimmedSecondLastName = secondLastName.trim();
+    const trimmedPhone = phone.trim();
+    const nextFieldErrors: { phone?: string } = {};
+    if (!trimmedPhone) {
+      nextFieldErrors.phone = "El teléfono es obligatorio.";
+    }
+    if (nextFieldErrors.phone) {
+      setFieldErrors(nextFieldErrors);
+      setSaveError("Completa los campos requeridos para guardar.");
+      return;
+    }
+
+    setFieldErrors({});
     setSaveError("");
     await updateUser({
       variables: {
@@ -147,8 +168,10 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
         data: {
           name: name || undefined,
           lastName: lastName || undefined,
-          secondLastName: secondLastName.trim() || null,
-          phone: phone.trim() || null,
+          secondLastName: trimmedSecondLastName || null,
+          phone: trimmedPhone,
+          businessEmail: businessEmail.trim() || null,
+          businessPhone: businessPhone.trim() || null,
           birthday: birthday || null,
         },
       },
@@ -395,19 +418,69 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
           </p>
         </div>
 
+          {/* Correo de empresa - editable */}
+          <div>
+          <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+            Correo de la empresa
+          </label>
+          <input
+            type="email"
+            value={businessEmail}
+            onChange={(e) => setBusinessEmail(e.target.value)}
+            placeholder="empresa@dominio.com"
+            className={INPUT_CLASS}
+          />
+           <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+            Este correo se usará para las cotizaciones y ventas.
+          </p>
+        </div>
+
+        {/* Teléfono de empresa - editable */}
+        <div>
+          <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+            Teléfono de la empresa
+          </label>
+          <input
+            type="tel"
+            value={businessPhone}
+            onChange={(e) => setBusinessPhone(e.target.value)}
+            placeholder="+52 55 1234 5678"
+            className={INPUT_CLASS}
+          />
+          <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+            Este teléfono se usará para las cotizaciones y ventas.
+          </p>
+        </div>
+
         {/* Teléfono - editable */}
         <div>
           <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
-            Teléfono
+            Teléfono <span className="text-red-500">*</span>
           </label>
           <input
             type="tel"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => {
+              setPhone(e.target.value);
+              if (fieldErrors.phone) {
+                setFieldErrors((prev) => ({ ...prev, phone: undefined }));
+              }
+            }}
             placeholder="+52 55 1234 5678"
-            className={INPUT_CLASS}
+            className={`${INPUT_CLASS} ${
+              fieldErrors.phone ? "border-red-400 focus:ring-red-500 dark:border-red-500" : ""
+            }`}
+            required
+            aria-invalid={Boolean(fieldErrors.phone)}
           />
+          {fieldErrors.phone ? (
+            <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">
+              {fieldErrors.phone}
+            </p>
+          ) : null}
         </div>
+
+      
 
         {/* Fecha de Nacimiento - editable */}
         <div>

@@ -47,7 +47,7 @@ export default function QuotationsSection({ userId }: QuotationsSectionProps) {
         >
           Cotizaciones
         </button>
-        <button
+        {/* <button
           type="button"
           role="tab"
           id="tab-productos"
@@ -61,7 +61,7 @@ export default function QuotationsSection({ userId }: QuotationsSectionProps) {
           }`}
         >
           Productos / Servicios
-        </button>
+        </button> */}
       </div>
 
       {activeTab === "cotizaciones" && (

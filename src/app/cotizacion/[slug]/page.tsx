@@ -62,6 +62,7 @@ export default function PublicQuotationPage() {
   const secondary = normalizeHexColor(company?.colorSecondary) ?? KADESH_SECONDARY;
   const cc = detail?.currency?.trim() || "MXN";
   const showDiscount = Boolean(detail?.showDiscount);
+  const showNotes = detail?.showNotes ?? true;
   const shouldAutoExportPdf = searchParams.get("export") === "pdf";
 
   useEffect(() => {
@@ -172,14 +173,14 @@ export default function PublicQuotationPage() {
                   .filter((part): part is string => Boolean(part?.trim()))
                   .join(" ") || "Equipo comercial"}
               </p>
-              {detail.assignedSeller?.email ? (
+              {detail.assignedSeller?.businessEmail ? (
                 <p className="mt-1 text-sm text-[#6b7280]">
-                  Email: {detail.assignedSeller?.email || ""}
+                  Email: {detail.assignedSeller.businessEmail}
                 </p>
               ) : null}
-              {detail.assignedSeller?.phone ? (
+              {detail.assignedSeller?.businessPhone ? (
                 <p className="mt-1 text-sm text-[#6b7280]">
-                  Teléfono: {detail.assignedSeller?.phone || ""}
+                  Teléfono: {detail.assignedSeller.businessPhone}
                 </p>
               ) : null}
               {detail.validUntil ? (
@@ -260,14 +261,14 @@ export default function PublicQuotationPage() {
             </div>
           </div>
 
-          {(detail.notes || detail.terms || company?.termsQuotation) ? (
+          {( (showNotes && detail.notes) || detail.terms || company?.termsQuotation) ? (
             <div className="mt-8 space-y-3 break-inside-avoid">
-              {detail.notes ? (
+              {showNotes && detail.notes ? (
                 <div>
                   <h3 className="text-xs font-bold tracking-widest text-[#616161] uppercase">
                     Notas
                   </h3>
-                  <p className="mt-1 text-sm text-[#374151] whitespace-pre-wrap">{detail.notes}</p>
+                  <p className="mt-1 text-xs text-[#374151] whitespace-pre-wrap">{detail.notes}</p>
                 </div>
               ) : null}
 
@@ -276,7 +277,7 @@ export default function PublicQuotationPage() {
                   <h3 className="text-xs font-bold tracking-widest text-[#616161] uppercase">
                     Términos y condiciones
                   </h3>
-                  <p className="mt-1 text-sm text-[#374151] whitespace-pre-wrap">
+                  <p className="mt-1 text-[9px] leading-[1.35] text-[#374151] whitespace-pre-wrap text-justify">
                     {detail.terms || company?.termsQuotation}
                   </p>
                 </div>

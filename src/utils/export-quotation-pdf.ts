@@ -127,6 +127,7 @@ export async function exportQuotationPdf(detail: SaasQuotationDetail): Promise<v
   const contentW = pageW - margin * 2;
   const cc = detail.currency?.trim() || "MXN";
   const showDiscount = Boolean(detail.showDiscount);
+  const showNotes = detail.showNotes ?? true;
 
   const primary = normalizeHexColor(detail.company?.colorPrimary) ?? KADESH_PRIMARY;
   const secondary = normalizeHexColor(detail.company?.colorSecondary) ?? KADESH_SECONDARY;
@@ -239,18 +240,18 @@ export async function exportQuotationPdf(detail: SaasQuotationDetail): Promise<v
   if (detail.lead?.address?.trim()) {
     clientMetaY = drawMetaLine(detail.lead.address, leftX, leftColW, clientMetaY);
   }
-  if (detail.assignedSeller?.email?.trim()) {
+  if (detail.assignedSeller?.businessEmail?.trim()) {
     advisorMetaY = drawMetaLine(
-      `Email: ${detail.assignedSeller.email}`,
+      `Email: ${detail.assignedSeller.businessEmail}`,
       rightX,
       rightColW,
       advisorMetaY,
       "right",
     );
   }
-  if (detail.assignedSeller?.phone?.trim()) {
+  if (detail.assignedSeller?.businessPhone?.trim()) {
     advisorMetaY = drawMetaLine(
-      `Tel: ${detail.assignedSeller.phone}`,
+      `Tel: ${detail.assignedSeller.businessPhone}`,
       rightX,
       rightColW,
       advisorMetaY,
@@ -378,7 +379,7 @@ export async function exportQuotationPdf(detail: SaasQuotationDetail): Promise<v
     (detail.terms?.trim() || detail.company?.termsQuotation?.trim() || "").trim(),
   );
 
-  if (notes) {
+  if (showNotes && notes) {
     if (tailY + 24 > pageHeight - margin) {
       doc.addPage();
       tailY = margin;
@@ -403,13 +404,13 @@ export async function exportQuotationPdf(detail: SaasQuotationDetail): Promise<v
     doc.setFont("helvetica", "bold");
     doc.setTextColor(97, 97, 97);
     doc.setFontSize(9);
-    doc.text("TERMINOS Y CONDICIONES", margin, tailY);
+    doc.text("TÉRMINOS Y CONDICIONES", margin, tailY);
     tailY += 14;
     doc.setFont("helvetica", "normal");
     doc.setTextColor(55, 65, 81);
-    doc.setFontSize(9);
-    tailY = drawJustifiedBlocks(doc, terms, margin, tailY, contentW, 12, margin);
-    tailY += 22;
+    doc.setFontSize(7);
+    tailY = drawJustifiedBlocks(doc, terms, margin, tailY, contentW, 9, margin);
+    tailY += 12;
   }
 
   // Signatures + contact footer (como un bloque final unido)
