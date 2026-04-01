@@ -143,6 +143,7 @@ export default function Navigation() {
   const isDark = mounted && (resolvedTheme === 'dark');
   const isHomePage = pathname === Routes.home;
   const atTopLight = !scrolled && !isDark && !isHomePage;
+  const registerHref = `${Routes.auth.login}?tab=register`;
   const navLinkClass = atTopLight
     ? 'text-gray-800 hover:text-orange-600 transition-colors duration-200'
     : 'text-white hover:text-orange-100 transition-colors duration-200';
@@ -294,14 +295,26 @@ export default function Navigation() {
               </AnimatePresence>
             </div>
           ) : (
-            <Link
-              href={Routes.auth.login}
-              className={`px-4 py-2 font-semibold text-sm rounded-lg transition-colors duration-200 ${
-                atTopLight ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-white/10 hover:bg-white/20 text-white'
-              }`}
-            >
-              Iniciar Sesión
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href={registerHref}
+                className={`px-4 py-2 font-semibold text-sm rounded-lg transition-colors duration-200 ${
+                  atTopLight
+                    ? 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-100'
+                    : 'bg-transparent border border-white/40 text-white hover:bg-white/10'
+                }`}
+              >
+                Registrarse
+              </Link>
+              <Link
+                href={Routes.auth.login}
+                className={`px-4 py-2 font-semibold text-sm rounded-lg transition-colors duration-200 ${
+                  atTopLight ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-white/10 hover:bg-white/20 text-white'
+                }`}
+              >
+                Iniciar Sesión
+              </Link>
+            </div>
           )}
         </div>
 
@@ -503,13 +516,22 @@ export default function Navigation() {
                       </button>
                     </div>
                   ) : (
-                    <Link
-                      href={Routes.auth.login}
-                      onClick={() => setOpened(false)}
-                      className="text-white font-semibold text-lg opacity-92 hover:opacity-100 py-4 px-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all text-center"
-                    >
-                      Iniciar Sesión
-                    </Link>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <Link
+                        href={registerHref}
+                        onClick={() => setOpened(false)}
+                        className="text-white font-semibold text-lg opacity-92 hover:opacity-100 py-4 px-4 rounded-xl border border-white/35 bg-transparent hover:bg-white/10 transition-all text-center"
+                      >
+                        Registrarse
+                      </Link>
+                      <Link
+                        href={Routes.auth.login}
+                        onClick={() => setOpened(false)}
+                        className="text-white font-semibold text-lg opacity-92 hover:opacity-100 py-4 px-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all text-center"
+                      >
+                        Iniciar Sesión
+                      </Link>
+                    </div>
                   )}
                 </div>
               </div>

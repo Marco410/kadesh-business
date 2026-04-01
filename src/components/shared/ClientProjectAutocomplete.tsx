@@ -20,6 +20,7 @@ export interface ClientProjectAutocompleteProps {
   userId: string;
   selectedProjectId: string | null;
   onSelectedProjectIdChange: (id: string | null) => void;
+  leadId?: string | null;
   enabled?: boolean;
   id?: string;
   label?: string;
@@ -32,6 +33,7 @@ export default function ClientProjectAutocomplete({
   userId,
   selectedProjectId,
   onSelectedProjectIdChange,
+  leadId = null,
   enabled = true,
   id = "client-project-autocomplete",
   label = "Proyecto",
@@ -54,15 +56,24 @@ export default function ClientProjectAutocomplete({
   const companyId = userData?.user?.company?.id ?? null;
 
   const whereClause = useMemo<SaasProjectsForSelectVariables["where"]>(() => {
+    const leadFilterId = leadId?.trim() || null;
     if (!companyId) return {};
     if (isAdminCompany) {
-      return { company: { id: { equals: companyId } } };
+      return {
+        company: { id: { equals: companyId } },
+        ...(leadFilterId
+          ? { businessLead: { id: { equals: leadFilterId } } }
+          : {}),
+      };
     }
     return {
       company: { id: { equals: companyId } },
       responsible: { id: { equals: userId } },
+      ...(leadFilterId
+        ? { businessLead: { id: { equals: leadFilterId } } }
+        : {}),
     };
-  }, [companyId, isAdminCompany, userId]);
+  }, [companyId, isAdminCompany, userId, leadId]);
 
   const { data: projectsData, loading } = useQuery<
     SaasProjectsForSelectResponse,

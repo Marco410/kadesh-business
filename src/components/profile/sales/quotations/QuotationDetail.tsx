@@ -558,18 +558,21 @@ export default function QuotationDetail() {
                         required
                       />
                     </div>
-                    <div>
-                      <ClientProjectAutocomplete
-                        id="qd-project"
-                        userId={userId}
-                        enabled={true}
-                        selectedProjectId={projectId || null}
-                        onSelectedProjectIdChange={(id) =>
-                          setProjectId(id ?? "")
-                        }
-                        placeholder="Buscar proyecto por nombre"
-                      />
-                    </div>
+                    { leadId && (
+                      <div>
+                        <ClientProjectAutocomplete
+                          id="qd-project"
+                          userId={userId}
+                          leadId={leadId || null}
+                          enabled={true}
+                          selectedProjectId={projectId || null}
+                          onSelectedProjectIdChange={(id) =>
+                            setProjectId(id ?? "")
+                          }
+                          placeholder="Buscar proyecto por nombre"
+                        />
+                      </div>
+                    )}
                     <div className="flex items-end">
                       <label
                         htmlFor="qd-show-discount"

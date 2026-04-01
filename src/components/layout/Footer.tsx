@@ -1,12 +1,15 @@
 import Link from 'next/link';
 import Logo from '../shared/Logo';
 import { NICHE_TARGET_MAPPING } from 'kadesh/constants/constans';
+import { Routes } from 'kadesh/core/routes';
 
 const FOOTER_LINKS = {
   producto: [
     { label: "Cómo funciona", href: "/#demo" },
     { label: "Planes", href: "/#precios" },
     { label: "Contacto", href: "/contacto" },
+    { label: "Iniciar sesión", href: Routes.auth.login },
+    { label: "Registrarse", href: `${Routes.auth.login}?tab=register` },
   ],
   legal: [
     { label: "Términos y condiciones", href: "/terminos" },

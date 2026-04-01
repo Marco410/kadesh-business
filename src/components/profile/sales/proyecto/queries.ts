@@ -142,6 +142,7 @@ export interface SaasProjectsListVariables {
   where: {
     company?: { id: { equals: string } };
     responsible?: { id: { equals: string } };
+    businessLead?: { id: { equals: string } };
   };
 }
 
