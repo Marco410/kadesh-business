@@ -21,7 +21,7 @@ const DEFAULT_CENTER = { lat: 19.4326, lng: -99.1332 };
 const DEFAULT_ZOOM = 5;
 const DEFAULT_RADIUS_KM = 5;
 const MIN_RADIUS_KM = 1;
-const MAX_RADIUS_KM = 20;
+const MAX_RADIUS_KM = 50;
 const CUSTOM_SEARCH_MIN_LENGTH = 2;
 const CUSTOM_SEARCH_MAX_LENGTH = 80;
 
