@@ -26,11 +26,11 @@ const CUSTOM_SEARCH_MIN_LENGTH = 2;
 const CUSTOM_SEARCH_MAX_LENGTH = 80;
 
 function sanitizeBusinessSearchTerm(value: string): string {
-  return value
-    .replace(/[^\p{L}\p{N}\s&.,\-]/gu, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, CUSTOM_SEARCH_MAX_LENGTH);
+  return value;
+}
+
+function normalizeBusinessSearchTerm(value: string): string {
+  return sanitizeBusinessSearchTerm(value).trim();
 }
 
 function isBusinessSearchTermValid(value: string): boolean {
@@ -228,7 +228,10 @@ export default function ObtenerClientesSection() {
     setStats(null);
     setShowZeroResultsHint(false);
 
-    const activeSearchTerm = searchMode === "custom" ? sanitizeBusinessSearchTerm(customSearch) : category;
+    const activeSearchTerm =
+      searchMode === "custom"
+        ? normalizeBusinessSearchTerm(customSearch)
+        : category;
     if (!activeSearchTerm) {
       sileo.error({ title: "Selecciona una categoría o escribe una búsqueda válida" });
       return;
