@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Location01Icon, Search01Icon } from "@hugeicons/core-free-icons";
+import { Location01Icon, Search01Icon, StarIcon } from "@hugeicons/core-free-icons";
 import { GOOGLE_PLACE_CATEGORIES } from "kadesh/constants/constans";
 import { useSyncLeadsArea } from "kadesh/components/profile/sales/obtener-clientes/hooks";
 import CurrentPlanSection from "../CurrentPlanSection";
@@ -26,7 +26,10 @@ const CUSTOM_SEARCH_MIN_LENGTH = 2;
 const CUSTOM_SEARCH_MAX_LENGTH = 80;
 
 function sanitizeBusinessSearchTerm(value: string): string {
-  return value;
+  return value
+    .replace(/[^\p{L}\p{N}\s&.,\-]/gu, "")
+    .replace(/\s+/g, " ")
+    .slice(0, CUSTOM_SEARCH_MAX_LENGTH);
 }
 
 function normalizeBusinessSearchTerm(value: string): string {
@@ -381,7 +384,7 @@ export default function ObtenerClientesSection() {
                   ? "border-emerald-200 dark:border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
                   : status === "active"
                     ? "border-orange-200 dark:border-orange-500/20 bg-orange-500/10 text-orange-700 dark:text-orange-400"
-                    : "border-[#e0e0e0] dark:border-[#3a3a3a] bg-white/60 text-[#616161] dark:text-[#b0b0b0]";
+                    : "border-[#e0e0e0] dark:border-[#3a3a3a] bg-white/10 text-[#616161] dark:text-[#b0b0b0]";
 
               return (
                 <div
@@ -398,254 +401,285 @@ export default function ObtenerClientesSection() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="w-full">
-            <div className="space-y-4 h-full">
-              <div className="mt-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 sm:p-5 shadow-sm">
-            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 mb-4">
-              <div>
-                <h3 className="text-sm font-semibold text-[#212121] dark:text-white">Filtros de búsqueda</h3>
-                <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1">
-                  Afiná la calidad de los negocios antes de importarlos.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-              <div className="w-full lg:col-span-4">
-                <label className="block text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
-                  Tipo de búsqueda
-                </label>
-                <div className="inline-flex w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] p-1 bg-white dark:bg-[#121212]">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchMode("category");
-                      setCustomSearch("");
-                    }}
-                    className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold transition-colors ${
-                      searchMode === "category"
-                        ? "bg-orange-500 text-white"
-                        : "text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#252525]"
-                    }`}
-                  >
-                    Categoría
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchMode("custom");
-                      setCategory("");
-                    }}
-                    className={`flex-1 rounded-md px-3 py-2 text-xs font-semibold transition-colors ${
-                      searchMode === "custom"
-                        ? "bg-orange-500 text-white"
-                        : "text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#252525]"
-                    }`}
-                  >
-                    Búsqueda libre
-                  </button>
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-white/15 dark:border-white/10 bg-white/70 dark:bg-[#161616]/70 backdrop-blur-xl p-4 sm:p-5 shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
+                <div className="mb-4">
+                  <h3 className="text-sm font-semibold text-[#212121] dark:text-white">
+                    Filtros de búsqueda
+                  </h3>
+                  <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1">
+                    Afina la calidad de los negocios antes de importarlos.
+                  </p>
                 </div>
-              </div>
 
-              <div className="w-full lg:col-span-8">
-                {searchMode === "category" ? (
-                  <Autocomplete
-                    id="obtener-clientes-category"
-                    label="Tipo de negocio"
-                    value={category}
-                    options={GOOGLE_PLACE_CATEGORIES.map(
-                      (opt): AutocompleteOption => ({
-                        id: opt.value,
-                        label: opt.label,
-                      })
-                    )}
-                    onChange={() => {}}
-                    onSelect={(option) => {
-                      setCategory(option.id);
-                    }}
-                    placeholder="Buscar categoría..."
-                    disabled={isLoading}
-                    className="w-full"
-                  />
-                ) : (
-                  <>
-                    <label
-                      htmlFor="obtener-clientes-custom-search"
-                      className="block text-sm font-medium text-[#212121] dark:text-white mb-2"
-                    >
-                      Empresa, categoría o negocio
+                <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-end">
+                  <div className="w-full xl:col-span-5">
+                    <label className="block text-[11px] font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
+                      Tipo de búsqueda
                     </label>
-                    <input
-                      id="obtener-clientes-custom-search"
-                      type="text"
-                      value={customSearch}
-                      onChange={(e) => setCustomSearch(sanitizeBusinessSearchTerm(e.target.value))}
-                      disabled={isLoading}
-                      placeholder="Ej. taquería, despacho legal, farmacia guadalajara"
-                      className="w-full px-4 py-2.5 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500/50"
-                      maxLength={CUSTOM_SEARCH_MAX_LENGTH}
-                    />
-                    <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
-                      Usa texto simple ({CUSTOM_SEARCH_MIN_LENGTH}-{CUSTOM_SEARCH_MAX_LENGTH} caracteres), solo letras,
-                      números y signos básicos.
-                    </p>
-                  </>
-                )}
-              </div>
-
-              <div className="w-full lg:col-span-12">
-                <label className="block text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
-                  Radio: {radiusKm} km
-                </label>
-                <input
-                  aria-label="Radio de búsqueda en kilómetros"
-                  type="range"
-                  min={MIN_RADIUS_KM}
-                  max={MAX_RADIUS_KM}
-                  step={1}
-                  value={radiusKm}
-                  onChange={(e) => {
-                    setRadiusKm(Number(e.target.value));
-                    setRadiusTouched(true);
-                  }}
-                  disabled={isLoading}
-                  style={{
-                    background: `linear-gradient(to right, #f97316 0%, #f97316 ${radiusPercent}%, #e5e7eb ${radiusPercent}%, #e5e7eb 100%)`,
-                  }}
-                  className="kadesh-range w-full h-5 appearance-none cursor-pointer rounded-full"
-                />
-                <div className="mt-2 flex items-center justify-between text-[11px] text-[#757575] dark:text-[#9ca3af]">
-                  <span>{MIN_RADIUS_KM} km</span>
-                  <span>{MAX_RADIUS_KM} km</span>
-                </div>
-              </div>
-
-      
-            </div>
-
-            {!pin && !isLoading && (
-              <p className="text-xs mt-2 text-[#616161] dark:text-[#b0b0b0]">
-                Selecciona un punto en el mapa (clic) para habilitar la búsqueda.
-              </p>
-            )}
-          </div>
-
-          <div className="mt-4 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#1e1e1e] overflow-hidden">
-            <div className="p-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <button
-                type="button"
-                onClick={() => setShowAdvancedFilters((v) => !v)}
-                className="flex-1 text-left flex items-center justify-between gap-3 rounded-lg px-2 py-1 hover:bg-[#f5f5f5] dark:hover:bg-[#252525] transition-colors"
-                aria-expanded={showAdvancedFilters}
-              >
-                <span className="text-sm font-semibold text-[#212121] dark:text-white">
-                  Filtros avanzados
-                </span>
-                <span className="text-[#616161] dark:text-[#b0b0b0] text-xs font-semibold">
-                  {showAdvancedFilters ? "—" : "+"}
-                </span>
-              </button>
-
-              <div className="flex flex-wrap items-center gap-2">
-                {minRating > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setMinRating(0)}
-                    className="inline-flex items-center gap-2 rounded-full border border-blue-200 dark:border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400 px-3 py-1 text-xs font-semibold hover:bg-blue-500/15 transition-colors"
-                    aria-label="Eliminar filtro de rating"
-                  >
-                    Rating: {minRating.toFixed(1)}+ <span aria-hidden="true">×</span>
-                  </button>
-                )}
-                {minReviews > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setMinReviews(0)}
-                    className="inline-flex items-center gap-2 rounded-full border border-blue-200 dark:border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400 px-3 py-1 text-xs font-semibold hover:bg-blue-500/15 transition-colors"
-                    aria-label="Eliminar filtro de reseñas"
-                  >
-                    Reseñas: {minReviews}+ <span aria-hidden="true">×</span>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {showAdvancedFilters && (
-              <div className="p-3 pt-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="w-full">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
-                      Rating mínimo
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map((opt) => {
-                        const selected = minRating === opt;
-                        return (
-                          <button
-                            key={opt}
-                            type="button"
-                            onClick={() => setMinRating(opt)}
-                            disabled={isLoading}
-                            className={`rounded-lg px-2 py-2 text-xs font-semibold border transition-colors ${
-                              selected
-                                ? "border-blue-400 bg-blue-500 text-white"
-                                : "border-[#e0e0e0] dark:border-[#3a3a3a] bg-white/70 dark:bg-[#121212] text-[#212121] dark:text-white hover:bg-white dark:hover:bg-[#252525]"
-                            }`}
-                          >
-                            {opt === 0 ? "0" : `${opt.toFixed(1)}+`}
-                          </button>
-                        );
-                      })}
+                    <div className="inline-flex w-full rounded-xl border border-white/20 dark:border-white/10 bg-white/60 dark:bg-[#0f0f0f]/70 p-1 shadow-inner">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchMode("category");
+                          setCustomSearch("");
+                        }}
+                        className={`flex-1 min-h-[52px] rounded-lg px-2 py-2 inline-flex items-center justify-center text-[13px] leading-tight font-semibold text-center whitespace-normal break-words transition-all duration-200 ease-in-out ${
+                          searchMode === "category"
+                            ? "bg-orange-500 text-white shadow-[0_6px_18px_rgba(249,115,22,0.45)]"
+                            : "text-[#616161] dark:text-[#b0b0b0] hover:bg-white/60 dark:hover:bg-white/5"
+                        }`}
+                      >
+                        Categoría
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchMode("custom");
+                          setCategory("");
+                        }}
+                        className={`flex-1 min-h-[52px] rounded-lg px-2 py-2 inline-flex items-center justify-center text-[13px] leading-tight font-semibold text-center whitespace-normal break-words transition-all duration-200 ease-in-out ${
+                          searchMode === "custom"
+                            ? "bg-orange-500 text-white shadow-[0_6px_18px_rgba(249,115,22,0.45)]"
+                            : "text-[#616161] dark:text-[#b0b0b0] hover:bg-white/60 dark:hover:bg-white/5"
+                        }`}
+                      >
+                        Búsqueda libre
+                      </button>
                     </div>
                   </div>
 
-                  <div className="w-full">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
-                      Reseñas mínimas
-                    </label>
-                    <input
-                      type="number"
-                      min={0}
-                      step={1}
-                      value={minReviews}
-                      onChange={(e) => setMinReviews(Number(e.target.value) || 0)}
-                      disabled={isLoading}
-                      className="w-full px-4 py-2 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/60 dark:focus:ring-orange-400/60 text-sm"
-                    />
+                  <div className="w-full xl:col-span-7">
+                    {searchMode === "category" ? (
+                      <Autocomplete
+                        id="obtener-clientes-category"
+                        label="Buscar categoría"
+                        value={category}
+                        options={GOOGLE_PLACE_CATEGORIES.map(
+                          (opt): AutocompleteOption => ({
+                            id: opt.value,
+                            label: opt.label,
+                          })
+                        )}
+                        onChange={() => {}}
+                        onSelect={(option) => {
+                          setCategory(option.id);
+                        }}
+                        placeholder="Buscar categoría..."
+                        disabled={isLoading}
+                        className="w-full"
+                      />
+                    ) : (
+                      <>
+                        <label
+                          htmlFor="obtener-clientes-custom-search"
+                          className="block text-sm font-medium text-[#212121] dark:text-white mb-2"
+                        >
+                          Empresa, categoría o negocio
+                        </label>
+                        <input
+                          id="obtener-clientes-custom-search"
+                          type="text"
+                          value={customSearch}
+                          onChange={(e) => setCustomSearch(sanitizeBusinessSearchTerm(e.target.value))}
+                          disabled={isLoading}
+                          placeholder="Ej. taquería, despacho legal, farmacia guadalajara"
+                          className="w-full px-4 py-2.5 rounded-xl border border-white/25 dark:border-white/10 bg-white/65 dark:bg-[#101010]/75 text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all duration-200 ease-in-out"
+                          maxLength={CUSTOM_SEARCH_MAX_LENGTH}
+                        />
+                 
+                      </>
+                    )}
+                  </div>
+
+                  <div className="w-full xl:col-span-12 pt-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-[11px] font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0]">
+                          Radio de búsqueda
+                      </label>
+                      <span className="inline-flex items-center rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400 px-2.5 py-1 text-xs font-semibold border border-orange-500/25">
+                        {radiusKm} km
+                      </span>
+                    </div>
+
+                    <div className="relative">
+                      <div
+                        className="absolute -top-8 z-10 rounded-md bg-[#1f1f1f] text-white text-[11px] px-2 py-1 shadow-md pointer-events-none transition-all duration-200 ease-in-out"
+                        style={{ left: `calc(${radiusPercent}% - 18px)` }}
+                      >
+                        {radiusKm}km
+                      </div>
+                      <input
+                        aria-label="Radio de búsqueda en kilómetros"
+                        type="range"
+                        min={MIN_RADIUS_KM}
+                        max={MAX_RADIUS_KM}
+                        step={1}
+                        value={radiusKm}
+                        onChange={(e) => {
+                          setRadiusKm(Number(e.target.value));
+                          setRadiusTouched(true);
+                        }}
+                        disabled={isLoading}
+                        style={{
+                          background: `linear-gradient(to right, #f97316 0%, #f97316 ${radiusPercent}%, #d4d4d8 ${radiusPercent}%, #d4d4d8 100%)`,
+                        }}
+                        className="kadesh-range w-full h-3 appearance-none cursor-pointer rounded-full transition-all duration-200 ease-in-out"
+                      />
+                    </div>
+                    <div className="mt-2 flex items-center justify-between text-[11px] text-[#757575] dark:text-[#9ca3af]">
+                      <span>1 km</span>
+                      <span>25 km</span>
+                      <span>50 km</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            )}
 
-            <div className="w-full mt-4 p-4">
-              <button
-                type="button"
-                onClick={runSync}
-                disabled={isLoading || !pin}
-                className="w-full flex items-center justify-center gap-2 px-8 py-2 rounded-lg font-semibold text-white bg-orange-500 hover:bg-orange-600 disabled:opacity-70 disabled:cursor-not-allowed transition-colors shadow-sm"
-              >
-                <HugeiconsIcon icon={Search01Icon} size={16} className="text-white" /> {isLoading ? "Buscando negocios…" : "Buscar negocios"}
-              </button>
+              <div className="rounded-2xl border border-white/15 dark:border-white/10 bg-white/65 dark:bg-[#141414]/70 backdrop-blur-xl overflow-hidden shadow-[0_8px_28px_rgba(0,0,0,0.14)]">
+                <button
+                  type="button"
+                  onClick={() => setShowAdvancedFilters((v) => !v)}
+                  className="w-full px-4 py-3 flex items-center justify-between gap-3 hover:bg-white/50 dark:hover:bg-white/5 transition-all duration-200 ease-in-out"
+                  aria-expanded={showAdvancedFilters}
+                >
+                  <span className="text-sm font-semibold text-[#212121] dark:text-white">
+                    Filtros avanzados
+                  </span>
+                  <span
+                    className={`inline-flex items-center justify-center size-6 rounded-full border border-white/20 dark:border-white/10 text-[#616161] dark:text-[#b0b0b0] transition-transform duration-200 ease-in-out ${
+                      showAdvancedFilters ? "rotate-180" : ""
+                    }`}
+                  >
+                    ˅
+                  </span>
+                </button>
+
+                <div className="px-4 pb-2 flex flex-wrap items-center gap-2">
+                  {minRating > 0 && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-300/50 dark:border-blue-400/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 pl-3 pr-1 py-1 text-xs font-semibold">
+                      Rating: {minRating.toFixed(1)}+
+                      <button
+                        type="button"
+                        onClick={() => setMinRating(0)}
+                        className="inline-flex items-center justify-center size-6 rounded-full hover:bg-blue-500/20 transition-colors duration-200 ease-in-out"
+                        aria-label="Quitar filtro de rating"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )}
+                  {minReviews > 0 && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-300/50 dark:border-blue-400/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 pl-3 pr-1 py-1 text-xs font-semibold">
+                      Resenas: {minReviews}+
+                      <button
+                        type="button"
+                        onClick={() => setMinReviews(0)}
+                        className="inline-flex items-center justify-center size-6 rounded-full hover:bg-blue-500/20 transition-colors duration-200 ease-in-out"
+                        aria-label="Quitar filtro de reseñas"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )}
+                </div>
+
+                <div
+                  className={`grid transition-all duration-200 ease-in-out ${
+                    showAdvancedFilters
+                      ? "grid-rows-[1fr] opacity-100"
+                      : "grid-rows-[0fr] opacity-0"
+                  }`}
+                >
+                  <div className="overflow-hidden mt-2">
+                    <div className="px-4 pb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="w-full">
+                        <label className="block text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
+                          Rating minimo
+                        </label>
+                        <div className="rounded-xl border border-white/25 dark:border-white/10 bg-white/55 dark:bg-[#101010]/65 p-3">
+                          <div className="flex flex-col items-start gap-2">
+                            <div className="inline-flex flex-wrap items-center gap-1.5">
+                              {[1, 2, 3, 4, 5].map((star) => {
+                                const isActive = star <= minRating;
+                                return (
+                                  <button
+                                    key={star}
+                                    type="button"
+                                    onClick={() => setMinRating(( star <= minRating && minRating == 1) ? 0 : star)}
+                                    disabled={isLoading}
+                                    className={`inline-flex items-center justify-center size-8 rounded-lg border transition-all duration-200 ease-in-out ${
+                                      isActive
+                                        ? "border-amber-300/70 bg-amber-500/15 text-amber-400"
+                                        : "border-white/20 dark:border-white/10 bg-transparent text-[#8b8b8b] hover:bg-white/50 dark:hover:bg-white/5"
+                                    }`}
+                                    aria-label={`Rating mínimo ${star} estrellas`}
+                                  >
+                                    <HugeiconsIcon icon={StarIcon} size={18} />
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                          <p className="mt-2 text-[11px] leading-relaxed text-[#616161] dark:text-[#9ca3af]">
+                            Rating mínimo: solo se incluirán negocios con calificación igual o superior al valor que selecciones.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="w-full">
+                        <label className="block text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
+                          Reseñas minimas
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          step={1}
+                          value={minReviews}
+                          onChange={(e) => setMinReviews(Number(e.target.value) || 0)}
+                          disabled={isLoading}
+                          className="w-full px-4 py-2.5 rounded-xl border border-white/25 dark:border-white/10 bg-white/65 dark:bg-[#101010]/75 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 text-sm transition-all duration-200 ease-in-out"
+                        />
+                        <p className="mt-2 text-[11px] leading-relaxed text-[#616161] dark:text-[#9ca3af]">
+                          Reseñas mínimas: descarta negocios con pocas opiniones para priorizar perfiles más confiables.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="px-4 pb-4">
+                  <button
+                    type="button"
+                    onClick={runSync}
+                    disabled={isLoading || !pin}
+                    className="w-full h-11 inline-flex items-center justify-center gap-2 rounded-xl font-semibold text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 ease-in-out shadow-[0_10px_24px_rgba(249,115,22,0.32)]"
+                  >
+                    <HugeiconsIcon icon={Search01Icon} size={16} className="text-white" />
+                    {isLoading ? "Buscando negocios..." : "Buscar negocios"}
+                  </button>
+                </div>
+              </div>
+
               {!pin && !isLoading && (
-                <p className="text-xs mt-2 text-[#616161] dark:text-[#b0b0b0]">
-                  Selecciona un punto en el mapa (clic) para habilitar la búsqueda.
+                <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  Selecciona un punto en el mapa (clic) para habilitar la busqueda.
+                </p>
+              )}
+
+              {pin && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Punto seleccionado: {pin.lat.toFixed(5)}, {pin.lng.toFixed(5)} - Radio: {radiusKm} km
                 </p>
               )}
             </div>
           </div>
-
-          {pin && (
-            <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-              Punto seleccionado: {pin.lat.toFixed(5)}, {pin.lng.toFixed(5)} — Radio: {radiusKm} km
-            </p>
-          )}
-        </div>
-        </div>
           <div className="w-full">
             <div className="relative z-0 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 dark:bg-gray-800/50">
             <div
               ref={mapContainerRef}
-              className="w-full h-[550px]"
-              style={{ minHeight: 320 }}
+              className="w-full h-[650px]"
+              style={{ minHeight: 350 }}
             />
             <button
               type="button"
