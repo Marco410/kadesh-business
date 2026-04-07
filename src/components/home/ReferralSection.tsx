@@ -9,6 +9,7 @@ import {
 } from "kadesh/components/profile/sales/queries";
 
 const MONTHS_RECURRING = 12;
+const ANNUAL_COMMISSION_PCT = 0.15;
 
 function formatCurrency(amount: number, currency = "MXN"): string {
   return new Intl.NumberFormat("es-MX", {
@@ -18,8 +19,33 @@ function formatCurrency(amount: number, currency = "MXN"): string {
   }).format(amount);
 }
 
-function getPlanByName(plans: SaasPlanItem[], slug: "starter" | "pro" | "agencia") {
-  return plans.find((plan) => plan.name.trim().toLowerCase() === slug);
+function isMonthlyFrequency(frequency: string): boolean {
+  const f = frequency?.toLowerCase();
+  return f === "monthly" || f === "month";
+}
+
+function isAnnualFrequency(frequency: string): boolean {
+  const f = frequency?.toLowerCase();
+  return f === "annual" || f === "yearly" || f === "year";
+}
+
+function normalizePlanBaseKey(name: string): string {
+  return name
+    .trim()
+    .replace(/\s+anual\s*$/i, "")
+    .trim()
+    .toLowerCase();
+}
+
+function getPlanPairBySlug(
+  plans: SaasPlanItem[],
+  slug: "starter" | "pro" | "agencia",
+): { monthly: SaasPlanItem | null; annual: SaasPlanItem | null } {
+  const base = plans.filter((p) => normalizePlanBaseKey(p.name) === slug);
+  return {
+    monthly: base.find((p) => isMonthlyFrequency(p.frequency)) ?? null,
+    annual: base.find((p) => isAnnualFrequency(p.frequency)) ?? null,
+  };
 }
 
 export default function ReferralSection() {
@@ -27,43 +53,52 @@ export default function ReferralSection() {
   const plans = data?.saasPlans ?? [];
 
   const { starter, pro, agencia } = useMemo(() => {
-    const starterPlan = getPlanByName(plans, "starter");
-    const proPlan = getPlanByName(plans, "pro");
-    const agenciaPlan = getPlanByName(plans, "agencia");
-    return { starter: starterPlan, pro: proPlan, agencia: agenciaPlan };
+    return {
+      starter: getPlanPairBySlug(plans, "starter"),
+      pro: getPlanPairBySlug(plans, "pro"),
+      agencia: getPlanPairBySlug(plans, "agencia"),
+    };
   }, [plans]);
 
-  const starterCurrency = starter?.currency ?? "MXN";
-  const proCurrency = pro?.currency ?? "MXN";
-  const agenciaCurrency = agencia?.currency ?? "MXN";
+  const starterCurrency = starter.monthly?.currency ?? starter.annual?.currency ?? "MXN";
+  const proCurrency = pro.monthly?.currency ?? pro.annual?.currency ?? "MXN";
+  const agenciaCurrency = agencia.monthly?.currency ?? agencia.annual?.currency ?? "MXN";
 
-  const starterUpfrontRate = (starter?.referralUpfrontCommissionPct ?? 20) / 100;
-  const starterRecurringRate = (starter?.referralRecurringCommissionPct ?? 10) / 100;
-  const proUpfrontRate = (pro?.referralUpfrontCommissionPct ?? 20) / 100;
-  const proRecurringRate = (pro?.referralRecurringCommissionPct ?? 10) / 100;
-  const agenciaUpfrontRate = (agencia?.referralUpfrontCommissionPct ?? 20) / 100;
-  const agenciaRecurringRate = (agencia?.referralRecurringCommissionPct ?? 10) / 100;
+  const starterUpfrontRate = (starter.monthly?.referralUpfrontCommissionPct ?? 20) / 100;
+  const starterRecurringRate = (starter.monthly?.referralRecurringCommissionPct ?? 10) / 100;
+  const proUpfrontRate = (pro.monthly?.referralUpfrontCommissionPct ?? 20) / 100;
+  const proRecurringRate = (pro.monthly?.referralRecurringCommissionPct ?? 10) / 100;
+  const agenciaUpfrontRate = (agencia.monthly?.referralUpfrontCommissionPct ?? 20) / 100;
+  const agenciaRecurringRate = (agencia.monthly?.referralRecurringCommissionPct ?? 10) / 100;
 
-  const starterFirst = starter ? starter.cost * starterUpfrontRate : 160;
-  const starterRecurring = starter ? starter.cost * starterRecurringRate : 80;
+  const starterFirst = starter.monthly ? starter.monthly.cost * starterUpfrontRate : 0;
+  const starterRecurring = starter.monthly ? starter.monthly.cost * starterRecurringRate : 0;
+  const starterAnnualCommission = starter.annual ? starter.annual.cost * ANNUAL_COMMISSION_PCT : 0;
 
-  const proFirst = pro ? pro.cost * proUpfrontRate : 340;
-  const proRecurring = pro ? pro.cost * proRecurringRate : 170;
+  const proFirst = pro.monthly ? pro.monthly.cost * proUpfrontRate : 0;
+  const proRecurring = pro.monthly ? pro.monthly.cost * proRecurringRate : 0;
+  const proAnnualCommission = pro.annual ? pro.annual.cost * ANNUAL_COMMISSION_PCT : 0;
 
-  const agenciaFirst = agencia ? agencia.cost * agenciaUpfrontRate : 700;
-  const agenciaRecurring = agencia ? agencia.cost * agenciaRecurringRate : 350;
+  const agenciaFirst = agencia.monthly ? agencia.monthly.cost * agenciaUpfrontRate : 0;
+  const agenciaRecurring = agencia.monthly ? agencia.monthly.cost * agenciaRecurringRate : 0;
+  const agenciaAnnualCommission = agencia.annual ? agencia.annual.cost * ANNUAL_COMMISSION_PCT : 0;
 
   const starterExampleFirstMonth = starterFirst * 10;
   const starterExampleMonthly = starterRecurring * 10;
+  const starterExampleAnnual = starterAnnualCommission * 10;
 
   const proExampleFirstMonth = proFirst * 10;
   const proExampleMonthly = proRecurring * 10;
+  const proExampleAnnual = proAnnualCommission * 10;
 
   const agenciaExampleFirstMonth = agenciaFirst * 5;
   const agenciaExampleMonthly = agenciaRecurring * 5;
+  const agenciaExampleAnnual = agenciaAnnualCommission * 5;
 
   const comboFirstMonth = starterFirst * 4 + proFirst * 4 + agenciaFirst * 2;
   const comboMonthly = starterRecurring * 4 + proRecurring * 4 + agenciaRecurring * 2;
+  const comboAnnual =
+    starterAnnualCommission * 4 + proAnnualCommission * 4 + agenciaAnnualCommission * 2;
 
   return (
     <section className="bg-[#f8f8f8] text-[#212121] dark:bg-[#0b0b0f] dark:text-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
@@ -87,11 +122,18 @@ export default function ReferralSection() {
           <div className="rounded-2xl border border-[#e0e0e0] dark:border-white/10 bg-white dark:bg-white/5 p-6">
             <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300 flex items-center gap-1 mb-1">
               💰 Starter{" "}
-              {starter && (
-                <span className="font-normal text-[#616161] dark:text-white/80">
-                  – {formatCurrency(starter.cost, starterCurrency)} / mes
-                </span>
-              )}
+              <span className="ml-1 inline-flex flex-wrap items-center gap-1.5 font-normal text-[#616161] dark:text-white/80">
+                {starter.monthly && (
+                  <span className="inline-flex items-center rounded-full bg-[#f5f5f5] px-2 py-0.5 text-[10px] font-semibold text-[#424242] dark:bg-white/10 dark:text-white/85">
+                    Mensual: {formatCurrency(starter.monthly.cost, starterCurrency)} / mes
+                  </span>
+                )}
+                {starter.annual && (
+                  <span className="inline-flex items-center rounded-full bg-emerald-600/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200">
+                    Anual: {formatCurrency(starter.annual.cost, starterCurrency)} / año (pago único)
+                  </span>
+                )}
+              </span>
             </p>
             <h3 className="text-lg font-semibold mb-3">Plan Starter</h3>
             <ul className="space-y-1.5 text-sm text-[#424242] dark:text-white/80 mb-4">
@@ -109,6 +151,15 @@ export default function ReferralSection() {
                 </span>{" "}
                 mientras el cliente siga activo (hasta {MONTHS_RECURRING} meses).
               </li>
+              {starter.annual && (
+                <li>
+                  <strong>Paquete anual (15%)</strong>: ganas{" "}
+                  <span className="font-semibold">
+                    {formatCurrency(starterAnnualCommission, starterCurrency)}
+                  </span>{" "}
+                  por venta anual (pago único).
+                </li>
+              )}
             </ul>
             <div className="rounded-xl bg-[#fafafa] dark:bg-white/5 border border-[#e0e0e0] dark:border-white/10 p-4 text-sm">
               <p className="font-semibold mb-1">Ejemplo</p>
@@ -124,6 +175,12 @@ export default function ReferralSection() {
                 {formatCurrency(starterExampleMonthly, starterCurrency)} durante{" "}
                 {MONTHS_RECURRING} meses
               </p>
+              {starter.annual && (
+                <p className="mt-1">
+                  • <strong>Ventas anuales</strong>:{" "}
+                  {formatCurrency(starterExampleAnnual, starterCurrency)} (10 ventas × 15%)
+                </p>
+              )}
             </div>
           </div>
 
@@ -131,11 +188,21 @@ export default function ReferralSection() {
           <div className="rounded-2xl border border-amber-400/50 dark:border-amber-300/60 bg-gradient-to-b from-amber-200/35 to-white dark:from-amber-500/10 dark:to-transparent p-6">
             <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 flex items-center gap-1 mb-1">
               ⭐ Pro{" "}
-              {pro && (
-                <span className="font-normal text-[#616161] dark:text-white/80">
-                  – {formatCurrency(pro.cost, proCurrency)} / mes (más vendido)
+              <span className="ml-1 inline-flex flex-wrap items-center gap-1.5 font-normal text-[#616161] dark:text-white/80">
+                {pro.monthly && (
+                  <span className="inline-flex items-center rounded-full bg-white/60 px-2 py-0.5 text-[10px] font-semibold text-[#424242] dark:bg-black/20 dark:text-white/85">
+                    Mensual: {formatCurrency(pro.monthly.cost, proCurrency)} / mes
+                  </span>
+                )}
+                {pro.annual && (
+                  <span className="inline-flex items-center rounded-full bg-amber-600/10 px-2 py-0.5 text-[10px] font-semibold text-amber-800 dark:bg-amber-400/10 dark:text-amber-200">
+                    Anual: {formatCurrency(pro.annual.cost, proCurrency)} / año (pago único)
+                  </span>
+                )}
+                <span className="inline-flex items-center rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                  Más vendido
                 </span>
-              )}
+              </span>
             </p>
             <h3 className="text-lg font-semibold mb-3">Plan Pro</h3>
             <ul className="space-y-1.5 text-sm text-[#424242] dark:text-white/80 mb-4">
@@ -153,6 +220,15 @@ export default function ReferralSection() {
                 </span>
                 .
               </li>
+              {pro.annual && (
+                <li>
+                  <strong>Paquete anual (15%)</strong>: ganas{" "}
+                  <span className="font-semibold">
+                    {formatCurrency(proAnnualCommission, proCurrency)}
+                  </span>{" "}
+                  por venta anual (pago único).
+                </li>
+              )}
             </ul>
             <div className="rounded-2xl bg-white/70 dark:bg-black/20 border border-amber-400/40 dark:border-amber-300/40 p-4 text-sm">
               <p className="font-semibold mb-1">Ejemplo</p>
@@ -168,6 +244,12 @@ export default function ReferralSection() {
                 {formatCurrency(proExampleMonthly, proCurrency)} durante{" "}
                 {MONTHS_RECURRING} meses
               </p>
+              {pro.annual && (
+                <p className="mt-1">
+                  • <strong>Ventas anuales</strong>:{" "}
+                  {formatCurrency(proExampleAnnual, proCurrency)} (10 ventas × 15%)
+                </p>
+              )}
             </div>
           </div>
 
@@ -175,11 +257,18 @@ export default function ReferralSection() {
           <div className="rounded-2xl border border-sky-300/70 dark:border-sky-300/50 bg-sky-50 dark:bg-sky-500/5 p-6">
             <p className="text-xs font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-300 flex items-center gap-1 mb-1">
               🚀 Agencia{" "}
-              {agencia && (
-                <span className="font-normal text-[#616161] dark:text-white/80">
-                  – {formatCurrency(agencia.cost, agenciaCurrency)} / mes
-                </span>
-              )}
+              <span className="ml-1 inline-flex flex-wrap items-center gap-1.5 font-normal text-[#616161] dark:text-white/80">
+                {agencia.monthly && (
+                  <span className="inline-flex items-center rounded-full bg-[#e0f2fe] px-2 py-0.5 text-[10px] font-semibold text-sky-900 dark:bg-sky-500/10 dark:text-white/85">
+                    Mensual: {formatCurrency(agencia.monthly.cost, agenciaCurrency)} / mes
+                  </span>
+                )}
+                {agencia.annual && (
+                  <span className="inline-flex items-center rounded-full bg-sky-600/10 px-2 py-0.5 text-[10px] font-semibold text-sky-800 dark:bg-sky-300/10 dark:text-sky-200">
+                    Anual: {formatCurrency(agencia.annual.cost, agenciaCurrency)} / año (pago único)
+                  </span>
+                )}
+              </span>
             </p>
             <h3 className="text-lg font-semibold mb-3">Plan Agencia</h3>
             <ul className="space-y-1.5 text-sm text-[#424242] dark:text-white/80 mb-4">
@@ -197,6 +286,15 @@ export default function ReferralSection() {
                 </span>
                 .
               </li>
+              {agencia.annual && (
+                <li>
+                  <strong>Paquete anual (15%)</strong>: ganas{" "}
+                  <span className="font-semibold">
+                    {formatCurrency(agenciaAnnualCommission, agenciaCurrency)}
+                  </span>{" "}
+                  por venta anual (pago único).
+                </li>
+              )}
             </ul>
             <div className="rounded-2xl bg-sky-100/60 dark:bg-sky-500/10 border border-sky-300/60 dark:border-sky-300/40 p-4 text-sm">
               <p className="font-semibold mb-1">Ejemplo</p>
@@ -212,6 +310,12 @@ export default function ReferralSection() {
                 {formatCurrency(agenciaExampleMonthly, agenciaCurrency)} durante{" "}
                 {MONTHS_RECURRING} meses
               </p>
+              {agencia.annual && (
+                <p className="mt-1">
+                  • <strong>Ventas anuales</strong>:{" "}
+                  {formatCurrency(agenciaExampleAnnual, agenciaCurrency)} (5 ventas × 15%)
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -227,7 +331,7 @@ export default function ReferralSection() {
               <li>• 4 planes Pro</li>
               <li>• 2 planes Agencia</li>
             </ul>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="rounded-xl bg-[#fafafa] dark:bg-black/30 border border-[#e0e0e0] dark:border-white/10 p-4 text-sm">
                 <p className="font-semibold mb-1">Ingresos primer mes</p>
                 <p>
@@ -267,6 +371,39 @@ export default function ReferralSection() {
                   Mientras los clientes sigan activos durante {MONTHS_RECURRING} meses.
                 </p>
               </div>
+              {(starter.annual || pro.annual || agencia.annual) && (
+                <div className="rounded-xl bg-[#f5f5f5] dark:bg-white/5 border border-[#e0e0e0] dark:border-white/10 p-4 text-sm">
+                  <p className="font-semibold mb-1">Ingresos por planes anuales (15%)</p>
+                  <p className="text-xs text-[#616161] dark:text-white/60 mb-2">
+                    Comisión única por cada venta anual (sin recurrencia).
+                  </p>
+                  {starter.annual && (
+                    <p>
+                      Starter anual: 4 × {formatCurrency(starterAnnualCommission, starterCurrency)} ={" "}
+                      <strong>
+                        {formatCurrency(starterAnnualCommission * 4, starterCurrency)}
+                      </strong>
+                    </p>
+                  )}
+                  {pro.annual && (
+                    <p>
+                      Pro anual: 4 × {formatCurrency(proAnnualCommission, proCurrency)} ={" "}
+                      <strong>{formatCurrency(proAnnualCommission * 4, proCurrency)}</strong>
+                    </p>
+                  )}
+                  {agencia.annual && (
+                    <p>
+                      Agencia anual: 2 × {formatCurrency(agenciaAnnualCommission, agenciaCurrency)} ={" "}
+                      <strong>
+                        {formatCurrency(agenciaAnnualCommission * 2, agenciaCurrency)}
+                      </strong>
+                    </p>
+                  )}
+                  <p className="mt-2 font-semibold text-[#212121] dark:text-white">
+                    Total anual (pago único): {formatCurrency(comboAnnual, starterCurrency)}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
