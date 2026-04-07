@@ -1,0 +1,21 @@
+/** Alineado con Keystone `UserAuthLog.source` (select). */
+export const USER_AUTH_LOG_SOURCE = {
+  REGISTER_USER: "REGISTER_USER",
+  CUSTOM_AUTH: "CUSTOM_AUTH",
+} as const;
+
+export type UserAuthLogSource =
+  (typeof USER_AUTH_LOG_SOURCE)[keyof typeof USER_AUTH_LOG_SOURCE];
+
+/** Valores para `UserAuthLog.step` (filtrar en Admin). */
+export const USER_AUTH_LOG_STEP = {
+  REGISTER_SUCCESS: "REGISTER_SUCCESS",
+  REGISTER_FAIL_INVALID_REFERRER: "REGISTER_FAIL_INVALID_REFERRER",
+  REGISTER_FAIL: "REGISTER_FAIL",
+  CUSTOM_AUTH_SIGNUP: "CUSTOM_AUTH_SIGNUP",
+  CUSTOM_AUTH_LOGIN: "CUSTOM_AUTH_LOGIN",
+  CUSTOM_AUTH_FAIL: "CUSTOM_AUTH_FAIL",
+} as const;
+
+export type UserAuthLogStep =
+  (typeof USER_AUTH_LOG_STEP)[keyof typeof USER_AUTH_LOG_STEP];

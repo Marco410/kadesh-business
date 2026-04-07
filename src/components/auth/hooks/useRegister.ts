@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQuery } from '@apollo/client';
 import {
@@ -24,7 +24,13 @@ import { useUser } from 'kadesh/utils/UserContext';
 import { trackCompleteRegistration } from 'kadesh/utils/facebook-pixel';
 import { Routes } from 'kadesh/core/routes';
 import { sileo } from 'sileo';
+import {
+  USER_AUTH_LOG_SOURCE,
+  USER_AUTH_LOG_STEP,
+} from 'kadesh/constants/user-auth-log';
+import { maskEmailForAuthLog, safeLogMessage } from 'kadesh/utils/auth-log-helpers';
 import { useTouchUserLastLogin } from './useTouchUserLastLogin';
+import { useLogUserAuth } from './useLogUserAuth';
 
 /** Texto crudo de error (GraphQL + mensaje) para detectar patrones sin filtrar al usuario. */
 function collectRegisterErrorText(err: unknown): string {
@@ -72,7 +78,9 @@ interface UseRegisterOptions {
 export function useRegister(options?: UseRegisterOptions) {
   const router = useRouter();
   const touchUserLastLoginAt = useTouchUserLastLogin();
+  const logUserAuth = useLogUserAuth();
   const { refreshUser } = useUser();
+  const latestEmailForLogRef = useRef('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -84,6 +92,8 @@ export function useRegister(options?: UseRegisterOptions) {
   const [error, setError] = useState('');
   const [referralCode, setReferralCode] = useState(options?.referralCode ?? '');
 
+  latestEmailForLogRef.current = email.trim();
+
   const [authenticateUser] = useMutation<
     AuthenticateUserResponse,
     AuthenticateUserVariables
@@ -94,6 +104,18 @@ export function useRegister(options?: UseRegisterOptions) {
     RolesByNamesVariables
   >(ROLES_BY_NAMES_QUERY, {
     variables: { where: { name: { in: [Role.VENDEDOR, Role.ADMIN_COMPANY] } } },
+    onError: (apolloErr) => {
+      logUserAuth({
+        source: USER_AUTH_LOG_SOURCE.REGISTER_USER,
+        step: USER_AUTH_LOG_STEP.REGISTER_FAIL,
+        success: false,
+        message: safeLogMessage(
+          `Consulta de roles: ${collectRegisterErrorText(apolloErr)}`,
+        ),
+        emailMasked: maskEmailForAuthLog(latestEmailForLogRef.current),
+        responseSnapshot: { reason: 'roles_query_error' },
+      });
+    },
   });
 
   const vendedorRoleId = rolesData?.roles?.find((r) => r.name === Role.VENDEDOR)?.id;
@@ -198,14 +220,40 @@ export function useRegister(options?: UseRegisterOptions) {
 
     setIsSubmitting(true);
     try {
-      const { data: companyData } = await createSaasCompany({
-        variables: {
-          data: { name: companyName.trim() },
-        },
-      });
+      let companyId: string | undefined;
+      try {
+        const { data: companyData } = await createSaasCompany({
+          variables: {
+            data: { name: companyName.trim() },
+          },
+        });
+        companyId = companyData?.createSaasCompany?.id;
+      } catch (companyErr) {
+        logUserAuth({
+          source: USER_AUTH_LOG_SOURCE.REGISTER_USER,
+          step: USER_AUTH_LOG_STEP.REGISTER_FAIL,
+          success: false,
+          message: safeLogMessage(
+            `createSaasCompany: ${collectRegisterErrorText(companyErr)}`,
+          ),
+          emailMasked: maskEmailForAuthLog(email),
+          responseSnapshot: { reason: 'create_company_mutation_error' },
+        });
+        const friendly = mapRegisterErrorToUserMessage(companyErr);
+        setError(friendly);
+        sileo.error({ title: 'Error al registrar usuario', description: friendly });
+        return;
+      }
 
-      const companyId = companyData?.createSaasCompany?.id;
       if (!companyId) {
+        logUserAuth({
+          source: USER_AUTH_LOG_SOURCE.REGISTER_USER,
+          step: USER_AUTH_LOG_STEP.REGISTER_FAIL,
+          success: false,
+          message: 'client: createSaasCompany devolvió id vacío',
+          emailMasked: maskEmailForAuthLog(email),
+          responseSnapshot: { reason: 'create_company_empty_id' },
+        });
         setError('No se pudo crear la empresa. Intenta de nuevo.');
         return;
       }
@@ -214,28 +262,44 @@ export function useRegister(options?: UseRegisterOptions) {
         (id): id is string => Boolean(id)
       );
       if (roleIds.length === 0) {
+        logUserAuth({
+          source: USER_AUTH_LOG_SOURCE.REGISTER_USER,
+          step: USER_AUTH_LOG_STEP.REGISTER_FAIL,
+          success: false,
+          message:
+            'client: roles vendedor/admin empresa no disponibles (consulta incompleta o error previo)',
+          emailMasked: maskEmailForAuthLog(email),
+          responseSnapshot: {
+            reason: 'roles_not_ready',
+            hasVendedorRoleId: Boolean(vendedorRoleId),
+            hasAdminCompanyRoleId: Boolean(adminCompanyRoleId),
+          },
+        });
         setError('No se pudo asignar los roles. Recarga la página e intenta de nuevo.');
         return;
       }
 
-      await registerUser({
-        variables: {
-          data: {
-            name,
-            lastName,
-            email,
-            password,
-            phone: phone || undefined,
-            company: { connect: { id: companyId } },
-            roles: { connect: roleIds.map((id) => ({ id })) },
+      try {
+        await registerUser({
+          variables: {
+            data: {
+              name,
+              lastName,
+              email,
+              password,
+              phone: phone || undefined,
+              company: { connect: { id: companyId } },
+              roles: { connect: roleIds.map((id) => ({ id })) },
+            },
+            referrerCode: referralCode || null,
           },
-          referrerCode: referralCode || null,
-        },
-      });
-    } catch (err) {
-      const friendly = mapRegisterErrorToUserMessage(err);
-      setError(friendly);
-      sileo.error({ title: 'Error al registrar usuario', description: friendly });
+        });
+      } catch (regErr) {
+        // No UserAuthLog: el backend ya registra intentos/resultado de registerUser
+        const friendly = mapRegisterErrorToUserMessage(regErr);
+        setError(friendly);
+        sileo.error({ title: 'Error al registrar usuario', description: friendly });
+      }
     } finally {
       setIsSubmitting(false);
     }
