@@ -377,7 +377,7 @@ export default function EditWorkspaceSettingsModal({
       ? ""
       : `¿Eliminar el estado «${
           statusPendingDelete.name.trim() || statusPendingDelete.key
-        }»? Si lo eliminas, las actividades, seguimientos y propuestas que estén en este estado pasarán automáticamente a «${
+        }»? Si lo eliminas, las tareas, seguimientos y propuestas que estén en este estado pasarán automáticamente a «${
           statusRows.find((r) => r.isDefault)?.name?.trim() || "el estado por defecto"
         }».`;
 
@@ -508,10 +508,10 @@ export default function EditWorkspaceSettingsModal({
                   />
                   <span className="min-w-0">
                     <span className="block text-sm font-medium text-[#212121] dark:text-white">
-                      Actividades
+                      Tareas
                     </span>
                     <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
-                      Pestaña y columnas de actividades en el tablero
+                      Pestaña y columnas de tareas en el tablero
                     </span>
                   </span>
                 </label>
@@ -556,7 +556,7 @@ export default function EditWorkspaceSettingsModal({
                       Estados CRM
                     </p>
                     <p className="text-xs text-[#616161] dark:text-[#9e9e9e]">
-                      Agrega estados para categorizar las actividades, seguimientos y propuestas.
+                      Agrega estados para categorizar las tareas, seguimientos y propuestas.
                     </p>
                   </div>
                   <button

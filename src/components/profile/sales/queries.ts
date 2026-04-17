@@ -690,6 +690,9 @@ export const TECH_SALES_ACTIVITIES_QUERY = gql`
   query TechSalesActivities($where: TechSalesActivityWhereInput!) {
     techSalesActivities(where: $where) {
       id
+      title
+      dueDate
+      priority
       activityDate
       type
       result
@@ -736,6 +739,9 @@ export interface TechSalesActivitiesCalendarVariables {
 export interface TechSalesActivitiesResponse {
   techSalesActivities: Array<{
     id: string;
+    title: string | null;
+    dueDate: string | null;
+    priority: string | null;
     activityDate: string;
     type: string;
     result: string | null;
@@ -762,6 +768,9 @@ export const TECH_SALES_ACTIVITY_QUERY = gql`
   query TechSalesActivity($where: TechSalesActivityWhereUniqueInput!) {
     techSalesActivity(where: $where) {
       id
+      title
+      dueDate
+      priority
       activityDate
       type
       result
@@ -770,6 +779,11 @@ export const TECH_SALES_ACTIVITY_QUERY = gql`
       businessLead {
         id
         businessName
+      }
+      assignedSeller {
+        id
+        name
+        lastName
       }
     }
   }
@@ -782,12 +796,20 @@ export interface TechSalesActivityVariables {
 export interface TechSalesActivityResponse {
   techSalesActivity: {
     id: string;
+    title: string | null;
+    dueDate: string | null;
+    priority: string | null;
     activityDate: string;
     type: string;
     result: string | null;
     comments: string | null;
     createdAt: string;
     businessLead: { id: string; businessName: string } | null;
+    assignedSeller: {
+      id: string;
+      name: string;
+      lastName: string | null;
+    } | null;
   } | null;
 }
 
@@ -795,6 +817,9 @@ export const CREATE_TECH_SALES_ACTIVITY_MUTATION = gql`
   mutation CreateTechSalesActivity($data: TechSalesActivityCreateInput!) {
     createTechSalesActivity(data: $data) {
       id
+      title
+      dueDate
+      priority
       type
       activityDate
       result
@@ -805,6 +830,9 @@ export const CREATE_TECH_SALES_ACTIVITY_MUTATION = gql`
 
 export interface CreateTechSalesActivityVariables {
   data: {
+    title: string;
+    dueDate?: string | null;
+    priority?: string | null;
     type: string;
     activityDate: string;
     result?: string | null;
@@ -819,6 +847,9 @@ export interface CreateTechSalesActivityVariables {
 export interface CreateTechSalesActivityMutation {
   createTechSalesActivity: {
     id: string;
+    title: string | null;
+    dueDate: string | null;
+    priority: string | null;
     type: string;
     activityDate: string;
     result: string | null;
@@ -833,6 +864,9 @@ export const UPDATE_TECH_SALES_ACTIVITY_MUTATION = gql`
   ) {
     updateTechSalesActivity(where: $where, data: $data) {
       id
+      title
+      dueDate
+      priority
       type
       activityDate
       result
@@ -844,18 +878,25 @@ export const UPDATE_TECH_SALES_ACTIVITY_MUTATION = gql`
 export interface UpdateTechSalesActivityVariables {
   where: { id: string };
   data: {
+    title?: string | null;
+    dueDate?: string | null;
+    priority?: string | null;
     type?: string | null;
     activityDate?: string | null;
     result?: string | null;
     comments?: string | null;
     hiddenInWorkspace?: boolean | null;
     statusCrm?: { connect: { id: string } } | null;
+    assignedSeller?: { connect: { id: string } } | null;
   };
 }
 
 export interface UpdateTechSalesActivityMutation {
   updateTechSalesActivity: {
     id: string;
+    title: string | null;
+    dueDate: string | null;
+    priority: string | null;
     type: string;
     activityDate: string;
     result: string | null;

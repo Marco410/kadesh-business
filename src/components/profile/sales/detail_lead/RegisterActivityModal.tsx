@@ -15,7 +15,7 @@ import {
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
 import { workspaceConnectPayload } from "kadesh/components/profile/sales/workspaces/workspace-connect";
 import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
-import { SALES_ACTIVITY_TYPE } from "kadesh/constants/constans";
+import { SALES_ACTIVITY_TYPE, TASK_PRIORITY } from "kadesh/constants/constans";
 import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
 import ActivityDetailModal from "./ActivityDetailModal";
@@ -115,6 +115,9 @@ export default function RegisterActivityModal({
       await createActivity({
         variables: {
           data: {
+            title: type,
+            dueDate: null,
+            priority: TASK_PRIORITY.MEDIA,
             type,
             activityDate: dateTimeLocalToISO(activityDate),
             result: result.trim() || null,

@@ -122,7 +122,7 @@ export default function WorkspaceSwitcher({
           ))}
           {workspaces.length === 0 && !loading && (
             <p className="px-4 py-3 text-xs text-[#616161] dark:text-[#9e9e9e]">
-              Aún no tienes espacios. Crea uno para organizar actividades, tareas y
+              Aún no tienes espacios. Crea uno para organizar tareas, seguimientos y
               propuestas.
             </p>
           )}

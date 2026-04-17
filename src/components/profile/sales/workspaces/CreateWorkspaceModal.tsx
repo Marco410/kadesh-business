@@ -108,7 +108,7 @@ export default function CreateWorkspaceModal({
               Nuevo espacio de trabajo
             </h2>
             <p className="mt-1 text-sm text-[#616161] dark:text-[#9e9e9e]">
-              Agrupa actividades, seguimientos y propuestas en un mismo contexto.
+              Agrupa tareas, seguimientos y propuestas en un mismo contexto.
             </p>
           </div>
           <form onSubmit={handleSubmit} className="p-5 space-y-4">
@@ -141,10 +141,10 @@ export default function CreateWorkspaceModal({
                 />
                 <span className="min-w-0">
                   <span className="block text-sm font-medium text-[#212121] dark:text-white">
-                    Actividades
+                    Tareas
                   </span>
                   <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
-                    Mostrar actividades de CRM en este workspace
+                    Mostrar tareas de CRM en este workspace
                   </span>
                 </span>
               </label>

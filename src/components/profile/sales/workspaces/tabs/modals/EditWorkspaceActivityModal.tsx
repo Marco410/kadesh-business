@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
 import Link from "next/link";
+import { Autocomplete, type AutocompleteOption } from "kadesh/components/shared";
 import {
   TECH_SALES_ACTIVITIES_QUERY,
   UPDATE_TECH_SALES_ACTIVITY_MUTATION,
@@ -13,13 +14,19 @@ import {
   type UpdateTechSalesActivityMutation,
   type UpdateTechSalesActivityVariables,
 } from "kadesh/components/profile/sales/queries";
-import type { SaasWorkspaceCrmStatus } from "kadesh/components/profile/sales/workspaces/queries";
+import {
+  SAAS_WORKSPACE_DETAIL_QUERY,
+  type SaasWorkspaceCrmStatus,
+  type SaasWorkspaceDetailResponse,
+  type SaasWorkspaceDetailVariables,
+} from "kadesh/components/profile/sales/workspaces/queries";
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
 import HiddenInWorkspaceSwitch from "./HiddenInWorkspaceSwitch";
 import { Routes } from "kadesh/core/routes";
-import { SALES_ACTIVITY_TYPE } from "kadesh/constants/constans";
+import { SALES_ACTIVITY_TYPE, TASK_PRIORITY } from "kadesh/constants/constans";
 
 const ACTIVITY_TYPE_OPTIONS = Object.values(SALES_ACTIVITY_TYPE);
+const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
 
 function formatDateTimeLocal(date: Date): string {
   const y = date.getFullYear();
@@ -33,6 +40,27 @@ function formatDateTimeLocal(date: Date): string {
 function dateTimeLocalToISO(value: string): string {
   if (!value) return new Date().toISOString();
   return new Date(value).toISOString();
+}
+
+/** Valor para `input type="date"` a partir de un calendar day / ISO del API. */
+function dueDateToDateInput(value: string | null | undefined): string {
+  if (value == null || value === "") return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function memberDisplayName(m: {
+  name: string;
+  lastName: string | null;
+  email: string | null;
+}): string {
+  const full = [m.name, m.lastName ?? ""].filter(Boolean).join(" ").trim();
+  return m.email ? `${full} (${m.email})` : full;
 }
 
 const inputClassName =
@@ -57,17 +85,48 @@ export default function EditWorkspaceActivityModal({
   crmStatuses,
   defaultCrmStatusId,
 }: EditWorkspaceActivityModalProps) {
+  const [title, setTitle] = useState("");
   const [type, setType] = useState("");
   const [activityDate, setActivityDate] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [priority, setPriority] = useState<string>(TASK_PRIORITY.MEDIA);
+  const [responsibleUserId, setResponsibleUserId] = useState("");
   const [result, setResult] = useState("");
   const [comments, setComments] = useState("");
   const [statusCrmId, setStatusCrmId] = useState("");
   const [hiddenInWorkspace, setHiddenInWorkspace] = useState(false);
 
+  const { data: wsDetail, loading: wsMembersLoading } = useQuery<
+    SaasWorkspaceDetailResponse,
+    SaasWorkspaceDetailVariables
+  >(SAAS_WORKSPACE_DETAIL_QUERY, {
+    variables: { where: { id: workspaceId } },
+    skip: !isOpen || !workspaceId,
+    fetchPolicy: "cache-and-network",
+  });
+
+  const memberOptions = useMemo<AutocompleteOption[]>(() => {
+    const members = wsDetail?.saasWorkspace?.members ?? [];
+    const opts = members.map((m) => ({
+      id: m.id,
+      label: memberDisplayName(m),
+    }));
+    const seller = activity?.assignedSeller;
+    if (seller && !opts.some((o) => o.id === seller.id)) {
+      const label = [seller.name, seller.lastName ?? ""].filter(Boolean).join(" ").trim();
+      opts.unshift({ id: seller.id, label: label || seller.id });
+    }
+    return opts;
+  }, [wsDetail?.saasWorkspace?.members, activity?.assignedSeller]);
+
   useEffect(() => {
     if (!isOpen || !activity) return;
+    setTitle(activity.title?.trim() ?? activity.type);
     setType(activity.type);
     setActivityDate(formatDateTimeLocal(new Date(activity.activityDate)));
+    setDueDate(dueDateToDateInput(activity.dueDate));
+    setPriority(activity.priority ?? TASK_PRIORITY.MEDIA);
+    setResponsibleUserId(activity.assignedSeller?.id ?? "");
     setResult(activity.result ?? "");
     setComments(activity.comments ?? "");
     setStatusCrmId(
@@ -98,19 +157,32 @@ export default function EditWorkspaceActivityModal({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!activity) return;
+    if (!title.trim()) {
+      sileo.warning({ title: "Escribe el título de la actividad" });
+      return;
+    }
+    if (!responsibleUserId.trim()) {
+      sileo.warning({ title: "Selecciona un responsable" });
+      return;
+    }
     const statusPayload =
       statusCrmId.trim() !== ""
         ? { statusCrm: { connect: { id: statusCrmId.trim() } } }
         : {};
+    const due = dueDate.trim();
     updateActivity({
       variables: {
         where: { id: activity.id },
         data: {
+          title: title.trim(),
+          dueDate: due ? due : null,
+          priority: priority || TASK_PRIORITY.MEDIA,
           type,
           activityDate: dateTimeLocalToISO(activityDate),
           result: result.trim() || null,
           comments: comments.trim() || null,
           hiddenInWorkspace,
+          assignedSeller: { connect: { id: responsibleUserId.trim() } },
           ...statusPayload,
         },
       },
@@ -180,6 +252,33 @@ export default function EditWorkspaceActivityModal({
             </div>
 
             <div>
+              <label
+                htmlFor="edit-ws-activity-title"
+                className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+              >
+                Título de la actividad
+              </label>
+              <input
+                id="edit-ws-activity-title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className={inputClassName}
+                required
+              />
+            </div>
+
+            <Autocomplete
+              id="edit-ws-activity-responsible"
+              label="Responsable"
+              value={responsibleUserId}
+              options={memberOptions}
+              onSelect={(option) => setResponsibleUserId(option?.id ?? "")}
+              placeholder="Buscar miembro del workspace"
+              required
+              loading={wsMembersLoading}
+            />
+
+            <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
                 Tipo
               </label>
@@ -207,6 +306,42 @@ export default function EditWorkspaceActivityModal({
                 className={inputClassName}
                 required
               />
+            </div>
+
+            <div>
+              <label
+                htmlFor="edit-ws-activity-due"
+                className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+              >
+                Fecha límite
+              </label>
+              <p className="mb-1.5 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                Opcional. Deadline para esta actividad.
+              </p>
+              <input
+                id="edit-ws-activity-due"
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className={inputClassName}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
+                Prioridad
+              </label>
+              <select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                className={inputClassName}
+              >
+                {TASK_PRIORITY_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>

@@ -108,7 +108,7 @@ export default function WorkspaceCrmStatusColumn({
   const emptyCopy = showHiddenOnly
     ? "No hay registros ocultos en este estado."
     : entityTab === "act"
-      ? "No hay actividades en este estado."
+      ? "No hay tareas en este estado."
       : entityTab === "tasks"
         ? "No hay seguimientos en este estado."
         : "No hay propuestas en este estado.";
@@ -169,7 +169,7 @@ export default function WorkspaceCrmStatusColumn({
                         Actividad
                       </p>
                       <p className="text-sm font-semibold text-[#212121] dark:text-white line-clamp-2">
-                        {a.type}
+                        {a.title?.trim() || a.type}
                         {a.businessLead ? ` · ${a.businessLead.businessName}` : ""}
                       </p>
                       {a.businessLead && (
@@ -182,7 +182,10 @@ export default function WorkspaceCrmStatusColumn({
                         </Link>
                       )}
                       <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                        {a.title?.trim() ? `${a.type} · ` : ""}
                         {formatDateShort(a.activityDate)}
+                        {a.dueDate ? ` · Vence ${formatDateShort(a.dueDate)}` : ""}
+                        {a.priority ? ` · ${a.priority}` : ""}
                         {a.result ? ` · ${a.result}` : ""}
                       </p>
                       <div className="mt-3 flex items-center justify-between gap-2">

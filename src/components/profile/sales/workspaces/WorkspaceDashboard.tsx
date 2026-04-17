@@ -32,7 +32,7 @@ export default function WorkspaceDashboard({
             Este workspace no tiene tabs habilitadas
           </p>
           <p className="mt-2 text-sm text-[#616161] dark:text-[#9e9e9e] max-w-md mx-auto">
-            Al crear el espacio se desactivaron Actividades, Seguimientos y Propuestas.
+            Al crear el espacio se desactivaron Tareas, Seguimientos y Propuestas.
           </p>
         </div>
       ) : isLoadingConfig ? (

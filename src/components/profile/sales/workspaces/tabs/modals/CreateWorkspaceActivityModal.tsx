@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
-import { ClientLeadAutocomplete } from "kadesh/components/shared";
+import { ClientLeadAutocomplete, Autocomplete, type AutocompleteOption } from "kadesh/components/shared";
 import {
   CREATE_TECH_SALES_ACTIVITY_MUTATION,
   TECH_SALES_ACTIVITIES_QUERY,
@@ -12,11 +12,17 @@ import {
   type CreateTechSalesActivityVariables,
   type TechSalesActivitiesVariables,
 } from "kadesh/components/profile/sales/queries";
+import {
+  SAAS_WORKSPACE_DETAIL_QUERY,
+  type SaasWorkspaceDetailResponse,
+  type SaasWorkspaceDetailVariables,
+} from "kadesh/components/profile/sales/workspaces/queries";
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
 import { workspaceConnectPayload } from "kadesh/components/profile/sales/workspaces/workspace-connect";
-import { SALES_ACTIVITY_TYPE } from "kadesh/constants/constans";
+import { SALES_ACTIVITY_TYPE, TASK_PRIORITY } from "kadesh/constants/constans";
 
 const ACTIVITY_TYPE_OPTIONS = Object.values(SALES_ACTIVITY_TYPE);
+const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
 
 function formatDateTimeLocal(date: Date): string {
   const y = date.getFullYear();
@@ -30,6 +36,15 @@ function formatDateTimeLocal(date: Date): string {
 function dateTimeLocalToISO(value: string): string {
   if (!value) return new Date().toISOString();
   return new Date(value).toISOString();
+}
+
+function memberDisplayName(m: {
+  name: string;
+  lastName: string | null;
+  email: string | null;
+}): string {
+  const full = [m.name, m.lastName ?? ""].filter(Boolean).join(" ").trim();
+  return m.email ? `${full}` : full;
 }
 
 const inputClassName =
@@ -51,19 +66,44 @@ export default function CreateWorkspaceActivityModal({
   defaultStatusCrmId,
 }: CreateWorkspaceActivityModalProps) {
   const [leadId, setLeadId] = useState("");
+  const [title, setTitle] = useState("");
   const [type, setType] = useState<string>(SALES_ACTIVITY_TYPE.LLAMADA);
   const [activityDate, setActivityDate] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [priority, setPriority] = useState<string>(TASK_PRIORITY.MEDIA);
+  const [responsibleUserId, setResponsibleUserId] = useState("");
   const [result, setResult] = useState("");
   const [comments, setComments] = useState("");
+
+  const { data: wsDetail, loading: wsMembersLoading } = useQuery<
+    SaasWorkspaceDetailResponse,
+    SaasWorkspaceDetailVariables
+  >(SAAS_WORKSPACE_DETAIL_QUERY, {
+    variables: { where: { id: workspaceId } },
+    skip: !isOpen || !workspaceId,
+    fetchPolicy: "cache-and-network",
+  });
+
+  const memberOptions = useMemo<AutocompleteOption[]>(() => {
+    const members = wsDetail?.saasWorkspace?.members ?? [];
+    return members.map((m) => ({
+      id: m.id,
+      label: memberDisplayName(m),
+    }));
+  }, [wsDetail?.saasWorkspace?.members]);
 
   useEffect(() => {
     if (!isOpen) return;
     setLeadId("");
+    setTitle("");
     setType(SALES_ACTIVITY_TYPE.LLAMADA);
     setActivityDate(formatDateTimeLocal(new Date()));
+    setDueDate("");
+    setPriority(TASK_PRIORITY.MEDIA);
+    setResponsibleUserId(userId);
     setResult("");
     setComments("");
-  }, [isOpen]);
+  }, [isOpen, userId]);
 
   const boardWhere: TechSalesActivitiesVariables["where"] = mergeWorkspaceFilter(
     {},
@@ -89,20 +129,32 @@ export default function CreateWorkspaceActivityModal({
       sileo.warning({ title: "Selecciona un lead" });
       return;
     }
+    if (!title.trim()) {
+      sileo.warning({ title: "Escribe el título de la actividad" });
+      return;
+    }
+    if (!responsibleUserId.trim()) {
+      sileo.warning({ title: "Selecciona un responsable" });
+      return;
+    }
     const statusCrmConnect =
       defaultStatusCrmId != null && defaultStatusCrmId !== ""
         ? { statusCrm: { connect: { id: defaultStatusCrmId } } }
         : {};
 
+    const due = dueDate.trim();
     createActivity({
       variables: {
         data: {
+          title: title.trim(),
+          dueDate: due ? due : null,
+          priority: priority || TASK_PRIORITY.MEDIA,
           type,
           activityDate: dateTimeLocalToISO(activityDate),
           result: result.trim() || null,
           comments: comments.trim() || null,
           businessLead: { connect: { id: leadId.trim() } },
-          assignedSeller: { connect: { id: userId } },
+          assignedSeller: { connect: { id: responsibleUserId.trim() } },
           ...workspaceConnectPayload(workspaceId),
           ...statusCrmConnect,
         },
@@ -160,6 +212,34 @@ export default function CreateWorkspaceActivityModal({
             />
 
             <div>
+              <label
+                htmlFor="ws-activity-title"
+                className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+              >
+                Título de la actividad
+              </label>
+              <input
+                id="ws-activity-title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className={inputClassName}
+                placeholder="Ej. Llamada de seguimiento"
+                required
+              />
+            </div>
+
+            <Autocomplete
+              id="ws-activity-responsible"
+              label="Responsable"
+              value={responsibleUserId}
+              options={memberOptions}
+              onSelect={(option) => setResponsibleUserId(option?.id ?? "")}
+              placeholder="Buscar miembro del workspace"
+              required
+              loading={wsMembersLoading}
+            />
+
+            <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
                 Tipo
               </label>
@@ -187,6 +267,42 @@ export default function CreateWorkspaceActivityModal({
                 className={inputClassName}
                 required
               />
+            </div>
+
+            <div>
+              <label
+                htmlFor="ws-activity-due"
+                className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+              >
+                Fecha límite
+              </label>
+              <p className="mb-1.5 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                Opcional. Deadline para esta actividad.
+              </p>
+              <input
+                id="ws-activity-due"
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className={inputClassName}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
+                Prioridad
+              </label>
+              <select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                className={inputClassName}
+              >
+                {TASK_PRIORITY_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
@@ -238,4 +354,3 @@ export default function CreateWorkspaceActivityModal({
     </AnimatePresence>
   );
 }
-

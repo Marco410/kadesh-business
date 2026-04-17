@@ -80,7 +80,7 @@ export default function WorkspacesTab({
           Espacios de trabajo
         </h2>
         <p className="mt-1 text-sm text-[#616161] dark:text-[#9e9e9e] max-w-2xl">
-          Organiza actividades, seguimientos y propuestas por equipo o cliente. El
+          Organiza tareas, seguimientos y propuestas por equipo o cliente. El
           selector también aplica en Ventas y Calendario cuando un espacio está
           activo.
         </p>

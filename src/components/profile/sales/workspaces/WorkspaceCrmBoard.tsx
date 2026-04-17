@@ -68,7 +68,7 @@ export default function WorkspaceCrmBoard({
 }: WorkspaceCrmBoardProps) {
   const mainEntityTabOptions = useMemo((): { key: WorkspaceCrmEntityTab; title: string }[] => {
     const o: { key: WorkspaceCrmEntityTab; title: string }[] = [];
-    if (showActivities) o.push({ key: "act", title: "Actividades" });
+    if (showActivities) o.push({ key: "act", title: "Tareas" });
     if (showFollowUpTasks) o.push({ key: "tasks", title: "Seguimientos" });
     if (showProposals) o.push({ key: "props", title: "Propuestas" });
     return o;
