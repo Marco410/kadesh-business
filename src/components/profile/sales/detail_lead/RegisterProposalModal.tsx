@@ -27,6 +27,9 @@ import ProposalDetailModal from "./ProposalDetailModal";
 import CreateProjectModal from "./CreateProjectModal";
 import { hasPlanFeature } from "../helpers/plan-features";
 import { useSubscription } from "../SubscriptionContext";
+import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
+import { workspaceConnectPayload } from "kadesh/components/profile/sales/workspaces/workspace-connect";
+import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
 
 const PROPOSAL_STATUS_OPTIONS = Object.values(PROPOSAL_STATUS);
 
@@ -55,6 +58,7 @@ export default function RegisterProposalModal({
   leadId,
   userId,
 }: RegisterProposalModalProps) {
+  const { currentWorkspaceId } = useWorkspaceContext();
   const { subscription } = useSubscription();
   const { data: userData } = useQuery<UserCompanyCategoriesResponse, UserCompanyCategoriesVariables>(
     USER_COMPANY_CATEGORIES_QUERY,
@@ -72,14 +76,17 @@ export default function RegisterProposalModal({
   const [fileOrUrl, setFileOrUrl] = useState("");
   const [createProjectProposalId, setCreateProjectProposalId] = useState<string | null>(null);
 
-  const proposalsWhere: TechProposalsVariables["where"] = {
-    AND: [
-      {
-        assignedSeller: { id: { equals: userId } },
-        businessLead: { id: { equals: leadId } },
-      },
-    ],
-  };
+  const proposalsWhere: TechProposalsVariables["where"] = mergeWorkspaceFilter(
+    {
+      AND: [
+        {
+          assignedSeller: { id: { equals: userId } },
+          businessLead: { id: { equals: leadId } },
+        },
+      ],
+    },
+    currentWorkspaceId
+  );
 
   const { data: proposalsData, loading: proposalsLoading, refetch } = useQuery<
     TechProposalsResponse,
@@ -197,6 +204,7 @@ export default function RegisterProposalModal({
               notes: notes.trim() || null,
               businessLead: { connect: { id: leadId } },
               assignedSeller: { connect: { id: userId } },
+              ...workspaceConnectPayload(currentWorkspaceId),
             },
           },
         });

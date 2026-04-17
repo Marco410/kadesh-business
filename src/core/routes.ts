@@ -38,6 +38,7 @@ export const Routes = {
   panelAddLead: '/panel/ventas/lead/agregar',
   panelSyncLeads: '/panel/ventas/obtener-clientes',
   panelAddSalesperson: '/panel/ventas/agregar-vendedor',
+  panelAddCompanyUser: '/panel/espacios/agregar-usuario',
   panelPlans: '/panel/ventas/planes',
   panelPlanSubscribe: (planId: string): string => `/panel/ventas/planes/suscripcion/${planId}`,
   panelPlanSubscriptionSuccess: "/panel/ventas/planes/suscripcion/success",

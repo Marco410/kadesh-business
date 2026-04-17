@@ -22,6 +22,8 @@ import {
   type TechFollowUpTasksVariables,
   type TechFollowUpTasksCountResponse,
 } from "kadesh/components/profile/sales/queries";
+import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
+import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
 import { EVENT_COLORS, PLAN_FEATURE_KEYS } from "kadesh/constants/constans";
 import { hasPlanFeature } from "../helpers/plan-features";
 import { useSubscription } from "../SubscriptionContext";
@@ -38,38 +40,50 @@ export default function LeadCrmActions({
   leadId,
   userId,
 }: LeadCrmActionsProps) {
+  const { currentWorkspaceId } = useWorkspaceContext();
   const [activityModalOpen, setActivityModalOpen] = useState(false);
   const [proposalModalOpen, setProposalModalOpen] = useState(false);
   const [followUpModalOpen, setFollowUpModalOpen] = useState(false);
   const { subscription } = useSubscription();
 
 
-  const activitiesWhere: TechSalesActivitiesVariables["where"] = {
-    AND: [
+  const activitiesWhere: TechSalesActivitiesVariables["where"] =
+    mergeWorkspaceFilter(
       {
-        assignedSeller: { id: { equals: userId } },
-        businessLead: { id: { equals: leadId } },
+        AND: [
+          {
+            assignedSeller: { id: { equals: userId } },
+            businessLead: { id: { equals: leadId } },
+          },
+        ],
       },
-    ],
-  };
+      currentWorkspaceId
+    );
 
-  const proposalsWhere: TechProposalsVariables["where"] = {
-    AND: [
-      {
-        assignedSeller: { id: { equals: userId } },
-        businessLead: { id: { equals: leadId } },
-      },
-    ],
-  };
+  const proposalsWhere: TechProposalsVariables["where"] = mergeWorkspaceFilter(
+    {
+      AND: [
+        {
+          assignedSeller: { id: { equals: userId } },
+          businessLead: { id: { equals: leadId } },
+        },
+      ],
+    },
+    currentWorkspaceId
+  );
 
-  const followUpTasksWhere: TechFollowUpTasksVariables["where"] = {
-    AND: [
+  const followUpTasksWhere: TechFollowUpTasksVariables["where"] =
+    mergeWorkspaceFilter(
       {
-        assignedSeller: { id: { equals: userId } },
-        businessLead: { id: { equals: leadId } },
+        AND: [
+          {
+            assignedSeller: { id: { equals: userId } },
+            businessLead: { id: { equals: leadId } },
+          },
+        ],
       },
-    ],
-  };
+      currentWorkspaceId
+    );
 
   const { data: countData } = useQuery<
     TechSalesActivitiesCountResponse,
@@ -111,8 +125,6 @@ export default function LeadCrmActions({
   const handleNewFollowUp = () => {
     setFollowUpModalOpen(true);
   };
-
-  console.log("subscription", subscription);
 
   return (
     <div className="flex flex-col gap-4 p-4">

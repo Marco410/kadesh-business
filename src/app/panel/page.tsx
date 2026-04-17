@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useQuery } from "@apollo/client";
@@ -18,6 +18,8 @@ import {
   FolderIcon,
   CalendarIcon,
   UserAdd01Icon,
+  UserGroupIcon,
+  WorkIcon,
 } from "@hugeicons/core-free-icons";
 import ProfileData from "kadesh/components/profile/ProfileData";
 import SalesSection from "kadesh/components/profile/sales/SalesSection";
@@ -41,15 +43,19 @@ import { PLAN_FEATURE_KEYS, Role } from "kadesh/constants/constans";
 import FeatureLockedSection from "kadesh/components/profile/sales/FeatureLockedSection";
 import { SubscriptionProvider } from "kadesh/components/profile/sales/SubscriptionContext";
 import ReferralDashboardSection from "kadesh/components/profile/referral/ReferralDashboardSection";
+import WorkspacesTab from "kadesh/components/profile/sales/workspaces/WorkspacesTab";
+import WorkspaceSwitcher from "kadesh/components/profile/sales/workspaces/WorkspaceSwitcher";
+import CreateWorkspaceModal from "kadesh/components/profile/sales/workspaces/CreateWorkspaceModal";
 
-const VALID_TABS = ["inicio", "profile", "ventas", "vendedores", "archivos", "proyectos", "cotizaciones", "calendar", "referidos"] as const;
+const VALID_TABS = ["inicio", "profile", "ventas", "vendedores", "archivos", "proyectos", "cotizaciones", "calendar", "workspaces", "referidos"] as const;
 
 function getValidTab(
   tabFromUrl: string | null,
   hasVendedorRole: boolean,
   isAdminCompany: boolean,
   hasUploadFilesFeature: boolean,
-  hasCalendarFeature: boolean
+  hasCalendarFeature: boolean,
+  hasWorkspacesFeature: boolean
 ): (typeof VALID_TABS)[number] {
   if (!tabFromUrl || !VALID_TABS.includes(tabFromUrl as (typeof VALID_TABS)[number])) {
     return "inicio";
@@ -63,6 +69,12 @@ function getValidTab(
   if (tabFromUrl === "archivos" && (!hasUploadFilesFeature)) {
     return "inicio";
   }
+  if (tabFromUrl === "calendar" && !hasCalendarFeature) {
+    return "inicio";
+  }
+  if (tabFromUrl === "workspaces" && !hasWorkspacesFeature) {
+    return "inicio";
+  }
   return tabFromUrl as (typeof VALID_TABS)[number];
 }
 
@@ -70,11 +82,16 @@ const navItems = [
   { key: "inicio" as const, label: "Inicio", icon: DashboardSquare01Icon },
   { key: "profile" as const, label: "Datos del perfil", icon: UserIcon },
   { key: "ventas" as const, label: "Ventas", icon: Chart01Icon, requireVendedor: true },
-  { key: "vendedores" as const, label: "Vendedores", icon: UserIcon, requireAdminCompany: true, requireSalesPersonManagement: false },
-  { key: "archivos" as const, label: "Archivos", icon: FileIcon, requireAdminCompany: false, requireUploadFilesFeature: true },
+  { key: "vendedores" as const, label: "Vendedores", icon: UserGroupIcon, requireAdminCompany: true, requireSalesPersonManagement: false },
+  { key: "archivos" as const, label: "Archivos", icon: FileIcon },
   { key: "proyectos" as const, label: "Proyectos", icon: FolderIcon },
   { key: "cotizaciones" as const, label: "Cotizaciones", icon: FileIcon },
   { key: "calendar" as const, label: "Mi Calendario", icon: CalendarIcon },
+  {
+    key: "workspaces" as const,
+    label: "Espacios de trabajo",
+    icon: WorkIcon
+  },
   { key: "referidos" as const, label: "Referidos", icon: UserAdd01Icon },
 ];
 
@@ -86,6 +103,7 @@ function DashboardSidebar({
   isAdminCompany,
   hasSalesPersonManagement,
   hasUploadFilesFeature,
+  hasWorkspacesFeature,
 }: {
   selectedTab: string;
   onTabChange: (key: string) => void;
@@ -93,6 +111,7 @@ function DashboardSidebar({
   isAdminCompany: boolean;
   hasSalesPersonManagement: boolean;
   hasUploadFilesFeature: boolean;
+  hasWorkspacesFeature: boolean;
 }) {
   return (
     <aside className="w-full lg:w-60 shrink-0">
@@ -102,6 +121,7 @@ function DashboardSidebar({
           if ("requireAdminCompany" in item && item.requireAdminCompany && !isAdminCompany) return null;
           if ("requireSalesPersonManagement" in item && item.requireSalesPersonManagement && !hasSalesPersonManagement) return null;
           if ("requireUploadFilesFeature" in item && item.requireUploadFilesFeature && !hasUploadFilesFeature) return null;
+          if ("requireWorkspacesFeature" in item && item.requireWorkspacesFeature && !hasWorkspacesFeature) return null;
           const isActive = selectedTab === item.key;
           return (
             <button
@@ -176,6 +196,7 @@ function QuickActions({ hasVendedorRole }: { hasVendedorRole: boolean }) {
 function ProfilePageContent() {
   const { user, loading } = useUser();
   const router = useRouter();
+  const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const tabFromUrl = searchParams.get("tab");
@@ -220,7 +241,11 @@ function ProfilePageContent() {
     subscription?.planFeatures ?? null,
     PLAN_FEATURE_KEYS.CALENDAR_CRM
   );
-  const selectedTab = getValidTab(tabFromUrl, hasVendedorRole, isAdminCompany, hasUploadFilesFeature, hasCalendarFeature);
+  const hasWorkspacesFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.WORKSPACES
+  );
+  const selectedTab = getValidTab(tabFromUrl, hasVendedorRole, isAdminCompany, hasUploadFilesFeature, hasCalendarFeature, hasWorkspacesFeature);
 
   const handleTabChange = (key: string) => {
     router.replace(`${pathname}?tab=${key}`, { scroll: false });
@@ -271,6 +296,7 @@ function ProfilePageContent() {
                 isAdminCompany={isAdminCompany}
                 hasSalesPersonManagement={hasSalesPersonManagement}
                 hasUploadFilesFeature={hasUploadFilesFeature}
+                hasWorkspacesFeature={hasWorkspacesFeature}
               />
 
               <main className="flex-1 min-w-0">
@@ -334,10 +360,14 @@ function ProfilePageContent() {
                   )
                 )}
 
-                {selectedTab === "archivos" && hasUploadFilesFeature && (
-                  <div className="space-y-6">
-                    <ArchivosSection userId={user.id} />
-                  </div>
+                {selectedTab === "archivos" && (
+                  hasUploadFilesFeature ? (
+                    <div className="space-y-6">
+                      <ArchivosSection userId={user.id} />
+                    </div>
+                  ) : (
+                    <FeatureLockedSection sectionName="Archivos" />
+                  )
                 )}
 
                 {selectedTab === "proyectos" && (
@@ -370,6 +400,19 @@ function ProfilePageContent() {
                   )
                 )}
 
+                {selectedTab === "workspaces" && (
+                  hasWorkspacesFeature ? (
+                    <div className="space-y-6">
+                      <WorkspacesTab
+                        userId={user.id}
+                        onRequestCreateWorkspace={() => setCreateWorkspaceOpen(true)}
+                      />
+                    </div>
+                  ) : (
+                    <FeatureLockedSection sectionName="Espacios de trabajo" />
+                  )
+                )}
+
                 {selectedTab === "referidos" && (
                   <div className="flex flex-col gap-5">
                     <div className="max-w-none">
@@ -388,6 +431,13 @@ function ProfilePageContent() {
           </div>
         </div>
       </SubscriptionProvider>
+      {hasWorkspacesFeature && user?.id && (
+        <CreateWorkspaceModal
+          isOpen={createWorkspaceOpen}
+          onClose={() => setCreateWorkspaceOpen(false)}
+          userId={user.id}
+        />
+      )}
       <Footer />
     </div>
   );

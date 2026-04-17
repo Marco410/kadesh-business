@@ -12,6 +12,7 @@ interface ConfirmModalProps {
   cancelText?: string;
   isLoading?: boolean;
   confirmButtonColor?: 'red' | 'orange' | 'blue';
+  stackedOverModal?: boolean;
 }
 
 export default function ConfirmModal({
@@ -24,7 +25,11 @@ export default function ConfirmModal({
   cancelText = 'Cancelar',
   isLoading = false,
   confirmButtonColor = 'red',
+  stackedOverModal = false,
 }: ConfirmModalProps) {
+  const backdropZ = stackedOverModal ? 'z-[140]' : 'z-50';
+  const dialogZ = stackedOverModal ? 'z-[145]' : 'z-[60]';
+
   const confirmButtonClasses = {
     red: 'bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600',
     orange: 'bg-orange-500 hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600',
@@ -39,7 +44,7 @@ export default function ConfirmModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            className={`fixed inset-0 bg-black/50 flex items-center justify-center p-4 ${backdropZ}`}
             onClick={onClose}
           />
           <motion.div
@@ -47,7 +52,7 @@ export default function ConfirmModal({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center p-4 pointer-events-none"
+            className={`fixed inset-0 flex items-center justify-center p-4 pointer-events-none ${dialogZ}`}
           >
             <div 
               className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-lg w-full p-8 pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
@@ -70,7 +75,6 @@ export default function ConfirmModal({
                 <p className="text-md text-[#616161] dark:text-[#b0b0b0] leading-relaxed">
                   {message}
                 </p>
-                {/* Two buttons layout: responsive (mobile: action first, then cancel below; desktop: side by side) */}
                 <div className={`flex flex-col sm:flex-row gap-3 ${cancelText ? 'sm:justify-end' : 'sm:justify-center'}`}>
                   <button 
                     onClick={onConfirm}

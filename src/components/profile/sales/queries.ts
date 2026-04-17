@@ -695,12 +695,24 @@ export const TECH_SALES_ACTIVITIES_QUERY = gql`
       result
       comments
       createdAt
+      hiddenInWorkspace
+      statusCrm {
+        id
+        name
+        color
+        key
+      }
       businessLead {
         id
         businessName
       }
       assignedSeller {
         id
+        name
+        lastName
+        profileImage {
+          url
+        }
       }
     }
   }
@@ -729,8 +741,20 @@ export interface TechSalesActivitiesResponse {
     result: string | null;
     comments: string | null;
     createdAt: string;
+    hiddenInWorkspace: boolean | null;
+    statusCrm: {
+      id: string;
+      name: string;
+      color: string;
+      key: string;
+    } | null;
     businessLead: { id: string; businessName: string } | null;
-    assignedSeller?: { id: string } | null;
+    assignedSeller?: {
+      id: string;
+      name: string;
+      lastName: string | null;
+      profileImage: { url: string } | null;
+    } | null;
   }>;
 }
 
@@ -787,11 +811,50 @@ export interface CreateTechSalesActivityVariables {
     comments?: string | null;
     businessLead: { connect: { id: string } };
     assignedSeller: { connect: { id: string } };
+    workspace?: { connect: { id: string } } | null;
+    statusCrm?: { connect: { id: string } } | null;
   };
 }
 
 export interface CreateTechSalesActivityMutation {
   createTechSalesActivity: {
+    id: string;
+    type: string;
+    activityDate: string;
+    result: string | null;
+    comments: string | null;
+  };
+}
+
+export const UPDATE_TECH_SALES_ACTIVITY_MUTATION = gql`
+  mutation UpdateTechSalesActivity(
+    $where: TechSalesActivityWhereUniqueInput!
+    $data: TechSalesActivityUpdateInput!
+  ) {
+    updateTechSalesActivity(where: $where, data: $data) {
+      id
+      type
+      activityDate
+      result
+      comments
+    }
+  }
+`;
+
+export interface UpdateTechSalesActivityVariables {
+  where: { id: string };
+  data: {
+    type?: string | null;
+    activityDate?: string | null;
+    result?: string | null;
+    comments?: string | null;
+    hiddenInWorkspace?: boolean | null;
+    statusCrm?: { connect: { id: string } } | null;
+  };
+}
+
+export interface UpdateTechSalesActivityMutation {
+  updateTechSalesActivity: {
     id: string;
     type: string;
     activityDate: string;
@@ -816,12 +879,24 @@ export const TECH_PROPOSALS_QUERY = gql`
       updatedAt
       approved
       paid
+      hiddenInWorkspace
+      statusCrm {
+        id
+        name
+        color
+        key
+      }
       businessLead {
         id
         businessName
       }
       assignedSeller {
         id
+        name
+        lastName
+        profileImage {
+          url
+        }
       }
       project {
         id
@@ -880,8 +955,20 @@ export interface TechProposalsResponse {
     updatedAt: string | null;
     approved: boolean | null;
     paid: boolean | null;
+    hiddenInWorkspace: boolean | null;
+    statusCrm: {
+      id: string;
+      name: string;
+      color: string;
+      key: string;
+    } | null;
     businessLead: { id: string; businessName: string } | null;
-    assignedSeller?: { id: string } | null;
+    assignedSeller?: {
+      id: string;
+      name: string;
+      lastName: string | null;
+      profileImage: { url: string } | null;
+    } | null;
     project: { id: string } | null;
   }>;
 }
@@ -964,6 +1051,8 @@ export interface CreateTechProposalVariables {
     notes?: string | null;
     businessLead: { connect: { id: string } };
     assignedSeller: { connect: { id: string } };
+    workspace?: { connect: { id: string } } | null;
+    statusCrm?: { connect: { id: string } } | null;
   };
 }
 
@@ -1015,6 +1104,8 @@ export interface UpdateTechProposalVariables {
     notes?: string | null;
     approved?: boolean | null;
     paid?: boolean | null;
+    hiddenInWorkspace?: boolean | null;
+    statusCrm?: { connect: { id: string } } | null;
   };
 }
 
@@ -1045,12 +1136,24 @@ export const TECH_FOLLOW_UP_TASKS_QUERY = gql`
       notes
       createdAt
       updatedAt
+      hiddenInWorkspace
+      statusCrm {
+        id
+        name
+        color
+        key
+      }
       businessLead {
         id
         businessName
       }
       assignedSeller {
         id
+        name
+        lastName
+        profileImage {
+          url
+        }
       }
     }
   }
@@ -1085,8 +1188,20 @@ export interface TechFollowUpTasksResponse {
     notes: string | null;
     createdAt: string;
     updatedAt: string | null;
+    hiddenInWorkspace: boolean | null;
+    statusCrm: {
+      id: string;
+      name: string;
+      color: string;
+      key: string;
+    } | null;
     businessLead: { id: string; businessName: string } | null;
-    assignedSeller?: { id: string } | null;
+    assignedSeller?: {
+      id: string;
+      name: string;
+      lastName: string | null;
+      profileImage: { url: string } | null;
+    } | null;
   }>;
 }
 
@@ -1156,6 +1271,8 @@ export interface CreateTechFollowUpTaskVariables {
     notes?: string | null;
     businessLead: { connect: { id: string } };
     assignedSeller: { connect: { id: string } };
+    workspace?: { connect: { id: string } } | null;
+    statusCrm?: { connect: { id: string } } | null;
   };
 }
 
@@ -1198,6 +1315,8 @@ export interface UpdateTechFollowUpTaskVariables {
     status?: string | null;
     priority?: string | null;
     notes?: string | null;
+    hiddenInWorkspace?: boolean | null;
+    statusCrm?: { connect: { id: string } } | null;
   };
 }
 
@@ -1250,6 +1369,37 @@ export interface CompanyVendedoresResponse {
   }>;
 }
 
+/** Usuarios de la empresa con rol `user_company` (sin flujo de comisiones). */
+export const COMPANY_USER_COMPANY_USERS_QUERY = gql`
+  query CompanyUserCompanyUsers($where: UserWhereInput!) {
+    users(where: $where, orderBy: [{ name: asc }], take: 300) {
+      id
+      name
+      lastName
+      email
+      phone
+      birthday
+    }
+  }
+`;
+
+export interface CompanyUserCompanyUsersVariables {
+  where: {
+    company?: { id?: { equals: string } };
+    roles?: { some?: { name?: { equals: string } } };
+  };
+}
+
+export interface CompanyUserCompanyUsersResponse {
+  users: Array<{
+    id: string;
+    name: string;
+    lastName: string | null;
+    email: string | null;
+    phone: string | null;
+    birthday: string | null;
+  }>;
+}
 
 export const UPDATE_VENDEDOR_MUTATION = gql`
   mutation UpdateVendedor(

@@ -12,6 +12,8 @@ import {
   type TechProposalsResponse,
   type TechProposalsBySellerVariables,
 } from "kadesh/components/profile/sales/queries";
+import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
+import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
 import { PIPELINE_STATUS, PLAN_FEATURE_KEYS, PROPOSAL_STATUS } from "kadesh/constants/constans";
 import { formatCurrency } from "kadesh/utils/format-currency";
 import { Routes } from "kadesh/core/routes";
@@ -30,6 +32,7 @@ interface StatsSectionProps {
 export default function StatsSection({ userId, companyId, isAdminCompany, salesComission }: StatsSectionProps) {
   const router = useRouter();
   const { subscription } = useSubscription();
+  const { currentWorkspaceId } = useWorkspaceContext();
 
   const where = {
     ...(!isAdminCompany ? { salesPerson: { some: { id: { equals: userId } } } } : {}),
@@ -49,14 +52,17 @@ export default function StatsSection({ userId, companyId, isAdminCompany, salesC
 
   const leadsCount = leadsCountData?.techBusinessLeadsCount ?? 0;
   
+  const proposalsWhere = mergeWorkspaceFilter(
+    { assignedSeller: { id: { equals: userId } } },
+    currentWorkspaceId
+  );
+
   const { data: proposalsData } = useQuery<
     TechProposalsResponse,
     TechProposalsBySellerVariables
   >(TECH_PROPOSALS_QUERY, {
     variables: {
-      where: {
-        assignedSeller: { id: { equals: userId } },
-      },
+      where: proposalsWhere,
     },
     skip: !userId,
   });

@@ -15,6 +15,9 @@ import {
   type UpdateTechFollowUpTaskVariables,
   type UpdateTechFollowUpTaskMutation,
 } from "kadesh/components/profile/sales/queries";
+import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
+import { workspaceConnectPayload } from "kadesh/components/profile/sales/workspaces/workspace-connect";
+import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
 import {
   FOLLOW_UP_TASK_STATUS,
   TASK_PRIORITY,
@@ -51,19 +54,23 @@ export default function RegisterFollowUpModal({
   leadId,
   userId,
 }: RegisterFollowUpModalProps) {
+  const { currentWorkspaceId } = useWorkspaceContext();
   const [scheduledDate, setScheduledDate] = useState("");
   const [status, setStatus] = useState<string>(FOLLOW_UP_TASK_STATUS.PENDIENTE);
   const [priority, setPriority] = useState<string>(TASK_PRIORITY.MEDIA);
   const [notes, setNotes] = useState("");
 
-  const tasksWhere: TechFollowUpTasksVariables["where"] = {
-    AND: [
-      {
-        assignedSeller: { id: { equals: userId } },
-        businessLead: { id: { equals: leadId } },
-      },
-    ],
-  };
+  const tasksWhere: TechFollowUpTasksVariables["where"] = mergeWorkspaceFilter(
+    {
+      AND: [
+        {
+          assignedSeller: { id: { equals: userId } },
+          businessLead: { id: { equals: leadId } },
+        },
+      ],
+    },
+    currentWorkspaceId
+  );
 
   const { data: tasksData, loading: tasksLoading } = useQuery<
     TechFollowUpTasksResponse,
@@ -162,6 +169,7 @@ export default function RegisterFollowUpModal({
               notes: notes.trim() || undefined,
               businessLead: { connect: { id: leadId } },
               assignedSeller: { connect: { id: userId } },
+              ...workspaceConnectPayload(currentWorkspaceId),
             },
           },
         });

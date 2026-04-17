@@ -19,6 +19,7 @@ export enum Role {
   AUTHOR = "author",
   ADMIN_COMPANY = "admin_company",
   VENDEDOR = "vendedor",
+  USER_COMPANY = "user_company",
 }
 
 export const GOOGLE_PLACE_CATEGORIES = [
@@ -657,6 +658,7 @@ export const PLAN_FEATURE_KEYS = {
   ADD_OWN_LEADS: "add_own_leads",
   EXPORT_EXCEL: "export_excel",
   QUOTATIONS: "quotations",
+  WORKSPACES: "workspaces",
 } as const;
 
 export type PlanFeatureKey =
@@ -727,6 +729,10 @@ export const PLAN_FEATURES_MAP: Record<
   [PLAN_FEATURE_KEYS.QUOTATIONS]: {
     name: "Cotizaciones",
     description: "Crear y gestionar cotizaciones",
+  },
+  [PLAN_FEATURE_KEYS.WORKSPACES]: {
+    name: "Espacios de trabajo",
+    description: "Crear y gestionar espacios de trabajo",
   },
 };
 

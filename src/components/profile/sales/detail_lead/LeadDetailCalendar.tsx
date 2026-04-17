@@ -13,6 +13,8 @@ import {
   type TechFollowUpTasksVariables,
   type TechFollowUpTasksResponse,
 } from "kadesh/components/profile/sales/queries";
+import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
+import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
 import { EVENT_LABELS } from "kadesh/constants/constans";
 import SalesCalendarView, { type CalendarEvent } from "../SalesCalendarView";
 
@@ -47,21 +49,41 @@ export default function LeadDetailCalendar({
   businessName,
   sellerName,
 }: LeadDetailCalendarProps) {
-  const whereActivities: TechSalesActivitiesVariables["where"] = {
-    AND: [
-      { assignedSeller: { id: { equals: userId } }, businessLead: { id: { equals: leadId } } },
-    ],
-  };
-  const whereProposals: TechProposalsVariables["where"] = {
-    AND: [
-      { assignedSeller: { id: { equals: userId } }, businessLead: { id: { equals: leadId } } },
-    ],
-  };
-  const whereTasks: TechFollowUpTasksVariables["where"] = {
-    AND: [
-      { assignedSeller: { id: { equals: userId } }, businessLead: { id: { equals: leadId } } },
-    ],
-  };
+  const { currentWorkspaceId } = useWorkspaceContext();
+  const whereActivities: TechSalesActivitiesVariables["where"] =
+    mergeWorkspaceFilter(
+      {
+        AND: [
+          {
+            assignedSeller: { id: { equals: userId } },
+            businessLead: { id: { equals: leadId } },
+          },
+        ],
+      },
+      currentWorkspaceId
+    );
+  const whereProposals: TechProposalsVariables["where"] = mergeWorkspaceFilter(
+    {
+      AND: [
+        {
+          assignedSeller: { id: { equals: userId } },
+          businessLead: { id: { equals: leadId } },
+        },
+      ],
+    },
+    currentWorkspaceId
+  );
+  const whereTasks: TechFollowUpTasksVariables["where"] = mergeWorkspaceFilter(
+    {
+      AND: [
+        {
+          assignedSeller: { id: { equals: userId } },
+          businessLead: { id: { equals: leadId } },
+        },
+      ],
+    },
+    currentWorkspaceId
+  );
 
   const { data: activitiesData } = useQuery<
     TechSalesActivitiesResponse,
