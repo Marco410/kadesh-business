@@ -7,7 +7,7 @@ import {
   type SaasWorkspaceDetailVariables,
 } from "kadesh/components/profile/sales/workspaces/queries";
 
-export type WorkspaceDashboardTabKey = "act" | "tasks" | "props";
+export type WorkspaceDashboardTabKey = "tech" | "act" | "tasks" | "props";
 
 export function useWorkspaceTabsConfig(workspaceId: string) {
   const wsQ = useQuery<SaasWorkspaceDetailResponse, SaasWorkspaceDetailVariables>(
@@ -19,11 +19,13 @@ export function useWorkspaceTabsConfig(workspaceId: string) {
     }
   );
 
+  const showTasks = wsQ.data?.saasWorkspace?.showTasks ?? true;
   const showActivities = wsQ.data?.saasWorkspace?.showActivities ?? true;
   const showProposals = wsQ.data?.saasWorkspace?.showProposals ?? true;
   const showFollowUpTasks = wsQ.data?.saasWorkspace?.showFollowUpTasks ?? true;
 
   const enabledTabs = [
+    showTasks ? ("tech" as const) : null,
     showActivities ? ("act" as const) : null,
     showFollowUpTasks ? ("tasks" as const) : null,
     showProposals ? ("props" as const) : null,
@@ -41,6 +43,7 @@ export function useWorkspaceTabsConfig(workspaceId: string) {
 
   return {
     wsQ,
+    showTasks,
     showActivities,
     showProposals,
     showFollowUpTasks,

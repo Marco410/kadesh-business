@@ -104,6 +104,7 @@ export default function EditWorkspaceSettingsModal({
   workspaceId,
 }: EditWorkspaceSettingsModalProps) {
   const [name, setName] = useState("");
+  const [showTasks, setShowTasks] = useState(true);
   const [showActivities, setShowActivities] = useState(true);
   const [showProposals, setShowProposals] = useState(true);
   const [showFollowUpTasks, setShowFollowUpTasks] = useState(true);
@@ -166,6 +167,7 @@ export default function EditWorkspaceSettingsModal({
     const w = wsData?.saasWorkspace;
     if (!w) return;
     setName(w.name ?? "");
+    setShowTasks(w.showTasks ?? true);
     setShowActivities(w.showActivities ?? true);
     setShowProposals(w.showProposals ?? true);
     setShowFollowUpTasks(w.showFollowUpTasks ?? true);
@@ -294,6 +296,7 @@ export default function EditWorkspaceSettingsModal({
           where: { id: workspaceId },
           data: {
             name: trimmed,
+            showTasks,
             showActivities,
             showProposals,
             showFollowUpTasks,
@@ -502,8 +505,8 @@ export default function EditWorkspaceSettingsModal({
                 <label className="flex items-start gap-3 cursor-pointer select-none">
                   <input
                     type="checkbox"
-                    checked={showActivities}
-                    onChange={(e) => setShowActivities(e.target.checked)}
+                    checked={showTasks}
+                    onChange={(e) => setShowTasks(e.target.checked)}
                     className="mt-0.5 h-4 w-4 rounded border-[#e0e0e0] dark:border-[#3a3a3a] accent-orange-500"
                   />
                   <span className="min-w-0">
@@ -511,7 +514,23 @@ export default function EditWorkspaceSettingsModal({
                       Tareas
                     </span>
                     <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
-                      Pestaña y columnas de tareas en el tablero
+                      Pestaña y columnas de tareas generales del workspace
+                    </span>
+                  </span>
+                </label>
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={showActivities}
+                    onChange={(e) => setShowActivities(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-[#e0e0e0] dark:border-[#3a3a3a] accent-orange-500"
+                  />
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                      Actividades
+                    </span>
+                    <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
+                      Pestaña y columnas de actividades en el tablero
                     </span>
                   </span>
                 </label>
@@ -556,7 +575,8 @@ export default function EditWorkspaceSettingsModal({
                       Estados CRM
                     </p>
                     <p className="text-xs text-[#616161] dark:text-[#9e9e9e]">
-                      Agrega estados para categorizar las tareas, seguimientos y propuestas.
+                      Agrega estados para categorizar tareas del espacio, actividades, seguimientos y
+                      propuestas.
                     </p>
                   </div>
                   <button

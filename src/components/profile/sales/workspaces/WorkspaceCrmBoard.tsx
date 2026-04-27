@@ -10,21 +10,27 @@ import {
   TECH_FOLLOW_UP_TASKS_QUERY,
   TECH_PROPOSALS_QUERY,
   TECH_SALES_ACTIVITIES_QUERY,
+  TECH_TASKS_QUERY,
   UPDATE_TECH_FOLLOW_UP_TASK_MUTATION,
   UPDATE_TECH_PROPOSAL_MUTATION,
   UPDATE_TECH_SALES_ACTIVITY_MUTATION,
+  UPDATE_TECH_TASK_MUTATION,
   type TechFollowUpTasksResponse,
   type TechFollowUpTasksVariables,
   type TechProposalsResponse,
   type TechProposalsVariables,
   type TechSalesActivitiesResponse,
   type TechSalesActivitiesVariables,
+  type TechTasksResponse,
+  type TechTasksVariables,
   type UpdateTechFollowUpTaskMutation,
   type UpdateTechFollowUpTaskVariables,
   type UpdateTechProposalMutation,
   type UpdateTechProposalVariables,
   type UpdateTechSalesActivityMutation,
   type UpdateTechSalesActivityVariables,
+  type UpdateTechTaskMutation,
+  type UpdateTechTaskVariables,
 } from "kadesh/components/profile/sales/queries";
 import type { SaasWorkspaceCrmStatus } from "kadesh/components/profile/sales/workspaces/queries";
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
@@ -37,13 +43,16 @@ import WorkspaceCrmStatusColumn, {
 import CreateWorkspaceActivityModal from "kadesh/components/profile/sales/workspaces/tabs/modals/CreateWorkspaceActivityModal";
 import CreateWorkspaceFollowUpModal from "kadesh/components/profile/sales/workspaces/tabs/modals/CreateWorkspaceFollowUpModal";
 import CreateWorkspaceProposalModal from "kadesh/components/profile/sales/workspaces/tabs/modals/CreateWorkspaceProposalModal";
+import CreateWorkspaceTechTaskModal from "kadesh/components/profile/sales/workspaces/tabs/modals/CreateWorkspaceTechTaskModal";
 import EditWorkspaceActivityModal from "kadesh/components/profile/sales/workspaces/tabs/modals/EditWorkspaceActivityModal";
 import EditWorkspaceFollowUpModal from "kadesh/components/profile/sales/workspaces/tabs/modals/EditWorkspaceFollowUpModal";
 import EditWorkspaceProposalModal from "kadesh/components/profile/sales/workspaces/tabs/modals/EditWorkspaceProposalModal";
+import EditWorkspaceTechTaskModal from "kadesh/components/profile/sales/workspaces/tabs/modals/EditWorkspaceTechTaskModal";
 
 type ActivityRow = TechSalesActivitiesResponse["techSalesActivities"][number];
 type TaskRow = TechFollowUpTasksResponse["techFollowUpTasks"][number];
 type ProposalRow = TechProposalsResponse["techProposals"][number];
+type TechTaskRow = TechTasksResponse["techTasks"][number];
 
 export interface WorkspaceCrmBoardProps {
   workspaceId: string;
@@ -51,6 +60,7 @@ export interface WorkspaceCrmBoardProps {
   showSkeleton?: boolean;
   crmStatuses: SaasWorkspaceCrmStatus[];
   defaultCrmStatusId: string | null;
+  showTasks: boolean;
   showActivities: boolean;
   showFollowUpTasks: boolean;
   showProposals: boolean;
@@ -62,17 +72,19 @@ export default function WorkspaceCrmBoard({
   showSkeleton,
   crmStatuses,
   defaultCrmStatusId,
+  showTasks,
   showActivities,
   showFollowUpTasks,
   showProposals,
 }: WorkspaceCrmBoardProps) {
   const mainEntityTabOptions = useMemo((): { key: WorkspaceCrmEntityTab; title: string }[] => {
     const o: { key: WorkspaceCrmEntityTab; title: string }[] = [];
-    if (showActivities) o.push({ key: "act", title: "Tareas" });
+    if (showTasks) o.push({ key: "tech", title: "Tareas" });
+    if (showActivities) o.push({ key: "act", title: "Actividades" });
     if (showFollowUpTasks) o.push({ key: "tasks", title: "Seguimientos" });
     if (showProposals) o.push({ key: "props", title: "Propuestas" });
     return o;
-  }, [showActivities, showFollowUpTasks, showProposals]);
+  }, [showTasks, showActivities, showFollowUpTasks, showProposals]);
 
   const validBoardTabKeys = useMemo((): WorkspaceCrmBoardViewTab[] => {
     const keys: WorkspaceCrmBoardViewTab[] = mainEntityTabOptions.map((e) => e.key);
@@ -81,6 +93,7 @@ export default function WorkspaceCrmBoard({
   }, [mainEntityTabOptions]);
 
   const [boardViewTab, setBoardViewTab] = useState<WorkspaceCrmBoardViewTab>(() => {
+    if (showTasks) return "tech";
     if (showActivities) return "act";
     if (showFollowUpTasks) return "tasks";
     return "props";
@@ -93,10 +106,12 @@ export default function WorkspaceCrmBoard({
     }
   }, [workspaceId, validBoardTabKeys, boardViewTab]);
 
+  const [openTechTask, setOpenTechTask] = useState(false);
   const [openActivity, setOpenActivity] = useState(false);
   const [openFollowUp, setOpenFollowUp] = useState(false);
   const [openProposal, setOpenProposal] = useState(false);
 
+  const [editTechTask, setEditTechTask] = useState<TechTaskRow | null>(null);
   const [editActivity, setEditActivity] = useState<ActivityRow | null>(null);
   const [editTask, setEditTask] = useState<TaskRow | null>(null);
   const [editProposal, setEditProposal] = useState<ProposalRow | null>(null);
@@ -114,6 +129,13 @@ export default function WorkspaceCrmBoard({
     {},
     workspaceId
   );
+  const techTasksWhere: TechTasksVariables["where"] = mergeWorkspaceFilter({}, workspaceId);
+
+  const techQ = useQuery<TechTasksResponse, TechTasksVariables>(TECH_TASKS_QUERY, {
+    variables: { where: techTasksWhere },
+    skip: !workspaceId || !showTasks,
+    fetchPolicy: "cache-and-network",
+  });
 
   const actQ = useQuery<TechSalesActivitiesResponse, TechSalesActivitiesVariables>(
     TECH_SALES_ACTIVITIES_QUERY,
@@ -145,17 +167,21 @@ export default function WorkspaceCrmBoard({
   const { registerWorkspaceBoardRefetch } = useWorkspaceContext();
 
   const boardQueriesRef = useRef({
+    showTasks,
     showActivities,
     showFollowUpTasks,
     showProposals,
+    techQ,
     actQ,
     taskQ,
     propQ,
   });
   boardQueriesRef.current = {
+    showTasks,
     showActivities,
     showFollowUpTasks,
     showProposals,
+    techQ,
     actQ,
     taskQ,
     propQ,
@@ -165,6 +191,7 @@ export default function WorkspaceCrmBoard({
     const run = async () => {
       const q = boardQueriesRef.current;
       await Promise.all([
+        q.showTasks ? q.techQ.refetch() : Promise.resolve(),
         q.showActivities ? q.actQ.refetch() : Promise.resolve(),
         q.showFollowUpTasks ? q.taskQ.refetch() : Promise.resolve(),
         q.showProposals ? q.propQ.refetch() : Promise.resolve(),
@@ -176,12 +203,19 @@ export default function WorkspaceCrmBoard({
     };
   }, [registerWorkspaceBoardRefetch]);
 
+  const techTasks = techQ.data?.techTasks ?? [];
   const activities = actQ.data?.techSalesActivities ?? [];
   const tasks = taskQ.data?.techFollowUpTasks ?? [];
   const proposals = propQ.data?.techProposals ?? [];
 
   const boardRefetches = useMemo((): InternalRefetchQueriesInclude => {
     const q: InternalRefetchQueriesInclude = [];
+    if (showTasks) {
+      q.push({
+        query: TECH_TASKS_QUERY,
+        variables: { where: mergeWorkspaceFilter({}, workspaceId) },
+      });
+    }
     if (showActivities) {
       q.push({
         query: TECH_SALES_ACTIVITIES_QUERY,
@@ -201,7 +235,7 @@ export default function WorkspaceCrmBoard({
       });
     }
     return q;
-  }, [workspaceId, showActivities, showFollowUpTasks, showProposals]);
+  }, [workspaceId, showTasks, showActivities, showFollowUpTasks, showProposals]);
 
   const [updateActivity] = useMutation<
     UpdateTechSalesActivityMutation,
@@ -227,6 +261,14 @@ export default function WorkspaceCrmBoard({
     awaitRefetchQueries: true,
   });
 
+  const [updateTechTask] = useMutation<UpdateTechTaskMutation, UpdateTechTaskVariables>(
+    UPDATE_TECH_TASK_MUTATION,
+    {
+      refetchQueries: boardRefetches,
+      awaitRefetchQueries: true,
+    }
+  );
+
   const handleDropToColumn = useCallback(
     async (columnStatusId: string, e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
@@ -237,6 +279,7 @@ export default function WorkspaceCrmBoard({
         if (payload.entity !== boardViewTab) return;
       } else {
         if (
+          (payload.entity === "tech" && !showTasks) ||
           (payload.entity === "act" && !showActivities) ||
           (payload.entity === "tasks" && !showFollowUpTasks) ||
           (payload.entity === "props" && !showProposals)
@@ -246,11 +289,13 @@ export default function WorkspaceCrmBoard({
       }
 
       const item =
-        payload.entity === "act"
-          ? activities.find((x) => x.id === payload.id)
-          : payload.entity === "tasks"
-            ? tasks.find((x) => x.id === payload.id)
-            : proposals.find((x) => x.id === payload.id);
+        payload.entity === "tech"
+          ? techTasks.find((x) => x.id === payload.id)
+          : payload.entity === "act"
+            ? activities.find((x) => x.id === payload.id)
+            : payload.entity === "tasks"
+              ? tasks.find((x) => x.id === payload.id)
+              : proposals.find((x) => x.id === payload.id);
       if (!item) return;
 
       const effectiveStatusId =
@@ -261,7 +306,9 @@ export default function WorkspaceCrmBoard({
 
       const data = { statusCrm: { connect: { id: columnStatusId } } };
       try {
-        if (payload.entity === "act") {
+        if (payload.entity === "tech") {
+          await updateTechTask({ variables: { where: { id: item.id }, data } });
+        } else if (payload.entity === "act") {
           await updateActivity({ variables: { where: { id: item.id }, data } });
         } else if (payload.entity === "tasks") {
           await updateTask({ variables: { where: { id: item.id }, data } });
@@ -277,19 +324,23 @@ export default function WorkspaceCrmBoard({
     },
     [
       boardViewTab,
+      showTasks,
       showActivities,
       showFollowUpTasks,
       showProposals,
+      techTasks,
       activities,
       tasks,
       proposals,
       defaultCrmStatusId,
+      updateTechTask,
       updateActivity,
       updateTask,
       updateProposal,
     ]
   );
 
+  const loadingTechTasks = showSkeleton || (showTasks && techQ.loading && !techQ.data);
   const loadingActivities =
     showSkeleton || (showActivities && actQ.loading && !actQ.data);
   const loadingTasks =
@@ -299,14 +350,17 @@ export default function WorkspaceCrmBoard({
   const columnLoading =
     boardViewTab === "hidden"
       ? showSkeleton ||
+        (showTasks && techQ.loading && !techQ.data) ||
         (showActivities && actQ.loading && !actQ.data) ||
         (showFollowUpTasks && taskQ.loading && !taskQ.data) ||
         (showProposals && propQ.loading && !propQ.data)
-      : boardViewTab === "act"
-        ? loadingActivities
-        : boardViewTab === "tasks"
-          ? loadingTasks
-          : loadingProposals;
+      : boardViewTab === "tech"
+        ? loadingTechTasks
+        : boardViewTab === "act"
+          ? loadingActivities
+          : boardViewTab === "tasks"
+            ? loadingTasks
+            : loadingProposals;
 
   const addBtnClass =
     "inline-flex items-center gap-1.5 rounded-xl border border-neutral-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-orange-600 shadow-sm hover:border-orange-300 hover:bg-orange-50/80 dark:border-[#333] dark:bg-[#1e1e1e] dark:text-orange-400 dark:shadow-none dark:hover:bg-orange-500/5";
@@ -373,6 +427,12 @@ export default function WorkspaceCrmBoard({
           ) : null}
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {boardViewTab !== "hidden" && boardViewTab === "tech" && showTasks && (
+            <button type="button" onClick={() => setOpenTechTask(true)} className={addBtnClass}>
+              <HugeiconsIcon icon={Add01Icon} size={16} />
+              Agregar tarea
+            </button>
+          )}
           {boardViewTab !== "hidden" && boardViewTab === "act" && showActivities && (
             <button type="button" onClick={() => setOpenActivity(true)} className={addBtnClass}>
               <HugeiconsIcon icon={Add01Icon} size={16} />
@@ -402,6 +462,7 @@ export default function WorkspaceCrmBoard({
             defaultStatusColumnId={defaultCrmStatusId}
             entityTab={boardViewTab === "hidden" ? "act" : boardViewTab}
             showHiddenOnly={boardViewTab === "hidden"}
+            techTasks={techTasks}
             activities={activities}
             tasks={tasks}
             proposals={proposals}
@@ -417,6 +478,7 @@ export default function WorkspaceCrmBoard({
               void handleDropToColumn(status.id, ev);
             }}
             onBoardDragEnd={() => setDropTargetColumnId(null)}
+            onEditTechTask={setEditTechTask}
             onEditActivity={setEditActivity}
             onEditTask={setEditTask}
             onEditProposal={setEditProposal}
@@ -424,6 +486,15 @@ export default function WorkspaceCrmBoard({
         ))}
       </div>
 
+      {showTasks && (
+        <CreateWorkspaceTechTaskModal
+          isOpen={openTechTask}
+          onClose={() => setOpenTechTask(false)}
+          workspaceId={workspaceId}
+          userId={userId}
+          defaultStatusCrmId={defaultCrmStatusId}
+        />
+      )}
       {showActivities && (
         <CreateWorkspaceActivityModal
           isOpen={openActivity}
@@ -452,6 +523,16 @@ export default function WorkspaceCrmBoard({
         />
       )}
 
+      {showTasks && (
+        <EditWorkspaceTechTaskModal
+          isOpen={editTechTask != null}
+          onClose={() => setEditTechTask(null)}
+          workspaceId={workspaceId}
+          task={editTechTask}
+          crmStatuses={crmStatuses}
+          defaultCrmStatusId={defaultCrmStatusId}
+        />
+      )}
       {showActivities && (
         <EditWorkspaceActivityModal
           isOpen={editActivity != null}

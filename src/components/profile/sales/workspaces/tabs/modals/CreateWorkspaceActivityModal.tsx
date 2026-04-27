@@ -38,6 +38,15 @@ function dateTimeLocalToISO(value: string): string {
   return new Date(value).toISOString();
 }
 
+function formatDateForInput(value: string): string {
+  if (!value) return "";
+  const d = new Date(value);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 function memberDisplayName(m: {
   name: string;
   lastName: string | null;
@@ -49,6 +58,14 @@ function memberDisplayName(m: {
 
 const inputClassName =
   "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#252525] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
+
+function RequiredFieldMark() {
+  return (
+    <span className="text-red-500" aria-hidden="true">
+      *
+    </span>
+  );
+}
 
 export interface CreateWorkspaceActivityModalProps {
   isOpen: boolean;
@@ -98,7 +115,7 @@ export default function CreateWorkspaceActivityModal({
     setTitle("");
     setType(SALES_ACTIVITY_TYPE.LLAMADA);
     setActivityDate(formatDateTimeLocal(new Date()));
-    setDueDate("");
+    setDueDate(formatDateForInput(new Date().toISOString()));
     setPriority(TASK_PRIORITY.MEDIA);
     setResponsibleUserId(userId);
     setResult("");
@@ -147,7 +164,7 @@ export default function CreateWorkspaceActivityModal({
       variables: {
         data: {
           title: title.trim(),
-          dueDate: due ? due : null,
+          dueDate: due || null,
           priority: priority || TASK_PRIORITY.MEDIA,
           type,
           activityDate: dateTimeLocalToISO(activityDate),
@@ -155,6 +172,7 @@ export default function CreateWorkspaceActivityModal({
           comments: comments.trim() || null,
           businessLead: { connect: { id: leadId.trim() } },
           assignedSeller: { connect: { id: responsibleUserId.trim() } },
+          createdBy: { connect: { id: userId } },
           ...workspaceConnectPayload(workspaceId),
           ...statusCrmConnect,
         },
@@ -179,10 +197,10 @@ export default function CreateWorkspaceActivityModal({
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.96 }}
-        className="fixed inset-0 z-[125] flex items-center justify-center p-4 pointer-events-none"
+        className="modal fixed inset-0 z-[125] pointer-events-none"
       >
         <div
-          className="pointer-events-auto w-full max-w-lg rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] shadow-2xl overflow-hidden"
+          className="pointer-events-auto w-full max-w-lg rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] shadow-2xl"
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
@@ -216,7 +234,7 @@ export default function CreateWorkspaceActivityModal({
                 htmlFor="ws-activity-title"
                 className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
               >
-                Título de la actividad
+                Título de la actividad <RequiredFieldMark />
               </label>
               <input
                 id="ws-activity-title"
@@ -225,6 +243,7 @@ export default function CreateWorkspaceActivityModal({
                 className={inputClassName}
                 placeholder="Ej. Llamada de seguimiento"
                 required
+                minLength={1}
               />
             </div>
 
@@ -241,12 +260,13 @@ export default function CreateWorkspaceActivityModal({
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Tipo
+                Tipo <RequiredFieldMark />
               </label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
                 className={inputClassName}
+                required
               >
                 {ACTIVITY_TYPE_OPTIONS.map((opt) => (
                   <option key={opt} value={opt}>
@@ -258,7 +278,7 @@ export default function CreateWorkspaceActivityModal({
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Fecha y hora
+                Fecha y hora <RequiredFieldMark />
               </label>
               <input
                 type="datetime-local"
@@ -274,28 +294,27 @@ export default function CreateWorkspaceActivityModal({
                 htmlFor="ws-activity-due"
                 className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
               >
-                Fecha límite
+                Fecha límite <RequiredFieldMark />
               </label>
-              <p className="mb-1.5 text-xs text-[#616161] dark:text-[#9e9e9e]">
-                Opcional. Deadline para esta actividad.
-              </p>
               <input
                 id="ws-activity-due"
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
                 className={inputClassName}
+                required
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Prioridad
+                Prioridad <RequiredFieldMark />
               </label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
                 className={inputClassName}
+                required
               >
                 {TASK_PRIORITY_OPTIONS.map((opt) => (
                   <option key={opt} value={opt}>
@@ -307,7 +326,7 @@ export default function CreateWorkspaceActivityModal({
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Resultado
+                Resultado <RequiredFieldMark />
               </label>
               <input
                 value={result}
@@ -315,12 +334,13 @@ export default function CreateWorkspaceActivityModal({
                 className={inputClassName}
                 placeholder="Ej. Cliente interesado"
                 required
+                minLength={1}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Comentarios
+                Comentarios <RequiredFieldMark />
               </label>
               <textarea
                 value={comments}
@@ -329,6 +349,7 @@ export default function CreateWorkspaceActivityModal({
                 rows={3}
                 placeholder="Notas adicionales…"
                 required
+                minLength={1}
               />
             </div>
 

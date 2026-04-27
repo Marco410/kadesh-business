@@ -24,6 +24,7 @@ export default function CreateWorkspaceModal({
   userId,
 }: CreateWorkspaceModalProps) {
   const [name, setName] = useState("");
+  const [showTasks, setShowTasks] = useState(true);
   const [showActivities, setShowActivities] = useState(true);
   const [showProposals, setShowProposals] = useState(true);
   const [showFollowUpTasks, setShowFollowUpTasks] = useState(true);
@@ -32,6 +33,7 @@ export default function CreateWorkspaceModal({
   useEffect(() => {
     if (!isOpen) return;
     setName("");
+    setShowTasks(true);
     setShowActivities(true);
     setShowProposals(true);
     setShowFollowUpTasks(true);
@@ -58,6 +60,7 @@ export default function CreateWorkspaceModal({
           data: {
             name: trimmed,
             members: { connect: [{ id: userId }] },
+            showTasks,
             showActivities,
             showProposals,
             showFollowUpTasks,
@@ -91,10 +94,10 @@ export default function CreateWorkspaceModal({
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.96 }}
-        className="fixed inset-0 z-[125] flex items-center justify-center p-4 pointer-events-none"
+        className="modal fixed inset-0 z-[125] pointer-events-none"
       >
         <div
-          className="pointer-events-auto w-full max-w-md rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] shadow-2xl overflow-hidden"
+          className="pointer-events-auto w-full max-w-md rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] shadow-2xl"
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
@@ -108,7 +111,8 @@ export default function CreateWorkspaceModal({
               Nuevo espacio de trabajo
             </h2>
             <p className="mt-1 text-sm text-[#616161] dark:text-[#9e9e9e]">
-              Agrupa tareas, seguimientos y propuestas en un mismo contexto.
+              Agrupa tareas del espacio, actividades de ventas, seguimientos y propuestas en un mismo
+              contexto.
             </p>
           </div>
           <form onSubmit={handleSubmit} className="p-5 space-y-4">
@@ -135,8 +139,8 @@ export default function CreateWorkspaceModal({
               <label className="flex items-start gap-3 cursor-pointer select-none">
                 <input
                   type="checkbox"
-                  checked={showActivities}
-                  onChange={(e) => setShowActivities(e.target.checked)}
+                  checked={showTasks}
+                  onChange={(e) => setShowTasks(e.target.checked)}
                   className="mt-0.5 h-4 w-4 rounded border-[#e0e0e0] dark:border-[#3a3a3a] accent-orange-500"
                 />
                 <span className="min-w-0">
@@ -144,7 +148,24 @@ export default function CreateWorkspaceModal({
                     Tareas
                   </span>
                   <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
-                    Mostrar tareas de CRM en este workspace
+                    Mostrar tareas generales del workspace (no son actividades de ventas ni
+                    seguimientos de lead)
+                  </span>
+                </span>
+              </label>
+              <label className="flex items-start gap-3 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={showActivities}
+                  onChange={(e) => setShowActivities(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-[#e0e0e0] dark:border-[#3a3a3a] accent-orange-500"
+                />
+                <span className="min-w-0">
+                  <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                    Actividades
+                  </span>
+                  <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
+                    Mostrar actividades de ventas en este espacio de trabajo
                   </span>
                 </span>
               </label>

@@ -23,6 +23,7 @@ export const SAAS_WORKSPACE_DETAIL_QUERY = gql`
       showActivities
       showProposals
       showFollowUpTasks
+      showTasks
       crmStatuses {
         id
         name
@@ -67,6 +68,7 @@ export interface SaasWorkspaceDetailResponse {
     showActivities: boolean | null;
     showProposals: boolean | null;
     showFollowUpTasks: boolean | null;
+    showTasks: boolean | null;
     crmStatuses: SaasWorkspaceCrmStatus[] | null;
     members: Array<{
       id: string;
@@ -88,6 +90,7 @@ export const CREATE_SAAS_WORKSPACE_MUTATION = gql`
       showActivities
       showProposals
       showFollowUpTasks
+      showTasks
     }
   }
 `;
@@ -99,6 +102,7 @@ export interface CreateSaasWorkspaceVariables {
     showActivities?: boolean;
     showProposals?: boolean;
     showFollowUpTasks?: boolean;
+    showTasks?: boolean;
   };
 }
 
@@ -109,6 +113,7 @@ export interface CreateSaasWorkspaceMutation {
     showActivities: boolean | null;
     showProposals: boolean | null;
     showFollowUpTasks: boolean | null;
+    showTasks: boolean | null;
   };
 }
 
@@ -123,6 +128,7 @@ export const UPDATE_SAAS_WORKSPACE_MUTATION = gql`
       showActivities
       showProposals
       showFollowUpTasks
+      showTasks
       members {
         id
       }
@@ -143,6 +149,7 @@ export interface UpdateSaasWorkspaceVariables {
     showActivities?: boolean | null;
     showProposals?: boolean | null;
     showFollowUpTasks?: boolean | null;
+    showTasks?: boolean | null;
   };
 }
 
@@ -239,6 +246,7 @@ export interface UpdateSaasWorkspaceMutation {
     showActivities: boolean | null;
     showProposals: boolean | null;
     showFollowUpTasks: boolean | null;
+    showTasks: boolean | null;
     members: Array<{ id: string }>;
     crmStatuses: Array<{ id: string; name: string; color: string }> | null;
   };
@@ -254,6 +262,7 @@ export const CREATE_SAAS_WORKSPACES_MUTATION = gql`
       showActivities
       showFollowUpTasks
       showProposals
+      showTasks
       crmStatuses {
         id
       }
@@ -267,6 +276,7 @@ export type SaasWorkspaceBulkCreateInputItem = {
   showActivities?: boolean;
   showProposals?: boolean;
   showFollowUpTasks?: boolean;
+  showTasks?: boolean;
   members?: { connect: Array<{ id: string }> };
 };
 
@@ -282,6 +292,7 @@ export interface CreateSaasWorkspacesMutation {
     showActivities: boolean | null;
     showFollowUpTasks: boolean | null;
     showProposals: boolean | null;
+    showTasks: boolean | null;
     crmStatuses: Array<{ id: string }> | null;
   }>;
 }

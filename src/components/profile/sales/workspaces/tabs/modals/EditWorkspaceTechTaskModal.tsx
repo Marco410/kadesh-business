@@ -6,20 +6,20 @@ import { useMutation } from "@apollo/client";
 import { sileo } from "sileo";
 import Link from "next/link";
 import {
-  TECH_PROPOSALS_QUERY,
-  UPDATE_TECH_PROPOSAL_MUTATION,
-  type TechProposalsResponse,
-  type TechProposalsVariables,
-  type UpdateTechProposalMutation,
-  type UpdateTechProposalVariables,
+  TECH_TASKS_QUERY,
+  UPDATE_TECH_TASK_MUTATION,
+  type TechTasksResponse,
+  type TechTasksVariables,
+  type UpdateTechTaskMutation,
+  type UpdateTechTaskVariables,
 } from "kadesh/components/profile/sales/queries";
 import type { SaasWorkspaceCrmStatus } from "kadesh/components/profile/sales/workspaces/queries";
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
 import HiddenInWorkspaceSwitch from "./HiddenInWorkspaceSwitch";
 import { Routes } from "kadesh/core/routes";
-import { PROPOSAL_STATUS } from "kadesh/constants/constans";
+import { TASK_PRIORITY } from "kadesh/constants/constans";
 
-const PROPOSAL_STATUS_OPTIONS = Object.values(PROPOSAL_STATUS);
+const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
 
 function formatDateForInput(value: string): string {
   if (!value) return "";
@@ -30,93 +30,87 @@ function formatDateForInput(value: string): string {
   return `${y}-${m}-${day}`;
 }
 
+function dateInputToIso(dateStr: string): string {
+  if (!dateStr) return new Date().toISOString();
+  return new Date(`${dateStr}T12:00:00`).toISOString();
+}
+
 const inputClassName =
   "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#252525] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 
-type ProposalRow = TechProposalsResponse["techProposals"][number];
+type TechTaskRow = TechTasksResponse["techTasks"][number];
 
-export interface EditWorkspaceProposalModalProps {
+export interface EditWorkspaceTechTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   workspaceId: string;
-  proposal: ProposalRow | null;
+  task: TechTaskRow | null;
   crmStatuses: SaasWorkspaceCrmStatus[];
   defaultCrmStatusId: string | null;
 }
 
-export default function EditWorkspaceProposalModal({
+export default function EditWorkspaceTechTaskModal({
   isOpen,
   onClose,
   workspaceId,
-  proposal,
+  task,
   crmStatuses,
   defaultCrmStatusId,
-}: EditWorkspaceProposalModalProps) {
-  const [sentDate, setSentDate] = useState("");
-  const [amount, setAmount] = useState("");
-  const [status, setStatus] = useState("");
-  const [product, setProduct] = useState("");
-  const [notes, setNotes] = useState("");
-  const [fileOrUrl, setFileOrUrl] = useState("");
+}: EditWorkspaceTechTaskModalProps) {
+  const [title, setTitle] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [priority, setPriority] = useState("");
+  const [result, setResult] = useState("");
+  const [comments, setComments] = useState("");
   const [statusCrmId, setStatusCrmId] = useState("");
   const [hiddenInWorkspace, setHiddenInWorkspace] = useState(false);
 
   useEffect(() => {
-    if (!isOpen || !proposal) return;
-    setSentDate(formatDateForInput(proposal.sentDate));
-    setAmount(proposal.amount != null ? String(proposal.amount) : "");
-    setStatus(proposal.status);
-    setProduct(proposal.product ?? "");
-    setNotes(proposal.notes ?? "");
-    setFileOrUrl(proposal.fileOrUrl ?? "");
-    setStatusCrmId(
-      proposal.statusCrm?.id ?? defaultCrmStatusId ?? crmStatuses[0]?.id ?? ""
-    );
-    setHiddenInWorkspace(proposal.hiddenInWorkspace === true);
-  }, [isOpen, proposal, defaultCrmStatusId, crmStatuses]);
+    if (!isOpen || !task) return;
+    setTitle(task.title ?? "");
+    setStartDate(formatDateForInput(task.startDate));
+    setDueDate(task.dueDate ? formatDateForInput(task.dueDate) : "");
+    setPriority(task.priority);
+    setResult(task.result ?? "");
+    setComments(task.comments ?? "");
+    setStatusCrmId(task.statusCrm?.id ?? defaultCrmStatusId ?? crmStatuses[0]?.id ?? "");
+    setHiddenInWorkspace(task.hiddenInWorkspace === true);
+  }, [isOpen, task, defaultCrmStatusId, crmStatuses]);
 
-  const boardWhere: TechProposalsVariables["where"] = mergeWorkspaceFilter({}, workspaceId);
+  const boardWhere: TechTasksVariables["where"] = mergeWorkspaceFilter({}, workspaceId);
 
-  const [updateProposal, { loading }] = useMutation<
-    UpdateTechProposalMutation,
-    UpdateTechProposalVariables
-  >(UPDATE_TECH_PROPOSAL_MUTATION, {
-    refetchQueries: [{ query: TECH_PROPOSALS_QUERY, variables: { where: boardWhere } }],
+  const [updateTask, { loading }] = useMutation<
+    UpdateTechTaskMutation,
+    UpdateTechTaskVariables
+  >(UPDATE_TECH_TASK_MUTATION, {
+    refetchQueries: [{ query: TECH_TASKS_QUERY, variables: { where: boardWhere } }],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      sileo.success({ title: "Propuesta actualizada" });
+      sileo.success({ title: "Tarea actualizada" });
       onClose();
     },
     onError: (err) =>
-      sileo.error({ title: err.message || "No se pudo actualizar la propuesta" }),
+      sileo.error({ title: err.message || "No se pudo actualizar la tarea" }),
   });
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!proposal) return;
-    if (!fileOrUrl.trim()) {
-      sileo.warning({ title: "La URL o referencia al archivo es obligatoria" });
-      return;
-    }
-    const amountNum = amount.trim() ? parseFloat(amount) : null;
-    if (amountNum != null && (Number.isNaN(amountNum) || amountNum < 0)) {
-      sileo.warning({ title: "El monto debe ser un número válido" });
-      return;
-    }
+    if (!task) return;
     const statusPayload =
       statusCrmId.trim() !== ""
         ? { statusCrm: { connect: { id: statusCrmId.trim() } } }
         : {};
-    updateProposal({
+    updateTask({
       variables: {
-        where: { id: proposal.id },
+        where: { id: task.id },
         data: {
-          sentDate: sentDate || formatDateForInput(new Date().toISOString()),
-          amount: amountNum,
-          status: status || PROPOSAL_STATUS.ENVIADA,
-          fileOrUrl: fileOrUrl.trim(),
-          product: product.trim() || null,
-          notes: notes.trim() || null,
+          title: title.trim() || null,
+          startDate: dateInputToIso(startDate),
+          dueDate: dueDate.trim() !== "" ? dateInputToIso(dueDate) : null,
+          priority: priority || TASK_PRIORITY.MEDIA,
+          result: result.trim(),
+          comments: comments.trim(),
           hiddenInWorkspace,
           ...statusPayload,
         },
@@ -124,12 +118,12 @@ export default function EditWorkspaceProposalModal({
     });
   }
 
-  if (!isOpen || !proposal) return null;
+  if (!isOpen || !task) return null;
 
   return (
     <AnimatePresence>
       <motion.div
-        key="ewp-backdrop"
+        key="ewt-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -137,7 +131,7 @@ export default function EditWorkspaceProposalModal({
         onClick={onClose}
       />
       <motion.div
-        key="ewp-dialog"
+        key="ewt-dialog"
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.96 }}
@@ -148,21 +142,21 @@ export default function EditWorkspaceProposalModal({
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
-          aria-labelledby="edit-ws-proposal-title"
+          aria-labelledby="edit-ws-tech-task-title"
         >
           <div className="border-b border-[#e0e0e0] dark:border-[#3a3a3a] px-5 py-4">
             <h2
-              id="edit-ws-proposal-title"
+              id="edit-ws-tech-task-title"
               className="text-lg font-semibold text-[#212121] dark:text-white"
             >
-              Editar propuesta
+              Editar tarea
             </h2>
-            {proposal.businessLead && (
+            {task.businessLead && (
               <Link
-                href={Routes.panelLead(proposal.businessLead.id)}
+                href={Routes.panelLead(task.businessLead.id)}
                 className="mt-2 inline-block text-sm font-medium text-orange-600 dark:text-orange-400 hover:underline"
               >
-                Ir al lead: {proposal.businessLead.businessName}
+                Ir al lead: {task.businessLead.businessName}
               </Link>
             )}
           </div>
@@ -186,81 +180,79 @@ export default function EditWorkspaceProposalModal({
               </select>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
+                Título
+              </label>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className={inputClassName}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
+                Prioridad
+              </label>
+              <select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                className={inputClassName}
+              >
+                {TASK_PRIORITY_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                  Fecha envío
+                  Fecha de la tarea
                 </label>
                 <input
                   type="date"
-                  value={sentDate}
-                  onChange={(e) => setSentDate(e.target.value)}
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
                   className={inputClassName}
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                  Estado (legado)
+                  Fecha límite
                 </label>
-                <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
+                <input
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
                   className={inputClassName}
-                >
-                  {PROPOSAL_STATUS_OPTIONS.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                URL o referencia al archivo
+                Resultado o cierre
               </label>
               <input
-                value={fileOrUrl}
-                onChange={(e) => setFileOrUrl(e.target.value)}
+                value={result}
+                onChange={(e) => setResult(e.target.value)}
                 className={inputClassName}
-                required
+                placeholder="Opcional"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Producto o servicio
-              </label>
-              <input
-                value={product}
-                onChange={(e) => setProduct(e.target.value)}
-                className={inputClassName}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Monto
-              </label>
-              <input
-                type="number"
-                min={0}
-                step="0.01"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className={inputClassName}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Notas
+                Comentarios
               </label>
               <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
+                value={comments}
+                onChange={(e) => setComments(e.target.value)}
                 className={inputClassName}
                 rows={3}
               />

@@ -10,6 +10,7 @@ import type {
   TechFollowUpTasksResponse,
   TechProposalsResponse,
   TechSalesActivitiesResponse,
+  TechTasksResponse,
 } from "kadesh/components/profile/sales/queries";
 import AssigneeAvatar from "kadesh/components/profile/sales/workspaces/AssigneeAvatar";
 import { filterByCrmStatusColumn } from "kadesh/components/profile/sales/workspaces/filter-by-crm-status";
@@ -21,16 +22,17 @@ import CardSkeleton from "kadesh/components/profile/sales/workspaces/tabs/CardSk
 type ActivityRow = TechSalesActivitiesResponse["techSalesActivities"][number];
 type TaskRow = TechFollowUpTasksResponse["techFollowUpTasks"][number];
 type ProposalRow = TechProposalsResponse["techProposals"][number];
+type TechTaskRow = TechTasksResponse["techTasks"][number];
 
-export type WorkspaceCrmEntityTab = "act" | "tasks" | "props";
+export type WorkspaceCrmEntityTab = "tech" | "act" | "tasks" | "props";
 
 export type WorkspaceCrmBoardViewTab = WorkspaceCrmEntityTab | "hidden";
 
 const emptyLineClass =
-  "rounded-xl border border-dashed border-neutral-300 bg-white py-18 text-center text-sm font-medium text-neutral-600 shadow-sm dark:border-[#404040] dark:bg-[#1e1e1e]/60 dark:text-[#9e9e9e]";
+  "rounded-xl border border-dashed border-neutral-300 bg-white py-18 h-42 text-center text-sm font-medium text-neutral-600 shadow-sm dark:border-[#404040] dark:bg-[#1e1e1e]/60 dark:text-[#9e9e9e] ";
 
 const cardShellClass =
-  "flex w-full gap-0 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-all hover:border-orange-400/50 hover:shadow-md dark:border-[#333] dark:bg-[#1e1e1e] dark:hover:border-orange-500/35 text-left";
+  "flex w-full gap-0 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-all hover:border-orange-400/50 hover:shadow-md dark:border-[#333] dark:bg-[#1e1e1e] dark:hover:border-orange-500/35 text-left min-h-42";
 
 const dragHandleClass =
   "flex shrink-0 cursor-grab touch-none items-center justify-center border-r border-neutral-200 bg-neutral-100 px-1.5 text-neutral-500 hover:bg-neutral-200/80 hover:text-neutral-700 active:cursor-grabbing dark:border-[#333] dark:bg-[#222] dark:text-[#9e9e9e] dark:hover:bg-[#2a2a2a] dark:hover:text-[#b0b0b0]";
@@ -49,6 +51,7 @@ export interface WorkspaceCrmStatusColumnProps {
   defaultStatusColumnId: string | null;
   entityTab: WorkspaceCrmEntityTab;
   showHiddenOnly?: boolean;
+  techTasks: TechTaskRow[];
   activities: ActivityRow[];
   tasks: TaskRow[];
   proposals: ProposalRow[];
@@ -58,6 +61,7 @@ export interface WorkspaceCrmStatusColumnProps {
   onColumnDragLeave: (e: React.DragEvent<HTMLDivElement>) => void;
   onColumnDrop: (e: React.DragEvent<HTMLDivElement>) => void;
   onBoardDragEnd: () => void;
+  onEditTechTask: (t: TechTaskRow) => void;
   onEditActivity: (a: ActivityRow) => void;
   onEditTask: (t: TaskRow) => void;
   onEditProposal: (p: ProposalRow) => void;
@@ -68,6 +72,7 @@ export default function WorkspaceCrmStatusColumn({
   defaultStatusColumnId,
   entityTab,
   showHiddenOnly = false,
+  techTasks,
   activities,
   tasks,
   proposals,
@@ -77,6 +82,7 @@ export default function WorkspaceCrmStatusColumn({
   onColumnDragLeave,
   onColumnDrop,
   onBoardDragEnd,
+  onEditTechTask,
   onEditActivity,
   onEditTask,
   onEditProposal,
@@ -93,25 +99,32 @@ export default function WorkspaceCrmStatusColumn({
   const colProposals = byHidden(
     filterByCrmStatusColumn(proposals, status.id, defaultStatusColumnId)
   );
+  const colTechTasks = byHidden(
+    filterByCrmStatusColumn(techTasks, status.id, defaultStatusColumnId)
+  );
 
   const hiddenInColumnCount =
-    colActivities.length + colTasks.length + colProposals.length;
+    colActivities.length + colTechTasks.length + colTasks.length + colProposals.length;
 
   const count = showHiddenOnly
     ? hiddenInColumnCount
-    : entityTab === "act"
-      ? colActivities.length
-      : entityTab === "tasks"
-        ? colTasks.length
-        : colProposals.length;
+    : entityTab === "tech"
+      ? colTechTasks.length
+      : entityTab === "act"
+        ? colActivities.length
+        : entityTab === "tasks"
+          ? colTasks.length
+          : colProposals.length;
 
   const emptyCopy = showHiddenOnly
     ? "No hay registros ocultos en este estado."
-    : entityTab === "act"
+    : entityTab === "tech"
       ? "No hay tareas en este estado."
-      : entityTab === "tasks"
-        ? "No hay seguimientos en este estado."
-        : "No hay propuestas en este estado.";
+      : entityTab === "act"
+        ? "No hay actividades en este estado."
+        : entityTab === "tasks"
+          ? "No hay seguimientos en este estado."
+          : "No hay propuestas en este estado.";
 
   const dropZoneClass = dropHighlight
     ? "rounded-xl bg-orange-50 ring-2 ring-orange-400/70 ring-inset dark:bg-orange-500/10 dark:ring-orange-500/45"
@@ -146,6 +159,59 @@ export default function WorkspaceCrmStatusColumn({
               <p className={emptyLineClass}>{emptyCopy}</p>
             ) : (
               <>
+                {colTechTasks.map((tt) => (
+                  <div key={`tech-${tt.id}`} className={cardShellClass}>
+                    <button
+                      type="button"
+                      draggable
+                      onDragStart={(e) => {
+                        setWorkspaceCrmDragData(e.dataTransfer, { entity: "tech", id: tt.id });
+                      }}
+                      onDragEnd={onBoardDragEnd}
+                      className={dragHandleClass}
+                      aria-label="Arrastrar a otra columna"
+                    >
+                      <HugeiconsIcon icon={DragDropVerticalIcon} size={18} />
+                    </button>
+                    <button
+                      type="button"
+                      className={cardBodyClass}
+                      onClick={() => onEditTechTask(tt)}
+                    >
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-orange-600 dark:text-orange-400">
+                        Tarea
+                      </p>
+                      <p className="text-sm font-semibold text-[#212121] dark:text-white line-clamp-2">
+                        {tt.title?.trim()}
+                        {tt.businessLead ? ` · ${tt.businessLead.businessName}` : ""}
+                      </p>
+                      {tt.businessLead && (
+                        <Link
+                          href={Routes.panelLead(tt.businessLead.id)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="mt-1 inline-block text-xs font-medium text-orange-600 dark:text-orange-400 hover:underline"
+                        >
+                          Abrir lead
+                        </Link>
+                      )}
+                      <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                        {formatDateShort(tt.startDate)}
+                        {tt.dueDate ? ` · Vence ${formatDateShort(tt.dueDate)}` : ""}
+                        {tt.priority ? ` · ${tt.priority}` : ""}
+                      </p>
+                      <div className="mt-3 flex items-center justify-between gap-2">
+                        <StatusPill label={tt.statusCrm?.name ?? "Tarea"} />
+                        {tt.responsible && (
+                          <AssigneeAvatar
+                            name={tt.responsible.name}
+                            lastName={tt.responsible.lastName}
+                            imageUrl={tt.responsible.profileImage?.url}
+                          />
+                        )}
+                      </div>
+                    </button>
+                  </div>
+                ))}
                 {colActivities.map((a) => (
                   <div key={`act-${a.id}`} className={cardShellClass}>
                     <button
@@ -305,6 +371,61 @@ export default function WorkspaceCrmStatusColumn({
                   </div>
                 ))}
               </>
+            )
+          ) : entityTab === "tech" ? (
+            colTechTasks.length === 0 ? (
+              <p className={emptyLineClass}>{emptyCopy}</p>
+            ) : (
+              colTechTasks.map((tt) => (
+                <div key={tt.id} className={cardShellClass}>
+                  <button
+                    type="button"
+                    draggable
+                    onDragStart={(e) => {
+                      setWorkspaceCrmDragData(e.dataTransfer, { entity: "tech", id: tt.id });
+                    }}
+                    onDragEnd={onBoardDragEnd}
+                    className={dragHandleClass}
+                    aria-label="Arrastrar a otra columna"
+                  >
+                    <HugeiconsIcon icon={DragDropVerticalIcon} size={18} />
+                  </button>
+                  <button
+                    type="button"
+                    className={cardBodyClass}
+                    onClick={() => onEditTechTask(tt)}
+                  >
+                    <p className="text-sm font-semibold text-[#212121] dark:text-white line-clamp-2">
+                      {tt.title?.trim()}
+                      {tt.businessLead ? ` · ${tt.businessLead.businessName}` : ""}
+                    </p>
+                    {tt.businessLead && (
+                      <Link
+                        href={Routes.panelLead(tt.businessLead.id)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="mt-1 inline-block text-xs font-medium text-orange-600 dark:text-orange-400 hover:underline"
+                      >
+                        Abrir lead
+                      </Link>
+                    )}
+                    <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                      {formatDateShort(tt.startDate)}
+                      {tt.dueDate ? ` · Vence ${formatDateShort(tt.dueDate)}` : ""}
+                      {tt.priority ? ` · ${tt.priority}` : ""}
+                    </p>
+                    <div className="mt-3 flex items-center justify-between gap-2">
+                      <StatusPill label={tt.statusCrm?.name ?? "Tarea"} />
+                      {tt.responsible && (
+                        <AssigneeAvatar
+                          name={tt.responsible.name}
+                          lastName={tt.responsible.lastName}
+                          imageUrl={tt.responsible.profileImage?.url}
+                        />
+                      )}
+                    </div>
+                  </button>
+                </div>
+              ))
             )
           ) : entityTab === "act" ? (
             colActivities.length === 0 ? (

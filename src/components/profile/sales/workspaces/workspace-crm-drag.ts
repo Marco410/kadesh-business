@@ -1,7 +1,7 @@
 export const WORKSPACE_CRM_CARD_DRAG_MIME = "application/x-kadesh-workspace-crm-card";
 
 export type WorkspaceCrmCardDragPayload = {
-  entity: "act" | "tasks" | "props";
+  entity: "tech" | "act" | "tasks" | "props";
   id: string;
 };
 
@@ -23,7 +23,10 @@ export function readWorkspaceCrmDragPayload(
     if (
       v &&
       typeof v.id === "string" &&
-      (v.entity === "act" || v.entity === "tasks" || v.entity === "props")
+      (v.entity === "tech" ||
+        v.entity === "act" ||
+        v.entity === "tasks" ||
+        v.entity === "props")
     ) {
       return v;
     }

@@ -599,6 +599,14 @@ export const TASK_PRIORITY = {
   ALTA: "Alta",
 } as const;
 
+/** Tipos de `TechTask` en workspace (alineado con backend / CRM). */
+export const WORKSPACE_TASK_TYPE = {
+  GENERAL: "General",
+  PROGRAMADA: "Programada",
+  REVISION: "Revisión",
+  MANTENIMIENTO: "Mantenimiento",
+} as const;
+
 export const EVENT_COLORS = {
   activity: "bg-orange-500",
   proposal: "bg-blue-500",

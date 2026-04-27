@@ -16,6 +16,7 @@ export default function WorkspaceDashboard({
 }: WorkspaceDashboardProps) {
   const {
     enabledTabs,
+    showTasks,
     showActivities,
     showFollowUpTasks,
     showProposals,
@@ -32,7 +33,8 @@ export default function WorkspaceDashboard({
             Este workspace no tiene tabs habilitadas
           </p>
           <p className="mt-2 text-sm text-[#616161] dark:text-[#9e9e9e] max-w-md mx-auto">
-            Al crear el espacio se desactivaron Tareas, Seguimientos y Propuestas.
+            Al crear el espacio se desactivaron las pestañas del tablero (tareas, actividades,
+            seguimientos y propuestas).
           </p>
         </div>
       ) : isLoadingConfig ? (
@@ -62,6 +64,7 @@ export default function WorkspaceDashboard({
           showSkeleton={showSkeleton}
           crmStatuses={crmStatuses}
           defaultCrmStatusId={defaultCrmStatusId}
+          showTasks={showTasks}
           showActivities={showActivities}
           showFollowUpTasks={showFollowUpTasks}
           showProposals={showProposals}

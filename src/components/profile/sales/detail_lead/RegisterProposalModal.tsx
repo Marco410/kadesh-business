@@ -204,6 +204,7 @@ export default function RegisterProposalModal({
               notes: notes.trim() || null,
               businessLead: { connect: { id: leadId } },
               assignedSeller: { connect: { id: userId } },
+              createdBy: { connect: { id: userId } },
               ...workspaceConnectPayload(currentWorkspaceId),
             },
           },

@@ -122,23 +122,23 @@ export default function WorkspaceSwitcher({
           ))}
           {workspaces.length === 0 && !loading && (
             <p className="px-4 py-3 text-xs text-[#616161] dark:text-[#9e9e9e]">
-              Aún no tienes espacios. Crea uno para organizar tareas, seguimientos y
+              Aún no tienes espacios. Crea uno para organizar tareas, actividades, seguimientos y
               propuestas.
             </p>
           )}
           <div className="my-1 h-px bg-[#e0e0e0] dark:bg-[#3a3a3a]" />
-          <button
-            type="button"
-            onClick={() => {
-              setOpen(false);
-              void refetch();
-              onRequestCreate?.();
-            }}
-            className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-orange-600 dark:text-orange-400 hover:bg-orange-500/5 font-medium"
-          >
-            <HugeiconsIcon icon={Add01Icon} size={18} />
-            Crear nuevo espacio
-          </button>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                void refetch();
+                onRequestCreate?.();
+              }}
+              className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-orange-600 dark:text-orange-400 hover:bg-orange-500/5 font-medium"
+            >
+              <HugeiconsIcon icon={Add01Icon} size={18} />
+              Crear nuevo espacio
+            </button>
         </div>
       )}
     </div>
