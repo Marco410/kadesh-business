@@ -18,6 +18,8 @@ import {
   type TechFollowUpTasksResponse,
   type TechFollowUpTasksCalendarVariables,
 } from "kadesh/components/profile/sales/queries";
+import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
+import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
 import { Role } from "kadesh/constants/constans";
 import { EVENT_LABELS } from "kadesh/constants/constans";
 import SalesCalendarView, { type CalendarEvent } from "kadesh/components/profile/sales/SalesCalendarView";
@@ -49,6 +51,7 @@ interface VendedoresCalendarProps {
 }
 
 export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) {
+  const { currentWorkspaceId } = useWorkspaceContext();
   const { user } = useUser();
   const isAdminCompany =
     user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
@@ -93,9 +96,11 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
     return map;
   }, [vendedores, isAdminCompany, userId, user?.name]);
 
-  const whereCalendar: TechSalesActivitiesCalendarVariables["where"] = {
-    assignedSeller: { id: { in: vendedorIds } },
-  };
+  const whereCalendar: TechSalesActivitiesCalendarVariables["where"] =
+    mergeWorkspaceFilter(
+      { assignedSeller: { id: { in: vendedorIds } } },
+      currentWorkspaceId
+    );
 
   const { data: activitiesData } = useQuery<
     TechSalesActivitiesResponse,

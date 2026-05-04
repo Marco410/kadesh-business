@@ -42,6 +42,9 @@ export default function ClientLeadAutocomplete({
   const { user } = useUser();
   const isAdminCompany =
     user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const isUserCompany =
+    user?.roles?.some((r) => r.name === Role.USER_COMPANY) ?? false;
+  const hasCompanyWideLeadScope = isAdminCompany || isUserCompany;
 
   const { data: userData } = useQuery<
     UserCompanyCategoriesResponse,
@@ -58,11 +61,11 @@ export default function ClientLeadAutocomplete({
       ...(companyId
         ? { saasCompany: { some: { id: { equals: companyId } } } }
         : {}),
-      ...(!isAdminCompany
+      ...(!hasCompanyWideLeadScope
         ? { salesPerson: { some: { id: { equals: userId } } } }
         : {}),
     }),
-    [companyId, isAdminCompany, userId],
+    [companyId, hasCompanyWideLeadScope, userId],
   );
 
   const clientsQueryVariables = useMemo(
@@ -70,12 +73,12 @@ export default function ClientLeadAutocomplete({
       buildClientLeadsQueryVariables({
         where: clientsWhere,
         companyId,
-        isAdminCompany,
+        hasCompanyWideLeadScope,
         userId,
         take: 500,
         orderBy: [{ createdAt: "desc" }],
       }),
-    [clientsWhere, companyId, isAdminCompany, userId],
+    [clientsWhere, companyId, hasCompanyWideLeadScope, userId],
   );
 
   const { data: clientsData, loading: loadingClients } = useQuery<

@@ -7,6 +7,7 @@ import { ThemeProvider } from '../providers/ThemeProvider';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
 import { UserProvider } from "kadesh/utils/UserContext";
+import { WorkspaceProvider } from "kadesh/components/profile/sales/workspaces";
 import { HeroUIProvider } from "@heroui/system";
 import { Toaster } from "sileo";
 import { useTheme } from "next-themes";
@@ -40,7 +41,9 @@ export default function ClientProviders({
       <HeroUIProvider locale="es-MX">
         <ApolloProviderWrapper>
           <UserProvider>
+            <WorkspaceProvider>
             {children}
+            </WorkspaceProvider>
             <ThemedToaster />
             <SpeedInsights />
             <Analytics />

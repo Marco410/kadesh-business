@@ -15,6 +15,7 @@ import {
   type UpdateSaasCompanyVariables,
 } from "kadesh/utils/queries";
 import { Routes } from "kadesh/core/routes";
+import { PaletteColorPicker } from "kadesh/components/shared";
 
 const INPUT_CLASS =
   "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
@@ -393,12 +394,13 @@ export default function ProfileCompanySection({
                 <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
                   Color primario (hex)
                 </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
+                <div className="space-y-2">
+                  <PaletteColorPicker
+                    label=""
                     value={normalizeHexColor(colorPrimary) ?? DEFAULT_PRIMARY}
-                    onChange={(e) => setColorPrimary(e.target.value.toUpperCase())}
-                    className="h-11 w-14 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] p-1 cursor-pointer"
+                    onChange={(hex) => setColorPrimary(hex.toUpperCase())}
+                    disabled={savingCompany}
+                    ariaLabel="Elegir color primario de la empresa"
                   />
                   <input
                     type="text"
@@ -406,6 +408,7 @@ export default function ProfileCompanySection({
                     onChange={(e) => setColorPrimary(e.target.value)}
                     placeholder="#F7945E"
                     className={INPUT_CLASS}
+                    disabled={savingCompany}
                   />
                 </div>
               </div>
@@ -414,12 +417,13 @@ export default function ProfileCompanySection({
                 <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
                   Color secundario (hex)
                 </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
+                <div className="space-y-2">
+                  <PaletteColorPicker
+                    label=""
                     value={normalizeHexColor(colorSecondary) ?? DEFAULT_SECONDARY}
-                    onChange={(e) => setColorSecondary(e.target.value.toUpperCase())}
-                    className="h-11 w-14 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] p-1 cursor-pointer"
+                    onChange={(hex) => setColorSecondary(hex.toUpperCase())}
+                    disabled={savingCompany}
+                    ariaLabel="Elegir color secundario de la empresa"
                   />
                   <input
                     type="text"
@@ -427,6 +431,7 @@ export default function ProfileCompanySection({
                     onChange={(e) => setColorSecondary(e.target.value)}
                     placeholder="#E07C3A"
                     className={INPUT_CLASS}
+                    disabled={savingCompany}
                   />
                 </div>
               </div>

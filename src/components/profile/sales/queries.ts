@@ -690,17 +690,32 @@ export const TECH_SALES_ACTIVITIES_QUERY = gql`
   query TechSalesActivities($where: TechSalesActivityWhereInput!) {
     techSalesActivities(where: $where) {
       id
+      title
+      dueDate
+      priority
       activityDate
       type
       result
       comments
       createdAt
+      hiddenInWorkspace
+      statusCrm {
+        id
+        name
+        color
+        key
+      }
       businessLead {
         id
         businessName
       }
       assignedSeller {
         id
+        name
+        lastName
+        profileImage {
+          url
+        }
       }
     }
   }
@@ -724,13 +739,28 @@ export interface TechSalesActivitiesCalendarVariables {
 export interface TechSalesActivitiesResponse {
   techSalesActivities: Array<{
     id: string;
+    title: string | null;
+    dueDate: string | null;
+    priority: string | null;
     activityDate: string;
     type: string;
     result: string | null;
     comments: string | null;
     createdAt: string;
+    hiddenInWorkspace: boolean | null;
+    statusCrm: {
+      id: string;
+      name: string;
+      color: string;
+      key: string;
+    } | null;
     businessLead: { id: string; businessName: string } | null;
-    assignedSeller?: { id: string } | null;
+    assignedSeller?: {
+      id: string;
+      name: string;
+      lastName: string | null;
+      profileImage: { url: string } | null;
+    } | null;
   }>;
 }
 
@@ -738,6 +768,9 @@ export const TECH_SALES_ACTIVITY_QUERY = gql`
   query TechSalesActivity($where: TechSalesActivityWhereUniqueInput!) {
     techSalesActivity(where: $where) {
       id
+      title
+      dueDate
+      priority
       activityDate
       type
       result
@@ -746,6 +779,11 @@ export const TECH_SALES_ACTIVITY_QUERY = gql`
       businessLead {
         id
         businessName
+      }
+      assignedSeller {
+        id
+        name
+        lastName
       }
     }
   }
@@ -758,12 +796,20 @@ export interface TechSalesActivityVariables {
 export interface TechSalesActivityResponse {
   techSalesActivity: {
     id: string;
+    title: string | null;
+    dueDate: string | null;
+    priority: string | null;
     activityDate: string;
     type: string;
     result: string | null;
     comments: string | null;
     createdAt: string;
     businessLead: { id: string; businessName: string } | null;
+    assignedSeller: {
+      id: string;
+      name: string;
+      lastName: string | null;
+    } | null;
   } | null;
 }
 
@@ -771,6 +817,9 @@ export const CREATE_TECH_SALES_ACTIVITY_MUTATION = gql`
   mutation CreateTechSalesActivity($data: TechSalesActivityCreateInput!) {
     createTechSalesActivity(data: $data) {
       id
+      title
+      dueDate
+      priority
       type
       activityDate
       result
@@ -781,18 +830,74 @@ export const CREATE_TECH_SALES_ACTIVITY_MUTATION = gql`
 
 export interface CreateTechSalesActivityVariables {
   data: {
+    title: string;
+    dueDate?: string | null;
+    priority?: string | null;
     type: string;
     activityDate: string;
     result?: string | null;
     comments?: string | null;
     businessLead: { connect: { id: string } };
     assignedSeller: { connect: { id: string } };
+    createdBy: { connect: { id: string } };
+    workspace?: { connect: { id: string } } | null;
+    statusCrm?: { connect: { id: string } } | null;
   };
 }
 
 export interface CreateTechSalesActivityMutation {
   createTechSalesActivity: {
     id: string;
+    title: string | null;
+    dueDate: string | null;
+    priority: string | null;
+    type: string;
+    activityDate: string;
+    result: string | null;
+    comments: string | null;
+  };
+}
+
+export const UPDATE_TECH_SALES_ACTIVITY_MUTATION = gql`
+  mutation UpdateTechSalesActivity(
+    $where: TechSalesActivityWhereUniqueInput!
+    $data: TechSalesActivityUpdateInput!
+  ) {
+    updateTechSalesActivity(where: $where, data: $data) {
+      id
+      title
+      dueDate
+      priority
+      type
+      activityDate
+      result
+      comments
+    }
+  }
+`;
+
+export interface UpdateTechSalesActivityVariables {
+  where: { id: string };
+  data: {
+    title?: string | null;
+    dueDate?: string | null;
+    priority?: string | null;
+    type?: string | null;
+    activityDate?: string | null;
+    result?: string | null;
+    comments?: string | null;
+    hiddenInWorkspace?: boolean | null;
+    statusCrm?: { connect: { id: string } } | null;
+    assignedSeller?: { connect: { id: string } } | null;
+  };
+}
+
+export interface UpdateTechSalesActivityMutation {
+  updateTechSalesActivity: {
+    id: string;
+    title: string | null;
+    dueDate: string | null;
+    priority: string | null;
     type: string;
     activityDate: string;
     result: string | null;
@@ -816,12 +921,24 @@ export const TECH_PROPOSALS_QUERY = gql`
       updatedAt
       approved
       paid
+      hiddenInWorkspace
+      statusCrm {
+        id
+        name
+        color
+        key
+      }
       businessLead {
         id
         businessName
       }
       assignedSeller {
         id
+        name
+        lastName
+        profileImage {
+          url
+        }
       }
       project {
         id
@@ -880,8 +997,20 @@ export interface TechProposalsResponse {
     updatedAt: string | null;
     approved: boolean | null;
     paid: boolean | null;
+    hiddenInWorkspace: boolean | null;
+    statusCrm: {
+      id: string;
+      name: string;
+      color: string;
+      key: string;
+    } | null;
     businessLead: { id: string; businessName: string } | null;
-    assignedSeller?: { id: string } | null;
+    assignedSeller?: {
+      id: string;
+      name: string;
+      lastName: string | null;
+      profileImage: { url: string } | null;
+    } | null;
     project: { id: string } | null;
   }>;
 }
@@ -964,6 +1093,9 @@ export interface CreateTechProposalVariables {
     notes?: string | null;
     businessLead: { connect: { id: string } };
     assignedSeller: { connect: { id: string } };
+    createdBy: { connect: { id: string } };
+    workspace?: { connect: { id: string } } | null;
+    statusCrm?: { connect: { id: string } } | null;
   };
 }
 
@@ -1015,6 +1147,9 @@ export interface UpdateTechProposalVariables {
     notes?: string | null;
     approved?: boolean | null;
     paid?: boolean | null;
+    hiddenInWorkspace?: boolean | null;
+    statusCrm?: { connect: { id: string } } | null;
+    assignedSeller?: { connect: { id: string } } | null;
   };
 }
 
@@ -1045,12 +1180,24 @@ export const TECH_FOLLOW_UP_TASKS_QUERY = gql`
       notes
       createdAt
       updatedAt
+      hiddenInWorkspace
+      statusCrm {
+        id
+        name
+        color
+        key
+      }
       businessLead {
         id
         businessName
       }
       assignedSeller {
         id
+        name
+        lastName
+        profileImage {
+          url
+        }
       }
     }
   }
@@ -1085,8 +1232,20 @@ export interface TechFollowUpTasksResponse {
     notes: string | null;
     createdAt: string;
     updatedAt: string | null;
+    hiddenInWorkspace: boolean | null;
+    statusCrm: {
+      id: string;
+      name: string;
+      color: string;
+      key: string;
+    } | null;
     businessLead: { id: string; businessName: string } | null;
-    assignedSeller?: { id: string } | null;
+    assignedSeller?: {
+      id: string;
+      name: string;
+      lastName: string | null;
+      profileImage: { url: string } | null;
+    } | null;
   }>;
 }
 
@@ -1156,6 +1315,9 @@ export interface CreateTechFollowUpTaskVariables {
     notes?: string | null;
     businessLead: { connect: { id: string } };
     assignedSeller: { connect: { id: string } };
+    createdBy: { connect: { id: string } };
+    workspace?: { connect: { id: string } } | null;
+    statusCrm?: { connect: { id: string } } | null;
   };
 }
 
@@ -1198,6 +1360,9 @@ export interface UpdateTechFollowUpTaskVariables {
     status?: string | null;
     priority?: string | null;
     notes?: string | null;
+    hiddenInWorkspace?: boolean | null;
+    statusCrm?: { connect: { id: string } } | null;
+    assignedSeller?: { connect: { id: string } } | null;
   };
 }
 
@@ -1211,6 +1376,220 @@ export interface UpdateTechFollowUpTaskMutation {
     updatedAt: string | null;
     businessLead: { businessName: string } | null;
   };
+}
+
+// --- TechTask (tareas generales del workspace) ---
+
+export const TECH_TASKS_QUERY = gql`
+  query TechTasks($where: TechTaskWhereInput!) {
+    techTasks(where: $where) {
+      id
+      title
+      startDate
+      dueDate
+      priority
+      result
+      comments
+      createdAt
+      hiddenInWorkspace
+      statusCrm {
+        id
+        name
+        color
+        key
+      }
+      businessLead {
+        id
+        businessName
+      }
+      workspace {
+        id
+      }
+      responsible {
+        id
+        name
+        lastName
+        profileImage {
+          url
+        }
+      }
+    }
+  }
+`;
+
+export interface TechTasksVariables {
+  where: Record<string, unknown>;
+}
+
+export interface TechTasksResponse {
+  techTasks: Array<{
+    id: string;
+    title: string | null;
+    startDate: string;
+    dueDate: string | null;
+    priority: string;
+    result: string | null;
+    comments: string | null;
+    createdAt: string;
+    hiddenInWorkspace: boolean | null;
+    statusCrm: {
+      id: string;
+      name: string;
+      color: string;
+      key: string;
+    } | null;
+    businessLead: { id: string; businessName: string } | null;
+    workspace: { id: string } | null;
+    responsible: {
+      id: string;
+      name: string;
+      lastName: string | null;
+      profileImage: { url: string } | null;
+    } | null;
+  }>;
+}
+
+export const CREATE_TECH_TASK_MUTATION = gql`
+  mutation CreateTechTask($data: TechTaskCreateInput!) {
+    createTechTask(data: $data) {
+      id
+      title
+      startDate
+      dueDate
+      priority
+      result
+      comments
+      createdAt
+      hiddenInWorkspace
+      businessLead {
+        id
+      }
+      responsible {
+        id
+      }
+      statusCrm {
+        id
+      }
+      workspace {
+        id
+      }
+    }
+  }
+`;
+
+export interface CreateTechTaskVariables {
+  data: {
+    title?: string | null;
+    startDate: string;
+    dueDate?: string | null;
+    priority?: string | null;
+    result?: string | null;
+    comments?: string | null;
+    workspace: { connect: { id: string } };
+    responsible?: { connect: { id: string } } | null;
+    businessLead?: { connect: { id: string } } | null;
+    statusCrm?: { connect: { id: string } } | null;
+    createdBy: { connect: { id: string } };
+  };
+}
+
+export interface CreateTechTaskMutation {
+  createTechTask: {
+    id: string;
+    title: string | null;
+    startDate: string;
+    dueDate: string | null;
+    priority: string;
+    result: string | null;
+    comments: string | null;
+    createdAt: string;
+    hiddenInWorkspace: boolean | null;
+    businessLead: { id: string } | null;
+    responsible: { id: string } | null;
+    statusCrm: { id: string } | null;
+    workspace: { id: string } | null;
+  };
+}
+
+export const UPDATE_TECH_TASK_MUTATION = gql`
+  mutation UpdateTechTask(
+    $where: TechTaskWhereUniqueInput!
+    $data: TechTaskUpdateInput!
+  ) {
+    updateTechTask(where: $where, data: $data) {
+      id
+      title
+      startDate
+      dueDate
+      priority
+      result
+      comments
+      createdAt
+      hiddenInWorkspace
+      businessLead {
+        id
+      }
+      responsible {
+        id
+      }
+      statusCrm {
+        id
+      }
+      workspace {
+        id
+      }
+    }
+  }
+`;
+
+export interface UpdateTechTaskVariables {
+  where: { id: string };
+  data: {
+    title?: string | null;
+    startDate?: string | null;
+    dueDate?: string | null;
+    priority?: string | null;
+    result?: string | null;
+    comments?: string | null;
+    hiddenInWorkspace?: boolean | null;
+    statusCrm?: { connect: { id: string } } | null;
+    businessLead?: { connect: { id: string } } | null;
+    responsible?: { connect: { id: string } } | null;
+  };
+}
+
+export interface UpdateTechTaskMutation {
+  updateTechTask: {
+    id: string;
+    title: string | null;
+    startDate: string;
+    dueDate: string | null;
+    priority: string;
+    result: string | null;
+    comments: string | null;
+    createdAt: string;
+    hiddenInWorkspace: boolean | null;
+    businessLead: { id: string } | null;
+    responsible: { id: string } | null;
+    statusCrm: { id: string } | null;
+    workspace: { id: string } | null;
+  };
+}
+
+export const DELETE_TECH_TASK_MUTATION = gql`
+  mutation DeleteTechTask($where: TechTaskWhereUniqueInput!) {
+    deleteTechTask(where: $where) {
+      id
+    }
+  }
+`;
+
+export interface DeleteTechTaskVariables {
+  where: { id: string };
+}
+
+export interface DeleteTechTaskMutation {
+  deleteTechTask: { id: string } | null;
 }
 
 // ─── Agregar vendedor ───────────────────────────────────────────────────────
@@ -1250,6 +1629,37 @@ export interface CompanyVendedoresResponse {
   }>;
 }
 
+/** Usuarios de la empresa con rol `user_company` (sin flujo de comisiones). */
+export const COMPANY_USER_COMPANY_USERS_QUERY = gql`
+  query CompanyUserCompanyUsers($where: UserWhereInput!) {
+    users(where: $where, orderBy: [{ name: asc }], take: 300) {
+      id
+      name
+      lastName
+      email
+      phone
+      birthday
+    }
+  }
+`;
+
+export interface CompanyUserCompanyUsersVariables {
+  where: {
+    company?: { id?: { equals: string } };
+    roles?: { some?: { name?: { equals: string } } };
+  };
+}
+
+export interface CompanyUserCompanyUsersResponse {
+  users: Array<{
+    id: string;
+    name: string;
+    lastName: string | null;
+    email: string | null;
+    phone: string | null;
+    birthday: string | null;
+  }>;
+}
 
 export const UPDATE_VENDEDOR_MUTATION = gql`
   mutation UpdateVendedor(

@@ -78,6 +78,16 @@ export default function ActivityDetailModal({
               </p>
             ) : (
               <>
+                {activity.title?.trim() ? (
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                      Título
+                    </p>
+                    <p className="text-sm text-[#212121] dark:text-[#ffffff]">
+                      {activity.title}
+                    </p>
+                  </div>
+                ) : null}
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
                     Fecha y hora
@@ -94,6 +104,38 @@ export default function ActivityDetailModal({
                     {activity.type}
                   </p>
                 </div>
+                {activity.dueDate ? (
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                      Fecha límite
+                    </p>
+                    <p className="text-sm text-[#212121] dark:text-[#ffffff]">
+                      {formatDateShort(activity.dueDate)}
+                    </p>
+                  </div>
+                ) : null}
+                {activity.priority ? (
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                      Prioridad
+                    </p>
+                    <p className="text-sm text-[#212121] dark:text-[#ffffff]">
+                      {activity.priority}
+                    </p>
+                  </div>
+                ) : null}
+                {activity.assignedSeller ? (
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                      Responsable
+                    </p>
+                    <p className="text-sm text-[#212121] dark:text-[#ffffff]">
+                      {[activity.assignedSeller.name, activity.assignedSeller.lastName ?? ""]
+                        .filter(Boolean)
+                        .join(" ")}
+                    </p>
+                  </div>
+                ) : null}
                 {activity.businessLead && (
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">

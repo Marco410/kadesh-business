@@ -93,6 +93,48 @@
   }
 }
 
+@layer components {
+  .modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding-top: max(1rem, env(safe-area-inset-top, 0px));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+    padding-left: 1rem;
+    padding-right: 1rem;
+    min-height: 0;
+    overscroll-behavior: contain;
+  }
+
+  .modal > :first-child {
+    box-sizing: border-box;
+    max-height: min(90dvh, calc(100dvh - 2.5rem));
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html:has(.modal) {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  html:has(.modal) body {
+    overflow: hidden !important;
+    overscroll-behavior: none;
+  }
+
+  html:has(.modal) #__next {
+    overflow: hidden;
+  }
+
+
+  [data-sileo-viewport] {
+    z-index: 200 !important;
+  }
+}
+
 /* Scrollbar personalizado naranja */
 ::-webkit-scrollbar {
   width: 18px;

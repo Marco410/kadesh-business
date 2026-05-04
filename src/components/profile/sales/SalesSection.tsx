@@ -224,6 +224,8 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const companyId = userData?.user?.company?.id ?? null;
 
   const isAdminCompany = user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const isUserCompany = user?.roles?.some((r) => r.name === Role.USER_COMPANY) ?? false;
+  const hasCompanyWideLeadScope = isAdminCompany || isUserCompany;
 
   const { data: vendedoresData } = useQuery<
     CompanyVendedoresResponse,
@@ -235,7 +237,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
         roles: { some: { name: { equals: Role.VENDEDOR } } },
       },
     },
-    skip: !companyId || !isAdminCompany,
+    skip: !companyId || !hasCompanyWideLeadScope,
   });
 
   const vendedores = (vendedoresData?.users ?? []).map((u) => ({
@@ -250,7 +252,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     pipelineStatus?: { equals: string };
   }> = [];
   
-  if (!isAdminCompany) {
+  if (!hasCompanyWideLeadScope) {
     statusSomeConditions.push({ salesPerson: { id: { equals: userId } } });
   }
   if (companyId != null) {
@@ -266,7 +268,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const where = {
     ...(filterByVendedorId === "sin_asignar"
       ? { salesPerson: { none: {} } }
-      : !isAdminCompany
+      : !hasCompanyWideLeadScope
         ? { salesPerson: { some: { id: { equals: userId } } } }
         : {}),
     ...(companyId != null && {
@@ -383,7 +385,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const leadsQueryVariables = buildClientLeadsQueryVariables({
     where,
     companyId,
-    isAdminCompany,
+    hasCompanyWideLeadScope,
     userId,
     take: LEADS_PAGE_SIZE,
     skip: (effectivePage - 1) * LEADS_PAGE_SIZE,
@@ -445,7 +447,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       });
       if (exportError) throw exportError;
       const allLeads = exportData?.techBusinessLeads ?? [];
-      downloadLeadsExcel(allLeads, isAdminCompany);
+      downloadLeadsExcel(allLeads, hasCompanyWideLeadScope);
       if (ctx.totalCount > MAX_LEADS_EXPORT) {
         sileo.warning({
           title: "Exportación parcial",
@@ -466,7 +468,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     } finally {
       setExportingExcel(false);
     }
-  }, [client, isAdminCompany, userId]);
+  }, [client, hasCompanyWideLeadScope, userId]);
 
   const [updateLead] = useMutation<
     UpdateTechBusinessLeadMutation,
@@ -586,7 +588,13 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       <div className="w-full space-y-6">
         <CurrentPlanSection />
 
-        <StatsSection userId={userId} companyId={companyId} isAdminCompany={isAdminCompany} salesComission={userData?.user?.salesComission ?? 0} />
+        <StatsSection
+          userId={userId}
+          companyId={companyId}
+          isAdminCompany={isAdminCompany}
+          companyWideLeadScope={hasCompanyWideLeadScope}
+          salesComission={userData?.user?.salesComission ?? 0}
+        />
 
       <div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
@@ -648,7 +656,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
             setAssignToVendedorId(null);
             setSelectedLeadIds(new Set());
           }}
-          isAdminCompany={isAdminCompany}
+          isAdminCompany={hasCompanyWideLeadScope}
         />
         <SalesLeadsTable
           leads={leads}
@@ -662,7 +670,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
           pageSize={LEADS_PAGE_SIZE}
           currentPage={effectivePage}
           onPageChange={pushLeadsPage}
-          isAdminCompany={isAdminCompany}
+          isAdminCompany={hasCompanyWideLeadScope}
         />
       </div>
     </div>

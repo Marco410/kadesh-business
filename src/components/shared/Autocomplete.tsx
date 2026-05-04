@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
+import RequiredFieldMark from './RequiredFieldMark';
 
 /** Lowercase + sin acentos (fab → fábricas). */
 function normalizeForSearch(text: string): string {
@@ -120,7 +121,7 @@ export default function Autocomplete({
   return (
     <div className={`relative ${className}`} ref={containerRef}>
       <label htmlFor={id} className="block text-sm font-medium text-[#212121] dark:text-[#ffffff] mb-2">
-        {label} {required && <span className="text-red-500">*</span>}
+        {label} {required ? <RequiredFieldMark /> : null}
       </label>
       <div className="relative">
         <input

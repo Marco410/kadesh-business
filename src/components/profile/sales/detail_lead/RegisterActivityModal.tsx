@@ -12,7 +12,10 @@ import {
   type CreateTechSalesActivityVariables,
   type CreateTechSalesActivityMutation,
 } from "kadesh/components/profile/sales/queries";
-import { SALES_ACTIVITY_TYPE } from "kadesh/constants/constans";
+import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
+import { workspaceConnectPayload } from "kadesh/components/profile/sales/workspaces/workspace-connect";
+import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
+import { SALES_ACTIVITY_TYPE, TASK_PRIORITY } from "kadesh/constants/constans";
 import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
 import ActivityDetailModal from "./ActivityDetailModal";
@@ -50,19 +53,24 @@ export default function RegisterActivityModal({
   leadId,
   userId,
 }: RegisterActivityModalProps) {
+  const { currentWorkspaceId } = useWorkspaceContext();
   const [type, setType] = useState<string>(SALES_ACTIVITY_TYPE.LLAMADA);
   const [activityDate, setActivityDate] = useState("");
   const [result, setResult] = useState("");
   const [comments, setComments] = useState("");
 
-  const activitiesWhere: TechSalesActivitiesVariables["where"] = {
-    AND: [
+  const activitiesWhere: TechSalesActivitiesVariables["where"] =
+    mergeWorkspaceFilter(
       {
-        assignedSeller: { id: { equals: userId } },
-        businessLead: { id: { equals: leadId } },
+        AND: [
+          {
+            assignedSeller: { id: { equals: userId } },
+            businessLead: { id: { equals: leadId } },
+          },
+        ],
       },
-    ],
-  };
+      currentWorkspaceId
+    );
 
   const { data: activitiesData, loading: activitiesLoading } = useQuery<
     TechSalesActivitiesResponse,
@@ -107,12 +115,17 @@ export default function RegisterActivityModal({
       await createActivity({
         variables: {
           data: {
+            title: type,
+            dueDate: null,
+            priority: TASK_PRIORITY.MEDIA,
             type,
             activityDate: dateTimeLocalToISO(activityDate),
             result: result.trim() || null,
             comments: comments.trim() || null,
             businessLead: { connect: { id: leadId } },
             assignedSeller: { connect: { id: userId } },
+            createdBy: { connect: { id: userId } },
+            ...workspaceConnectPayload(currentWorkspaceId),
           },
         },
       });
