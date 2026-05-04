@@ -36,7 +36,7 @@ function formatPrice(cost: number, currency: string): string {
 
 function formatPeriod(frequency: string): string {
   const f = frequency?.toLowerCase();
-  return f === "monthly" ? "mes" : f === "yearly" ? "año" : frequency || "";
+  return f === "monthly" ? "mes" : f === "annual" ? "año" : frequency || "";
 }
 
 const inputBase =
@@ -235,6 +235,9 @@ export default function SuscripcionSection() {
             <div className="mt-4">
               <span className="text-3xl font-bold text-[#212121] dark:text-[#ffffff]">
                 {formatPrice(plan.cost, plan.currency)}
+              </span>
+              <span className="ml-1 text-xs font-medium text-[#616161] dark:text-[#757575]">
+                {plan.currency}
               </span>
               <span className="text-[#616161] dark:text-[#b0b0b0]">
                 /{formatPeriod(plan.frequency)}

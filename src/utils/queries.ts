@@ -327,6 +327,34 @@ export interface AuthenticateUserVariables {
   password: string;
 }
 
+export const CREATE_USER_AUTH_LOG_MUTATION = gql`
+  mutation CreateUserAuthLog($data: UserAuthLogCreateInput!) {
+    createUserAuthLog(data: $data) {
+      id
+    }
+  }
+`;
+
+/** Campos alineados con Keystone `UserAuthLog`. */
+export interface UserAuthLogCreateInput {
+  user?: { connect: { id: string } };
+  source: string;
+  step: string;
+  success: boolean;
+  message?: string | null;
+  emailMasked?: string | null;
+  responseSnapshot?: Record<string, unknown> | null;
+  durationMs?: number | null;
+}
+
+export interface CreateUserAuthLogVariables {
+  data: UserAuthLogCreateInput;
+}
+
+export interface CreateUserAuthLogResponse {
+  createUserAuthLog: { id: string } | null;
+}
+
 export interface AuthenticateUserResponse {
   authenticateUserWithPassword:
     | {

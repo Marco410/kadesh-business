@@ -250,7 +250,7 @@ function CommissionsTab({ userId }: { userId: string }) {
     (acc, c) => {
       const key = c.status.toLowerCase() as "pending" | "paid" | "cancelled";
       acc[key] += c.amount;
-      acc.total += c.amount;
+      if (key !== "cancelled") acc.total += c.amount;
       return acc;
     },
     { pending: 0, paid: 0, cancelled: 0, total: 0 },
