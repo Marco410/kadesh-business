@@ -64,6 +64,7 @@ export interface WorkspaceCrmBoardProps {
   showActivities: boolean;
   showFollowUpTasks: boolean;
   showProposals: boolean;
+  canReassignAssignee?: boolean;
 }
 
 export default function WorkspaceCrmBoard({
@@ -76,6 +77,7 @@ export default function WorkspaceCrmBoard({
   showActivities,
   showFollowUpTasks,
   showProposals,
+  canReassignAssignee = false,
 }: WorkspaceCrmBoardProps) {
   const mainEntityTabOptions = useMemo((): { key: WorkspaceCrmEntityTab; title: string }[] => {
     const o: { key: WorkspaceCrmEntityTab; title: string }[] = [];
@@ -531,6 +533,7 @@ export default function WorkspaceCrmBoard({
           task={editTechTask}
           crmStatuses={crmStatuses}
           defaultCrmStatusId={defaultCrmStatusId}
+          canReassignAssignee={canReassignAssignee}
         />
       )}
       {showActivities && (
@@ -541,6 +544,7 @@ export default function WorkspaceCrmBoard({
           activity={editActivity}
           crmStatuses={crmStatuses}
           defaultCrmStatusId={defaultCrmStatusId}
+          canReassignAssignee={canReassignAssignee}
         />
       )}
       {showFollowUpTasks && (
@@ -551,6 +555,7 @@ export default function WorkspaceCrmBoard({
           task={editTask}
           crmStatuses={crmStatuses}
           defaultCrmStatusId={defaultCrmStatusId}
+          canReassignAssignee={canReassignAssignee}
         />
       )}
       {showProposals && (
@@ -561,6 +566,7 @@ export default function WorkspaceCrmBoard({
           proposal={editProposal}
           crmStatuses={crmStatuses}
           defaultCrmStatusId={defaultCrmStatusId}
+          canReassignAssignee={canReassignAssignee}
         />
       )}
     </>

@@ -26,16 +26,26 @@ interface StatsSectionProps {
   userId: string;
   companyId: string | null;
   isAdminCompany: boolean;
+  /** Admin empresa o user_company: conteos de leads a nivel empresa (misma lógica que la tabla). */
+  companyWideLeadScope?: boolean;
   salesComission: number;
 }
 
-export default function StatsSection({ userId, companyId, isAdminCompany, salesComission }: StatsSectionProps) {
+export default function StatsSection({
+  userId,
+  companyId,
+  isAdminCompany,
+  companyWideLeadScope,
+  salesComission,
+}: StatsSectionProps) {
   const router = useRouter();
   const { subscription } = useSubscription();
   const { currentWorkspaceId } = useWorkspaceContext();
 
+  const scopeLeadsByCompany = companyWideLeadScope ?? isAdminCompany;
+
   const where = {
-    ...(!isAdminCompany ? { salesPerson: { some: { id: { equals: userId } } } } : {}),
+    ...(!scopeLeadsByCompany ? { salesPerson: { some: { id: { equals: userId } } } } : {}),
     ...(companyId != null && {
       saasCompany: { some: { id: { equals: companyId } } },
     }),

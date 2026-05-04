@@ -243,6 +243,7 @@ export default function WorkspacesTab({
           workspaceId={currentWorkspaceId}
           userId={userId}
           showSkeleton={isWorkspaceSwitching}
+          canReassignAssignee={isAdminCompany}
         />
       )}
 

@@ -3,7 +3,11 @@ import type { TechBusinessLeadsVariables } from "kadesh/components/profile/sales
 type BuildClientLeadsQueryVariablesArgs = {
   where: TechBusinessLeadsVariables["where"];
   companyId: string | null;
-  isAdminCompany: boolean;
+  /**
+   * Admin empresa o usuario empresa (`user_company`): ven todos los leads de la company
+   * en el mismo alcance que la lista principal de ventas.
+   */
+  hasCompanyWideLeadScope: boolean;
   userId: string;
   take?: number;
   skip?: number;
@@ -12,12 +16,12 @@ type BuildClientLeadsQueryVariablesArgs = {
 
 /**
  * Shared query builder for visible clients (techBusinessLeads) by session scope.
- * Reused by SalesSection and CreateProjectModal autocomplete.
+ * Reused by SalesSection and ClientLeadAutocomplete.
  */
 export function buildClientLeadsQueryVariables({
   where,
   companyId,
-  isAdminCompany,
+  hasCompanyWideLeadScope,
   userId,
   take,
   skip,
@@ -25,7 +29,7 @@ export function buildClientLeadsQueryVariables({
 }: BuildClientLeadsQueryVariablesArgs): TechBusinessLeadsVariables {
   const statusWhere =
     companyId != null
-      ? isAdminCompany
+      ? hasCompanyWideLeadScope
         ? { saasCompany: { id: { equals: companyId } } }
         : {
             AND: [
@@ -46,4 +50,3 @@ export function buildClientLeadsQueryVariables({
     ...(orderBy ? { orderBy } : {}),
   };
 }
-

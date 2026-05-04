@@ -5,6 +5,7 @@ export { default as Autocomplete } from './Autocomplete';
 export type { AutocompleteOption } from './Autocomplete';
 export { default as ClientLeadAutocomplete } from './ClientLeadAutocomplete';
 export type { ClientLeadAutocompleteProps } from './ClientLeadAutocomplete';
+export { default as RequiredFieldMark } from './RequiredFieldMark';
 export { default as ClientProjectAutocomplete } from './ClientProjectAutocomplete';
 export type { ClientProjectAutocompleteProps } from './ClientProjectAutocomplete';
 export { default as ConfirmModal } from './ConfirmModal';

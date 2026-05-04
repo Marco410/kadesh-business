@@ -13,6 +13,8 @@ import {
   type SaasWorkspacesResponse,
 } from "kadesh/components/profile/sales/workspaces/queries";
 import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
+import { Role } from "kadesh/constants/constans";
+import { useUser } from "kadesh/utils/UserContext";
 
 export interface WorkspaceSwitcherProps {
   enabled: boolean;
@@ -25,6 +27,10 @@ export default function WorkspaceSwitcher({
   onRequestCreate,
   className = "",
 }: WorkspaceSwitcherProps) {
+  const { user } = useUser();
+  const isAdminCompany =
+    user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+
   const { currentWorkspaceId, setCurrentWorkspaceId } = useWorkspaceContext();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -122,23 +128,37 @@ export default function WorkspaceSwitcher({
           ))}
           {workspaces.length === 0 && !loading && (
             <p className="px-4 py-3 text-xs text-[#616161] dark:text-[#9e9e9e]">
-              Aún no tienes espacios. Crea uno para organizar tareas, actividades, seguimientos y
-              propuestas.
+              {isAdminCompany ? (
+                <>
+                  Aún no tienes espacios. Crea uno para organizar tareas, actividades, seguimientos y
+                  propuestas.
+                </>
+              ) : (
+                <>
+                  Aún no hay espacios de trabajo. Un administrador de empresa puede crearlos para
+                  organizar tareas, actividades, seguimientos y propuestas.
+                </>
+              )}
             </p>
           )}
-          <div className="my-1 h-px bg-[#e0e0e0] dark:bg-[#3a3a3a]" />
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(false);
-                void refetch();
-                onRequestCreate?.();
-              }}
-              className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-orange-600 dark:text-orange-400 hover:bg-orange-500/5 font-medium"
-            >
-              <HugeiconsIcon icon={Add01Icon} size={18} />
-              Crear nuevo espacio
-            </button>
+
+          {isAdminCompany && (
+            <>
+              <div className="my-1 h-px bg-[#e0e0e0] dark:bg-[#3a3a3a]" />
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  void refetch();
+                  onRequestCreate?.();
+                }}
+                className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-orange-600 dark:text-orange-400 hover:bg-orange-500/5 font-medium"
+              >
+                <HugeiconsIcon icon={Add01Icon} size={18} />
+                Crear nuevo espacio
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

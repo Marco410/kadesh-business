@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
 import Link from "next/link";
 import {
@@ -13,8 +13,14 @@ import {
   type UpdateTechTaskMutation,
   type UpdateTechTaskVariables,
 } from "kadesh/components/profile/sales/queries";
-import type { SaasWorkspaceCrmStatus } from "kadesh/components/profile/sales/workspaces/queries";
+import {
+  SAAS_WORKSPACE_DETAIL_QUERY,
+  type SaasWorkspaceCrmStatus,
+  type SaasWorkspaceDetailResponse,
+  type SaasWorkspaceDetailVariables,
+} from "kadesh/components/profile/sales/workspaces/queries";
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
+import { Autocomplete, RequiredFieldMark, type AutocompleteOption } from "kadesh/components/shared";
 import HiddenInWorkspaceSwitch from "./HiddenInWorkspaceSwitch";
 import { Routes } from "kadesh/core/routes";
 import { TASK_PRIORITY } from "kadesh/constants/constans";
@@ -38,6 +44,15 @@ function dateInputToIso(dateStr: string): string {
 const inputClassName =
   "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#252525] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 
+function memberDisplayName(m: {
+  name: string;
+  lastName: string | null;
+  email: string | null;
+}): string {
+  const full = [m.name, m.lastName ?? ""].filter(Boolean).join(" ").trim();
+  return m.email ? `${full} (${m.email})` : full;
+}
+
 type TechTaskRow = TechTasksResponse["techTasks"][number];
 
 export interface EditWorkspaceTechTaskModalProps {
@@ -47,6 +62,7 @@ export interface EditWorkspaceTechTaskModalProps {
   task: TechTaskRow | null;
   crmStatuses: SaasWorkspaceCrmStatus[];
   defaultCrmStatusId: string | null;
+  canReassignAssignee?: boolean;
 }
 
 export default function EditWorkspaceTechTaskModal({
@@ -56,6 +72,7 @@ export default function EditWorkspaceTechTaskModal({
   task,
   crmStatuses,
   defaultCrmStatusId,
+  canReassignAssignee = false,
 }: EditWorkspaceTechTaskModalProps) {
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -65,6 +82,30 @@ export default function EditWorkspaceTechTaskModal({
   const [comments, setComments] = useState("");
   const [statusCrmId, setStatusCrmId] = useState("");
   const [hiddenInWorkspace, setHiddenInWorkspace] = useState(false);
+  const [responsibleUserId, setResponsibleUserId] = useState("");
+
+  const { data: wsDetail, loading: wsMembersLoading } = useQuery<
+    SaasWorkspaceDetailResponse,
+    SaasWorkspaceDetailVariables
+  >(SAAS_WORKSPACE_DETAIL_QUERY, {
+    variables: { where: { id: workspaceId } },
+    skip: !isOpen || !workspaceId,
+    fetchPolicy: "cache-and-network",
+  });
+
+  const memberOptions = useMemo<AutocompleteOption[]>(() => {
+    const members = wsDetail?.saasWorkspace?.members ?? [];
+    const opts = members.map((m) => ({
+      id: m.id,
+      label: memberDisplayName(m),
+    }));
+    const resp = task?.responsible;
+    if (resp && !opts.some((o) => o.id === resp.id)) {
+      const label = [resp.name, resp.lastName ?? ""].filter(Boolean).join(" ").trim();
+      opts.unshift({ id: resp.id, label: label || resp.id });
+    }
+    return opts;
+  }, [wsDetail?.saasWorkspace?.members, task?.responsible]);
 
   useEffect(() => {
     if (!isOpen || !task) return;
@@ -76,6 +117,7 @@ export default function EditWorkspaceTechTaskModal({
     setComments(task.comments ?? "");
     setStatusCrmId(task.statusCrm?.id ?? defaultCrmStatusId ?? crmStatuses[0]?.id ?? "");
     setHiddenInWorkspace(task.hiddenInWorkspace === true);
+    setResponsibleUserId(task.responsible?.id ?? "");
   }, [isOpen, task, defaultCrmStatusId, crmStatuses]);
 
   const boardWhere: TechTasksVariables["where"] = mergeWorkspaceFilter({}, workspaceId);
@@ -97,9 +139,17 @@ export default function EditWorkspaceTechTaskModal({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!task) return;
+    if (canReassignAssignee && !responsibleUserId.trim()) {
+      sileo.warning({ title: "Selecciona un responsable" });
+      return;
+    }
     const statusPayload =
       statusCrmId.trim() !== ""
         ? { statusCrm: { connect: { id: statusCrmId.trim() } } }
+        : {};
+    const assignPayload =
+      canReassignAssignee && responsibleUserId.trim()
+        ? { responsible: { connect: { id: responsibleUserId.trim() } } }
         : {};
     updateTask({
       variables: {
@@ -112,6 +162,7 @@ export default function EditWorkspaceTechTaskModal({
           result: result.trim(),
           comments: comments.trim(),
           hiddenInWorkspace,
+          ...assignPayload,
           ...statusPayload,
         },
       },
@@ -164,7 +215,7 @@ export default function EditWorkspaceTechTaskModal({
           <form onSubmit={handleSubmit} className="p-5 space-y-4">
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Estado CRM
+                Estado CRM <RequiredFieldMark />
               </label>
               <select
                 value={statusCrmId}
@@ -182,14 +233,48 @@ export default function EditWorkspaceTechTaskModal({
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Título
+                Título <RequiredFieldMark />
               </label>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                required
                 className={inputClassName}
               />
             </div>
+
+            {canReassignAssignee ? (
+              <Autocomplete
+                id="edit-ws-tech-task-responsible"
+                label="Responsable"
+                value={responsibleUserId}
+                options={memberOptions}
+                onSelect={(option) => setResponsibleUserId(option?.id ?? "")}
+                placeholder="Buscar miembro del workspace"
+                required
+                loading={wsMembersLoading}
+              />
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
+                  Responsable
+                </label>
+                <div
+                  className={`${inputClassName} text-[#616161] dark:text-[#b0b0b0]`}
+                  aria-readonly
+                >
+                  {task.responsible
+                    ? [task.responsible.name, task.responsible.lastName ?? ""]
+                        .filter(Boolean)
+                        .join(" ")
+                        .trim() || "—"
+                    : "Sin asignar"}
+                </div>
+                <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                  Solo un administrador de empresa puede cambiar al responsable.
+                </p>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
@@ -211,7 +296,7 @@ export default function EditWorkspaceTechTaskModal({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                  Fecha de la tarea
+                  Fecha de la tarea <RequiredFieldMark />
                 </label>
                 <input
                   type="date"

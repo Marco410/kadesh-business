@@ -7,6 +7,7 @@ import { sileo } from "sileo";
 import {
   ClientLeadAutocomplete,
   Autocomplete,
+  RequiredFieldMark,
   type AutocompleteOption,
 } from "kadesh/components/shared";
 import {
@@ -22,7 +23,8 @@ import {
   type SaasWorkspaceDetailVariables,
 } from "kadesh/components/profile/sales/workspaces/queries";
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
-import { TASK_PRIORITY } from "kadesh/constants/constans";
+import { Role, TASK_PRIORITY } from "kadesh/constants/constans";
+import { useUser } from "kadesh/utils/UserContext";
 
 const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
 
@@ -52,14 +54,6 @@ function dateInputToIso(dateStr: string): string {
 const inputClassName =
   "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#252525] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 
-function RequiredFieldMark() {
-  return (
-    <span className="text-red-500" aria-hidden="true">
-      *
-    </span>
-  );
-}
-
 export interface CreateWorkspaceTechTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -75,6 +69,10 @@ export default function CreateWorkspaceTechTaskModal({
   userId,
   defaultStatusCrmId,
 }: CreateWorkspaceTechTaskModalProps) {
+  const { user } = useUser();
+  const isUserCompany =
+    user?.roles?.some((r) => r.name === Role.USER_COMPANY) ?? false;
+
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -88,7 +86,7 @@ export default function CreateWorkspaceTechTaskModal({
     SaasWorkspaceDetailVariables
   >(SAAS_WORKSPACE_DETAIL_QUERY, {
     variables: { where: { id: workspaceId } },
-    skip: !isOpen || !workspaceId,
+    skip: !isOpen || !workspaceId || isUserCompany,
     fetchPolicy: "cache-and-network",
   });
 
@@ -135,8 +133,9 @@ export default function CreateWorkspaceTechTaskModal({
         : {};
     const leadConnect =
       leadId.trim() !== "" ? { businessLead: { connect: { id: leadId.trim() } } } : {};
-    const responsibleConnect =
-      responsibleUserId.trim() !== ""
+    const responsibleConnect = isUserCompany
+      ? { responsible: { connect: { id: userId } } }
+      : responsibleUserId.trim() !== ""
         ? { responsible: { connect: { id: responsibleUserId.trim() } } }
         : {};
 
@@ -258,6 +257,7 @@ export default function CreateWorkspaceTechTaskModal({
 
             <ClientLeadAutocomplete
               id="ws-tech-task-lead"
+              label="Cliente"
               userId={userId}
               enabled={isOpen}
               selectedLeadId={leadId || null}
@@ -266,16 +266,21 @@ export default function CreateWorkspaceTechTaskModal({
               required
             />
 
-            <Autocomplete
-              id="ws-tech-task-responsible"
-              label="Responsable"
-              value={responsibleUserId}
-              options={memberOptions}
-              onSelect={(option) => setResponsibleUserId(option?.id ?? "")}
-              placeholder="Buscar miembro del workspace"
-              loading={wsMembersLoading}
-              required
-            />
+            {isUserCompany ? (
+              <div>
+              </div>
+            ) : (
+              <Autocomplete
+                id="ws-tech-task-responsible"
+                label="Responsable"
+                value={responsibleUserId}
+                options={memberOptions}
+                onSelect={(option) => setResponsibleUserId(option?.id ?? "")}
+                placeholder="Buscar miembro del workspace"
+                loading={wsMembersLoading}
+                required
+              />
+            )}
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">

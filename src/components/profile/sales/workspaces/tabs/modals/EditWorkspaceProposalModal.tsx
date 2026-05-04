@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
 import Link from "next/link";
 import {
@@ -13,8 +13,14 @@ import {
   type UpdateTechProposalMutation,
   type UpdateTechProposalVariables,
 } from "kadesh/components/profile/sales/queries";
-import type { SaasWorkspaceCrmStatus } from "kadesh/components/profile/sales/workspaces/queries";
+import {
+  SAAS_WORKSPACE_DETAIL_QUERY,
+  type SaasWorkspaceCrmStatus,
+  type SaasWorkspaceDetailResponse,
+  type SaasWorkspaceDetailVariables,
+} from "kadesh/components/profile/sales/workspaces/queries";
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
+import { Autocomplete, RequiredFieldMark, type AutocompleteOption } from "kadesh/components/shared";
 import HiddenInWorkspaceSwitch from "./HiddenInWorkspaceSwitch";
 import { Routes } from "kadesh/core/routes";
 import { PROPOSAL_STATUS } from "kadesh/constants/constans";
@@ -33,6 +39,15 @@ function formatDateForInput(value: string): string {
 const inputClassName =
   "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#252525] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 
+function memberDisplayName(m: {
+  name: string;
+  lastName: string | null;
+  email: string | null;
+}): string {
+  const full = [m.name, m.lastName ?? ""].filter(Boolean).join(" ").trim();
+  return m.email ? `${full} (${m.email})` : full;
+}
+
 type ProposalRow = TechProposalsResponse["techProposals"][number];
 
 export interface EditWorkspaceProposalModalProps {
@@ -42,6 +57,7 @@ export interface EditWorkspaceProposalModalProps {
   proposal: ProposalRow | null;
   crmStatuses: SaasWorkspaceCrmStatus[];
   defaultCrmStatusId: string | null;
+  canReassignAssignee?: boolean;
 }
 
 export default function EditWorkspaceProposalModal({
@@ -51,6 +67,7 @@ export default function EditWorkspaceProposalModal({
   proposal,
   crmStatuses,
   defaultCrmStatusId,
+  canReassignAssignee = false,
 }: EditWorkspaceProposalModalProps) {
   const [sentDate, setSentDate] = useState("");
   const [amount, setAmount] = useState("");
@@ -60,6 +77,30 @@ export default function EditWorkspaceProposalModal({
   const [fileOrUrl, setFileOrUrl] = useState("");
   const [statusCrmId, setStatusCrmId] = useState("");
   const [hiddenInWorkspace, setHiddenInWorkspace] = useState(false);
+  const [assignedSellerId, setAssignedSellerId] = useState("");
+
+  const { data: wsDetail, loading: wsMembersLoading } = useQuery<
+    SaasWorkspaceDetailResponse,
+    SaasWorkspaceDetailVariables
+  >(SAAS_WORKSPACE_DETAIL_QUERY, {
+    variables: { where: { id: workspaceId } },
+    skip: !isOpen || !workspaceId,
+    fetchPolicy: "cache-and-network",
+  });
+
+  const memberOptions = useMemo<AutocompleteOption[]>(() => {
+    const members = wsDetail?.saasWorkspace?.members ?? [];
+    const opts = members.map((m) => ({
+      id: m.id,
+      label: memberDisplayName(m),
+    }));
+    const seller = proposal?.assignedSeller;
+    if (seller && !opts.some((o) => o.id === seller.id)) {
+      const label = [seller.name, seller.lastName ?? ""].filter(Boolean).join(" ").trim();
+      opts.unshift({ id: seller.id, label: label || seller.id });
+    }
+    return opts;
+  }, [wsDetail?.saasWorkspace?.members, proposal?.assignedSeller]);
 
   useEffect(() => {
     if (!isOpen || !proposal) return;
@@ -73,6 +114,7 @@ export default function EditWorkspaceProposalModal({
       proposal.statusCrm?.id ?? defaultCrmStatusId ?? crmStatuses[0]?.id ?? ""
     );
     setHiddenInWorkspace(proposal.hiddenInWorkspace === true);
+    setAssignedSellerId(proposal.assignedSeller?.id ?? "");
   }, [isOpen, proposal, defaultCrmStatusId, crmStatuses]);
 
   const boardWhere: TechProposalsVariables["where"] = mergeWorkspaceFilter({}, workspaceId);
@@ -103,9 +145,17 @@ export default function EditWorkspaceProposalModal({
       sileo.warning({ title: "El monto debe ser un número válido" });
       return;
     }
+    if (canReassignAssignee && !assignedSellerId.trim()) {
+      sileo.warning({ title: "Selecciona un vendedor asignado" });
+      return;
+    }
     const statusPayload =
       statusCrmId.trim() !== ""
         ? { statusCrm: { connect: { id: statusCrmId.trim() } } }
+        : {};
+    const assignPayload =
+      canReassignAssignee && assignedSellerId.trim()
+        ? { assignedSeller: { connect: { id: assignedSellerId.trim() } } }
         : {};
     updateProposal({
       variables: {
@@ -118,6 +168,7 @@ export default function EditWorkspaceProposalModal({
           product: product.trim() || null,
           notes: notes.trim() || null,
           hiddenInWorkspace,
+          ...assignPayload,
           ...statusPayload,
         },
       },
@@ -170,7 +221,7 @@ export default function EditWorkspaceProposalModal({
           <form onSubmit={handleSubmit} className="p-5 space-y-4">
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Estado CRM
+                Estado CRM <RequiredFieldMark />
               </label>
               <select
                 value={statusCrmId}
@@ -186,10 +237,43 @@ export default function EditWorkspaceProposalModal({
               </select>
             </div>
 
+            {canReassignAssignee ? (
+              <Autocomplete
+                id="edit-ws-proposal-assigned"
+                label="Vendedor asignado"
+                value={assignedSellerId}
+                options={memberOptions}
+                onSelect={(option) => setAssignedSellerId(option?.id ?? "")}
+                placeholder="Buscar miembro del workspace"
+                required
+                loading={wsMembersLoading}
+              />
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
+                  Vendedor asignado
+                </label>
+                <div
+                  className={`${inputClassName} text-[#616161] dark:text-[#b0b0b0]`}
+                  aria-readonly
+                >
+                  {proposal.assignedSeller
+                    ? [proposal.assignedSeller.name, proposal.assignedSeller.lastName ?? ""]
+                        .filter(Boolean)
+                        .join(" ")
+                        .trim() || "—"
+                    : "Sin asignar"}
+                </div>
+                <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                  Solo un administrador de empresa puede cambiar al vendedor asignado.
+                </p>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                  Fecha envío
+                  Fecha envío <RequiredFieldMark />
                 </label>
                 <input
                   type="date"
@@ -219,7 +303,7 @@ export default function EditWorkspaceProposalModal({
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                URL o referencia al archivo
+                URL o referencia al archivo <RequiredFieldMark />
               </label>
               <input
                 value={fileOrUrl}

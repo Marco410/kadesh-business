@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
 import Link from "next/link";
-import { Autocomplete, type AutocompleteOption } from "kadesh/components/shared";
+import { Autocomplete, RequiredFieldMark, type AutocompleteOption } from "kadesh/components/shared";
 import {
   TECH_SALES_ACTIVITIES_QUERY,
   UPDATE_TECH_SALES_ACTIVITY_MUTATION,
@@ -75,6 +75,7 @@ export interface EditWorkspaceActivityModalProps {
   activity: ActivityRow | null;
   crmStatuses: SaasWorkspaceCrmStatus[];
   defaultCrmStatusId: string | null;
+  canReassignAssignee?: boolean;
 }
 
 export default function EditWorkspaceActivityModal({
@@ -84,6 +85,7 @@ export default function EditWorkspaceActivityModal({
   activity,
   crmStatuses,
   defaultCrmStatusId,
+  canReassignAssignee = false,
 }: EditWorkspaceActivityModalProps) {
   const [title, setTitle] = useState("");
   const [type, setType] = useState("");
@@ -161,7 +163,7 @@ export default function EditWorkspaceActivityModal({
       sileo.warning({ title: "Escribe el título de la actividad" });
       return;
     }
-    if (!responsibleUserId.trim()) {
+    if (canReassignAssignee && !responsibleUserId.trim()) {
       sileo.warning({ title: "Selecciona un responsable" });
       return;
     }
@@ -182,7 +184,9 @@ export default function EditWorkspaceActivityModal({
           result: result.trim() || null,
           comments: comments.trim() || null,
           hiddenInWorkspace,
-          assignedSeller: { connect: { id: responsibleUserId.trim() } },
+          ...(canReassignAssignee
+            ? { assignedSeller: { connect: { id: responsibleUserId.trim() } } }
+            : {}),
           ...statusPayload,
         },
       },
@@ -235,7 +239,7 @@ export default function EditWorkspaceActivityModal({
           <form onSubmit={handleSubmit} className="p-5 space-y-4">
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Estado CRM
+                Estado CRM <RequiredFieldMark />
               </label>
               <select
                 value={statusCrmId}
@@ -256,7 +260,7 @@ export default function EditWorkspaceActivityModal({
                 htmlFor="edit-ws-activity-title"
                 className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
               >
-                Título de la actividad
+                Título de la actividad <RequiredFieldMark />
               </label>
               <input
                 id="edit-ws-activity-title"
@@ -267,25 +271,48 @@ export default function EditWorkspaceActivityModal({
               />
             </div>
 
-            <Autocomplete
-              id="edit-ws-activity-responsible"
-              label="Responsable"
-              value={responsibleUserId}
-              options={memberOptions}
-              onSelect={(option) => setResponsibleUserId(option?.id ?? "")}
-              placeholder="Buscar miembro del workspace"
-              required
-              loading={wsMembersLoading}
-            />
+            {canReassignAssignee ? (
+              <Autocomplete
+                id="edit-ws-activity-responsible"
+                label="Responsable"
+                value={responsibleUserId}
+                options={memberOptions}
+                onSelect={(option) => setResponsibleUserId(option?.id ?? "")}
+                placeholder="Buscar miembro del workspace"
+                required
+                loading={wsMembersLoading}
+              />
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
+                  Responsable
+                </label>
+                <div
+                  className={`${inputClassName} text-[#616161] dark:text-[#b0b0b0]`}
+                  aria-readonly
+                >
+                  {activity.assignedSeller
+                    ? [activity.assignedSeller.name, activity.assignedSeller.lastName ?? ""]
+                        .filter(Boolean)
+                        .join(" ")
+                        .trim() || "—"
+                    : "Sin asignar"}
+                </div>
+                <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                  Solo un administrador de empresa puede cambiar al vendedor asignado.
+                </p>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Tipo
+                Tipo <RequiredFieldMark />
               </label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
                 className={inputClassName}
+                required
               >
                 {ACTIVITY_TYPE_OPTIONS.map((opt) => (
                   <option key={opt} value={opt}>
@@ -297,7 +324,7 @@ export default function EditWorkspaceActivityModal({
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Fecha y hora
+                Fecha y hora <RequiredFieldMark />
               </label>
               <input
                 type="datetime-local"
@@ -329,12 +356,13 @@ export default function EditWorkspaceActivityModal({
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Prioridad
+                Prioridad <RequiredFieldMark />
               </label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
                 className={inputClassName}
+                required
               >
                 {TASK_PRIORITY_OPTIONS.map((opt) => (
                   <option key={opt} value={opt}>
@@ -346,7 +374,7 @@ export default function EditWorkspaceActivityModal({
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Resultado
+                Resultado <RequiredFieldMark />
               </label>
               <input
                 value={result}
@@ -358,7 +386,7 @@ export default function EditWorkspaceActivityModal({
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
-                Comentarios
+                Comentarios <RequiredFieldMark />
               </label>
               <textarea
                 value={comments}

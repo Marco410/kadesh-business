@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation } from "@apollo/client";
 import { sileo } from "sileo";
-import { ClientLeadAutocomplete } from "kadesh/components/shared";
+import { ClientLeadAutocomplete, RequiredFieldMark } from "kadesh/components/shared";
 import {
   CREATE_TECH_PROPOSAL_MUTATION,
   TECH_PROPOSALS_QUERY,
@@ -29,14 +29,6 @@ function formatDateForInput(value: string): string {
 
 const inputClassName =
   "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#252525] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
-
-function RequiredFieldMark() {
-  return (
-    <span className="text-red-500" aria-hidden="true">
-      *
-    </span>
-  );
-}
 
 export interface CreateWorkspaceProposalModalProps {
   isOpen: boolean;
@@ -164,6 +156,7 @@ export default function CreateWorkspaceProposalModal({
           <form onSubmit={handleSubmit} className="p-5 space-y-4">
             <ClientLeadAutocomplete
               id="ws-proposal-lead"
+              label="Cliente"
               userId={userId}
               enabled={isOpen}
               selectedLeadId={leadId || null}

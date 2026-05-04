@@ -4,7 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
-import { ClientLeadAutocomplete, Autocomplete, type AutocompleteOption } from "kadesh/components/shared";
+import {
+  ClientLeadAutocomplete,
+  Autocomplete,
+  RequiredFieldMark,
+  type AutocompleteOption,
+} from "kadesh/components/shared";
 import {
   CREATE_TECH_SALES_ACTIVITY_MUTATION,
   TECH_SALES_ACTIVITIES_QUERY,
@@ -19,7 +24,8 @@ import {
 } from "kadesh/components/profile/sales/workspaces/queries";
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
 import { workspaceConnectPayload } from "kadesh/components/profile/sales/workspaces/workspace-connect";
-import { SALES_ACTIVITY_TYPE, TASK_PRIORITY } from "kadesh/constants/constans";
+import { Role, SALES_ACTIVITY_TYPE, TASK_PRIORITY } from "kadesh/constants/constans";
+import { useUser } from "kadesh/utils/UserContext";
 
 const ACTIVITY_TYPE_OPTIONS = Object.values(SALES_ACTIVITY_TYPE);
 const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
@@ -59,14 +65,6 @@ function memberDisplayName(m: {
 const inputClassName =
   "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#252525] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 
-function RequiredFieldMark() {
-  return (
-    <span className="text-red-500" aria-hidden="true">
-      *
-    </span>
-  );
-}
-
 export interface CreateWorkspaceActivityModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -82,6 +80,10 @@ export default function CreateWorkspaceActivityModal({
   userId,
   defaultStatusCrmId,
 }: CreateWorkspaceActivityModalProps) {
+  const { user } = useUser();
+  const isUserCompany =
+    user?.roles?.some((r) => r.name === Role.USER_COMPANY) ?? false;
+
   const [leadId, setLeadId] = useState("");
   const [title, setTitle] = useState("");
   const [type, setType] = useState<string>(SALES_ACTIVITY_TYPE.LLAMADA);
@@ -97,7 +99,7 @@ export default function CreateWorkspaceActivityModal({
     SaasWorkspaceDetailVariables
   >(SAAS_WORKSPACE_DETAIL_QUERY, {
     variables: { where: { id: workspaceId } },
-    skip: !isOpen || !workspaceId,
+    skip: !isOpen || !workspaceId || isUserCompany,
     fetchPolicy: "cache-and-network",
   });
 
@@ -150,10 +152,11 @@ export default function CreateWorkspaceActivityModal({
       sileo.warning({ title: "Escribe el título de la actividad" });
       return;
     }
-    if (!responsibleUserId.trim()) {
+    if (!isUserCompany && !responsibleUserId.trim()) {
       sileo.warning({ title: "Selecciona un responsable" });
       return;
     }
+    const assignedSellerId = isUserCompany ? userId : responsibleUserId.trim();
     const statusCrmConnect =
       defaultStatusCrmId != null && defaultStatusCrmId !== ""
         ? { statusCrm: { connect: { id: defaultStatusCrmId } } }
@@ -171,7 +174,7 @@ export default function CreateWorkspaceActivityModal({
           result: result.trim() || null,
           comments: comments.trim() || null,
           businessLead: { connect: { id: leadId.trim() } },
-          assignedSeller: { connect: { id: responsibleUserId.trim() } },
+          assignedSeller: { connect: { id: assignedSellerId } },
           createdBy: { connect: { id: userId } },
           ...workspaceConnectPayload(workspaceId),
           ...statusCrmConnect,
@@ -221,6 +224,7 @@ export default function CreateWorkspaceActivityModal({
           <form onSubmit={handleSubmit} className="p-5 space-y-4">
             <ClientLeadAutocomplete
               id="ws-activity-lead"
+              label="Cliente"
               userId={userId}
               enabled={isOpen}
               selectedLeadId={leadId || null}
@@ -247,16 +251,20 @@ export default function CreateWorkspaceActivityModal({
               />
             </div>
 
-            <Autocomplete
-              id="ws-activity-responsible"
-              label="Responsable"
-              value={responsibleUserId}
-              options={memberOptions}
-              onSelect={(option) => setResponsibleUserId(option?.id ?? "")}
-              placeholder="Buscar miembro del workspace"
-              required
-              loading={wsMembersLoading}
-            />
+            {isUserCompany ? (
+              <div></div>
+            ) : (
+              <Autocomplete
+                id="ws-activity-responsible"
+                label="Responsable"
+                value={responsibleUserId}
+                options={memberOptions}
+                onSelect={(option) => setResponsibleUserId(option?.id ?? "")}
+                placeholder="Buscar miembro del workspace"
+                required
+                loading={wsMembersLoading}
+              />
+            )}
 
             <div>
               <label className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">

@@ -436,6 +436,7 @@ function ProfilePageContent() {
           isOpen={createWorkspaceOpen}
           onClose={() => setCreateWorkspaceOpen(false)}
           userId={user.id}
+          companyId={companyId}
         />
       )}
       <Footer />

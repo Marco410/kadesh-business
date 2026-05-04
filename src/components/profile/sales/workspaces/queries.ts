@@ -99,6 +99,7 @@ export interface CreateSaasWorkspaceVariables {
   data: {
     name: string;
     members?: { connect: Array<{ id: string }> };
+    company?: { connect: { id: string } };
     showActivities?: boolean;
     showProposals?: boolean;
     showFollowUpTasks?: boolean;

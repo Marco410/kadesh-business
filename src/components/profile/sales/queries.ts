@@ -1149,6 +1149,7 @@ export interface UpdateTechProposalVariables {
     paid?: boolean | null;
     hiddenInWorkspace?: boolean | null;
     statusCrm?: { connect: { id: string } } | null;
+    assignedSeller?: { connect: { id: string } } | null;
   };
 }
 
@@ -1361,6 +1362,7 @@ export interface UpdateTechFollowUpTaskVariables {
     notes?: string | null;
     hiddenInWorkspace?: boolean | null;
     statusCrm?: { connect: { id: string } } | null;
+    assignedSeller?: { connect: { id: string } } | null;
   };
 }
 

@@ -7,12 +7,15 @@ export interface WorkspaceDashboardProps {
   workspaceId: string;
   userId: string;
   showSkeleton?: boolean;
+  /** Solo admin de empresa puede reasignar vendedor/responsable al editar ítems del tablero. */
+  canReassignAssignee?: boolean;
 }
 
 export default function WorkspaceDashboard({
   workspaceId,
   userId,
   showSkeleton,
+  canReassignAssignee = false,
 }: WorkspaceDashboardProps) {
   const {
     enabledTabs,
@@ -68,6 +71,7 @@ export default function WorkspaceDashboard({
           showActivities={showActivities}
           showFollowUpTasks={showFollowUpTasks}
           showProposals={showProposals}
+          canReassignAssignee={canReassignAssignee}
         />
       )}
     </div>

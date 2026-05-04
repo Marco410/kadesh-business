@@ -16,12 +16,14 @@ export interface CreateWorkspaceModalProps {
   isOpen: boolean;
   onClose: () => void;
   userId: string;
+  companyId: string | null;
 }
 
 export default function CreateWorkspaceModal({
   isOpen,
   onClose,
   userId,
+  companyId,
 }: CreateWorkspaceModalProps) {
   const [name, setName] = useState("");
   const [showTasks, setShowTasks] = useState(true);
@@ -54,12 +56,17 @@ export default function CreateWorkspaceModal({
       sileo.warning({ title: "Escribe un nombre para el espacio" });
       return;
     }
+    if (!companyId?.trim()) {
+      sileo.warning({ title: "No se pudo obtener la empresa. Vuelve a intentar en unos segundos." });
+      return;
+    }
     try {
       const { data } = await createWs({
         variables: {
           data: {
             name: trimmed,
             members: { connect: [{ id: userId }] },
+            company: { connect: { id: companyId.trim() } },
             showTasks,
             showActivities,
             showProposals,
@@ -212,7 +219,7 @@ export default function CreateWorkspaceModal({
               </button>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !companyId?.trim()}
                 className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-60"
               >
                 {loading ? "Guardando…" : "Crear espacio"}
