@@ -345,7 +345,7 @@ export default function ObtenerClientesSection() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <CurrentPlanSection />
+      {/* <CurrentPlanSection /> */}
       <div className="relative z-20 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
           Obtener negocios por zona
@@ -402,7 +402,7 @@ export default function ObtenerClientesSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="w-full">
             <div className="space-y-4">
-              <div className="rounded-2xl border border-white/15 dark:border-white/10 bg-white/70 dark:bg-[#161616]/70 backdrop-blur-xl p-4 sm:p-5 shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
+              <div className="relative z-10 rounded-2xl border border-white/15 dark:border-white/10 bg-white/70 dark:bg-[#161616]/70 backdrop-blur-xl p-4 sm:p-5 shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
                 <div className="mb-4">
                   <h3 className="text-sm font-semibold text-[#212121] dark:text-white">
                     Filtros de búsqueda
