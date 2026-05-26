@@ -1857,6 +1857,36 @@ export const CREATE_PAYMENT_METHOD = gql`
   }
 `;
 
+export const BEGIN_COMPANY_SUBSCRIPTION = gql`
+  mutation BeginCompanySubscription($input: BeginCompanySubscriptionInput!) {
+    beginCompanySubscription(input: $input) {
+      success
+      message
+      clientSecret
+      stripeSubscriptionId
+      stripePaymentIntentId
+    }
+  }
+`;
+
+export interface BeginCompanySubscriptionInput {
+  planId: string;
+  email: string;
+  total: string;
+}
+
+export interface BeginCompanySubscriptionResult {
+  success: boolean;
+  message: string;
+  clientSecret: string | null;
+  stripeSubscriptionId: string | null;
+  stripePaymentIntentId: string | null;
+}
+
+export interface BeginCompanySubscriptionResponse {
+  beginCompanySubscription: BeginCompanySubscriptionResult;
+}
+
 export const CREATE_COMPANY_SUBSCRIPTION = gql`
   mutation CreateCompanySubscription(
     $input: CreateCompanySubscriptionInput!
@@ -1875,10 +1905,12 @@ export interface CreateCompanySubscriptionInput {
   notes?: string | null;
   nameCard: string;
   email: string;
-  paymentMethodId: string;
+  paymentMethodId?: string | null;
   total: string;
   paymentType: string;
   noDuplicatePaymentMethod?: boolean | null;
+  stripeSubscriptionId?: string | null;
+  stripePaymentIntentId?: string | null;
 }
 
 export interface CreateCompanySubscriptionResult {
