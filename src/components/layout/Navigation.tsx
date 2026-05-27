@@ -211,8 +211,13 @@ export default function Navigation() {
             </AnimatePresence>
           </div>
 
+          <Link
+            href={Routes.conocenos}
+            className={`font-semibold text-sm ${navLinkClass}`}
+          >
+            Conócenos
+          </Link>
 
-          {/* Contacto Link */}
           <Link
             href={Routes.contact}
             className={`font-semibold text-sm ${navLinkClass}`}
@@ -220,7 +225,6 @@ export default function Navigation() {
             Contacto
           </Link>
 
-          {/* Contacto Link */}
           {user?.id ? (<Link
             href={Routes.panel}
             className={`font-semibold text-sm ${navLinkClass}`}
@@ -406,7 +410,14 @@ export default function Navigation() {
                     Inicio
                   </Link>
 
-                  {/* Contacto Link Mobile */}
+                  <Link
+                    href={Routes.conocenos}
+                    onClick={() => setOpened(false)}
+                    className="text-white font-semibold text-lg no-underline opacity-92 hover:opacity-100 py-4 px-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all"
+                  >
+                    Conócenos
+                  </Link>
+
                   <Link
                     href={Routes.contact}
                     onClick={() => setOpened(false)}
