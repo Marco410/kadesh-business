@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { NICHE_TARGET_MAPPING } from "kadesh/constants/constans";
+import { NOVEDADES_CANONICAL } from "kadesh/components/changelog/novedades-seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://kadesh.com.mx";
@@ -34,6 +35,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.9,
+    },
+    /** Changelog / release notes — contenido que cambia con cada versión SaaS (SEO + AEO) */
+    {
+      url: NOVEDADES_CANONICAL,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/contacto`,
