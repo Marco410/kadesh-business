@@ -32,6 +32,9 @@ interface AutocompleteProps {
   searchKey?: string; // Key to use for search (default: 'label')
   displayKey?: string; // Key to display (default: 'label')
   className?: string;
+  /** Evita sugerencias nativas del navegador (p. ej. Chrome autofill). */
+  disableBrowserAutocomplete?: boolean;
+  dropdownClassName?: string;
 }
 
 export default function Autocomplete({
@@ -49,9 +52,14 @@ export default function Autocomplete({
   searchKey = 'label',
   displayKey = 'label',
   className = '',
+  disableBrowserAutocomplete = false,
+  dropdownClassName = '',
 }: AutocompleteProps) {
   const [search, setSearch] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [blockBrowserAutocomplete, setBlockBrowserAutocomplete] = useState(
+    disableBrowserAutocomplete
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -113,6 +121,9 @@ export default function Autocomplete({
   };
 
   const handleFocus = () => {
+    if (disableBrowserAutocomplete) {
+      setBlockBrowserAutocomplete(false);
+    }
     if (!disabled && !loading && options.length > 0) {
       setShowDropdown(true);
     }
@@ -134,6 +145,19 @@ export default function Autocomplete({
           placeholder={placeholder}
           disabled={disabled || loading}
           required={required}
+          readOnly={blockBrowserAutocomplete}
+          autoComplete={disableBrowserAutocomplete ? 'off' : undefined}
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          name={disableBrowserAutocomplete ? `${id}-kadesh-no-autofill` : undefined}
+          data-lpignore="true"
+          data-1p-ignore
+          data-form-type="other"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={showDropdown}
+          aria-controls={`${id}-listbox`}
           className={`w-full px-2 py-1.5 rounded-lg border ${
             error 
               ? 'border-red-500 dark:border-red-500' 
@@ -167,7 +191,11 @@ export default function Autocomplete({
         
         {/* Dropdown */}
         {showDropdown && !disabled && !loading && filteredOptions.length > 0 && (
-          <div className="absolute z-50 w-full mt-1 bg-white dark:bg-[#121212] border border-[#e0e0e0] dark:border-[#3a3a3a] rounded-lg shadow-lg max-h-60 overflow-y-auto">
+          <div
+            id={`${id}-listbox`}
+            role="listbox"
+            className={`absolute z-[200] w-full mt-1 bg-white dark:bg-[#121212] border border-[#e0e0e0] dark:border-[#3a3a3a] rounded-lg shadow-xl max-h-60 overflow-y-auto ${dropdownClassName}`}
+          >
             {filteredOptions.map((option) => (
               <button
                 key={option.id}
@@ -187,7 +215,7 @@ export default function Autocomplete({
         
         {/* No results message */}
         {showDropdown && !disabled && !loading && search && filteredOptions.length === 0 && (
-          <div className="absolute z-50 w-full mt-1 bg-white dark:bg-[#121212] border border-[#e0e0e0] dark:border-[#3a3a3a] rounded-lg shadow-lg p-4 text-center text-[#616161] dark:text-[#b0b0b0]">
+          <div className={`absolute z-[200] w-full mt-1 bg-white dark:bg-[#121212] border border-[#e0e0e0] dark:border-[#3a3a3a] rounded-lg shadow-xl p-4 text-center text-[#616161] dark:text-[#b0b0b0] ${dropdownClassName}`}>
             No se encontraron resultados que coincidan con "{search}"
           </div>
         )}

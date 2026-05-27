@@ -49,10 +49,10 @@ export default function ObtenerClientesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-[#212121] dark:text-[#ffffff] mb-2">
-              Obtener clientes
+              Motor de Exploración B2B
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Selecciona una zona en el mapa y sincroniza negocios desde Google Maps como leads.
+              Selecciona una zona en el mapa y sincroniza negocios desde el mapa como leads.
             </p>
           </div>
           <div className="mt-5 mb-4">
