@@ -149,11 +149,11 @@ export default function AddLeadSection() {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
         <Link
-          href={`${Routes.panel}?tab=ventas`}
+          href={`${Routes.panel}?tab=clientes`}
           className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-          Volver a Ventas
+          Volver a Clientes
         </Link>
       </div>
 

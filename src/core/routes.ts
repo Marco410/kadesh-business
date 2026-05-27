@@ -31,17 +31,16 @@ export const Routes = {
   
   // Profile
   panel: '/panel',
-  panelLead: (id: string): string => `/panel/ventas/lead/${id}`,
-  panelProject: (id: string): string => `/panel/ventas/proyecto/${id}`,
+  panelLead: (id: string): string => `/panel/clientes/lead/${id}`,
+  panelProject: (id: string): string => `/panel/clientes/proyecto/${id}`,
   panelQuotation: (id: string): string => `/panel/cotizacion/${id}`,
   publicQuotation: (slug: string): string => `/cotizacion/${slug}`,
-  panelAddLead: '/panel/ventas/lead/agregar',
-  panelSyncLeads: '/panel/ventas/obtener-clientes',
-  panelAddSalesperson: '/panel/ventas/agregar-vendedor',
+  panelAddLead: '/panel/clientes/lead/agregar',
+  panelAddSalesperson: '/panel/clientes/agregar-vendedor',
   panelAddCompanyUser: '/panel/espacios/agregar-usuario',
-  panelPlans: '/panel/ventas/planes',
-  panelPlanSubscribe: (planId: string): string => `/panel/ventas/planes/suscripcion/${planId}`,
-  panelPlanSubscriptionSuccess: "/panel/ventas/planes/suscripcion/success",
+  panelPlans: '/panel/clientes/planes',
+  panelPlanSubscribe: (planId: string): string => `/panel/clientes/planes/suscripcion/${planId}`,
+  panelPlanSubscriptionSuccess: "/panel/clientes/planes/suscripcion/success",
 
   
   // About

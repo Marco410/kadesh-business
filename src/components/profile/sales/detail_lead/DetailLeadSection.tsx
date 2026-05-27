@@ -266,7 +266,7 @@ export default function DetailLeadSection() {
           onClick={() => router.back()}
           className="mt-4 inline-block text-orange-500 dark:text-orange-400 hover:underline"
         >
-          Volver a Ventas
+          Volver a Clientes
         </button>
       </div>
     );
@@ -349,7 +349,7 @@ export default function DetailLeadSection() {
             className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-            Volver a Ventas
+            Volver a Clientes
           </button>
           <h1 className="text-lg font-bold text-[#212121] dark:text-[#ffffff] truncate">
             {lead.businessName || "Lead sin nombre"}

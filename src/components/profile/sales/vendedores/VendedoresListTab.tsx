@@ -7,9 +7,9 @@ import {
   type UserCompanyCategoriesResponse,
   type UserCompanyCategoriesVariables,
 } from "kadesh/components/profile/sales/queries";
-import { Role } from "kadesh/constants/constans";
+import { PLAN_FEATURE_KEYS, Role } from "kadesh/constants/constans";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { UserIcon, Search01Icon } from "@hugeicons/core-free-icons";
+import { UserIcon, Search01Icon, UserAdd02Icon } from "@hugeicons/core-free-icons";
 import {
   COMPANY_VENDEDORES_WITH_STATS_QUERY,
   type CompanyVendedoresWithStatsResponse,
@@ -17,6 +17,10 @@ import {
 } from "./queries";
 import VendedorCard from "./VendedorCard";
 import VendedorDetailModal from "./VendedorDetailModal";
+import { hasPlanFeature } from "../helpers/plan-features";
+import { Routes } from "kadesh/core/routes";
+import { useRouter } from "next/navigation";
+import { useSubscription } from "../SubscriptionContext";
 
 export interface VendedoresListTabProps {
   userId: string;
@@ -40,8 +44,10 @@ function normalizeSearch(value: string): string {
 }
 
 export default function VendedoresListTab({ userId }: VendedoresListTabProps) {
+  const router = useRouter();
   const [searchInput, setSearchInput] = useState("");
   const [selectedVendedorId, setSelectedVendedorId] = useState<string | null>(null);
+  const { subscription } = useSubscription();
 
   const { data: userData } = useQuery<
     UserCompanyCategoriesResponse,
@@ -122,19 +128,32 @@ export default function VendedoresListTab({ userId }: VendedoresListTabProps) {
             Lista de vendedores de tu empresa y sus métricas.
           </p>
         </div>
-        <div className="relative w-full sm:w-64">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#616161] dark:text-[#b0b0b0]">
-            <HugeiconsIcon icon={Search01Icon} size={18} />
-          </span>
-          <input
-            type="search"
-            placeholder="Buscar por nombre..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-white placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent text-sm"
-            aria-label="Buscar vendedores por nombre"
-          />
+        <div className="flex flex-row gap-3 w-full sm:w-auto items-center">
+          {hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT) && (
+            <button
+              type="button"
+              onClick={() => router.push(Routes.panelAddSalesperson)}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors"
+            >
+              <HugeiconsIcon icon={UserAdd02Icon} size={18} strokeWidth={2} />
+              Gestionar vendedores
+            </button>
+          )}
+          <div className="relative w-full sm:w-64">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#616161] dark:text-[#b0b0b0]">
+              <HugeiconsIcon icon={Search01Icon} size={18} />
+            </span>
+            <input
+              type="search"
+              placeholder="Buscar por nombre..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-white placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent text-sm"
+              aria-label="Buscar vendedores por nombre"
+            />
+          </div>
         </div>
+  
       </div>
 
       {vendedores.length === 0 ? (
