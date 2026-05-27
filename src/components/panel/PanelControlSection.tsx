@@ -20,6 +20,7 @@ import {
   UserAdd01Icon,
   UserGroupIcon,
   WorkIcon,
+  FlashIcon,
 } from "@hugeicons/core-free-icons";
 import ProfileData from "kadesh/components/profile/ProfileData";
 import SalesSection from "kadesh/components/profile/sales/SalesSection";
@@ -160,6 +161,7 @@ function DashboardWelcome({ userName }: { userName: string }) {
 function QuickActions({ hasVendedorRole }: { hasVendedorRole: boolean }) {
   const actions = [
     { label: "Editar mi perfil", href: `${Routes.panel}?tab=profile`, icon: UserIcon },
+    { label: "Ver novedades", href: Routes.novedades, icon: FlashIcon },
     ...(hasVendedorRole
       ? [
           { label: "Ver leads", href: `${Routes.panel}?tab=clientes`, icon: Chart01Icon },

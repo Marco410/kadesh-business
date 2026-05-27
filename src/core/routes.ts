@@ -31,6 +31,7 @@ export const Routes = {
   
   // Profile
   panel: '/panel',
+  panelProfile: '/panel?tab=profile',
   panelLead: (id: string): string => `/panel/clientes/lead/${id}`,
   panelProject: (id: string): string => `/panel/clientes/proyecto/${id}`,
   panelQuotation: (id: string): string => `/panel/cotizacion/${id}`,
@@ -46,5 +47,6 @@ export const Routes = {
   // About
   conocenos: '/conocenos',
   precios: '/precios',
+  novedades: '/novedades',
   
 } as const;

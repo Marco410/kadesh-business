@@ -289,11 +289,18 @@ export default function Navigation() {
                     className="absolute top-full right-0 mt-2 bg-white dark:bg-[#1e1e1e] rounded-lg shadow-lg py-2 min-w-[180px] z-50"
                   >
                     <Link
-                      href={Routes.panel}
+                      href={Routes.panelProfile}
                       onClick={() => setAvatarDropdownOpen(false)}
                       className="block px-4 py-2 text-sm text-[#212121] dark:text-[#ffffff] hover:bg-orange-500/10 dark:hover:bg-white/10 transition-colors"
                     >
                       Mi perfil
+                    </Link>
+                    <Link
+                      href={Routes.novedades}
+                      onClick={() => setAvatarDropdownOpen(false)}
+                      className="block px-4 py-2 text-sm text-[#212121] dark:text-[#ffffff] hover:bg-orange-500/10 dark:hover:bg-white/10 transition-colors"
+                    >
+                      Novedades
                     </Link>
                     <button
                       onClick={handleLogout}
