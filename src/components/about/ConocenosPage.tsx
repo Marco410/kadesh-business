@@ -273,7 +273,7 @@ export default function ConocenosPage() {
                     Prueba Kadesh Hoy
                   </Link>
                   <Link
-                    href="/#precios"
+                    href={Routes.precios}
                     className="inline-flex items-center justify-center rounded-2xl border border-white/20 px-8 py-4 text-lg font-semibold text-white transition-colors hover:border-orange-500/50 hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#141414]"
                   >
                     Ver planes y precios

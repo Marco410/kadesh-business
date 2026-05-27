@@ -46,5 +46,6 @@ export const Routes = {
   
   // About
   conocenos: '/conocenos',
+  precios: '/precios',
   
 } as const;

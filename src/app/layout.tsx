@@ -55,7 +55,7 @@ const globalGeoJsonLd = {
           price: 799,
           priceCurrency: 'MXN',
           category: 'SaaS B2B',
-          url: 'https://kadesh.com.mx/#precios',
+          url: 'https://kadesh.com.mx/precios',
         },
         {
           '@type': 'Offer',
@@ -63,7 +63,7 @@ const globalGeoJsonLd = {
           price: 1699,
           priceCurrency: 'MXN',
           category: 'SaaS B2B',
-          url: 'https://kadesh.com.mx/#precios',
+          url: 'https://kadesh.com.mx/precios',
         },
         {
           '@type': 'Offer',
@@ -71,7 +71,7 @@ const globalGeoJsonLd = {
           price: 3499,
           priceCurrency: 'MXN',
           category: 'SaaS B2B',
-          url: 'https://kadesh.com.mx/#precios',
+          url: 'https://kadesh.com.mx/precios',
         },
       ],
       description:

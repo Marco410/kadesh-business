@@ -7,7 +7,7 @@ const FOOTER_LINKS = {
   producto: [
     { label: "Cómo funciona", href: "/#demo" },
     { label: "Conócenos", href: Routes.conocenos },
-    { label: "Planes", href: "/#precios" },
+    { label: "Planes y precios", href: Routes.precios },
     { label: "Contacto", href: "/contacto" },
     { label: "Iniciar sesión", href: Routes.auth.login },
     { label: "Registrarse", href: `${Routes.auth.login}?tab=register` },

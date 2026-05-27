@@ -689,6 +689,10 @@ export interface PlansSectionProps {
   sectionTitle?: string;
   /** Override section subtitle. */
   sectionSubtitle?: string;
+  /** Heading level for the section title (use h2 when the page already has an h1). */
+  sectionHeadingLevel?: "h1" | "h2";
+  /** Optional id for the section title element (aria-labelledby). */
+  sectionTitleId?: string;
   showBtnStart?: boolean;
 }
 
@@ -696,6 +700,8 @@ export default function PlansSection({
   hideBackLink = false,
   sectionTitle = "Planes y precios",
   sectionSubtitle = "Planes a la medida de tu empresa",
+  sectionHeadingLevel = "h1",
+  sectionTitleId,
   showBtnStart = true,
 }: PlansSectionProps = {}) {
   const router = useRouter();
@@ -731,10 +737,22 @@ export default function PlansSection({
         </div>
       )}
 
-      <section id="planes" className="text-center">
-        <h1 className="text-3xl font-bold text-[#212121] dark:text-[#ffffff]">
-          {sectionTitle}
-        </h1>
+      <section id="planes" className="text-center" aria-labelledby={sectionTitleId}>
+        {sectionHeadingLevel === "h2" ? (
+          <h2
+            id={sectionTitleId}
+            className="text-3xl font-bold text-[#212121] dark:text-[#ffffff]"
+          >
+            {sectionTitle}
+          </h2>
+        ) : (
+          <h1
+            id={sectionTitleId}
+            className="text-3xl font-bold text-[#212121] dark:text-[#ffffff]"
+          >
+            {sectionTitle}
+          </h1>
+        )}
         <p className="mt-2 text-[#616161] dark:text-[#b0b0b0]">
           {sectionSubtitle}
         </p>
