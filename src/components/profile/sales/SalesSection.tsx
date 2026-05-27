@@ -586,15 +586,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   return (
     <SubscriptionProvider companyId={companyId}>
       <div className="w-full space-y-6">
-        <CurrentPlanSection />
-
-        <StatsSection
-          userId={userId}
-          companyId={companyId}
-          isAdminCompany={isAdminCompany}
-          companyWideLeadScope={hasCompanyWideLeadScope}
-          salesComission={userData?.user?.salesComission ?? 0}
-        />
+      
 
       <div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
@@ -673,6 +665,14 @@ export default function SalesSection({ userId }: SalesSectionProps) {
           isAdminCompany={hasCompanyWideLeadScope}
         />
       </div>
+
+      <StatsSection
+          userId={userId}
+          companyId={companyId}
+          isAdminCompany={isAdminCompany}
+          companyWideLeadScope={hasCompanyWideLeadScope}
+          salesComission={userData?.user?.salesComission ?? 0}
+        />
     </div>
     </SubscriptionProvider>
   );

@@ -728,11 +728,11 @@ export default function PlansSection({
       {!hideBackLink && (
         <div className="mb-6">
           <Link
-            href={`${Routes.panel}?tab=ventas`}
+            href={`${Routes.panel}?tab=clientes`}
             className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-700 dark:hover:text-orange-400"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-            Volver a Ventas
+            Volver a Clientes
           </Link>
         </div>
       )}

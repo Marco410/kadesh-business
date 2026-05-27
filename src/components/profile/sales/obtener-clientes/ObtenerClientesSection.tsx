@@ -7,6 +7,7 @@ import {
   CenterFocusIcon,
   FilterHorizontalIcon,
   Location01Icon,
+  MentoringIcon,
   Radar01Icon,
   Search01Icon,
   StarIcon,
@@ -20,6 +21,7 @@ import { sileo } from "sileo";
 import { Routes } from "kadesh/core/routes";
 import { Autocomplete, type AutocompleteOption } from "kadesh/components/shared";
 import LeadsStatsCards, { type LeadsStatsCardsHandle } from "./LeadsStatsCards";
+import { useRouter } from "next/navigation";
 
 const CATEGORY_OPTIONS: AutocompleteOption[] = GOOGLE_PLACE_CATEGORIES.map((opt) => ({
   id: opt.value,
@@ -162,6 +164,7 @@ export default function ObtenerClientesSection() {
     skippedLowRating: number;
   } | null>(null);
   const [showZeroResultsHint, setShowZeroResultsHint] = useState(false);
+  const [hasNewLeadsAdded, setHasNewLeadsAdded] = useState(false);
   const [leafletReady, setLeafletReady] = useState(false);
   const [locatingUser, setLocatingUser] = useState(false);
 
@@ -177,7 +180,8 @@ export default function ObtenerClientesSection() {
   const markerRef = useRef<LeafletMarker | null>(null);
   const circleRef = useRef<LeafletCircle | null>(null);
   const filtersPopoverRef = useRef<HTMLDivElement>(null);
-
+  const router = useRouter();
+  
   useEffect(() => {
     setThemeMounted(true);
   }, []);
@@ -387,6 +391,7 @@ export default function ObtenerClientesSection() {
       setStats({ created, alreadyInDb, skippedLowRating: skipped });
       setHasSearched(true);
       setShowZeroResultsHint(syncedLeadsCount === 0);
+      setHasNewLeadsAdded(syncedLeadsCount > 0);
 
       if (syncedLeadsCount > 0) {
         statsRef.current?.refetch();
@@ -396,16 +401,16 @@ export default function ObtenerClientesSection() {
     };
 
     sileo.promise(fetchData(), {
-      loading: { title: `Buscando ${categoryLabel.toLowerCase()} en la zona…` },
+      loading: { title: `Buscando leads de ${categoryLabel.toLowerCase()} en la zona…` },
       success: (data) => {
         const count = data.syncedLeadsCount;
         if (count === 0) {
-          return { title: "No se encontraron negocios nuevos en esta zona" };
+          return { title: "No se encontraron leads nuevos en esta zona" };
         }
-        const countText = count === 1 ? "1 negocio" : `${count} negocios`;
+        const countText = count === 1 ? "1 lead" : `${count} leads`;
         return {
           title: `${countText} de ${data.categoryLabel} ${count === 1 ? "agregado" : "agregados"}`,
-          description: `Se han agregado ${countText} de ${data.categoryLabel} a la base de datos`,
+          description: `Se han agregado ${countText} de ${data.categoryLabel} a tu base de datos`,
         };
       },
       error: (err) => ({
@@ -431,8 +436,8 @@ export default function ObtenerClientesSection() {
         <RoleAccessDeniedSection
           title="No tienes acceso a Obtener clientes"
           description="Esta herramienta está pensada para el equipo comercial. Como vendedor no puedes importar negocios desde el mapa."
-          backHref={`${Routes.panel}?tab=ventas`}
-          backLabel="Volver a Ventas"
+          backHref={`${Routes.panel}?tab=clientes`}
+          backLabel="Volver a Clientes"
         />
       </div>
     );
@@ -720,6 +725,24 @@ export default function ObtenerClientesSection() {
             className={locatingUser ? "animate-pulse text-orange-500" : undefined}
           />
         </button>
+
+        {hasNewLeadsAdded && (
+          <button
+            type="button"
+            onClick={() => router.push(`${Routes.panel}?tab=clientes`)}
+            className="absolute top-8 right-32 z-20 flex items-center gap-2 rounded-full border border-orange-100 bg-white/95 px-5 py-3 text-sm font-semibold text-orange-600 shadow-xl ring-1 ring-orange-200/40 backdrop-blur-md transition hover:bg-orange-50 hover:text-orange-700 dark:border-orange-900/30 dark:bg-gray-900/80 dark:text-orange-400 dark:hover:bg-gray-800"
+            aria-label="Ver mis nuevos clientes"
+            title="Ver mis nuevos clientes"
+          >
+            <HugeiconsIcon
+              icon={MentoringIcon}
+              size={22}
+              className="shrink-0"
+              aria-hidden
+            />
+            <span>Ver mis nuevos clientes</span>
+          </button>
+        )}
 
       </div>
 

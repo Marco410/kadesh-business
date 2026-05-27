@@ -22,10 +22,10 @@ export default function SuscripcionSuccessPage() {
             Tu plan ha sido activado correctamente. Ya puedes usar todas las funciones incluidas.
           </p>
           <Link
-            href={`${Routes.panel}?tab=ventas`}
+            href={`${Routes.panel}?tab=clientes`}
             className="mt-8 inline-block w-full rounded-xl bg-orange-500 px-6 py-3 text-center text-sm font-semibold text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
           >
-            Ir a Ventas
+            Ir a Clientes
           </Link>
           <Link
             href={Routes.panelPlans}

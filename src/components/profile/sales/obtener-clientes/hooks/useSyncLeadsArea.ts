@@ -32,7 +32,6 @@ export function useSyncLeadsArea() {
       minRating: params.minRating ?? null,
       minReviews: params.minReviews ?? null,
     };
-    console.log("input", input);
     const result = await mutate({ variables: { input } });
     return result.data?.syncLeadsFront ?? null;
   };
