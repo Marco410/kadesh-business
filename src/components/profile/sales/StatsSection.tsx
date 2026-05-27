@@ -1,9 +1,6 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Add01Icon, MapsSearchIcon, UserAdd02Icon, UserSearch01Icon } from "@hugeicons/core-free-icons";
-
 import {
   TECH_BUSINESS_LEADS_COUNT_QUERY,
   TECH_PROPOSALS_QUERY,
@@ -16,9 +13,7 @@ import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces
 import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
 import { PIPELINE_STATUS, PLAN_FEATURE_KEYS, PROPOSAL_STATUS } from "kadesh/constants/constans";
 import { formatCurrency } from "kadesh/utils/format-currency";
-import { Routes } from "kadesh/core/routes";
 import { useRouter } from "next/navigation";
-import { hasPlanFeature } from "./helpers/plan-features";
 import { useSubscription } from "./SubscriptionContext";
 import { InfoTooltip } from "kadesh/components/shared";
 
@@ -115,9 +110,6 @@ export default function StatsSection({
   const clientesGanados = clientesGanadosData?.techBusinessLeadsCount ?? 0;
   const contactados = contactadosData?.techBusinessLeadsCount ?? 0;
 
-
-
-  const hasPlanFeaturesRequired = hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.LEAD_SYNC) || hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT);
   return (
     <div className="flex flex-col gap-4">
       {/* Stats */}
@@ -161,48 +153,6 @@ export default function StatsSection({
           </p>
         </div>
       </div>
-      {(isAdminCompany && hasPlanFeaturesRequired) && (
-      <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm bg-gradient-to-r from-orange-500/10 to-transparent dark:from-orange-500/20 dark:to-transparent">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div className="flex flex-col gap-2 min-w-0">
-            <p className="text-xs uppercase tracking-wide font-semibold text-[#9e9e9e] dark:text-white">
-              Acciones rápidas
-            </p>
-            <div className="flex flex-col sm:flex-row flex-wrap gap-2">
-              {hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.LEAD_SYNC) && (
-                <button
-                  type="button"
-                  onClick={() => router.push(Routes.panelSyncLeads)}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 active:bg-orange-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors w-full sm:w-auto"
-                >
-                  <HugeiconsIcon icon={UserSearch01Icon} size={18} strokeWidth={2} />
-                  Obtener nuevos clientes
-                </button>
-              )}
-              {hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT) && (
-                <button
-                  type="button"
-                  onClick={() => router.push(Routes.panelAddSalesperson)}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors w-full sm:w-auto"
-                >
-                  <HugeiconsIcon icon={UserAdd02Icon} size={18} strokeWidth={2} />
-                  Gestionar vendedores
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-4 py-3 min-w-[11rem] lg:min-w-[12.5rem]">
-            <p className="text-xs uppercase tracking-wide font-semibold text-[#9e9e9e] dark:text-[#8b8b8b]">
-              Total clientes
-            </p>
-            <p className="text-3xl font-bold text-[#212121] dark:text-[#ffffff] mt-1 tabular-nums">
-              {leadsCount}
-            </p>
-          </div>
-        </div>
-      </div>
-      )}
     </div>
   );
 }

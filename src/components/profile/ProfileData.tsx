@@ -19,6 +19,7 @@ import { Routes } from "kadesh/core/routes";
 import { Role } from "kadesh/constants/constans";
 import ProfileCompanySection from "./ProfileCompanySection";
 import type { AuthenticatedItem } from "kadesh/utils/types";
+import CurrentPlanSection from "./sales/CurrentPlanSection";
 
 const INPUT_CLASS =
   "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
@@ -227,320 +228,324 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
   }
 
   return (
-    <div
-      className={`grid grid-cols-1 gap-6${isAdminCompany ? " xl:grid-cols-2" : ""}`}
-    >
-      <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 sm:p-8 border border-[#e0e0e0] dark:border-[#3a3a3a] shadow-md dark:shadow-lg">
-        <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-          <h2 className="text-2xl font-bold text-[#212121] dark:text-[#ffffff]">
-            Información Personal
-          </h2>
-          <SaveChangesButton
-            isDirty={isDirty}
-            saving={saving}
-            onSave={handleSave}
-          />
-        </div>
+    <div className="space-y-6">
+      <CurrentPlanSection />
+      <div
+        className={`grid grid-cols-1 gap-6${isAdminCompany ? " xl:grid-cols-2" : ""}`}
+      >
 
-        {saveError && (
-          <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm font-medium">
-            {saveError}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Avatar con botón editar */}
-        <div className="md:col-span-2 flex items-center gap-6 mb-4 pb-6 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
-          <div className="flex flex-col items-start gap-1">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="sr-only"
-              aria-label="Subir nueva foto de perfil"
-              onChange={handleImageChange}
+        <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 sm:p-8 border border-[#e0e0e0] dark:border-[#3a3a3a] shadow-md dark:shadow-lg">
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+            <h2 className="text-2xl font-bold text-[#212121] dark:text-[#ffffff]">
+              Información Personal
+            </h2>
+            <SaveChangesButton
+              isDirty={isDirty}
+              saving={saving}
+              onSave={handleSave}
             />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={imageUploading}
-              className="relative w-24 h-24 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-2xl overflow-hidden group cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {user.profileImage?.url ? (
-                <Image
-                  src={user.profileImage.url}
-                  alt={user.name || "Usuario"}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <span>{user.name?.charAt(0) || "U"}</span>
-              )}
-              {/* Gradient + lápiz siempre visible */}
-              <span className="absolute inset-0 rounded-full bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-60 transition-opacity" />
-              <span className="absolute inset-0 flex items-center justify-center opacity-100 transition-opacity">
-                <span className="rounded-full bg-white/90 dark:bg-black/50 p-1.5">
-                  <HugeiconsIcon
-                    icon={Edit01Icon}
-                    className="size-5 text-[#212121] dark:text-white"
+          </div>
+
+          {saveError && (
+            <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm font-medium">
+              {saveError}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Avatar con botón editar */}
+          <div className="md:col-span-2 flex items-center gap-6 mb-4 pb-6 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
+            <div className="flex flex-col items-start gap-1">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                aria-label="Subir nueva foto de perfil"
+                onChange={handleImageChange}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={imageUploading}
+                className="relative w-24 h-24 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-2xl overflow-hidden group cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {user.profileImage?.url ? (
+                  <Image
+                    src={user.profileImage.url}
+                    alt={user.name || "Usuario"}
+                    fill
+                    className="object-cover"
                   />
+                ) : (
+                  <span>{user.name?.charAt(0) || "U"}</span>
+                )}
+                {/* Gradient + lápiz siempre visible */}
+                <span className="absolute inset-0 rounded-full bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-60 transition-opacity" />
+                <span className="absolute inset-0 flex items-center justify-center opacity-100 transition-opacity">
+                  <span className="rounded-full bg-white/90 dark:bg-black/50 p-1.5">
+                    <HugeiconsIcon
+                      icon={Edit01Icon}
+                      className="size-5 text-[#212121] dark:text-white"
+                    />
+                  </span>
                 </span>
-              </span>
-              {imageUploading && (
-                <span className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
-                  <span className="animate-spin size-6 border-2 border-white border-t-transparent rounded-full" />
-                </span>
+                {imageUploading && (
+                  <span className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
+                    <span className="animate-spin size-6 border-2 border-white border-t-transparent rounded-full" />
+                  </span>
+                )}
+              </button>
+              {imageError && (
+                <p className="text-sm text-red-600 dark:text-red-400 max-w-[24rem]">
+                  {imageError}
+                </p>
               )}
-            </button>
-            {imageError && (
-              <p className="text-sm text-red-600 dark:text-red-400 max-w-[24rem]">
-                {imageError}
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-[#212121] dark:text-[#ffffff]">
+                {user.name} {user.lastName} {user.secondLastName || ""}
+              </h3>
+              <p className="text-[#616161] dark:text-[#b0b0b0]">
+                @{user.username}
               </p>
-            )}
+              {user.verified && (
+                <span className="inline-flex items-center gap-1 mt-1 text-xs text-orange-500 dark:text-orange-400">
+                  <svg
+                    className="w-4 h-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 .723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Verificado
+                </span>
+              )}
+            </div>
           </div>
+
+          {/* Nombre - editable */}
           <div>
-            <h3 className="text-xl font-bold text-[#212121] dark:text-[#ffffff]">
-              {user.name} {user.lastName} {user.secondLastName || ""}
-            </h3>
-            <p className="text-[#616161] dark:text-[#b0b0b0]">
-              @{user.username}
-            </p>
-            {user.verified && (
-              <span className="inline-flex items-center gap-1 mt-1 text-xs text-orange-500 dark:text-orange-400">
-                <svg
-                  className="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 .723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Verificado
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Nombre - editable */}
-        <div>
-          <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
-            Nombre
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Tu nombre"
-            className={INPUT_CLASS}
-          />
-        </div>
-
-        {/* Apellido Paterno - editable */}
-        <div>
-          <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
-            Apellido Paterno
-          </label>
-          <input
-            type="text"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            placeholder="Apellido paterno"
-            className={INPUT_CLASS}
-          />
-        </div>
-
-        {/* Apellido Materno - editable */}
-        <div>
-          <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
-            Apellido Materno
-          </label>
-          <input
-            type="text"
-            value={secondLastName}
-            onChange={(e) => setSecondLastName(e.target.value)}
-            placeholder="Apellido materno (opcional)"
-            className={INPUT_CLASS}
-          />
-        </div>
-
-        {/* Username - no editable */}
-        <div>
-          <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
-            Nombre de Usuario
-          </label>
-          <div className="flex items-center gap-2">
+            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+              Nombre
+            </label>
             <input
               type="text"
-              value={user.username ? `@${user.username}` : ""}
-              readOnly
-              disabled
-              className={DISABLED_FIELD_CLASS}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Tu nombre"
+              className={INPUT_CLASS}
             />
           </div>
-          <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
-            Si necesitas actualizar este campo, envía un mensaje en{" "}
-            <Link
-              href={Routes.contact}
-              className="text-orange-500 dark:text-orange-400 hover:underline font-medium"
-            >
-              contacto
-            </Link>
-            .
-          </p>
-        </div>
 
-        {/* Email - no editable */}
-        <div>
-          <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
-            Correo Electrónico
-          </label>
-          <div className="flex items-center gap-2">
+          {/* Apellido Paterno - editable */}
+          <div>
+            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+              Apellido Paterno
+            </label>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Apellido paterno"
+              className={INPUT_CLASS}
+            />
+          </div>
+
+          {/* Apellido Materno - editable */}
+          <div>
+            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+              Apellido Materno
+            </label>
+            <input
+              type="text"
+              value={secondLastName}
+              onChange={(e) => setSecondLastName(e.target.value)}
+              placeholder="Apellido materno (opcional)"
+              className={INPUT_CLASS}
+            />
+          </div>
+
+          {/* Username - no editable */}
+          <div>
+            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+              Nombre de Usuario
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={user.username ? `@${user.username}` : ""}
+                readOnly
+                disabled
+                className={DISABLED_FIELD_CLASS}
+              />
+            </div>
+            <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              Si necesitas actualizar este campo, envía un mensaje en{" "}
+              <Link
+                href={Routes.contact}
+                className="text-orange-500 dark:text-orange-400 hover:underline font-medium"
+              >
+                contacto
+              </Link>
+              .
+            </p>
+          </div>
+
+          {/* Email - no editable */}
+          <div>
+            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+              Correo Electrónico
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="email"
+                value={user.email ?? ""}
+                readOnly
+                disabled
+                className={DISABLED_FIELD_CLASS}
+              />
+            </div>
+            <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              Si necesitas actualizar este campo, envía un mensaje en{" "}
+              <Link
+                href={Routes.contact}
+                className="text-orange-500 dark:text-orange-400 hover:underline font-medium"
+              >
+                contacto
+              </Link>
+              .
+            </p>
+          </div>
+
+            {/* Correo de empresa - editable */}
+            <div>
+            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+              Correo de la empresa
+            </label>
             <input
               type="email"
-              value={user.email ?? ""}
-              readOnly
-              disabled
-              className={DISABLED_FIELD_CLASS}
+              value={businessEmail}
+              onChange={(e) => setBusinessEmail(e.target.value)}
+              placeholder="empresa@dominio.com"
+              className={INPUT_CLASS}
             />
-          </div>
-          <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
-            Si necesitas actualizar este campo, envía un mensaje en{" "}
-            <Link
-              href={Routes.contact}
-              className="text-orange-500 dark:text-orange-400 hover:underline font-medium"
-            >
-              contacto
-            </Link>
-            .
-          </p>
-        </div>
-
-          {/* Correo de empresa - editable */}
-          <div>
-          <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
-            Correo de la empresa
-          </label>
-          <input
-            type="email"
-            value={businessEmail}
-            onChange={(e) => setBusinessEmail(e.target.value)}
-            placeholder="empresa@dominio.com"
-            className={INPUT_CLASS}
-          />
-           <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
-            Este correo se usará para las cotizaciones y ventas.
-          </p>
-        </div>
-
-        {/* Teléfono de empresa - editable */}
-        <div>
-          <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
-            Teléfono de la empresa
-          </label>
-          <input
-            type="tel"
-            value={businessPhone}
-            onChange={(e) => setBusinessPhone(e.target.value)}
-            placeholder="+52 55 1234 5678"
-            className={INPUT_CLASS}
-          />
-          <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
-            Este teléfono se usará para las cotizaciones y ventas.
-          </p>
-        </div>
-
-        {/* Teléfono - editable */}
-        <div>
-          <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
-            Teléfono <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => {
-              setPhone(e.target.value);
-              if (fieldErrors.phone) {
-                setFieldErrors((prev) => ({ ...prev, phone: undefined }));
-              }
-            }}
-            placeholder="+52 55 1234 5678"
-            className={`${INPUT_CLASS} ${
-              fieldErrors.phone ? "border-red-400 focus:ring-red-500 dark:border-red-500" : ""
-            }`}
-            required
-            aria-invalid={Boolean(fieldErrors.phone)}
-          />
-          {fieldErrors.phone ? (
-            <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">
-              {fieldErrors.phone}
+            <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              Este correo se usará para las cotizaciones y ventas.
             </p>
-          ) : null}
-        </div>
+          </div>
 
-      
-
-        {/* Fecha de Nacimiento - editable */}
-        <div>
-          <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
-            Fecha de Nacimiento
-          </label>
-          <input
-            type="date"
-            value={birthday}
-            onChange={(e) => setBirthday(e.target.value)}
-            className={INPUT_CLASS}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
-            Edad
-          </label>
-          <div className="flex items-center gap-2">
+          {/* Teléfono de empresa - editable */}
+          <div>
+            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+              Teléfono de la empresa
+            </label>
             <input
-              type="text"
-              value={
-                (user as { age?: number | null }).age
-                  ? `${(user as { age?: number | null }).age} años`
-                  : "No especificado"
-              }
-              readOnly
-              disabled
-              className={DISABLED_FIELD_CLASS}
+              type="tel"
+              value={businessPhone}
+              onChange={(e) => setBusinessPhone(e.target.value)}
+              placeholder="+52 55 1234 5678"
+              className={INPUT_CLASS}
+            />
+            <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              Este teléfono se usará para las cotizaciones y ventas.
+            </p>
+          </div>
+
+          {/* Teléfono - editable */}
+          <div>
+            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+              Teléfono <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                if (fieldErrors.phone) {
+                  setFieldErrors((prev) => ({ ...prev, phone: undefined }));
+                }
+              }}
+              placeholder="+52 55 1234 5678"
+              className={`${INPUT_CLASS} ${
+                fieldErrors.phone ? "border-red-400 focus:ring-red-500 dark:border-red-500" : ""
+              }`}
+              required
+              aria-invalid={Boolean(fieldErrors.phone)}
+            />
+            {fieldErrors.phone ? (
+              <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">
+                {fieldErrors.phone}
+              </p>
+            ) : null}
+          </div>
+
+        
+
+          {/* Fecha de Nacimiento - editable */}
+          <div>
+            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+              Fecha de Nacimiento
+            </label>
+            <input
+              type="date"
+              value={birthday}
+              onChange={(e) => setBirthday(e.target.value)}
+              className={INPUT_CLASS}
             />
           </div>
-          <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
-            Se autogenera con tu fecha de nacimiento.
-          </p>
-        </div>
 
-        {/* Miembro desde - no editable */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
-            Miembro desde
-          </label>
-          <div className="px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a] text-[#616161] dark:text-[#b0b0b0]">
-            {formatDate(user.createdAt)}
+          <div>
+            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+              Edad
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={
+                  (user as { age?: number | null }).age
+                    ? `${(user as { age?: number | null }).age} años`
+                    : "No especificado"
+                }
+                readOnly
+                disabled
+                className={DISABLED_FIELD_CLASS}
+              />
+            </div>
+            <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              Se autogenera con tu fecha de nacimiento.
+            </p>
+          </div>
+
+          {/* Miembro desde - no editable */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+              Miembro desde
+            </label>
+            <div className="px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a] text-[#616161] dark:text-[#b0b0b0]">
+              {formatDate(user.createdAt)}
+            </div>
+          </div>
+
+          {/* Botón guardar abajo (visible en móvil) */}
+          <div className="md:col-span-2 flex justify-center sm:justify-end pt-2">
+            <SaveChangesButton
+              isDirty={isDirty}
+              saving={saving}
+              onSave={handleSave}
+            />
+          </div>
           </div>
         </div>
 
-        {/* Botón guardar abajo (visible en móvil) */}
-        <div className="md:col-span-2 flex justify-center sm:justify-end pt-2">
-          <SaveChangesButton
-            isDirty={isDirty}
-            saving={saving}
-            onSave={handleSave}
-          />
-        </div>
-        </div>
+        {isAdminCompany && user.id ? (
+          <ProfileCompanySection userId={user.id} />
+        ) : null}
       </div>
-
-      {isAdminCompany && user.id ? (
-        <ProfileCompanySection userId={user.id} />
-      ) : null}
     </div>
   );
 }

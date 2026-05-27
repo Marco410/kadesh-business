@@ -15,7 +15,7 @@ interface RoleAccessDeniedSectionProps {
 export default function RoleAccessDeniedSection({
   title = "Sin permiso para acceder",
   description = "Tu rol no tiene acceso a esta sección. Si crees que es un error, contacta al administrador de tu empresa.",
-  backHref = `${Routes.panel}?tab=ventas`,
+  backHref = `${Routes.panel}?tab=clientes`,
   backLabel = "Volver al panel",
 }: RoleAccessDeniedSectionProps) {
   return (

@@ -1,0 +1,497 @@
+"use client";
+
+import { Suspense, useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useQuery } from "@apollo/client";
+import { useUser } from "kadesh/utils/UserContext";
+import { Routes } from "kadesh/core/routes";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  DashboardSquare01Icon,
+  UserIcon,
+  Chart01Icon,
+  Add01Icon,
+  ArrowRight01Icon,
+  FileAttachmentIcon,
+  FileIcon,
+  FolderIcon,
+  CalendarIcon,
+  UserAdd01Icon,
+  UserGroupIcon,
+  WorkIcon,
+} from "@hugeicons/core-free-icons";
+import ProfileData from "kadesh/components/profile/ProfileData";
+import SalesSection from "kadesh/components/profile/sales/SalesSection";
+import VendedoresSection from "kadesh/components/profile/sales/vendedores/VendedoresSection";
+import ArchivosSection from "kadesh/components/profile/sales/archivos/ArchivosSection";
+import { ProyectosSection } from "kadesh/components/profile/sales/proyecto";
+import { QuotationsSection } from "kadesh/components/profile/sales/quotations";
+import VendedoresCalendarioTab from "kadesh/components/profile/sales/vendedores/VendedoresCalendarioTab";
+import {
+  USER_COMPANY_CATEGORIES_QUERY,
+  SUBSCRIPTION_STATUS_QUERY,
+  type UserCompanyCategoriesResponse,
+  type UserCompanyCategoriesVariables,
+  type SubscriptionStatusResponse,
+  type SubscriptionStatusVariables,
+} from "kadesh/components/profile/sales/queries";
+import { hasPlanFeature } from "kadesh/components/profile/sales/helpers/plan-features";
+import { Footer, Navigation } from "kadesh/components/layout";
+import { ReferralSection as PublicReferralSection, ReferralLinkSection } from "kadesh/components/home";
+import { PLAN_FEATURE_KEYS, Role } from "kadesh/constants/constans";
+import FeatureLockedSection from "kadesh/components/profile/sales/FeatureLockedSection";
+import { SubscriptionProvider } from "kadesh/components/profile/sales/SubscriptionContext";
+import ReferralDashboardSection from "kadesh/components/profile/referral/ReferralDashboardSection";
+import WorkspacesTab from "kadesh/components/profile/sales/workspaces/WorkspacesTab";
+import CreateWorkspaceModal from "kadesh/components/profile/sales/workspaces/CreateWorkspaceModal";
+
+const VALID_TABS = ["inicio", "profile", "clientes", "vendedores", "archivos", "proyectos", "cotizaciones", "calendar", "workspaces", "referidos"] as const;
+
+function getValidTab(
+  tabFromUrl: string | null,
+  hasVendedorRole: boolean,
+  isAdminCompany: boolean,
+  hasUploadFilesFeature: boolean,
+  hasCalendarFeature: boolean,
+  hasWorkspacesFeature: boolean
+): (typeof VALID_TABS)[number] {
+  if (!tabFromUrl || !VALID_TABS.includes(tabFromUrl as (typeof VALID_TABS)[number])) {
+    return "inicio";
+  }
+  if (tabFromUrl === "clientes" && !hasVendedorRole) {
+    return "inicio";
+  }
+  if (tabFromUrl === "vendedores" && (!isAdminCompany )) {
+    return "inicio";
+  }
+  if (tabFromUrl === "archivos" && (!hasUploadFilesFeature)) {
+    return "inicio";
+  }
+  if (tabFromUrl === "calendar" && !hasCalendarFeature) {
+    return "inicio";
+  }
+  if (tabFromUrl === "workspaces" && !hasWorkspacesFeature) {
+    return "inicio";
+  }
+  return tabFromUrl as (typeof VALID_TABS)[number];
+}
+
+const navItems = [
+  { key: "inicio" as const, label: "Inicio", icon: DashboardSquare01Icon },
+  { key: "profile" as const, label: "Datos del perfil", icon: UserIcon },
+  { key: "clientes" as const, label: "Clientes", icon: Chart01Icon, requireVendedor: true },
+  { key: "vendedores" as const, label: "Vendedores", icon: UserGroupIcon, requireAdminCompany: true, requireSalesPersonManagement: false },
+  { key: "archivos" as const, label: "Archivos", icon: FileIcon },
+  { key: "proyectos" as const, label: "Proyectos", icon: FolderIcon },
+  { key: "cotizaciones" as const, label: "Cotizaciones", icon: FileIcon },
+  { key: "calendar" as const, label: "Mi Calendario", icon: CalendarIcon },
+  {
+    key: "workspaces" as const,
+    label: "Espacios de trabajo",
+    icon: WorkIcon
+  },
+  { key: "referidos" as const, label: "Referidos", icon: UserAdd01Icon },
+];
+
+
+function DashboardSidebar({
+  selectedTab,
+  onTabChange,
+  hasVendedorRole,
+  isAdminCompany,
+  hasSalesPersonManagement,
+  hasUploadFilesFeature,
+  hasWorkspacesFeature,
+}: {
+  selectedTab: string;
+  onTabChange: (key: string) => void;
+  hasVendedorRole: boolean;
+  isAdminCompany: boolean;
+  hasSalesPersonManagement: boolean;
+  hasUploadFilesFeature: boolean;
+  hasWorkspacesFeature: boolean;
+}) {
+  return (
+    <aside className="w-full lg:w-60 shrink-0">
+      <nav className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-2 shadow-sm">
+        {navItems.map((item) => {
+          if ("requireVendedor" in item && item.requireVendedor && !hasVendedorRole) return null;
+          if ("requireAdminCompany" in item && item.requireAdminCompany && !isAdminCompany) return null;
+          if ("requireSalesPersonManagement" in item && item.requireSalesPersonManagement && !hasSalesPersonManagement) return null;
+          if ("requireUploadFilesFeature" in item && item.requireUploadFilesFeature && !hasUploadFilesFeature) return null;
+          if ("requireWorkspacesFeature" in item && item.requireWorkspacesFeature && !hasWorkspacesFeature) return null;
+          const isActive = selectedTab === item.key;
+          return (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => onTabChange(item.key)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium transition-colors ${
+                isActive
+                  ? "bg-orange-500 text-white dark:bg-orange-500 dark:text-white"
+                  : "text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+              }`}
+            >
+              <HugeiconsIcon icon={item.icon} size={20} />
+              {item.label}
+            </button>
+          );
+        })}
+      </nav>
+    </aside>
+  );
+}
+
+function DashboardWelcome({ userName }: { userName: string }) {
+  const firstName = userName?.split(/\s+/)[0] || "Usuario";
+  return (
+    <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/10 to-orange-600/5 dark:from-orange-500/20 dark:to-transparent p-6 sm:p-8">
+      <h2 className="text-2xl sm:text-3xl font-bold text-[#212121] dark:text-white">
+        Hola, {firstName}
+      </h2>
+      <p className="mt-1 text-[#616161] dark:text-[#b0b0b0]">
+        Bienvenido a tu panel. Desde aquí gestionas tu perfil y ventas.
+      </p>
+    </div>
+  );
+}
+
+function QuickActions({ hasVendedorRole }: { hasVendedorRole: boolean }) {
+  const actions = [
+    { label: "Editar mi perfil", href: `${Routes.panel}?tab=profile`, icon: UserIcon },
+    ...(hasVendedorRole
+      ? [
+          { label: "Ver leads", href: `${Routes.panel}?tab=clientes`, icon: Chart01Icon },
+          { label: "Planes y precios", href: Routes.panelPlans, icon: FileAttachmentIcon },
+        ]
+      : []),
+  ];
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {actions.map((action) => (
+        <Link
+          key={action.href}
+          href={action.href}
+          className="group flex items-center gap-4 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-5 shadow-sm hover:border-orange-500/50 dark:hover:border-orange-500/50 hover:shadow-md transition-all"
+        >
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 dark:bg-orange-500/20 text-orange-500 dark:text-orange-400">
+            <HugeiconsIcon icon={action.icon} size={24} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-[#212121] dark:text-white">{action.label}</p>
+            <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5 flex items-center gap-1">
+              Ir <HugeiconsIcon icon={ArrowRight01Icon} size={12} className="opacity-70" />
+            </p>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+type PanelControlSectionProps = {
+  embedded?: boolean;
+};
+
+function PanelControlSectionContent({ embedded = false }: PanelControlSectionProps) {
+  const { user, loading } = useUser();
+  const router = useRouter();
+  const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const tabFromUrl = searchParams.get("tab");
+  const hasVendedorRole = user?.roles?.some((r) => r.name === Role.VENDEDOR) ?? false;
+  const isAdminCompany = user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+
+  const { data: userData } = useQuery<
+    UserCompanyCategoriesResponse,
+    UserCompanyCategoriesVariables
+  >(USER_COMPANY_CATEGORIES_QUERY, {
+    variables: { where: { id: user?.id ?? "" } },
+    skip: !user?.id,
+  });
+  const companyId = userData?.user?.company?.id ?? null;
+
+  const { data: subscriptionData } = useQuery<
+    SubscriptionStatusResponse,
+    SubscriptionStatusVariables
+  >(SUBSCRIPTION_STATUS_QUERY, {
+    variables: { companyId },
+    skip: !companyId,
+  });
+  const subscription = subscriptionData?.subscriptionStatus?.subscription ?? null;
+  const hasAdminRole = user?.roles?.some((r) => r.name === Role.ADMIN) ?? false;
+  const hasSalesPersonManagement = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT
+  );
+  const hasUploadFilesFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.UPLOAD_FILES
+  );
+  const hasProjectsFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.PROJECTS
+  );
+  const hasQuotationsFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.QUOTATIONS
+  );
+  const hasCalendarFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.CALENDAR_CRM
+  );
+  const hasWorkspacesFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.WORKSPACES
+  );
+  const selectedTab = getValidTab(tabFromUrl, hasVendedorRole, isAdminCompany, hasUploadFilesFeature, hasCalendarFeature, hasWorkspacesFeature);
+
+  const handleTabChange = (key: string) => {
+    router.replace(`${pathname}?tab=${key}`, { scroll: false });
+  };
+
+  useEffect(() => {
+    if (!loading && !user?.id) {
+      router.push(Routes.auth.login);
+    }
+  }, [user, loading, router]);
+
+  if (loading) {
+    if (embedded) {
+      return (
+        <div className="flex items-center justify-center py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent mx-auto" />
+            <p className="mt-3 text-sm text-[#616161] dark:text-[#b0b0b0]">Cargando panel...</p>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-orange-500 border-t-transparent mx-auto" />
+          <p className="mt-4 text-[#616161] dark:text-[#b0b0b0]">Cargando panel...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user?.id) {
+    return null;
+  }
+
+  const panelBody = (
+    <SubscriptionProvider companyId={companyId}>
+      <div className={embedded ? undefined : "pt-20 pb-12"}>
+        <div className={embedded ? undefined : "mx-auto px-10 sm:px-10 lg:px-10"}>
+          {!embedded && (
+            <div className="mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#212121] dark:text-white">
+                Panel de control
+              </h1>
+              <p className="text-[#616161] dark:text-[#b0b0b0] mt-1">
+                Gestiona tu información y ventas
+              </p>
+            </div>
+          )}
+
+          <div className="flex flex-col lg:flex-row gap-8">
+              <DashboardSidebar
+                selectedTab={selectedTab}
+                onTabChange={handleTabChange}
+                hasVendedorRole={hasVendedorRole}
+                isAdminCompany={isAdminCompany}
+                hasSalesPersonManagement={hasSalesPersonManagement}
+                hasUploadFilesFeature={hasUploadFilesFeature}
+                hasWorkspacesFeature={hasWorkspacesFeature}
+              />
+
+              <main className="flex-1 min-w-0">
+                {selectedTab === "inicio" && (
+                  <div className="space-y-8">
+                    <DashboardWelcome userName={user.name ?? ""} />
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#212121] dark:text-white mb-4">
+                        Acciones rápidas
+                      </h3>
+                      <QuickActions hasVendedorRole={hasVendedorRole} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#212121] dark:text-white mb-4">
+                        Referidos y comisiones
+                      </h3>
+                      <ReferralLinkSection
+                        userId={user.id}
+                        referralCode={userData?.user?.referralCode ?? ""}
+                        bank={userData?.user?.bank}
+                        clabe={userData?.user?.clabe}
+                        cardNumber={userData?.user?.cardNumber}
+                      />
+                    </div>
+                    <div className="rounded-2xl overflow-hidden border border-[#e0e0e0] dark:border-[#3a3a3a]">
+                      <PublicReferralSection />
+                    </div>
+
+                    {hasAdminRole && (
+                      <div className="pt-2 flex justify-center">
+                        <Link
+                          href="/panel/clientes/admin"
+                          className="text-xs text-[#616161] dark:text-[#b0b0b0] underline decoration-dotted opacity-70 hover:opacity-100 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+                        >
+                          Admin: verificar suscripciones (debug)
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {selectedTab === "profile" && (
+                  <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8 shadow-sm">
+                    <ProfileData user={user} />
+                  </div>
+                )}
+
+                {selectedTab === "clientes" && hasVendedorRole && (
+                  <div className="space-y-6">
+                    <SalesSection userId={user.id} />
+                  </div>
+                )}
+
+                {selectedTab === "vendedores" && (
+                  isAdminCompany && hasSalesPersonManagement ? (
+                    <div className="space-y-6">
+                      <VendedoresSection userId={user.id} />
+                    </div>
+                  ) : (
+                    <FeatureLockedSection sectionName="Vendedores" />
+                  )
+                )}
+
+                {selectedTab === "archivos" && (
+                  hasUploadFilesFeature ? (
+                    <div className="space-y-6">
+                      <ArchivosSection userId={user.id} />
+                    </div>
+                  ) : (
+                    <FeatureLockedSection sectionName="Archivos" />
+                  )
+                )}
+
+                {selectedTab === "proyectos" && (
+                  hasProjectsFeature ? (
+                    <div className="space-y-6">
+                      <ProyectosSection userId={user.id} />
+                    </div>
+                  ) : (
+                    <FeatureLockedSection sectionName="Proyectos" />
+                  )
+                )}
+
+                {selectedTab === "cotizaciones" && (
+                  hasQuotationsFeature ? (
+                    <div className="space-y-6">
+                      <QuotationsSection userId={user.id} />
+                    </div>
+                  ) : (
+                    <FeatureLockedSection sectionName="Cotizaciones" />
+                  )
+                )}
+
+                {selectedTab === "calendar" && (
+                  hasCalendarFeature ? (
+                    <div className="space-y-6">
+                      <VendedoresCalendarioTab userId={user.id} />
+                    </div>
+                  ) : (
+                    <FeatureLockedSection sectionName="Calendario" />
+                  )
+                )}
+
+                {selectedTab === "workspaces" && (
+                  hasWorkspacesFeature ? (
+                    <div className="space-y-6">
+                      <WorkspacesTab
+                        userId={user.id}
+                        onRequestCreateWorkspace={() => setCreateWorkspaceOpen(true)}
+                      />
+                    </div>
+                  ) : (
+                    <FeatureLockedSection sectionName="Espacios de trabajo" />
+                  )
+                )}
+
+                {selectedTab === "referidos" && (
+                  <div className="flex flex-col gap-5">
+                    <div className="max-w-none">
+                      <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
+                        Referidos
+                      </h2>
+                      <p className="mt-1 text-sm text-[#616161] dark:text-[#9e9e9e]">
+                        Usuarios que se registraron con tu código y tus comisiones generadas.
+                      </p>
+                    </div>
+                    <ReferralDashboardSection userId={user.id} />
+                  </div>
+                )}
+              </main>
+          </div>
+        </div>
+      </div>
+    </SubscriptionProvider>
+  );
+
+  return (
+    <>
+      {embedded ? (
+        panelBody
+      ) : (
+        <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#0a0a0a]">
+          <Navigation />
+          {panelBody}
+          <Footer />
+        </div>
+      )}
+      {hasWorkspacesFeature && user?.id && (
+        <CreateWorkspaceModal
+          isOpen={createWorkspaceOpen}
+          onClose={() => setCreateWorkspaceOpen(false)}
+          userId={user.id}
+          companyId={companyId}
+        />
+      )}
+    </>
+  );
+}
+
+function PanelControlSectionFallback({ embedded = false }: PanelControlSectionProps) {
+  if (embedded) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent mx-auto" />
+          <p className="mt-3 text-sm text-[#616161] dark:text-[#b0b0b0]">Cargando panel...</p>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#0a0a0a] flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-2 border-orange-500 border-t-transparent mx-auto" />
+        <p className="mt-4 text-[#616161] dark:text-[#b0b0b0]">Cargando panel...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function PanelControlSection({ embedded = false }: PanelControlSectionProps) {
+  return (
+    <Suspense fallback={<PanelControlSectionFallback embedded={embedded} />}>
+      <PanelControlSectionContent embedded={embedded} />
+    </Suspense>
+  );
+}

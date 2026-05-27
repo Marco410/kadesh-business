@@ -46,29 +46,10 @@ export default function ObtenerClientesPage() {
     <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#121212]">
       <Navigation />
       <SubscriptionProvider companyId={companyId}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-[#212121] dark:text-[#ffffff] mb-2">
-              Motor de Exploración B2B
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Selecciona una zona en el mapa y sincroniza negocios desde el mapa como leads.
-            </p>
-          </div>
-          <div className="mt-5 mb-4">
-            <Link
-              href={`${Routes.panel}?tab=ventas`}
-              className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
-            >
-              <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-              Volver a Ventas
-            </Link>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 pb-10 sm:px-6 lg:px-8">
           <ObtenerClientesSection />
         </div>
       </SubscriptionProvider>
-
-      <Footer />
     </div>
   );
 }
