@@ -1,27 +1,62 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useTheme } from "next-themes";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Location01Icon, Search01Icon, StarIcon } from "@hugeicons/core-free-icons";
+import {
+  CenterFocusIcon,
+  FilterHorizontalIcon,
+  Location01Icon,
+  Radar01Icon,
+  Search01Icon,
+  StarIcon,
+} from "@hugeicons/core-free-icons";
 import { GOOGLE_PLACE_CATEGORIES } from "kadesh/constants/constans";
 import { useSyncLeadsArea } from "kadesh/components/profile/sales/obtener-clientes/hooks";
-import CurrentPlanSection from "../CurrentPlanSection";
 import RoleAccessDeniedSection from "../RoleAccessDeniedSection";
 import { useUser } from "kadesh/utils/UserContext";
 import { isAdminCompanyUser } from "kadesh/utils/user-roles";
 import { sileo } from "sileo";
 import { Routes } from "kadesh/core/routes";
-import { Autocomplete, InfoTooltip, type AutocompleteOption } from "kadesh/components/shared";
+import { Autocomplete, type AutocompleteOption } from "kadesh/components/shared";
 import LeadsStatsCards, { type LeadsStatsCardsHandle } from "./LeadsStatsCards";
+
+const CATEGORY_OPTIONS: AutocompleteOption[] = GOOGLE_PLACE_CATEGORIES.map((opt) => ({
+  id: opt.value,
+  label: opt.label,
+}));
 
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
 
+const LEAD_MAP_ATTRIBUTION =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+
+const LEAD_MAP_TILE_URL =
+  "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+
+function isDarkMapTheme(resolvedTheme: string | undefined): boolean {
+  if (typeof document !== "undefined" && document.documentElement.classList.contains("dark")) {
+    return true;
+  }
+  return resolvedTheme === "dark";
+}
+
+function applyLeadMapThemeClass(
+  container: HTMLElement | null,
+  resolvedTheme: string | undefined
+) {
+  if (!container) return;
+  const isDark = isDarkMapTheme(resolvedTheme);
+  container.classList.toggle("lead-exploration-map--night", isDark);
+  container.classList.toggle("lead-exploration-map--standard", !isDark);
+}
+
+/** Ciudad de México — ubicación por defecto al cargar el mapa */
 const DEFAULT_CENTER = { lat: 19.4326, lng: -99.1332 };
-const DEFAULT_ZOOM = 5;
+const DEFAULT_ZOOM = 10;
 const DEFAULT_RADIUS_KM = 5;
-const MIN_RADIUS_KM = 1;
-const MAX_RADIUS_KM = 50;
+const RADIUS_OPTIONS_KM = [2, 5, 10, 25, 50] as const;
 const CUSTOM_SEARCH_MIN_LENGTH = 2;
 const CUSTOM_SEARCH_MAX_LENGTH = 80;
 
@@ -63,11 +98,18 @@ function loadExternalResource(
   });
 }
 
+interface LeafletTileLayer {
+  addTo(map: LeafletMap): LeafletTileLayer;
+  remove(): void;
+}
 interface LeafletMap {
   setView(center: [number, number], zoom: number): LeafletMap;
   getZoom(): number;
   fitBounds(bounds: unknown, options?: { padding?: [number, number] }): void;
   on(event: string, fn: (e: { latlng: { lat: number; lng: number } }) => void): void;
+  removeLayer(layer: LeafletTileLayer): LeafletMap;
+  invalidateSize(): void;
+  remove(): void;
 }
 interface LeafletMarker {
   setLatLng(latlng: [number, number]): LeafletMarker;
@@ -95,22 +137,24 @@ declare global {
           dashArray?: string;
         }
       ): LeafletCircle;
-      tileLayer(url: string, options: { attribution: string }): { addTo(map: LeafletMap): unknown };
+      tileLayer(
+        url: string,
+        options: { attribution: string; subdomains?: string; maxZoom?: number }
+      ): LeafletTileLayer;
     };
   }
 }
 
 export default function ObtenerClientesSection() {
   const [searchMode, setSearchMode] = useState<"category" | "custom">("category");
-  const [category, setCategory] = useState<string>("");
+  const [category, setCategory] = useState("");
   const [customSearch, setCustomSearch] = useState("");
-  const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
-  const [minRating, setMinRating] = useState<number>(3);
-  const [minReviews, setMinReviews] = useState<number>(20);
-  const [radiusTouched, setRadiusTouched] = useState(false);
+  const [radiusKm, setRadiusKm] = useState<number>(DEFAULT_RADIUS_KM);
+  const [minRating, setMinRating] = useState<number>(0);
+  const [minReviews, setMinReviews] = useState<number>(0);
   const [hasSearched, setHasSearched] = useState(false);
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(true);
-  const [pin, setPin] = useState<{ lat: number; lng: number } | null>(null);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [pin, setPin] = useState<{ lat: number; lng: number }>(DEFAULT_CENTER);
   const [message, setMessage] = useState<{ type: "ok" | "error"; text: string } | null>(null);
   const [stats, setStats] = useState<{
     created: number;
@@ -123,12 +167,25 @@ export default function ObtenerClientesSection() {
 
   const { syncLeadsArea, loading: isLoading, error: syncError } = useSyncLeadsArea();
   const { user, loading: userLoading } = useUser();
+  const { resolvedTheme } = useTheme();
+  const [themeMounted, setThemeMounted] = useState(false);
 
   const statsRef = useRef<LeadsStatsCardsHandle>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
+  const tileLayerRef = useRef<LeafletTileLayer | null>(null);
   const markerRef = useRef<LeafletMarker | null>(null);
   const circleRef = useRef<LeafletCircle | null>(null);
+  const filtersPopoverRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setThemeMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!themeMounted || !leafletReady) return;
+    applyLeadMapThemeClass(mapContainerRef.current, resolvedTheme);
+  }, [themeMounted, leafletReady, resolvedTheme]);
 
   useEffect(() => {
     let cancelled = false;
@@ -180,26 +237,64 @@ export default function ObtenerClientesSection() {
 
   useEffect(() => {
     const L = window.L;
-    if (!leafletReady || !mapContainerRef.current || mapRef.current || !L) return;
+    const container = mapContainerRef.current;
+    if (!leafletReady || !container || !L) return;
 
-    const map = L.map(mapContainerRef.current).setView(
+    const map = L.map(container).setView(
       [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
       DEFAULT_ZOOM
     );
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors",
-    }).addTo(map);
     mapRef.current = map;
+
+    tileLayerRef.current = L.tileLayer(LEAD_MAP_TILE_URL, {
+      attribution: LEAD_MAP_ATTRIBUTION,
+      subdomains: "abcd",
+      maxZoom: 20,
+    }).addTo(map);
+
+    applyLeadMapThemeClass(container, resolvedTheme);
 
     map.on("click", (e: { latlng: { lat: number; lng: number } }) => {
       const { lat, lng } = e.latlng;
       setPin({ lat, lng });
     });
-  }, [leafletReady]);
+
+    updateMapOverlays(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng, radiusKm);
+
+    requestAnimationFrame(() => {
+      map.invalidateSize();
+    });
+
+    return () => {
+      map.remove();
+      mapRef.current = null;
+      tileLayerRef.current = null;
+      markerRef.current = null;
+      circleRef.current = null;
+    };
+  }, [leafletReady, updateMapOverlays]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (pin) updateMapOverlays(pin.lat, pin.lng, radiusKm);
+    if (pin && mapRef.current) {
+      updateMapOverlays(pin.lat, pin.lng, radiusKm);
+    }
   }, [pin, radiusKm, updateMapOverlays]);
+
+  useEffect(() => {
+    if (!showAdvancedFilters) return;
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (
+        filtersPopoverRef.current &&
+        !filtersPopoverRef.current.contains(event.target as Node)
+      ) {
+        setShowAdvancedFilters(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, [showAdvancedFilters]);
 
   const goToMyLocation = useCallback(() => {
     if (!navigator.geolocation) {
@@ -211,22 +306,25 @@ export default function ObtenerClientesSection() {
       (position) => {
         const { latitude, longitude } = position.coords;
         setPin({ lat: latitude, lng: longitude });
-        mapRef.current?.setView([latitude, longitude], 15);
+        mapRef.current?.setView([latitude, longitude], 8);
         setLocatingUser(false);
       },
       () => {
-        sileo.error({ title: "No se pudo obtener tu ubicación. Verifica los permisos del navegador." });
+        sileo.error({
+          title: "No se pudo obtener tu ubicación. Verifica los permisos del navegador.",
+        });
         setLocatingUser(false);
       },
-      { enableHighAccuracy: true, timeout: 10000 },
+      { enableHighAccuracy: true, timeout: 10000 }
     );
   }, []);
 
+  const centerOnMexicoCity = useCallback(() => {
+    setPin(DEFAULT_CENTER);
+    mapRef.current?.setView([DEFAULT_CENTER.lat, DEFAULT_CENTER.lng], DEFAULT_ZOOM);
+  }, []);
+
   const runSync = async () => {
-    if (!pin) {
-      sileo.error({ title: "Haz clic en el mapa para colocar el punto de búsqueda" });
-      return;
-    }
     setMessage(null);
     setStats(null);
     setShowZeroResultsHint(false);
@@ -235,8 +333,14 @@ export default function ObtenerClientesSection() {
       searchMode === "custom"
         ? normalizeBusinessSearchTerm(customSearch)
         : category;
+
     if (!activeSearchTerm) {
-      sileo.error({ title: "Selecciona una categoría o escribe una búsqueda válida" });
+      sileo.error({
+        title:
+          searchMode === "category"
+            ? "Selecciona una categoría"
+            : "Escribe qué tipo de negocio buscas",
+      });
       return;
     }
     if (searchMode === "custom" && !isBusinessSearchTermValid(activeSearchTerm)) {
@@ -262,8 +366,6 @@ export default function ObtenerClientesSection() {
         minRating: minRating > 0 ? minRating : null,
         minReviews: minReviews > 0 ? minReviews : null,
       });
-
-      console.log("result", result);
 
       if (!result) {
         throw new Error(syncError?.message ?? "Error al sincronizar");
@@ -304,7 +406,6 @@ export default function ObtenerClientesSection() {
         return {
           title: `${countText} de ${data.categoryLabel} ${count === 1 ? "agregado" : "agregados"}`,
           description: `Se han agregado ${countText} de ${data.categoryLabel} a la base de datos`,
-          
         };
       },
       error: (err) => ({
@@ -313,15 +414,9 @@ export default function ObtenerClientesSection() {
     });
   };
 
-  const step1Done = Boolean(pin);
-  const step2Done = Boolean(pin);
-  const step3Done = hasSearched;
-  const radiusPercent =
-    ((radiusKm - MIN_RADIUS_KM) / (MAX_RADIUS_KM - MIN_RADIUS_KM)) * 100;
-
   if (userLoading) {
     return (
-      <div className="max-w-7xl mx-auto flex justify-center py-20">
+      <div className="flex justify-center py-20">
         <span
           className="size-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"
           aria-hidden
@@ -332,7 +427,7 @@ export default function ObtenerClientesSection() {
 
   if (!isAdminCompanyUser(user)) {
     return (
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="space-y-6">
         <RoleAccessDeniedSection
           title="No tienes acceso a Obtener clientes"
           description="Esta herramienta está pensada para el equipo comercial. Como vendedor no puedes importar negocios desde el mapa."
@@ -344,451 +439,344 @@ export default function ObtenerClientesSection() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* <CurrentPlanSection /> */}
-      <div className="relative z-20 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          Obtener negocios por zona
-        </h2>
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl">
-            Completa el flujo para importar negocios: el mapa muestra en vivo el área según el radio y los filtros
-            refinan la búsqueda.
-          </p>
-
-          <div className="flex flex-wrap gap-2">
-            {[
-              { n: 1, label: "Clic en el mapa" },
-              { n: 2, label: "Radio (km)" },
-                { n: 3, label: "Filtro y buscar" },
-            ].map((s) => {
-              const status =
-                s.n === 1
-                  ? step1Done
-                    ? "completed"
-                    : "active"
-                  : s.n === 2
-                    ? step1Done && !step2Done
-                      ? "active"
-                      : step2Done
-                        ? "completed"
-                        : "pending"
-                    : step3Done
-                      ? "completed"
-                      : step1Done && step2Done
-                        ? "active"
-                        : "pending";
-
-              const classes =
-                status === "completed"
-                  ? "border-emerald-200 dark:border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                  : status === "active"
-                    ? "border-orange-200 dark:border-orange-500/20 bg-orange-500/10 text-orange-700 dark:text-orange-400"
-                    : "border-[#e0e0e0] dark:border-[#3a3a3a] bg-white/10 text-[#616161] dark:text-[#b0b0b0]";
-
-              return (
-                <div
-                  key={s.n}
-                  className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${classes}`}
-                >
-                  <span className="tabular-nums">{status === "completed" ? "✓" : s.n}</span>
-                  <span className="whitespace-nowrap">{s.label}</span>
-                </div>
-              );
-            })}
+    <div className="space-y-6">
+      {/* Vista inmersiva: mapa a pantalla completa + controles flotantes */}
+      <div
+        className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen h-[calc(100vh-64px)] min-h-[480px] overflow-visible bg-gray-100 dark:bg-gray-900"
+        aria-label="Búsqueda de leads en mapa"
+      >
+        {/* Capa del mapa */}
+        <div
+          ref={mapContainerRef}
+          className={`absolute inset-0 z-0 h-full w-full overflow-hidden ${
+            themeMounted && isDarkMapTheme(resolvedTheme)
+              ? "lead-exploration-map--night"
+              : "lead-exploration-map--standard"
+          }`}
+          role="application"
+          aria-label="Mapa interactivo. Haz clic para mover el punto de búsqueda."
+        />
+        {!leafletReady && (
+          <div className="absolute inset-0 z-[1] flex items-center justify-center bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-sm">
+            <p className="text-sm text-gray-600 dark:text-gray-400">Cargando mapa…</p>
           </div>
-        </div>
+        )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="w-full">
-            <div className="space-y-4">
-              <div className="relative z-10 rounded-2xl border border-white/15 dark:border-white/10 bg-white/70 dark:bg-[#161616]/70 backdrop-blur-xl p-4 sm:p-5 shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
-                <div className="mb-4">
-                  <h3 className="text-sm font-semibold text-[#212121] dark:text-white">
-                    Filtros de búsqueda
-                  </h3>
-                  <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1">
-                    Afina la calidad de los negocios antes de importarlos.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-end">
-                  <div className="w-full xl:col-span-5">
-                    <label className="block text-[11px] font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
-                      Tipo de búsqueda
-                    </label>
-                    <div className="inline-flex w-full rounded-xl border border-white/20 dark:border-white/10 bg-white/60 dark:bg-[#0f0f0f]/70 p-1 shadow-inner">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSearchMode("category");
-                          setCustomSearch("");
-                        }}
-                        className={`flex-1 min-h-[52px] rounded-lg px-2 py-2 inline-flex items-center justify-center text-[13px] leading-tight font-semibold text-center whitespace-normal break-words transition-all duration-200 ease-in-out ${
-                          searchMode === "category"
-                            ? "bg-orange-500 text-white shadow-[0_6px_18px_rgba(249,115,22,0.45)]"
-                            : "text-[#616161] dark:text-[#b0b0b0] hover:bg-white/60 dark:hover:bg-white/5"
-                        }`}
-                      >
-                        Categoría
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSearchMode("custom");
-                          setCategory("");
-                        }}
-                        className={`flex-1 min-h-[52px] rounded-lg px-2 py-2 inline-flex items-center justify-center text-[13px] leading-tight font-semibold text-center whitespace-normal break-words transition-all duration-200 ease-in-out ${
-                          searchMode === "custom"
-                            ? "bg-orange-500 text-white shadow-[0_6px_18px_rgba(249,115,22,0.45)]"
-                            : "text-[#616161] dark:text-[#b0b0b0] hover:bg-white/60 dark:hover:bg-white/5"
-                        }`}
-                      >
-                        Búsqueda libre
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="w-full xl:col-span-7">
-                    {searchMode === "category" ? (
-                      <Autocomplete
-                        id="obtener-clientes-category"
-                        label="Buscar categoría"
-                        value={category}
-                        options={GOOGLE_PLACE_CATEGORIES.map(
-                          (opt): AutocompleteOption => ({
-                            id: opt.value,
-                            label: opt.label,
-                          })
-                        )}
-                        onChange={() => {}}
-                        onSelect={(option) => {
-                          setCategory(option.id);
-                        }}
-                        placeholder="Buscar categoría..."
-                        disabled={isLoading}
-                        className="w-full"
-                      />
-                    ) : (
-                      <>
-                        <label
-                          htmlFor="obtener-clientes-custom-search"
-                          className="block text-sm font-medium text-[#212121] dark:text-white mb-2"
-                        >
-                          Empresa, categoría o negocio
-                        </label>
-                        <input
-                          id="obtener-clientes-custom-search"
-                          type="text"
-                          value={customSearch}
-                          onChange={(e) => setCustomSearch(sanitizeBusinessSearchTerm(e.target.value))}
-                          disabled={isLoading}
-                          placeholder="Ej. taquería, despacho legal, farmacia guadalajara"
-                          className="w-full px-4 py-2.5 rounded-xl border border-white/25 dark:border-white/10 bg-white/65 dark:bg-[#101010]/75 text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all duration-200 ease-in-out"
-                          maxLength={CUSTOM_SEARCH_MAX_LENGTH}
-                        />
-                 
-                      </>
-                    )}
-                  </div>
-
-                  <div className="w-full xl:col-span-12 pt-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-[11px] font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0]">
-                          Radio de búsqueda
-                      </label>
-                      <span className="inline-flex items-center rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400 px-2.5 py-1 text-xs font-semibold border border-orange-500/25">
-                        {radiusKm} km
-                      </span>
-                    </div>
-
-                    <div className="relative">
-                      <div
-                        className="absolute -top-8 z-10 rounded-md bg-[#1f1f1f] text-white text-[11px] px-2 py-1 shadow-md pointer-events-none transition-all duration-200 ease-in-out"
-                        style={{ left: `calc(${radiusPercent}% - 18px)` }}
-                      >
-                        {radiusKm}km
-                      </div>
-                      <input
-                        aria-label="Radio de búsqueda en kilómetros"
-                        type="range"
-                        min={MIN_RADIUS_KM}
-                        max={MAX_RADIUS_KM}
-                        step={1}
-                        value={radiusKm}
-                        onChange={(e) => {
-                          setRadiusKm(Number(e.target.value));
-                          setRadiusTouched(true);
-                        }}
-                        disabled={isLoading}
-                        style={{
-                          background: `linear-gradient(to right, #f97316 0%, #f97316 ${radiusPercent}%, #d4d4d8 ${radiusPercent}%, #d4d4d8 100%)`,
-                        }}
-                        className="kadesh-range w-full h-3 appearance-none cursor-pointer rounded-full transition-all duration-200 ease-in-out"
-                      />
-                    </div>
-                    <div className="mt-2 flex items-center justify-between text-[11px] text-[#757575] dark:text-[#9ca3af]">
-                      <span>1 km</span>
-                      <span>25 km</span>
-                      <span>50 km</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-white/15 dark:border-white/10 bg-white/65 dark:bg-[#141414]/70 backdrop-blur-xl overflow-hidden shadow-[0_8px_28px_rgba(0,0,0,0.14)]">
-                <button
-                  type="button"
-                  onClick={() => setShowAdvancedFilters((v) => !v)}
-                  className="w-full px-4 py-3 flex items-center justify-between gap-3 hover:bg-white/50 dark:hover:bg-white/5 transition-all duration-200 ease-in-out"
-                  aria-expanded={showAdvancedFilters}
-                >
-                  <span className="text-sm font-semibold text-[#212121] dark:text-white">
-                    Filtros avanzados
-                  </span>
-                  <span
-                    className={`inline-flex items-center justify-center size-6 rounded-full border border-white/20 dark:border-white/10 text-[#616161] dark:text-[#b0b0b0] transition-transform duration-200 ease-in-out ${
-                      showAdvancedFilters ? "rotate-180" : ""
-                    }`}
-                  >
-                    ˅
-                  </span>
-                </button>
-
-                <div className="px-4 pb-2 flex flex-wrap items-center gap-2">
-                  {minRating > 0 && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-300/50 dark:border-blue-400/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 pl-3 pr-1 py-1 text-xs font-semibold">
-                      Rating: {minRating.toFixed(1)}+
-                      <button
-                        type="button"
-                        onClick={() => setMinRating(0)}
-                        className="inline-flex items-center justify-center size-6 rounded-full hover:bg-blue-500/20 transition-colors duration-200 ease-in-out"
-                        aria-label="Quitar filtro de rating"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  )}
-                  {minReviews > 0 && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-300/50 dark:border-blue-400/30 bg-blue-500/10 text-blue-700 dark:text-blue-300 pl-3 pr-1 py-1 text-xs font-semibold">
-                      Resenas: {minReviews}+
-                      <button
-                        type="button"
-                        onClick={() => setMinReviews(0)}
-                        className="inline-flex items-center justify-center size-6 rounded-full hover:bg-blue-500/20 transition-colors duration-200 ease-in-out"
-                        aria-label="Quitar filtro de reseñas"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  )}
-                </div>
-
+        {/* Isla flotante de búsqueda */}
+        <div className="absolute top-6 left-1/2 z-20 w-full max-w-4xl -translate-x-1/2 px-4 isolate">
+          <div className="relative z-30 flex flex-wrap items-start justify-center gap-2 overflow-visible sm:flex-nowrap">
+            <div
+              className="flex min-w-0 flex-1 flex-row flex-wrap items-center gap-2 overflow-visible rounded-2xl border border-gray-200 bg-white/90 p-2 shadow-2xl backdrop-blur-md dark:border-gray-700 dark:bg-gray-900/90 sm:flex-nowrap sm:min-w-[360px] lg:min-w-[520px]"
+              role="search"
+            >
+              {/* Tipo de búsqueda */}
+              <div className="w-full shrink-0 px-1 sm:w-auto sm:border-r sm:border-gray-200 sm:pr-2 dark:sm:border-gray-700">
+                <p className="mb-1 px-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 sm:sr-only">
+                  Tipo de búsqueda
+                </p>
                 <div
-                  className={`grid transition-all duration-200 ease-in-out ${
-                    showAdvancedFilters
-                      ? "grid-rows-[1fr] opacity-100"
-                      : "grid-rows-[0fr] opacity-0"
-                  }`}
+                  className="inline-flex w-full rounded-xl border border-gray-200 bg-gray-100/80 p-0.5 dark:border-gray-600 dark:bg-gray-800/80 sm:w-auto"
+                  role="group"
+                  aria-label="Tipo de búsqueda"
                 >
-                  <div className="overflow-hidden mt-2">
-                    <div className="px-4 pb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="w-full">
-                        <label className="block text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
-                          Rating minimo
-                        </label>
-                        <div className="rounded-xl border border-white/25 dark:border-white/10 bg-white/55 dark:bg-[#101010]/65 p-3">
-                          <div className="flex flex-col items-start gap-2">
-                            <div className="inline-flex flex-wrap items-center gap-1.5">
-                              {[1, 2, 3, 4, 5].map((star) => {
-                                const isActive = star <= minRating;
-                                return (
-                                  <button
-                                    key={star}
-                                    type="button"
-                                    onClick={() => setMinRating(( star <= minRating && minRating == 1) ? 0 : star)}
-                                    disabled={isLoading}
-                                    className={`inline-flex items-center justify-center size-8 rounded-lg border transition-all duration-200 ease-in-out ${
-                                      isActive
-                                        ? "border-amber-300/70 bg-amber-500/15 text-amber-400"
-                                        : "border-white/20 dark:border-white/10 bg-transparent text-[#8b8b8b] hover:bg-white/50 dark:hover:bg-white/5"
-                                    }`}
-                                    aria-label={`Rating mínimo ${star} estrellas`}
-                                  >
-                                    <HugeiconsIcon icon={StarIcon} size={18} />
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          </div>
-                          <p className="mt-2 text-[11px] leading-relaxed text-[#616161] dark:text-[#9ca3af]">
-                            Rating mínimo: solo se incluirán negocios con calificación igual o superior al valor que selecciones.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="w-full">
-                        <label className="block text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
-                          Reseñas minimas
-                        </label>
-                        <input
-                          type="number"
-                          min={0}
-                          step={1}
-                          value={minReviews}
-                          onChange={(e) => setMinReviews(Number(e.target.value) || 0)}
-                          disabled={isLoading}
-                          className="w-full px-4 py-2.5 rounded-xl border border-white/25 dark:border-white/10 bg-white/65 dark:bg-[#101010]/75 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 text-sm transition-all duration-200 ease-in-out"
-                        />
-                        <p className="mt-2 text-[11px] leading-relaxed text-[#616161] dark:text-[#9ca3af]">
-                          Reseñas mínimas: descarta negocios con pocas opiniones para priorizar perfiles más confiables.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="px-4 pb-4">
                   <button
                     type="button"
-                    onClick={runSync}
-                    disabled={isLoading || !pin}
-                    className="w-full h-11 inline-flex items-center justify-center gap-2 rounded-xl font-semibold text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:brightness-110 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 ease-in-out shadow-[0_10px_24px_rgba(249,115,22,0.32)]"
+                    onClick={() => {
+                      setSearchMode("category");
+                      setCustomSearch("");
+                    }}
+                    disabled={isLoading}
+                    className={`flex-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all sm:flex-none sm:px-3 ${
+                      searchMode === "category"
+                        ? "bg-orange-600 text-white shadow-[0_4px_14px_rgba(234,88,12,0.45)]"
+                        : "text-gray-600 hover:bg-white/60 dark:text-gray-300 dark:hover:bg-white/5"
+                    }`}
                   >
-                    <HugeiconsIcon icon={Search01Icon} size={16} className="text-white" />
-                    {isLoading ? "Buscando negocios..." : "Buscar negocios"}
+                    Categoría
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchMode("custom");
+                      setCategory("");
+                    }}
+                    disabled={isLoading}
+                    className={`flex-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all sm:flex-none sm:px-3 ${
+                      searchMode === "custom"
+                        ? "bg-orange-600 text-white shadow-[0_4px_14px_rgba(234,88,12,0.45)]"
+                        : "text-gray-600 hover:bg-white/60 dark:text-gray-300 dark:hover:bg-white/5"
+                    }`}
+                  >
+                    Búsqueda libre
                   </button>
                 </div>
               </div>
 
-              {!pin && !isLoading && (
-                <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
-                  Selecciona un punto en el mapa (clic) para habilitar la busqueda.
-                </p>
-              )}
+              {/* Campo de búsqueda */}
+              <div className="relative z-40 flex min-w-0 flex-1 items-center gap-2 overflow-visible border-gray-200 px-2 sm:border-r sm:px-3 dark:sm:border-gray-700">
+                {searchMode === "category" ? (
+                  <Autocomplete
+                    id="obtener-clientes-category"
+                    label="Buscar categoría"
+                    value={category}
+                    options={CATEGORY_OPTIONS}
+                    onChange={() => {}}
+                    onSelect={(option) => setCategory(option.id)}
+                    placeholder="Buscar categoría..."
+                    disabled={isLoading}
+                    disableBrowserAutocomplete
+                    className="min-w-0 flex-1 overflow-visible [&>label]:sr-only [&>label]:mb-0 [&_input]:border-0 [&_input]:bg-transparent [&_input]:px-0 [&_input]:py-2 [&_input]:text-sm [&_input]:shadow-none [&_input]:focus:ring-0 dark:[&_input]:bg-transparent"
+                  />
+                ) : (
+                  <label className="flex min-w-0 flex-1 items-center gap-2">
+                    <span className="sr-only">Búsqueda libre</span>
+                    <HugeiconsIcon
+                      icon={Search01Icon}
+                      size={18}
+                      className="shrink-0 text-gray-500 dark:text-gray-400"
+                      aria-hidden
+                    />
+                    <input
+                      type="text"
+                      value={customSearch}
+                      onChange={(e) =>
+                        setCustomSearch(sanitizeBusinessSearchTerm(e.target.value))
+                      }
+                      disabled={isLoading}
+                      placeholder="Ej. Constructoras, Clínicas..."
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                      name="kadesh-lead-free-search"
+                      data-lpignore="true"
+                      data-1p-ignore
+                      data-form-type="other"
+                      className="min-w-0 flex-1 border-0 bg-transparent text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-0 dark:text-white dark:placeholder:text-gray-400"
+                      maxLength={CUSTOM_SEARCH_MAX_LENGTH}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") void runSync();
+                      }}
+                    />
+                  </label>
+                )}
+              </div>
 
-              {pin && (
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Punto seleccionado: {pin.lat.toFixed(5)}, {pin.lng.toFixed(5)} - Radio: {radiusKm} km
-                </p>
-              )}
-            </div>
-          </div>
-          <div className="w-full">
-            <div className="relative z-0 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 dark:bg-gray-800/50">
-            <div
-              ref={mapContainerRef}
-              className="w-full h-[650px]"
-              style={{ minHeight: 350 }}
-            />
-            <button
-              type="button"
-              onClick={goToMyLocation}
-              disabled={locatingUser || !leafletReady}
-              className="absolute bottom-4 right-4 z-[1000] flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-[#1e1e1e] border border-gray-300 dark:border-gray-600 shadow-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-[#2a2a2a] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              title="Usar mi ubicación actual"
-            >
-              <HugeiconsIcon
-                icon={Location01Icon}
-                size={16}
-                className={locatingUser ? "animate-pulse text-orange-500" : "text-gray-500 dark:text-gray-400"}
-              />
-              {locatingUser ? "Localizando…" : "Mi ubicación"}
-            </button>
-          </div>
-          
-          {!leafletReady && (
-            <p className="text-center text-sm text-gray-500 dark:text-gray-400">Cargando mapa…</p>
-          )}
-           
-          </div>
-        </div>
+              <div className="flex w-full shrink-0 items-center justify-center px-2 sm:w-auto">
+                <label className="sr-only" htmlFor="obtener-clientes-radius">
+                  Radio de búsqueda
+                </label>
+                <select
+                  id="obtener-clientes-radius"
+                  value={radiusKm}
+                  onChange={(e) => setRadiusKm(Number(e.target.value))}
+                  disabled={isLoading}
+                  className="cursor-pointer border-0 bg-transparent py-2 pl-1 pr-6 text-sm font-medium text-gray-700 focus:outline-none focus:ring-0 dark:text-gray-200"
+                >
+                  {RADIUS_OPTIONS_KM.map((km) => (
+                    <option key={km} value={km}>
+                      A {km} km
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-        {message && !showZeroResultsHint && (
-          <div
-            className={`rounded-lg p-4 mt-4 ${
-              message.type === "error"
-                ? "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300"
-                : "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300"
-            }`}
-          >
-            {message.text}
-          </div>
-        )}
-
-        {showZeroResultsHint && (
-          <div className="rounded-xl border border-purple-200 dark:border-purple-800/60 bg-purple-50 dark:bg-purple-900/20 p-6 mt-4">
-            <div className="flex gap-4">
-              <span className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-800/40 flex items-center justify-center">
-                <HugeiconsIcon icon={Location01Icon} size={24} className="text-purple-600 dark:text-purple-400" />
-              </span>
-              <div>
-                <h3 className="font-semibold text-purple-900 dark:text-purple-100 mb-1">
-                  No se encontraron negocios en esta zona
-                </h3>
-                <p className="text-sm text-purple-800 dark:text-purple-200/90 mb-3">
-                  Prueba ajustar los parámetros o buscar en otro punto del mapa para obtener resultados.
-                </p>
-                <ul className="text-sm text-purple-700 dark:text-purple-300/90 space-y-1 list-disc list-inside">
-                  <li><strong>Amplía o reduce el radio</strong> (por ejemplo, más o menos de {radiusKm} km) para cubrir más área.</li>
-                  <li><strong>Elige otro tipo de negocio</strong> en el selector; puede haber más oferta en otra categoría.</li>
-                  <li><strong>Haz clic en otra zona del mapa</strong> (centro, otra ciudad o colonia) y vuelve a buscar.</li>
-                </ul>
+              <div className="w-full shrink-0 px-1 sm:w-auto sm:pl-1 sm:pr-1">
+                <button
+                  type="button"
+                  onClick={() => void runSync()}
+                  disabled={isLoading}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-orange-600 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+                >
+                  <HugeiconsIcon icon={Radar01Icon} size={16} className="text-white" aria-hidden />
+                  <span className="whitespace-nowrap">
+                    {isLoading ? "Buscando…" : "Buscar Leads"}
+                  </span>
+                </button>
               </div>
             </div>
+
+            {/* Filtros avanzados */}
+            <div ref={filtersPopoverRef} className="relative shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowAdvancedFilters((v) => !v)}
+                className="flex size-11 items-center justify-center rounded-full border border-gray-200 bg-white/90 text-gray-700 shadow-2xl backdrop-blur-md transition-colors hover:bg-white dark:border-gray-700 dark:bg-gray-900/90 dark:text-gray-200 dark:hover:bg-gray-800"
+                aria-expanded={showAdvancedFilters}
+                aria-controls="obtener-clientes-advanced-filters"
+                title="Filtros avanzados"
+              >
+                <HugeiconsIcon icon={FilterHorizontalIcon} size={20} aria-hidden />
+              </button>
+
+              {showAdvancedFilters && (
+                <div
+                  id="obtener-clientes-advanced-filters"
+                  className="absolute right-0 top-full z-20 mt-2 w-72 rounded-xl border border-gray-200 bg-white p-4 shadow-xl dark:border-gray-700 dark:bg-gray-800"
+                  role="dialog"
+                  aria-label="Filtros avanzados"
+                >
+                  <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Filtros Avanzados
+                  </h3>
+
+                  <div className="space-y-4">
+                    <div>
+                      <div className="mb-2 flex items-center justify-between">
+                        <label
+                          htmlFor="obtener-clientes-min-rating"
+                          className="text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                          Calificación mínima
+                        </label>
+                        <span className="text-sm font-semibold text-orange-600 dark:text-orange-400">
+                          {minRating > 0 ? `${minRating}+` : "Sin filtro"}
+                        </span>
+                      </div>
+                      <input
+                        id="obtener-clientes-min-rating"
+                        type="range"
+                        min={0}
+                        max={5}
+                        step={1}
+                        value={minRating}
+                        onChange={(e) => setMinRating(Number(e.target.value))}
+                        disabled={isLoading}
+                        className="h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-orange-600 dark:bg-gray-700"
+                      />
+                      <div className="mt-1 flex justify-between text-[10px] text-gray-500 dark:text-gray-400">
+                        <span>Sin filtro</span>
+                        <span>5 ★</span>
+                      </div>
+                      <div className="mt-2 flex gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => {
+                          const isActive = star <= minRating;
+                          return (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() =>
+                                setMinRating(star <= minRating && minRating === 1 ? 0 : star)
+                              }
+                              disabled={isLoading}
+                              className={`inline-flex size-8 items-center justify-center rounded-lg border transition-colors ${
+                                isActive
+                                  ? "border-amber-300/70 bg-amber-500/15 text-amber-500"
+                                  : "border-gray-200 bg-transparent text-gray-400 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+                              }`}
+                              aria-label={`Mínimo ${star} estrellas`}
+                            >
+                              <HugeiconsIcon icon={StarIcon} size={16} />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="obtener-clientes-min-reviews"
+                        className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                      >
+                        Mínimo de reseñas
+                      </label>
+                      <input
+                        id="obtener-clientes-min-reviews"
+                        type="number"
+                        min={0}
+                        step={1}
+                        value={minReviews}
+                        onChange={(e) => setMinReviews(Number(e.target.value) || 0)}
+                        disabled={isLoading}
+                        placeholder="Ej. 10, 50, 100"
+                        className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500/50 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        )}
+
+          <p className="relative z-0 mt-2 flex justify-center pointer-events-none">
+            <span className="rounded-full border border-gray-200/80 bg-white/90 px-3 py-1 text-xs font-medium text-gray-700 shadow-md backdrop-blur-md dark:border-gray-600/80 dark:bg-gray-900/95 dark:text-gray-200">
+              Haz clic en el mapa para mover el centro de búsqueda
+            </span>
+          </p>
+        </div>
+
+        {/* Centrar en mi ubicación */}
+        <button
+          type="button"
+          onClick={goToMyLocation}
+          disabled={locatingUser || !leafletReady}
+          className="absolute top-8 right-8 z-10 rounded-full border border-gray-200 bg-white/95 p-3 text-gray-800 shadow-lg backdrop-blur-sm transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+          title="Centrar en mi ubicación"
+          aria-label="Centrar en mi ubicación"
+        >
+          <HugeiconsIcon
+            icon={CenterFocusIcon}
+            size={22}
+            className={locatingUser ? "animate-pulse text-orange-500" : undefined}
+          />
+        </button>
 
       </div>
+
+      {message && !showZeroResultsHint && (
+        <div
+          className={`rounded-lg p-4 ${
+            message.type === "error"
+              ? "border border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300"
+              : "border border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
+
+      {showZeroResultsHint && (
+        <div className="rounded-xl border border-purple-200 bg-purple-50 p-6 dark:border-purple-800/60 dark:bg-purple-900/20">
+          <div className="flex gap-4">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-800/40">
+              <HugeiconsIcon
+                icon={Location01Icon}
+                size={24}
+                className="text-purple-600 dark:text-purple-400"
+              />
+            </span>
+            <div>
+              <h3 className="mb-1 font-semibold text-purple-900 dark:text-purple-100">
+                No se encontraron negocios en esta zona
+              </h3>
+              <p className="mb-3 text-sm text-purple-800 dark:text-purple-200/90">
+                Prueba ajustar los parámetros o buscar en otro punto del mapa.
+              </p>
+              <ul className="list-inside list-disc space-y-1 text-sm text-purple-700 dark:text-purple-300/90">
+                <li>
+                  <strong>Amplía o reduce el radio</strong> (por ejemplo, más o menos de {radiusKm}{" "}
+                  km).
+                </li>
+                <li>
+                  <strong>Prueba otro tipo de negocio</strong> en la barra de búsqueda.
+                </li>
+                <li>
+                  <strong>Haz clic en otra zona del mapa</strong> y vuelve a buscar.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {stats && hasSearched && (
+        <p className="text-center text-xs text-gray-500 dark:text-gray-400">
+          Última búsqueda: {stats.created} nuevos · {stats.alreadyInDb} ya en base ·{" "}
+          {stats.skippedLowRating} omitidos por rating
+        </p>
+      )}
+
       <LeadsStatsCards ref={statsRef} />
-      <style jsx>{`
-        .kadesh-range::-webkit-slider-runnable-track {
-          height: 14px;
-          border-radius: 9999px;
-        }
-        .kadesh-range::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          margin-top: -7px;
-          width: 28px;
-          height: 28px;
-          border-radius: 9999px;
-          border: 2px solid #f97316;
-          background:
-            radial-gradient(circle at center, #fff7ed 0 26%, transparent 27%),
-            #f97316;
-          box-shadow: 0 8px 20px rgba(249, 115, 22, 0.35);
-          transition: transform 0.15s ease;
-        }
-        .kadesh-range:hover::-webkit-slider-thumb {
-          transform: scale(1.05);
-        }
-        .kadesh-range:disabled::-webkit-slider-thumb {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-        .kadesh-range::-moz-range-track {
-          height: 14px;
-          border-radius: 9999px;
-          background: #e5e7eb;
-        }
-        .kadesh-range::-moz-range-progress {
-          height: 14px;
-          border-radius: 9999px;
-          background: #f97316;
-        }
-        .kadesh-range::-moz-range-thumb {
-          width: 28px;
-          height: 28px;
-          border-radius: 9999px;
-          border: 2px solid #f97316;
-          background:
-            radial-gradient(circle at center, #fff7ed 0 26%, transparent 27%),
-            #f97316;
-          box-shadow: 0 8px 20px rgba(249, 115, 22, 0.35);
-          transition: transform 0.15s ease;
-        }
-      `}</style>
     </div>
   );
 }
