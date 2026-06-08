@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -8,6 +8,8 @@ import {
   ZapIcon,
 } from "@hugeicons/core-free-icons";
 import { Footer, Navigation } from "kadesh/components/layout";
+import { useUser } from "kadesh/utils/UserContext";
+import { isAdminCompanyUser } from "kadesh/utils/user-roles";
 import PanelControlSection from "./PanelControlSection";
 import ObtenerClientesPage from "kadesh/app/panel/clientes/obtener-clientes/page";
 
@@ -24,7 +26,11 @@ const mainTabs: {
 
 const IOS_SEGMENT_EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
 
-function getMainTabFromUrl(tabParam: string | null): PanelMainTab {
+function getMainTabFromUrl(
+  tabParam: string | null,
+  canAccessExtraccion: boolean
+): PanelMainTab {
+  if (!canAccessExtraccion) return "control";
   return tabParam ? "control" : "extraccion";
 }
 
@@ -33,9 +39,18 @@ function PanelPageSectionContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
+  const { user } = useUser();
+  const canAccessExtraccion = isAdminCompanyUser(user);
+  const visibleTabs = useMemo(
+    () =>
+      canAccessExtraccion
+        ? mainTabs
+        : mainTabs.filter((tab) => tab.key !== "extraccion"),
+    [canAccessExtraccion]
+  );
 
   const [activeTab, setActiveTab] = useState<PanelMainTab>(() =>
-    getMainTabFromUrl(tabFromUrl)
+    getMainTabFromUrl(tabFromUrl, false)
   );
   const tablistRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<Record<PanelMainTab, HTMLButtonElement | null>>({
@@ -73,8 +88,8 @@ function PanelPageSectionContent() {
   }, [updateIndicator]);
 
   useEffect(() => {
-    setActiveTab(getMainTabFromUrl(tabFromUrl));
-  }, [tabFromUrl]);
+    setActiveTab(getMainTabFromUrl(tabFromUrl, canAccessExtraccion));
+  }, [tabFromUrl, canAccessExtraccion]);
 
   const handleMainTabChange = (key: PanelMainTab) => {
     setActiveTab(key);
@@ -107,7 +122,7 @@ function PanelPageSectionContent() {
                   transition: `left 320ms ${IOS_SEGMENT_EASE}, width 320ms ${IOS_SEGMENT_EASE}`,
                 }}
               />
-              {mainTabs.map((tab) => {
+              {visibleTabs.map((tab) => {
                 const isActive = activeTab === tab.key;
                 return (
                   <button
@@ -143,7 +158,7 @@ function PanelPageSectionContent() {
             </div>
           </div>
 
-          {activeTab === "control" ? (
+          {activeTab === "control" || !canAccessExtraccion ? (
             <PanelControlSection embedded />
           ) : (
             <ObtenerClientesPage />
