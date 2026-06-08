@@ -1783,6 +1783,7 @@ export const SAAS_PLANS_QUERY = gql`
       name
       active
       cost
+      costOld
       currency
       frequency
       leadLimit
@@ -1801,6 +1802,7 @@ export interface SaasPlanItem {
   name: string;
   active: boolean;
   cost: number;
+  costOld?: number | null;
   currency: string;
   frequency: string;
   leadLimit: number | null;

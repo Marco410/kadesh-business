@@ -130,8 +130,57 @@ function isCurrentPlanForPair(
 }
 
 function getPriceAriaLabel(plan: SaasPlanItem): string {
-  const monthly = formatPrice(plan.cost, plan.currency, plan.frequency);
-  return `Precio del plan ${plan.name} de Kadesh: ${monthly} al ${formatPeriod(plan.frequency)} en pesos mexicanos`;
+  const price = formatPrice(plan.cost, plan.currency, plan.frequency);
+  const period = formatPeriod(plan.frequency);
+  if (plan.costOld != null && plan.costOld > plan.cost) {
+    const oldPrice = formatPrice(plan.costOld, plan.currency, plan.frequency);
+    return `Precio del plan ${plan.name} de Kadesh: antes ${oldPrice}, ahora ${price} al ${period} en pesos mexicanos`;
+  }
+  return `Precio del plan ${plan.name} de Kadesh: ${price} al ${period} en pesos mexicanos`;
+}
+
+function PlanPriceLine({
+  price,
+  oldPrice,
+  currency,
+  periodLabel,
+  ariaLabel,
+  align = "center",
+}: {
+  price: number;
+  oldPrice?: number | null;
+  currency: string;
+  periodLabel: string;
+  ariaLabel?: string;
+  align?: "center" | "left";
+}) {
+  const showOldPrice = oldPrice != null && oldPrice > price;
+  const alignClass = align === "center" ? "items-center" : "items-start";
+  const rowClass = align === "center" ? "justify-center" : "justify-start";
+
+  return (
+    <div
+      aria-label={ariaLabel}
+      className={cn("flex flex-col gap-1", alignClass)}
+    >
+      {showOldPrice && (
+        <span className="text-lg font-medium tabular-nums text-[#9a9a9a] line-through decoration-1 dark:text-[#6a6a6a]">
+          {formatPrice(oldPrice, currency, "monthly")}
+        </span>
+      )}
+      <p className={cn("flex items-baseline gap-1 whitespace-nowrap", rowClass)}>
+        <span className="text-4xl font-bold tabular-nums tracking-tight text-[#212121] dark:text-[#ffffff]">
+          {formatPrice(price, currency, "monthly")}
+        </span>
+        <span className="shrink-0 text-sm font-medium text-[#616161] dark:text-[#757575]">
+          {currency}
+        </span>
+        <span className="shrink-0 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          {periodLabel}
+        </span>
+      </p>
+    </div>
+  );
 }
 
 function formatCostPerLead(
@@ -173,6 +222,25 @@ type BillingPeriod = "monthly" | "annual";
 function getPlanCta(name: string, isCurrentPlan: boolean): string {
   if (isCurrentPlan) return "Plan actual";
   return PLAN_CTA[name.trim().toLowerCase()] ?? "Iniciar suscripción";
+}
+
+function FeatureChip({ feature }: { feature: PlanFeatureItem }) {
+  return (
+    <li>
+      <span
+        title={feature.description}
+        className="inline-flex items-center gap-1.5 rounded-full border border-[#e0e0e0] bg-[#f5f5f5] px-2.5 py-1 text-xs text-[#616161] dark:border-[#3a3a3a] dark:bg-[#2a2a2a] dark:text-[#b0b0b0]"
+      >
+        <HugeiconsIcon
+          icon={CheckmarkCircle02Icon}
+          size={14}
+          className="shrink-0 text-orange-600 dark:text-orange-400"
+          aria-hidden
+        />
+        {feature.name}
+      </span>
+    </li>
+  );
 }
 
 function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
@@ -334,6 +402,7 @@ function PairedPlanCard({
   const leadLimit = planToSubscribe?.leadLimit ?? monthly?.leadLimit ?? annual?.leadLimit;
 
   let mainPrice = 0;
+  let mainOldPrice: number | null = null;
   let currency = planForMeta?.currency ?? "MXN";
   let priceAria = "";
   let annualDisclaimer: string | null = null;
@@ -341,14 +410,23 @@ function PairedPlanCard({
   if (billingPeriod === "monthly") {
     if (monthly) {
       mainPrice = monthly.cost;
+      mainOldPrice = monthly.costOld ?? null;
       currency = monthly.currency;
       priceAria = `Precio del plan ${displayName} de Kadesh: ${formatPrice(monthly.cost, monthly.currency, monthly.frequency)} al mes en pesos mexicanos`;
+      if (mainOldPrice != null && mainOldPrice > mainPrice) {
+        priceAria = `Precio del plan ${displayName} de Kadesh: antes ${formatPrice(mainOldPrice, monthly.currency, monthly.frequency)}, ahora ${formatPrice(mainPrice, monthly.currency, monthly.frequency)} al mes en pesos mexicanos`;
+      }
     }
   } else {
     if (annual) {
       mainPrice = annual.cost / 12;
+      mainOldPrice =
+        annual.costOld != null ? annual.costOld / 12 : null;
       currency = annual.currency;
       priceAria = `Equivalente mensual del plan ${displayName} con pago anual: ${formatPrice(mainPrice, annual.currency, "monthly")} al mes; cobro anual ${formatPrice(annual.cost, annual.currency, annual.frequency)}`;
+      if (mainOldPrice != null && mainOldPrice > mainPrice) {
+        priceAria = `Equivalente mensual del plan ${displayName} con pago anual: antes ${formatPrice(mainOldPrice, annual.currency, "monthly")}, ahora ${formatPrice(mainPrice, annual.currency, "monthly")} al mes; cobro anual ${formatPrice(annual.cost, annual.currency, annual.frequency)}`;
+      }
       const payOnce = formatPrice(annual.cost, annual.currency, annual.frequency);
       if (savings != null && savings > 0) {
         const saveFmt = formatPrice(savings, annual.currency, annual.frequency);
@@ -407,10 +485,10 @@ function PairedPlanCard({
           </span>
         )}
 
-        <div className="mt-4 min-h-[4.5rem]">
+        <div className="mt-4 min-h-[5.5rem]">
           <AnimatePresence mode="wait">
             <motion.div
-              key={`${billingPeriod}-${displayName}-${mainPrice}-${annual?.cost ?? 0}`}
+              key={`${billingPeriod}-${displayName}-${mainPrice}-${mainOldPrice ?? 0}-${annual?.cost ?? 0}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -418,15 +496,13 @@ function PairedPlanCard({
             >
               {((billingPeriod === "monthly" && monthly) ||
                 (billingPeriod === "annual" && annual)) && (
-                <p aria-label={priceAria}>
-                  <span className="text-4xl font-bold text-[#212121] dark:text-[#ffffff]">
-                    {formatPrice(mainPrice, currency, "monthly")}
-                  </span>
-                  <span className="ml-1 text-xs font-medium text-[#616161] dark:text-[#757575]">
-                    {currency}
-                  </span>
-                  <span className="text-[#616161] dark:text-[#b0b0b0]"> / mes</span>
-                </p>
+                <PlanPriceLine
+                  price={mainPrice}
+                  oldPrice={mainOldPrice}
+                  currency={currency}
+                  periodLabel="/ mes"
+                  ariaLabel={priceAria}
+                />
               )}
               {((billingPeriod === "monthly" && !monthly) ||
                 (billingPeriod === "annual" && !annual)) && (
@@ -445,18 +521,18 @@ function PairedPlanCard({
 
         {leadLimit != null && (
           <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
-            Cada mes puedes extraer{" "}
+            Cada mes tienes{" "}
             <strong className="text-[#212121] dark:text-[#e0e0e0]">
               {leadLimit}
             </strong>{" "}
-            leads
+            nuevos créditos para extraer leads
           </p>
         )}
-        {costPerLead && (
+       {/*  {costPerLead && (
           <p className="mt-2 text-xs font-semibold text-orange-700 dark:text-orange-400">
             Solo {costPerLead} {currency} por lead
           </p>
-        )}
+        )} */}
       </div>
 
       {includedFeatures.length > 0 && (
@@ -482,6 +558,86 @@ function PairedPlanCard({
         >
           {getPlanCta(displayName, isCurrentPlan ?? false)}
         </button>
+      )}
+    </div>
+  );
+}
+
+function FreePlanLayout({
+  plan,
+  includedFeatures,
+  isActive,
+  isCurrentPlan,
+}: {
+  plan: SaasPlanItem;
+  includedFeatures: PlanFeatureItem[];
+  isActive: boolean;
+  isCurrentPlan: boolean;
+}) {
+  const persona = getPlanPersona(plan.name);
+
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-3">
+          <div>
+            <h3 className="text-lg font-bold text-[#212121] dark:text-[#ffffff]">
+              {plan.name}
+            </h3>
+            {persona && (
+              <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                {persona}
+              </p>
+            )}
+            {!isActive && !isCurrentPlan && (
+              <span className="mt-1 block text-xs text-[#616161] dark:text-[#b0b0b0]">
+                No disponible
+              </span>
+            )}
+          </div>
+          <PlanPriceLine
+            price={plan.cost}
+            oldPrice={plan.costOld}
+            currency={plan.currency}
+            periodLabel={`/${formatPeriod(plan.frequency)}`}
+            ariaLabel={getPriceAriaLabel(plan)}
+            align="left"
+          />
+        </div>
+
+        <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+          <p className="inline-flex w-fit rounded-full bg-green-500 px-4 py-1 text-sm font-bold text-white">
+            Prueba gratuita de 7 días
+          </p>
+          {plan.leadLimit != null && (
+            <p className="text-xs font-semibold text-[#18653c] dark:text-green-400">
+              Incluye{" "}
+              <strong className="text-[#212121] dark:text-[#e0e0e0]">
+                {plan.leadLimit}
+              </strong>{" "}
+              créditos en el periodo de prueba
+            </p>
+          )}
+        </div>
+      </div>
+
+      {includedFeatures.length > 0 && (
+        <div className="space-y-3 border-t border-[#e0e0e0] pt-5 dark:border-[#3a3a3a]">
+          <div className="rounded-xl border border-orange-500/25 bg-orange-500/5 px-4 py-3 dark:border-orange-500/30 dark:bg-orange-500/10">
+            <p className="text-sm font-semibold text-[#212121] dark:text-white">
+              Todas las funcionalidades incluidas
+            </p>
+            <p className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              Prueba el sistema completo sin restricciones de funciones durante
+              tu periodo de prueba
+            </p>
+          </div>
+          <ul className="flex flex-wrap gap-2" role="list">
+            {includedFeatures.map((f) => (
+              <FeatureChip key={f.key} feature={f} />
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
@@ -524,31 +680,29 @@ function PlanCard({
             No disponible
           </span>
         )}
-        <p className="mt-4" aria-label={getPriceAriaLabel(plan)}>
-          <span className="text-4xl font-bold text-[#212121] dark:text-[#ffffff]">
-            {formatPrice(plan.cost, plan.currency, plan.frequency)}
-          </span>
-          <span className="text-xs font-medium text-[#616161] dark:text-[#757575] ml-1">
-            {plan.currency}
-          </span>
-          <span className="text-[#616161] dark:text-[#b0b0b0]">
-            /{formatPeriod(plan.frequency)}
-          </span>
-        </p>
+        <div className="mt-4">
+          <PlanPriceLine
+            price={plan.cost}
+            oldPrice={plan.costOld}
+            currency={plan.currency}
+            periodLabel={`/${formatPeriod(plan.frequency)}`}
+            ariaLabel={getPriceAriaLabel(plan)}
+          />
+        </div>
         {plan.leadLimit != null && (
           <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
-            Cada mes puedes extraer{" "}
+            Cada mes tienes{" "}
             <strong className="text-[#212121] dark:text-[#e0e0e0]">
               {plan.leadLimit}
             </strong>{" "}
-            leads
+            nuevos créditos para extraer leads
           </p>
         )}
-        {costPerLead && (
+      {/*   {costPerLead && (
           <p className="mt-2 text-xs font-semibold text-orange-700 dark:text-orange-400">
             Solo {costPerLead} {plan.currency} por lead
           </p>
-        )}
+        )} */}
       </div>
 
       {includedFeatures.length > 0 && (
@@ -602,6 +756,13 @@ function PlanCard({
 
       {isVertical ? (
         headerBlock
+      ) : plan.cost === 0 ? (
+        <FreePlanLayout
+          plan={plan}
+          includedFeatures={includedFeatures}
+          isActive={isActive}
+          isCurrentPlan={isCurrentPlan ?? false}
+        />
       ) : (
         <div className="flex flex-col gap-8 sm:flex-row sm:items-start">
           <div className="flex-1 shrink-0">
@@ -619,36 +780,47 @@ function PlanCard({
                   No disponible
                 </span>
               )}
-              <p className="mt-4" aria-label={getPriceAriaLabel(plan)}>
-                <span className="text-4xl font-bold text-[#212121] dark:text-[#ffffff]">
-                  {formatPrice(plan.cost, plan.currency, plan.frequency)}
-                </span>
-                <span className="text-xs font-medium text-[#616161] dark:text-[#757575] ml-1">
-                  {plan.currency}
-                </span>
-                <span className="text-[#616161] dark:text-[#b0b0b0]">
-                  /{formatPeriod(plan.frequency)}
-                </span>
-              </p>
+              <div className="mt-4">
+                <PlanPriceLine
+                  price={plan.cost}
+                  oldPrice={plan.costOld}
+                  currency={plan.currency}
+                  periodLabel={`/${formatPeriod(plan.frequency)}`}
+                  ariaLabel={getPriceAriaLabel(plan)}
+                  align="left"
+                />
+              </div>
               {plan.leadLimit != null && plan.cost !== 0 && (
                 <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
-                  Cada mes puedes extraer{" "}
+                  Cada mes tienes{" "}
                   <strong className="text-[#212121] dark:text-[#e0e0e0]">
                     {plan.leadLimit}
                   </strong>{" "}
-                  leads/mes
+                  créditos/mes
                 </p>
               )}
-              {costPerLead && (
+             {/*  {costPerLead && (
                 <p className="mt-2 text-xs font-semibold text-orange-700 dark:text-orange-400">
                   Solo {costPerLead} {plan.currency} por lead
                 </p>
-              )}
+              )} */}
               {plan.cost === 0 && (
-                <p className="mt-2 inline-block rounded-full bg-green-500 px-4 py-1 text-sm font-bold text-white">
-                  Prueba gratuita de 7 días
-                </p>
+                <div className="mt-2 flex flex-col gap-2">
+                  <p className="inline-block rounded-full bg-green-500 px-4 py-1 text-sm font-bold text-white">
+                    Prueba gratuita de 7 días
+                  </p>
+                  {plan.leadLimit != null && (
+                    <p className="text-xs font-semibold text-[#18653c] dark:text-green-400">
+                      Incluye {" "}
+                      <strong className="text-[#212121] dark:text-[#e0e0e0]">
+                        {plan.leadLimit}
+                      </strong>{" "}
+                      créditos en el periodo de prueba
+                    </p>
+                  )}
+                </div>
               )}
+         
             </div>
 
             {isActive && onSubscribe && plan.cost !== 0 && (
