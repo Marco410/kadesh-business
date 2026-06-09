@@ -1,4 +1,4 @@
-/** Static plan tiers for JSON-LD (aligned with global layout offers). */
+/** Static plan tiers for JSON-LD (aligned with global layout offers and saas_plan seed). */
 export const PRICING_PLAN_OFFERS = [
   {
     name: "Plan Free",
@@ -8,21 +8,43 @@ export const PRICING_PLAN_OFFERS = [
   },
   {
     name: "Plan Starter",
-    price: 799,
+    price: 399,
     description:
       "Ideal para freelancers y vendedores independientes que buscan clientes B2B en México.",
   },
   {
     name: "Plan Pro",
-    price: 1699,
+    price: 799,
     description:
       "Para equipos pequeños con más cuota de leads, exportación a Excel y CRM completo.",
   },
   {
     name: "Plan Agencia",
-    price: 3499,
+    price: 1999,
     description:
       "Para agencias y equipos comerciales con usuarios múltiples y asignación de leads.",
+  },
+] as const;
+
+/** Credit packages for JSON-LD (aligned with saas_credits seed). */
+export const PRICING_CREDIT_OFFERS = [
+  {
+    name: "250 Créditos Extra",
+    price: 349,
+    description:
+      "Recarga básica de créditos extra para completar tu cuota mensual de extracción B2B.",
+  },
+  {
+    name: "1,000 Créditos Extra",
+    price: 999,
+    description:
+      "Paquete de crecimiento con créditos extra para equipos con prospección activa.",
+  },
+  {
+    name: "3,000 Créditos Extra",
+    price: 2499,
+    description:
+      "Recarga a escala para campañas de prospección B2B de alto volumen.",
   },
 ] as const;
 
@@ -118,13 +140,16 @@ export function buildPreciosStructuredData() {
         "@id": `${BASE_URL}/precios#offers`,
         name: "Planes KADESH Negocios",
         url: `${BASE_URL}/precios`,
-        itemListElement: PRICING_PLAN_OFFERS.map((plan, index) => ({
+        itemListElement: [
+          ...PRICING_PLAN_OFFERS,
+          ...PRICING_CREDIT_OFFERS,
+        ].map((offer, index) => ({
           "@type": "Offer",
           position: index + 1,
-          name: plan.name,
-          price: plan.price,
+          name: offer.name,
+          price: offer.price,
           priceCurrency: "MXN",
-          description: plan.description,
+          description: offer.description,
           url: `${BASE_URL}/precios`,
           availability: "https://schema.org/InStock",
           eligibleRegion: {
@@ -156,10 +181,13 @@ export function buildPreciosStructuredData() {
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
         url: BASE_URL,
-        offers: PRICING_PLAN_OFFERS.filter((p) => p.price > 0).map((plan) => ({
+        offers: [
+          ...PRICING_PLAN_OFFERS.filter((p) => p.price > 0),
+          ...PRICING_CREDIT_OFFERS,
+        ].map((offer) => ({
           "@type": "Offer",
-          name: plan.name,
-          price: plan.price,
+          name: offer.name,
+          price: offer.price,
           priceCurrency: "MXN",
           url: `${BASE_URL}/precios`,
         })),
