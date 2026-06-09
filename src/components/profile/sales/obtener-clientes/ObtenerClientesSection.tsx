@@ -147,7 +147,11 @@ declare global {
   }
 }
 
-export default function ObtenerClientesSection() {
+export default function ObtenerClientesSection({
+  onLeadsSyncSuccess,
+}: {
+  onLeadsSyncSuccess?: () => void | Promise<void>;
+} = {}) {
   const [searchMode, setSearchMode] = useState<"category" | "custom">("category");
   const [category, setCategory] = useState("");
   const [customSearch, setCustomSearch] = useState("");
@@ -396,6 +400,8 @@ export default function ObtenerClientesSection() {
       if (syncedLeadsCount > 0) {
         statsRef.current?.refetch();
       }
+
+      void onLeadsSyncSuccess?.();
 
       return { syncedLeadsCount, categoryLabel };
     };

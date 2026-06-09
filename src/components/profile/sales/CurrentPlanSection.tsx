@@ -8,13 +8,7 @@ import {
   SUBSCRIPTION_STATUS_OPTIONS,
   SUBSCRIPTION_STATUS_CLASSES,
 } from "kadesh/constants/constans";
-
-/** Soporte humano: mismo número para llamada o WhatsApp */
-const SUPPORT_PHONE = {
-  display: "+52 1 443 938 2330",
-  tel: "tel:+5214439382330",
-  whatsapp: "https://wa.me/5214439382330",
-} as const;
+import { buildSupportWhatsAppUrl } from "kadesh/constants/support";
 
 function PlanMetric({
   label,
@@ -45,7 +39,7 @@ function SupportHelpFooter({ className }: { className?: string }) {
     >
       ¿Necesitas ayuda con tu plan, facturación o el uso de la plataforma?{" "}
       <a
-        href={SUPPORT_PHONE.whatsapp}
+        href={buildSupportWhatsAppUrl()}
         target="_blank"
         rel="noopener noreferrer"
         className={supportLinkClass}

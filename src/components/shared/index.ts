@@ -25,3 +25,5 @@ export type {
   HeroUIDatePickerGranularity,
 } from './DatePickerField';
 export { calendarDateToDateOnlyString } from './DatePickerField';
+export { default as SupportContactSection } from './SupportContactSection';
+export type { SupportContactSectionProps } from './SupportContactSection';

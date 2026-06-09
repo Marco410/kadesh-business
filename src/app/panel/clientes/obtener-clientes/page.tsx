@@ -12,7 +12,11 @@ import { Routes } from "kadesh/core/routes";
 import { useUser } from "kadesh/utils/UserContext";
 import EmptyCompanySection from "kadesh/components/profile/sales/EmptyCompanySection";
 
-export default function ObtenerClientesPage() {
+export default function ObtenerClientesPage({
+  onLeadsSyncSuccess,
+}: {
+  onLeadsSyncSuccess?: () => void | Promise<void>;
+} = {}) {
   const { user } = useUser();
   const userId = user?.id ?? "";
 
@@ -47,7 +51,7 @@ export default function ObtenerClientesPage() {
       <Navigation />
       <SubscriptionProvider companyId={companyId}>
         <div className="max-w-7xl mx-auto px-4 pb-10 sm:px-6 lg:px-8">
-          <ObtenerClientesSection />
+          <ObtenerClientesSection onLeadsSyncSuccess={onLeadsSyncSuccess} />
         </div>
       </SubscriptionProvider>
     </div>

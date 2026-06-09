@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -7,7 +8,16 @@ import {
   DashboardSquare01Icon,
   ZapIcon,
 } from "@hugeicons/core-free-icons";
+import { useQuery } from "@apollo/client";
 import { Footer, Navigation } from "kadesh/components/layout";
+import { useRemainingCredits } from "kadesh/components/panel/hooks";
+import {
+  USER_COMPANY_CATEGORIES_QUERY,
+  type UserCompanyCategoriesResponse,
+  type UserCompanyCategoriesVariables,
+} from "kadesh/components/profile/sales/queries";
+import { Routes } from "kadesh/core/routes";
+import { cn } from "kadesh/utils/cn";
 import { useUser } from "kadesh/utils/UserContext";
 import { isAdminCompanyUser } from "kadesh/utils/user-roles";
 import PanelControlSection from "./PanelControlSection";
@@ -34,6 +44,50 @@ function getMainTabFromUrl(
   return tabParam ? "control" : "extraccion";
 }
 
+function getCreditsButtonClasses(remainingQuota: number | null): string {
+  if (remainingQuota == null) {
+    return "bg-gradient-to-r from-gray-500 via-gray-600 to-gray-500 text-white shadow focus:ring-gray-400 dark:from-gray-700 dark:via-gray-500 dark:to-gray-400";
+  }
+  if (remainingQuota < 5) {
+    return "bg-gradient-to-r from-red-500 via-red-600 to-red-500 text-white shadow focus:ring-red-400 dark:from-red-700 dark:via-red-500 dark:to-red-400";
+  }
+  if (remainingQuota < 20) {
+    return "bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 text-[#212121] shadow focus:ring-amber-400 dark:from-amber-500 dark:via-yellow-500 dark:to-amber-400 dark:text-[#212121]";
+  }
+  return "bg-gradient-to-r from-blue-500 via-blue-600 to-blue-500 text-white shadow focus:ring-blue-400 dark:from-blue-700 dark:via-blue-500 dark:to-blue-400";
+}
+
+function PanelCreditsButton({
+  remainingQuota,
+  loading,
+}: {
+  remainingQuota: number | null;
+  loading: boolean;
+}) {
+  const isLowYellow = remainingQuota != null && remainingQuota >= 5 && remainingQuota < 20;
+
+  return (
+    <Link
+      href={Routes.panelCredits}
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2",
+        getCreditsButtonClasses(remainingQuota),
+      )}
+    >
+      <span
+        className={cn(
+          "mr-2 h-2 w-2 shrink-0 animate-pulse rounded-full",
+          isLowYellow ? "bg-[#212121]/70" : "bg-white/80",
+        )}
+      />
+      Créditos disponibles:{" "}
+      <span className="ml-1 text-base font-bold">
+        {loading ? "…" : (remainingQuota ?? "—")}
+      </span>
+    </Link>
+  );
+}
+
 function PanelPageSectionContent() {
   const router = useRouter();
   const pathname = usePathname();
@@ -41,6 +95,16 @@ function PanelPageSectionContent() {
   const tabFromUrl = searchParams.get("tab");
   const { user } = useUser();
   const canAccessExtraccion = isAdminCompanyUser(user);
+  const { data: userData } = useQuery<
+    UserCompanyCategoriesResponse,
+    UserCompanyCategoriesVariables
+  >(USER_COMPANY_CATEGORIES_QUERY, {
+    variables: { where: { id: user?.id ?? "" } },
+    skip: !user?.id,
+  });
+  const companyId = userData?.user?.company?.id ?? null;
+  const { remainingQuota, loading: creditsLoading, refetch: refetchRemainingCredits } =
+    useRemainingCredits(companyId);
   const visibleTabs = useMemo(
     () =>
       canAccessExtraccion
@@ -93,11 +157,16 @@ function PanelPageSectionContent() {
 
   const handleMainTabChange = (key: PanelMainTab) => {
     setActiveTab(key);
+    const params = new URLSearchParams(searchParams.toString());
     if (key === "extraccion") {
-      const params = new URLSearchParams(searchParams.toString());
       params.delete("tab");
       const query = params.toString();
       router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+      return;
+    }
+    if (!params.get("tab")) {
+      params.set("tab", "inicio");
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     }
   };
 
@@ -106,7 +175,8 @@ function PanelPageSectionContent() {
       <Navigation />
       <div className="pt-18 pb-5">
         <div className="mx-auto px-2 sm:px-3 lg:px-4">
-          <div className="mb-2 flex justify-center">
+          <div className="mb-2 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+            <div aria-hidden />
             <div
               ref={tablistRef}
               role="tablist"
@@ -156,12 +226,21 @@ function PanelPageSectionContent() {
                 );
               })}
             </div>
+            <div className="flex items-center justify-end">
+              <PanelCreditsButton
+                remainingQuota={remainingQuota}
+                loading={creditsLoading}
+              />
+            </div>
+       
           </div>
 
           {activeTab === "control" || !canAccessExtraccion ? (
             <PanelControlSection embedded />
           ) : (
-            <ObtenerClientesPage />
+            <ObtenerClientesPage
+              onLeadsSyncSuccess={() => void refetchRemainingCredits()}
+            />
           )}
         </div>
       </div>

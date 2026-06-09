@@ -42,6 +42,10 @@ export const Routes = {
   panelPlans: '/panel/clientes/planes',
   panelPlanSubscribe: (planId: string): string => `/panel/clientes/planes/suscripcion/${planId}`,
   panelPlanSubscriptionSuccess: "/panel/clientes/planes/suscripcion/success",
+  panelCredits: '/panel/creditos',
+  panelCreditPurchase: (creditId: string): string =>
+    `/panel/creditos/comprar/${creditId}`,
+  panelCreditPurchaseSuccess: '/panel/creditos/comprar/success',
 
   
   // About
