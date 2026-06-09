@@ -21,7 +21,7 @@ import { cn } from "kadesh/utils/cn";
 import { useUser } from "kadesh/utils/UserContext";
 import { isAdminCompanyUser } from "kadesh/utils/user-roles";
 import PanelControlSection from "./PanelControlSection";
-import ObtenerClientesPage from "kadesh/app/panel/clientes/obtener-clientes/page";
+import { ObtenerClientesPageContent } from "kadesh/components/profile/sales/obtener-clientes";
 
 type PanelMainTab = "control" | "extraccion";
 
@@ -238,7 +238,8 @@ function PanelPageSectionContent() {
           {activeTab === "control" || !canAccessExtraccion ? (
             <PanelControlSection embedded />
           ) : (
-            <ObtenerClientesPage
+            <ObtenerClientesPageContent
+              embedded
               onLeadsSyncSuccess={() => void refetchRemainingCredits()}
             />
           )}
