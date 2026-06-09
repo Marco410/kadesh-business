@@ -77,6 +77,11 @@ function getValidTab(
   if (tabFromUrl === "workspaces" && !hasWorkspacesFeature) {
     return "inicio";
   } */
+
+  if (!tabFromUrl && hasVendedorRole) {
+    return "inicio";
+  }
+  
   return tabFromUrl as (typeof VALID_TABS)[number];
 }
 
@@ -292,7 +297,7 @@ function PanelControlSectionContent({ embedded = false }: PanelControlSectionPro
 
   useEffect(() => {
     if (companyId && subscriptionLoading) return;
-    if (tabFromUrl && tabFromUrl !== selectedTab) {
+    if (!tabFromUrl || tabFromUrl !== selectedTab) {
       const params = new URLSearchParams(searchParams.toString());
       params.set("tab", selectedTab);
       router.replace(`${pathname}?${params.toString()}`, { scroll: false });
