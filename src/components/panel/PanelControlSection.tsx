@@ -46,8 +46,10 @@ import { SubscriptionProvider } from "kadesh/components/profile/sales/Subscripti
 import ReferralDashboardSection from "kadesh/components/profile/referral/ReferralDashboardSection";
 import WorkspacesTab from "kadesh/components/profile/sales/workspaces/WorkspacesTab";
 import CreateWorkspaceModal from "kadesh/components/profile/sales/workspaces/CreateWorkspaceModal";
+import { NovedadesPage } from "../changelog";
+import { SupportContactSection } from "../shared";
 
-const VALID_TABS = ["inicio", "profile", "clientes", "vendedores", "archivos", "proyectos", "cotizaciones", "calendar", "workspaces", "referidos"] as const;
+const VALID_TABS = ["inicio", "profile", "clientes", "vendedores", "archivos", "proyectos", "cotizaciones", "calendar", "workspaces", "referidos", "novedades"] as const;
 
 function getValidTab(
   tabFromUrl: string | null,
@@ -55,18 +57,18 @@ function getValidTab(
   isAdminCompany: boolean,
   hasUploadFilesFeature: boolean,
   hasCalendarFeature: boolean,
-  hasWorkspacesFeature: boolean
+  hasWorkspacesFeature: boolean,
 ): (typeof VALID_TABS)[number] {
-  if (!tabFromUrl || !VALID_TABS.includes(tabFromUrl as (typeof VALID_TABS)[number])) {
+/*   if (!tabFromUrl || !VALID_TABS.includes(tabFromUrl as (typeof VALID_TABS)[number])) {
     return "inicio";
   }
   if (tabFromUrl === "clientes" && !hasVendedorRole) {
     return "inicio";
   }
-  if (tabFromUrl === "vendedores" && (!isAdminCompany )) {
+  if (tabFromUrl === "vendedores" && !isAdminCompany) {
     return "inicio";
   }
-  if (tabFromUrl === "archivos" && (!hasUploadFilesFeature)) {
+  if (tabFromUrl === "archivos" && !hasUploadFilesFeature) {
     return "inicio";
   }
   if (tabFromUrl === "calendar" && !hasCalendarFeature) {
@@ -74,7 +76,7 @@ function getValidTab(
   }
   if (tabFromUrl === "workspaces" && !hasWorkspacesFeature) {
     return "inicio";
-  }
+  } */
   return tabFromUrl as (typeof VALID_TABS)[number];
 }
 
@@ -92,7 +94,11 @@ const navItems = [
     label: "Espacios de trabajo",
     icon: WorkIcon
   },
+];
+
+const navItemsKadeshConfig = [
   { key: "referidos" as const, label: "Referidos", icon: UserAdd01Icon },
+  { key: "novedades" as const, label: "Novedades", icon: FlashIcon },
 ];
 
 
@@ -114,14 +120,34 @@ function DashboardSidebar({
   hasWorkspacesFeature: boolean;
 }) {
   return (
-    <aside className="w-full lg:w-60 shrink-0">
-      <nav className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-2 shadow-sm">
+    <aside className="w-full lg:w-60 shrink-0 flex flex-col gap-5">
+      <nav className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-2 shadow-sm">
         {navItems.map((item) => {
           if ("requireVendedor" in item && item.requireVendedor && !hasVendedorRole) return null;
           if ("requireAdminCompany" in item && item.requireAdminCompany && !isAdminCompany) return null;
           if ("requireSalesPersonManagement" in item && item.requireSalesPersonManagement && !hasSalesPersonManagement) return null;
           if ("requireUploadFilesFeature" in item && item.requireUploadFilesFeature && !hasUploadFilesFeature) return null;
           if ("requireWorkspacesFeature" in item && item.requireWorkspacesFeature && !hasWorkspacesFeature) return null;
+          const isActive = selectedTab === item.key;
+          return (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => onTabChange(item.key)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium transition-colors ${
+                isActive
+                  ? "bg-orange-500 text-white dark:bg-orange-500 dark:text-white"
+                  : "text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+              }`}
+            >
+              <HugeiconsIcon icon={item.icon} size={20} />
+              {item.label}
+            </button>
+          );
+        })}
+      </nav>
+      <nav className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-2 shadow-sm">
+        {navItemsKadeshConfig.map((item) => {
           const isActive = selectedTab === item.key;
           return (
             <button
@@ -216,7 +242,7 @@ function PanelControlSectionContent({ embedded = false }: PanelControlSectionPro
   });
   const companyId = userData?.user?.company?.id ?? null;
 
-  const { data: subscriptionData } = useQuery<
+  const { data: subscriptionData, loading: subscriptionLoading } = useQuery<
     SubscriptionStatusResponse,
     SubscriptionStatusVariables
   >(SUBSCRIPTION_STATUS_QUERY, {
@@ -249,11 +275,29 @@ function PanelControlSectionContent({ embedded = false }: PanelControlSectionPro
     subscription?.planFeatures ?? null,
     PLAN_FEATURE_KEYS.WORKSPACES
   );
-  const selectedTab = getValidTab(tabFromUrl, hasVendedorRole, isAdminCompany, hasUploadFilesFeature, hasCalendarFeature, hasWorkspacesFeature);
+  const selectedTab = getValidTab(
+    tabFromUrl,
+    hasVendedorRole,
+    isAdminCompany,
+    hasUploadFilesFeature,
+    hasCalendarFeature,
+    hasWorkspacesFeature,
+  );
 
   const handleTabChange = (key: string) => {
-    router.replace(`${pathname}?tab=${key}`, { scroll: false });
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", key);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
+
+  useEffect(() => {
+    if (companyId && subscriptionLoading) return;
+    if (tabFromUrl && tabFromUrl !== selectedTab) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("tab", selectedTab);
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }
+  }, [companyId, subscriptionLoading, tabFromUrl, selectedTab, pathname, router, searchParams]);
 
   useEffect(() => {
     if (!loading && !user?.id) {
@@ -336,6 +380,10 @@ function PanelControlSectionContent({ embedded = false }: PanelControlSectionPro
                     </div>
                     <div className="rounded-2xl overflow-hidden border border-[#e0e0e0] dark:border-[#3a3a3a]">
                       <PublicReferralSection />
+                      <SupportContactSection
+                        whatsappMessage="Hola KADESH, tengo una consulta sobre mis referidos y comisiones."
+                        emailSubject="Consulta sobre referidos y comisiones — KADESH"
+                      />
                     </div>
 
                     {hasAdminRole && (
@@ -438,6 +486,12 @@ function PanelControlSectionContent({ embedded = false }: PanelControlSectionPro
                     </div>
                     <ReferralDashboardSection userId={user.id} />
                   </div>
+                )}
+
+                {selectedTab === "novedades" && (
+                    <div className="flex flex-col gap-5">
+                      <NovedadesPage />
+                    </div>
                 )}
               </main>
           </div>

@@ -42,6 +42,7 @@ import { Add01Icon, Download04Icon } from "@hugeicons/core-free-icons";
 import { hasPlanFeature } from "./helpers/plan-features";
 import { downloadLeadsExcel } from "./exportLeadsExcel";
 import { buildClientLeadsQueryVariables } from "./helpers/client-leads-query";
+import { SupportContactSection } from "kadesh/components/shared";
 
 const LEADS_PAGE_SIZE = 10;
 const MAX_LEADS_EXPORT = 10_000;
@@ -672,6 +673,11 @@ export default function SalesSection({ userId }: SalesSectionProps) {
           isAdminCompany={isAdminCompany}
           companyWideLeadScope={hasCompanyWideLeadScope}
           salesComission={userData?.user?.salesComission ?? 0}
+        />
+
+        <SupportContactSection
+          whatsappMessage="Hola KADESH, tengo una consulta sobre mis clientes."
+          emailSubject="Consulta sobre clientes — KADESH"
         />
     </div>
     </SubscriptionProvider>

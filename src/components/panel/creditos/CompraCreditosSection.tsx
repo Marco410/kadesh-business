@@ -1,20 +1,19 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@apollo/client";
 import { CardElement } from "@stripe/react-stripe-js";
 import { useTheme } from "next-themes";
 import {
-  SAAS_PLANS_QUERY,
+  SAAS_CREDITS_QUERY,
   USER_COMPANY_CATEGORIES_QUERY,
-  type SaasPlansResponse,
-  type SaasPlanItem,
-  type PlanFeatureItem,
+  type SaasCreditsResponse,
   type UserCompanyCategoriesResponse,
   type UserCompanyCategoriesVariables,
 } from "kadesh/components/profile/sales/queries";
+import EmptyCompanySection from "kadesh/components/profile/sales/EmptyCompanySection";
 import { Routes } from "kadesh/core/routes";
 import { useUser } from "kadesh/utils/UserContext";
 import { cn } from "kadesh/utils/cn";
@@ -23,22 +22,32 @@ import {
   ArrowLeft01Icon,
   CheckmarkCircle02Icon,
 } from "@hugeicons/core-free-icons";
-import { SupportContactSection } from "kadesh/components/shared";
-import { useSubscriptionPayment } from "./hooks/useSubscriptionPayment";
-import EmptyCompanySection from "../EmptyCompanySection";
+import { useCreditPurchasePayment } from "./hooks/useCreditPurchasePayment";
 
 function formatPrice(cost: number, currency: string): string {
-  const formatter = new Intl.NumberFormat("es-MX", {
+  return new Intl.NumberFormat("es-MX", {
     style: "currency",
     currency: currency || "MXN",
-  });
-  return formatter.format(cost);
+  }).format(cost);
 }
 
 function formatPeriod(frequency: string): string {
   const f = frequency?.toLowerCase();
-  return f === "monthly" ? "mes" : f === "annual" ? "año" : frequency || "";
+  if (f === "once") return "pago único";
+  if (f === "monthly" || f === "month") return "mes";
+  if (f === "annual" || f === "yearly" || f === "year") return "año";
+  return frequency || "";
 }
+
+function formatCredits(value: number): string {
+  return new Intl.NumberFormat("es-MX").format(value);
+}
+
+const CREDIT_SUMMARY_FEATURES = [
+  "Créditos extra para extracción B2B",
+  "Se suman a tu cuota del mes actual",
+  "Pago único, sin suscripción",
+] as const;
 
 const inputBase =
   "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-4 py-2.5 text-sm text-[#212121] dark:text-[#ffffff] placeholder:text-[#9e9e9e] dark:placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent";
@@ -75,9 +84,9 @@ const cardElementOptionsDark = {
   hidePostalCode: true,
 };
 
-export default function SuscripcionSection() {
+export default function CompraCreditosSection() {
   const params = useParams();
-  const id = params?.planId as string | undefined;
+  const id = params?.creditId as string | undefined;
   const { resolvedTheme } = useTheme();
   const { user } = useUser();
 
@@ -93,8 +102,7 @@ export default function SuscripcionSection() {
   const [notes, setNotes] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
 
-  const { data, loading, error } =
-    useQuery<SaasPlansResponse>(SAAS_PLANS_QUERY);
+  const { data, loading, error } = useQuery<SaasCreditsResponse>(SAAS_CREDITS_QUERY);
   const { data: userData } = useQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
@@ -103,45 +111,46 @@ export default function SuscripcionSection() {
     skip: !user?.id,
   });
 
-  const plan = id ? (data?.saasPlans?.find((p) => p.id === id) ?? null) : null;
+  const credit = id
+    ? (data?.saasCredits?.find((item) => item.id === id) ?? null)
+    : null;
   const stripeCustomerId = userData?.user?.stripeCustomerId;
+  const companyId = userData?.user?.company?.id ?? null;
 
-  const { processSubscriptionPayment, loadingPayment, redirecting } =
-    useSubscriptionPayment(user?.id, user?.email, stripeCustomerId);
+  const { processCreditPurchasePayment, loadingPayment, redirecting } =
+    useCreditPurchasePayment(user?.id, user?.email, stripeCustomerId);
 
-  const handleConfirmSubscription = async (e: React.FormEvent) => {
+  const handleConfirmPurchase = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!plan?.active || !acceptTerms || !user?.email) return;
+    if (!credit?.active || !acceptTerms || !user?.email) return;
     const nameCard =
       cardName.trim() || [user.name, user.lastName].filter(Boolean).join(" ");
-    await processSubscriptionPayment(plan, {
+    await processCreditPurchasePayment(credit, {
       nameCard: nameCard || "Tarjetahabiente",
       email: user.email,
       notes: notes.trim() || undefined,
     });
   };
 
-  const companyId = userData?.user?.company?.id ?? null;
-
   if (!id) {
     return (
-      <div className="max-w-lg mx-auto space-y-6">
+      <div className="mx-auto max-w-lg space-y-6">
         <Link
-          href={Routes.panelPlans}
-          className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
+          href={Routes.panelCredits}
+          className="inline-flex items-center gap-1.5 text-sm text-[#616161] hover:text-orange-500 dark:text-[#b0b0b0] dark:hover:text-orange-400"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-          Volver a planes
+          Volver a créditos
         </Link>
-        <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 text-center">
+        <div className="rounded-2xl border border-[#e0e0e0] bg-white p-6 text-center dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
           <p className="text-[#616161] dark:text-[#b0b0b0]">
-            Identificador de plan no válido.
+            Identificador de paquete no válido.
           </p>
           <Link
-            href={Routes.panelPlans}
+            href={Routes.panelCredits}
             className="mt-4 inline-block rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
           >
-            Ver planes
+            Ver paquetes
           </Link>
         </div>
       </div>
@@ -156,137 +165,145 @@ export default function SuscripcionSection() {
     );
   }
 
-  if (error || !plan) {
+  if (error || !credit) {
     return (
-      <div className="max-w-lg mx-auto space-y-6">
+      <div className="mx-auto max-w-lg space-y-6">
         <Link
-          href={Routes.panelPlans}
-          className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
+          href={Routes.panelCredits}
+          className="inline-flex items-center gap-1.5 text-sm text-[#616161] hover:text-orange-500 dark:text-[#b0b0b0] dark:hover:text-orange-400"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-          Volver a planes
+          Volver a créditos
         </Link>
         <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center dark:border-red-800 dark:bg-red-900/20">
           <p className="text-red-700 dark:text-red-300">
             {error
-              ? "No se pudo cargar el plan. Intenta de nuevo."
-              : "Plan no encontrado."}
+              ? "No se pudo cargar el paquete. Intenta de nuevo."
+              : "Paquete no encontrado."}
           </p>
           <Link
-            href={Routes.panelPlans}
+            href={Routes.panelCredits}
             className="mt-4 inline-block rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
           >
-            Ver planes
+            Ver paquetes
           </Link>
         </div>
       </div>
     );
   }
 
-  const isActive = plan.active;
-
   if (!companyId) {
     return (
       <EmptyCompanySection
         userId={user?.id ?? ""}
-        onSuccess={async () => {
-          /*  await refetchUserCompany();
-          await refreshUser(); */
-        }}
+        onSuccess={async () => {}}
       />
     );
   }
 
+  const isActive = credit.active;
+  const showOldPrice =
+    credit.costOld != null && credit.costOld > credit.cost;
+
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-8">
+    <div className="mx-auto w-full max-w-5xl space-y-8">
       <Link
-        href={Routes.panelPlans}
-        className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
+        href={Routes.panelCredits}
+        className="inline-flex items-center gap-1.5 text-sm text-[#616161] hover:text-orange-500 dark:text-[#b0b0b0] dark:hover:text-orange-400"
       >
         <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-        Volver a planes
+        Volver a créditos
       </Link>
 
       <section className="text-center">
         <h1 className="text-2xl font-bold text-[#212121] dark:text-[#ffffff]">
-          Iniciar suscripción
+          Comprar créditos extra
         </h1>
         <p className="mt-1 text-[#616161] dark:text-[#b0b0b0]">
-          Revisa el resumen del plan e ingresa tu método de pago.
+          Revisa el resumen del paquete e ingresa tu método de pago.
         </p>
       </section>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
-        {/* Resumen del plan */}
         <div
           className={cn(
             "relative rounded-2xl border p-6 sm:p-8",
-            "border-orange-500/50 dark:border-orange-500/50 bg-orange-500/5 dark:bg-orange-500/10",
+            credit.bestSeller
+              ? "border-orange-500/50 bg-orange-500/5 dark:border-orange-500/50 dark:bg-orange-500/10"
+              : "border-orange-500/50 bg-orange-500/5 dark:border-orange-500/50 dark:bg-orange-500/10",
           )}
         >
+          {credit.bestSeller && (
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-orange-500 px-4 py-1 text-xs font-bold text-white">
+              MÁS VENDIDO
+            </div>
+          )}
+
           <div className="text-center">
             <h2 className="text-xl font-bold text-[#212121] dark:text-[#ffffff]">
-              {plan.name}
+              {credit.name}
             </h2>
             {!isActive && (
               <p className="mt-1 text-sm text-amber-600 dark:text-amber-400">
-                Este plan no está disponible para nuevas suscripciones.
+                Este paquete no está disponible para compra.
               </p>
             )}
-            <div className="mt-4">
-              <span className="text-3xl font-bold text-[#212121] dark:text-[#ffffff]">
-                {formatPrice(plan.cost, plan.currency)}
-              </span>
-              <span className="ml-1 text-xs font-medium text-[#616161] dark:text-[#757575]">
-                {plan.currency}
-              </span>
-              <span className="text-[#616161] dark:text-[#b0b0b0]">
-                /{formatPeriod(plan.frequency)}
-              </span>
+            <div className="mt-4 flex flex-col items-center gap-1">
+              {showOldPrice && (
+                <span className="text-lg font-medium tabular-nums text-[#9a9a9a] line-through decoration-1 dark:text-[#6a6a6a]">
+                  {formatPrice(credit.costOld!, credit.currency)}
+                </span>
+              )}
+              <p className="flex items-baseline justify-center gap-1 whitespace-nowrap">
+                <span className="text-3xl font-bold tabular-nums text-[#212121] dark:text-[#ffffff]">
+                  {formatPrice(credit.cost, credit.currency)}
+                </span>
+                <span className="shrink-0 text-xs font-medium text-[#616161] dark:text-[#757575]">
+                  {credit.currency}
+                </span>
+                <span className="text-[#616161] dark:text-[#b0b0b0]">
+                  / {formatPeriod(credit.frequency)}
+                </span>
+              </p>
             </div>
-            {plan.leadLimit != null && (
-              <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
-                Cada mes puedes extraer{" "}
-                <strong className="text-[#212121] dark:text-[#e0e0e0]">
-                  {plan.leadLimit}
-                </strong>{" "}
-                leads
-              </p>
-            )}
+            <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
+              Recibes{" "}
+              <strong className="text-[#212121] dark:text-[#e0e0e0]">
+                {formatCredits(credit.creditsToAdd)}
+              </strong>{" "}
+              créditos extra para extraer leads
+            </p>
           </div>
-          {plan.planFeatures != null && plan.planFeatures.length > 0 && (
-            <ul className="mt-8 space-y-2">
-              {plan.planFeatures
-                .filter((f: PlanFeatureItem) => f.included)
-                .map((f: PlanFeatureItem) => (
-                  <li key={f.key} className="flex items-center gap-3 text-sm">
-                    <HugeiconsIcon
-                      icon={CheckmarkCircle02Icon}
-                      size={20}
-                      className="flex-shrink-0 text-orange-500 dark:text-orange-400"
-                    />
-                    <span className="text-[#212121] dark:text-[#e0e0e0]">
-                      {f.name}
-                    </span>
-                  </li>
-                ))}
-            </ul>
-          )}
+
+          <ul className="mt-8 space-y-2">
+            {CREDIT_SUMMARY_FEATURES.map((feature) => (
+              <li key={feature} className="flex items-center gap-3 text-sm">
+                <HugeiconsIcon
+                  icon={CheckmarkCircle02Icon}
+                  size={20}
+                  className="shrink-0 text-orange-500 dark:text-orange-400"
+                />
+                <span className="text-[#212121] dark:text-[#e0e0e0]">
+                  {feature}
+                </span>
+              </li>
+            ))}
+          </ul>
+
           <div className="mt-6">
             <Link
-              href={Routes.panelPlans}
+              href={Routes.panelCredits}
               className="text-sm font-medium text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300"
             >
-              Cambiar plan
+              Cambiar paquete
             </Link>
           </div>
         </div>
 
-        {/* Formulario método de pago */}
-        <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8">
+        <div className="rounded-2xl border border-[#e0e0e0] bg-white p-6 sm:p-8 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
           <h3 className="flex items-center gap-2 text-lg font-bold text-[#212121] dark:text-[#ffffff]">
             <span
-              className="flex size-9 items-center justify-center rounded-lg bg-orange-500/15 dark:bg-orange-500/20 text-orange-500 dark:text-orange-400"
+              className="flex size-9 items-center justify-center rounded-lg bg-orange-500/15 text-orange-500 dark:bg-orange-500/20 dark:text-orange-400"
               aria-hidden
             >
               <svg
@@ -306,10 +323,10 @@ export default function SuscripcionSection() {
             Método de pago
           </h3>
           <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
-            Ingresa los datos de tu tarjeta para confirmar la suscripción.
+            Ingresa los datos de tu tarjeta para confirmar la compra.
           </p>
 
-          <form onSubmit={handleConfirmSubscription} className="mt-6 space-y-4">
+          <form onSubmit={handleConfirmPurchase} className="mt-6 space-y-4">
             <div>
               <label
                 htmlFor="cardName"
@@ -336,7 +353,7 @@ export default function SuscripcionSection() {
               <label className="mb-1.5 block text-sm font-medium text-[#212121] dark:text-[#e0e0e0]">
                 Datos de la tarjeta
               </label>
-              <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-4 py-3 focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-transparent">
+              <div className="rounded-xl border border-[#e0e0e0] bg-white px-4 py-3 focus-within:border-transparent focus-within:ring-2 focus-within:ring-orange-500 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
                 <CardElement options={cardElementOptions} />
               </div>
             </div>
@@ -368,8 +385,8 @@ export default function SuscripcionSection() {
                 className="mt-1 size-4 rounded border-[#e0e0e0] text-orange-500 focus:ring-orange-500 dark:border-[#3a3a3a]"
               />
               <span className="text-sm text-[#616161] dark:text-[#b0b0b0]">
-                Acepto los términos del plan y el cargo recurrente según la
-                frecuencia seleccionada.
+                Acepto los términos y autorizo el cargo único por este paquete
+                de créditos.
               </span>
             </label>
 
@@ -401,11 +418,11 @@ export default function SuscripcionSection() {
                   ? "Redirigiendo…"
                   : loadingPayment
                     ? "Procesando…"
-                    : "Confirmar suscripción"}
+                    : "Confirmar compra"}
               </button>
               <Link
-                href={Routes.panelPlans}
-                className="w-full rounded-xl border-2 border-[#e0e0e0] dark:border-[#3a3a3a] px-6 py-3 text-center text-sm font-semibold text-[#212121] dark:text-[#e0e0e0] transition-colors hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                href={Routes.panelCredits}
+                className="w-full rounded-xl border-2 border-[#e0e0e0] px-6 py-3 text-center text-sm font-semibold text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
               >
                 Cancelar
               </Link>
@@ -413,11 +430,6 @@ export default function SuscripcionSection() {
           </form>
         </div>
       </div>
-
-      <SupportContactSection
-        whatsappMessage="Hola KADESH, tengo una consulta sobre mi suscripción o el proceso de pago."
-        emailSubject="Consulta sobre suscripción — KADESH"
-      />
     </div>
   );
 }

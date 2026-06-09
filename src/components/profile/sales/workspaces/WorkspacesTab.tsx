@@ -5,7 +5,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
+  Add01Icon,
   ArrowRight01Icon,
+  DashboardSquare01Icon,
   Edit02Icon,
   FolderIcon,
   UserMultiple02Icon,
@@ -187,51 +189,92 @@ export default function WorkspacesTab({
       </div>
 
       {!currentWorkspaceId ? (
-        <div className="rounded-2xl border border-dashed border-[#d0d0d0] dark:border-[#404040] bg-[#fafafa] dark:bg-[#181818] p-6 sm:p-8">
-          <div className="mb-6 max-w-2xl">
-            <p className="text-sm font-medium text-[#212121] dark:text-white">
-              Vista general activa
-            </p>
+        <div className="rounded-2xl border border-dashed border-[#d0d0d0] dark:border-[#404040] bg-[#fafafa] dark:bg-[#181818] p-5 sm:p-7">
+          <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex min-w-0 gap-3.5">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400">
+                <HugeiconsIcon icon={DashboardSquare01Icon} size={22} />
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-[#212121] dark:text-white">
+                  Vista general activa
+                </p>
+                <p className="mt-1 max-w-xl text-sm leading-relaxed text-[#616161] dark:text-[#9e9e9e]">
+                  Estás viendo todos los registros sin filtrar por espacio. Elige uno para enfocar
+                  tareas, actividades, seguimientos y propuestas.
+                </p>
+              </div>
+            </div>
+            {workspacePickerList.length > 0 && (
+              <span className="inline-flex shrink-0 self-start rounded-full border border-[#e0e0e0] bg-white px-3 py-1 text-xs font-medium text-[#616161] dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-[#9e9e9e]">
+                {workspacePickerList.length}{" "}
+                {workspacePickerList.length === 1 ? "espacio" : "espacios"}
+              </span>
+            )}
           </div>
+
           {workspacesListLoading && !workspacesListData ? (
-            <p className="text-sm text-[#616161] dark:text-[#9e9e9e]">
-              Cargando espacios…
-            </p>
+            <div className="flex flex-col gap-2" aria-busy="true" aria-label="Cargando espacios">
+              {[0, 1].map((i) => (
+                <div
+                  key={i}
+                  className="flex animate-pulse items-center gap-3 rounded-xl border border-[#e0e0e0] bg-white p-4 dark:border-[#2e2e2e] dark:bg-[#1a1a1a]"
+                >
+                  <div className="h-10 w-10 shrink-0 rounded-xl bg-[#e0e0e0] dark:bg-[#2e2e2e]" />
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <div className="h-4 w-32 rounded bg-[#e0e0e0] dark:bg-[#2e2e2e]" />
+                    <div className="h-3 w-20 rounded bg-[#e0e0e0] dark:bg-[#2e2e2e]" />
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : workspacePickerList.length === 0 ? (
-            <p className="text-sm text-[#616161] dark:text-[#9e9e9e] max-w-xl">
-              Aún no tienes espacios. Crea uno para organizar tareas, actividades, seguimientos y
-              propuestas.
-            </p>
+            <div className="flex flex-col items-center rounded-xl border border-[#e0e0e0] bg-white px-6 py-10 text-center dark:border-[#2e2e2e] dark:bg-[#1a1a1a]">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400">
+                <HugeiconsIcon icon={FolderIcon} size={24} />
+              </span>
+              <p className="mt-4 text-sm font-semibold text-[#212121] dark:text-white">
+                Aún no tienes espacios de trabajo
+              </p>
+              <p className="mt-1 max-w-sm text-sm text-[#616161] dark:text-[#9e9e9e]">
+                Crea uno para organizar tareas, actividades, seguimientos y propuestas por equipo o
+                cliente.
+              </p>
+              {onRequestCreateWorkspace && (
+                <button
+                  type="button"
+                  onClick={onRequestCreateWorkspace}
+                  className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50"
+                >
+                  <HugeiconsIcon icon={Add01Icon} size={18} />
+                  Crear espacio de trabajo
+                </button>
+              )}
+            </div>
           ) : (
-            <div
-              className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
-              role="list"
-              aria-label="Espacios de trabajo"
-            >
+            <div className="flex flex-col gap-2" role="list" aria-label="Espacios de trabajo">
               {workspacePickerList.map((w) => (
                 <button
                   key={w.id}
                   type="button"
                   role="listitem"
                   onClick={() => setCurrentWorkspaceId(w.id)}
-                  className="group flex w-full flex-col gap-3 rounded-2xl border border-[#e0e0e0] dark:border-[#2e2e2e] bg-white dark:bg-[#1a1a1a] p-4 text-left shadow-sm transition-all duration-150 hover:border-orange-400/60 hover:shadow-md hover:shadow-orange-500/5 dark:hover:border-orange-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50"
+                  className="group flex w-full items-center gap-3 rounded-xl border border-[#e0e0e0] bg-white p-3.5 text-left shadow-sm transition-all duration-150 hover:border-orange-400/60 hover:bg-orange-500/[0.02] hover:shadow-md hover:shadow-orange-500/5 dark:border-[#2e2e2e] dark:bg-[#1a1a1a] dark:hover:border-orange-500/40 dark:hover:bg-orange-500/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 sm:gap-4 sm:p-4"
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 transition-colors group-hover:bg-orange-500/15">
-                      <HugeiconsIcon icon={FolderIcon} size={20} />
-                    </span>
-                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[#bdbdbd] dark:text-[#4a4a4a] transition-colors group-hover:text-orange-500">
-                      <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
-                    </span>
-                  </div>
-                  <div className="min-w-0">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-600 transition-colors group-hover:bg-orange-500/15 dark:text-orange-400">
+                    <HugeiconsIcon icon={FolderIcon} size={20} />
+                  </span>
+                  <span className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold text-[#212121] dark:text-white">
                       {w.name}
                     </p>
-                    <p className="mt-0.5 text-xs text-[#9e9e9e] dark:text-[#616161] group-hover:text-orange-500/70">
-                      Abrir espacio
+                    <p className="mt-0.5 text-xs text-[#9e9e9e] transition-colors group-hover:text-orange-600/80 dark:text-[#757575] dark:group-hover:text-orange-400/80">
+                      Abrir espacio de trabajo
                     </p>
-                  </div>
+                  </span>
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#e8e8e8] bg-[#fafafa] text-[#9e9e9e] transition-all duration-150 group-hover:translate-x-0.5 group-hover:border-orange-400/40 group-hover:bg-orange-500/10 group-hover:text-orange-600 dark:border-[#333] dark:bg-[#222] dark:text-[#9e9e9e] dark:group-hover:border-orange-500/30 dark:group-hover:bg-orange-500/10 dark:group-hover:text-orange-400">
+                    <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+                  </span>
                 </button>
               ))}
             </div>

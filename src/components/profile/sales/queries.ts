@@ -1818,6 +1818,50 @@ export interface SaasPlansResponse {
   saasPlans: SaasPlanItem[];
 }
 
+// ─── Paquetes de créditos extra ─────────────────────────────────────────────
+
+export const SAAS_CREDITS_QUERY = gql`
+  query SaasCredits {
+    saasCredits {
+      id
+      slug
+      name
+      active
+      cost
+      costOld
+      currency
+      frequency
+      creditsToAdd
+      bestSeller
+      stripePriceId
+      stripeProductId
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export interface SaasCreditItem {
+  id: string;
+  slug: string;
+  name: string;
+  active: boolean;
+  cost: number;
+  costOld?: number | null;
+  currency: string;
+  frequency: string;
+  creditsToAdd: number;
+  bestSeller?: boolean | null;
+  stripePriceId: string | null;
+  stripeProductId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SaasCreditsResponse {
+  saasCredits: SaasCreditItem[];
+}
+
 // ─── Pago / Suscripción empresa ─────────────────────────────────────────────
 
 export const GET_STRIPE_PAYMENT_METHODS = gql`
@@ -1892,4 +1936,42 @@ export interface CreateCompanySubscriptionResult {
 
 export interface CreateCompanySubscriptionResponse {
   createCompanySubscription: CreateCompanySubscriptionResult;
+}
+
+export const PURCHASE_CREDITS_MUTATION = gql`
+  mutation PurchaseCredits($input: PurchaseCreditsInput!) {
+    purchaseCredits(input: $input) {
+      success
+      message
+      paymentId
+      creditsAdded
+      newCreditsTotal
+      subscriptionId
+    }
+  }
+`;
+
+export interface PurchaseCreditsInput {
+  creditPackageId: string;
+  notes?: string | null;
+  nameCard: string;
+  email: string;
+  paymentMethodId: string;
+  total: string;
+  paymentType: string;
+}
+
+export interface PurchaseCreditsResult {
+  success: boolean;
+  message: string;
+  paymentId: string | null;
+  /** Créditos comprados en esta transacción. */
+  creditsAdded: number | null;
+  /** Cuota disponible restante tras la compra (plan + extras − consumidos del mes). */
+  newCreditsTotal: number | null;
+  subscriptionId: string | null;
+}
+
+export interface PurchaseCreditsResponse {
+  purchaseCredits: PurchaseCreditsResult;
 }

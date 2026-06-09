@@ -10,6 +10,7 @@ import {
 import { GOOGLE_PLACE_CATEGORIES } from "kadesh/constants/constans";
 import { useUser } from "kadesh/utils/UserContext";
 import { getCategoryLabel } from "../helpers/category";
+import { SupportContactSection } from "kadesh/components/shared";
 
 export interface LeadsStatsCardsHandle {
   refetch: () => void;
@@ -160,6 +161,11 @@ const LeadsStatsCards = forwardRef<LeadsStatsCardsHandle>(function LeadsStatsCar
           </div>
         </div>
       )}
+
+      <SupportContactSection
+        whatsappMessage="Hola KADESH, tengo una consulta sobre mis clientes obtenidos."
+        emailSubject="Consulta sobre clientes obtenidos — KADESH"
+      />
     </div>
   );
 });
