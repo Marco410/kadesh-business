@@ -131,9 +131,10 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(globalGeoJsonLd) }}
         />
+        {/* Meta Pixel Code */}
         <Script
           id="facebook-pixel"
-          strategy="lazyOnload"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
 !function(f,b,e,v,n,t,s)
@@ -145,8 +146,8 @@ t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '1093441746302298');
-fbq('track', 'PageView'${process.env.NEXT_PUBLIC_META_PIXEL_TEST_EVENT_CODE ? `, { test_event_code: '${process.env.NEXT_PUBLIC_META_PIXEL_TEST_EVENT_CODE}' }` : ''});
-          `,
+fbq('track', 'PageView');
+            `,
           }}
         />
         <noscript>
