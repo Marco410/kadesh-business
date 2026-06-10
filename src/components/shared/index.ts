@@ -27,3 +27,5 @@ export type {
 export { calendarDateToDateOnlyString } from './DatePickerField';
 export { default as SupportContactSection } from './SupportContactSection';
 export type { SupportContactSectionProps } from './SupportContactSection';
+export { default as FloatingWhatsAppButton } from './FloatingWhatsAppButton';
+export type { FloatingWhatsAppButtonProps } from './FloatingWhatsAppButton';

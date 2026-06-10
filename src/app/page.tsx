@@ -20,14 +20,16 @@ import {
   FAQSection,
 } from "kadesh/components/home";
 import { Footer, Navigation } from "kadesh/components/layout";
+import { FloatingWhatsAppButton } from "kadesh/components/shared";
 
 export default function HomePage() {
   return (
     <>
+      <FloatingWhatsAppButton />
       <main className="min-h-screen">
         <Navigation />
         <HeroSection />
-        <HeroDifferentiatorsBadges />
+        {/* <HeroDifferentiatorsBadges /> */}
         <CategoriesMarqueeSection />
         <InteractiveDemoSection />
         <ContactProspectsSection />
