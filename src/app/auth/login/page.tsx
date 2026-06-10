@@ -8,9 +8,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   EyeIcon,
   ViewOffIcon,
-  StarIcon,
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
+import AuthPageVisual from "kadesh/components/auth/AuthPageVisual";
 import {
   useLogin,
   useRegister,
@@ -23,65 +23,6 @@ const REGISTER_TRUST_POINTS = [
   "50 leads gratis",
   "Cancela cuando quieras",
 ] as const;
-
-/** Panel visual del sistema: mapa + leads (sin imagen externa). */
-function AuthPageVisual() {
-  return (
-    <div className="absolute inset-0 flex flex-col bg-[#0d0d0d]">
-      {/* Mapa de fondo con grid */}
-      <div
-        className="absolute inset-0 opacity-90"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(15,15,15,0.97) 0%, transparent 60%),
-            repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(60,60,60,0.2) 28px, rgba(60,60,60,0.2) 29px),
-            repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(60,60,60,0.2) 28px, rgba(60,60,60,0.2) 29px)
-          `,
-        }}
-      />
-      {/* Círculo de radio y pin */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          className="w-64 h-64 rounded-full border-2 border-orange-500/60 border-dashed"
-          style={{ boxShadow: "0 0 0 4px rgba(247, 148, 94, 0.12)" }}
-        />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full w-6 h-6 rounded-full bg-orange-500 shadow-lg shadow-orange-500/40" />
-      </div>
-      {/* Overlay con gradiente y texto */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d0d] via-transparent to-[#0d0d0d]/80" />
-      <div className="relative z-10 flex flex-col items-center justify-center flex-1 p-8 text-center">
-        <h1 className="text-white/90 text-xl sm:text-xxl font-semibold max-w-sm mb-2">
-          Leads B2B desde Google Maps
-        </h1>
-        <p className="text-white/60 text-sm max-w-xs">
-          Elige ubicación, categoría y radio. Los datos se sincronizan con tu CRM.
-        </p>
-      </div>
-      {/* Mini lista de leads de ejemplo */}
-      <div className="relative z-10 p-6 pt-0">
-        <div className="rounded-xl border border-white/10 bg-[#1a1a1a]/80 backdrop-blur-sm p-4">
-          <p className="text-[10px] uppercase tracking-wider text-white/50 mb-2">
-            Ejemplo de leads
-          </p>
-          <ul className="space-y-2">
-            {["Bufete Legal García", "Dental Care CDMX", "Bar La Esquina"].map((name, i) => (
-              <li
-                key={name}
-                className="flex items-center justify-between text-xs text-white/80"
-              >
-                <span className="truncate pr-2">{name}</span>
-                <span className="flex items-center gap-1 text-amber-400 shrink-0">
-                  <HugeiconsIcon icon={StarIcon} size={12} />
-                  4.{i + 2}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function LoginPageContent() {
   const router = useRouter();

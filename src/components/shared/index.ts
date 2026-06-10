@@ -29,3 +29,6 @@ export { default as SupportContactSection } from './SupportContactSection';
 export type { SupportContactSectionProps } from './SupportContactSection';
 export { default as FloatingWhatsAppButton } from './FloatingWhatsAppButton';
 export type { FloatingWhatsAppButtonProps } from './FloatingWhatsAppButton';
+export { default as ProductDemoCard } from './ProductDemoCard';
+export type { ProductDemoCardProps } from './ProductDemoCard';
+export { PRODUCT_DEMO_LEADS } from './ProductDemoCard';
