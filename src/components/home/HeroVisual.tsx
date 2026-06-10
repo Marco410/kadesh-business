@@ -13,7 +13,6 @@ const MOCK_LEADS = [
   { name: "Taquería El Matador", rating: 4.3, phone: "55 7293 5783" },
   { name: "Restaurante Los Compadres", rating: 4.6, phone: "55 5119 2840" },
   { name: "Izakaya Sushi", rating: 4.9, phone: "55 6274 1092" },
-  { name: "Restaurante Los Compadres", rating: 4.6, phone: "55 5119 2840" },
 ] as const;
 
 const MAP_PINS = [
