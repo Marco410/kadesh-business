@@ -21,7 +21,11 @@ import {
 } from 'kadesh/components/profile/sales/queries';
 import { Role } from 'kadesh/constants/constans';
 import { useUser } from 'kadesh/utils/UserContext';
-import { trackCompleteRegistration } from 'kadesh/utils/facebook-pixel';
+import {
+  setRegisterSuccessUrl,
+  trackCompleteRegistration,
+  withRegisterSuccessUrl,
+} from 'kadesh/utils/facebook-pixel';
 import { Routes } from 'kadesh/core/routes';
 import { sileo } from 'sileo';
 import {
@@ -131,6 +135,7 @@ export function useRegister(options?: UseRegisterOptions) {
     RegisterUserVariables
   >(REGISTER_USER_MUTATION, {
     onCompleted: async () => {
+      setRegisterSuccessUrl();
       trackCompleteRegistration();
       // Save credentials before clearing form
       const savedEmail = email;
@@ -161,7 +166,7 @@ export function useRegister(options?: UseRegisterOptions) {
               await touchUserLastLoginAt(loggedInUser.id);
             }
             await refreshUser();
-            router.push(Routes.panel);
+            router.push(withRegisterSuccessUrl(Routes.panel));
             
             // Clear form after successful redirect
             setName('');
