@@ -22,12 +22,33 @@ const TEST_EVENT_CODE = process.env.NEXT_PUBLIC_META_PIXEL_TEST_EVENT_CODE;
  */
 export const META_REGISTER_SUCCESS_QUERY_KEY = 'registro-exitoso';
 
+type NextRouterLike = {
+  replace: (url: string, options?: { scroll?: boolean }) => void;
+};
+
+/** Conserva el param de registro exitoso al reconstruir query strings. */
+export function preserveRegisterSuccessParam(
+  params: URLSearchParams,
+): URLSearchParams {
+  if (typeof window === 'undefined') return params;
+  const value = new URL(window.location.href).searchParams.get(
+    META_REGISTER_SUCCESS_QUERY_KEY,
+  );
+  if (value) params.set(META_REGISTER_SUCCESS_QUERY_KEY, value);
+  return params;
+}
+
 /** Marca la URL actual como registro exitoso (sin recargar la página). */
-export function setRegisterSuccessUrl(): void {
+export function setRegisterSuccessUrl(router?: NextRouterLike): void {
   if (typeof window === 'undefined') return;
   const url = new URL(window.location.href);
   url.searchParams.set(META_REGISTER_SUCCESS_QUERY_KEY, '1');
-  window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+  const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+  if (router) {
+    router.replace(nextUrl, { scroll: false });
+    return;
+  }
+  window.history.replaceState(window.history.state, '', nextUrl);
 }
 
 /** Ruta con el identificador de registro exitoso (p. ej. `/panel?registro-exitoso=1`). */

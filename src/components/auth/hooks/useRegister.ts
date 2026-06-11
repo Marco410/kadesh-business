@@ -135,7 +135,7 @@ export function useRegister(options?: UseRegisterOptions) {
     RegisterUserVariables
   >(REGISTER_USER_MUTATION, {
     onCompleted: async () => {
-      setRegisterSuccessUrl();
+      setRegisterSuccessUrl(router);
       trackCompleteRegistration();
       // Save credentials before clearing form
       const savedEmail = email;
@@ -166,6 +166,8 @@ export function useRegister(options?: UseRegisterOptions) {
               await touchUserLastLoginAt(loggedInUser.id);
             }
             await refreshUser();
+            // Breve pausa para que Meta capture la URL antes de navegar al panel
+            await new Promise((resolve) => setTimeout(resolve, 400));
             router.push(withRegisterSuccessUrl(Routes.panel));
             
             // Clear form after successful redirect

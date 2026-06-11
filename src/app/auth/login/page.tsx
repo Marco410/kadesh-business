@@ -17,6 +17,10 @@ import {
   useGoogleLogin,
 } from "../../../components/auth/hooks";
 import { getRegisterPasswordStrength } from "kadesh/utils/register-password-strength";
+import {
+  META_REGISTER_SUCCESS_QUERY_KEY,
+  preserveRegisterSuccessParam,
+} from "kadesh/utils/facebook-pixel";
 
 const REGISTER_TRUST_POINTS = [
   "Sin tarjeta de crédito",
@@ -42,7 +46,9 @@ function LoginPageContent() {
   }, [tabParam]);
 
   const updateUrlForTab = (tab: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = preserveRegisterSuccessParam(
+      new URLSearchParams(searchParams.toString()),
+    );
     if (tab === "register") {
       params.set("tab", "register");
     } else {
@@ -91,15 +97,22 @@ function LoginPageContent() {
     handleSubmit: handleRegister,
   } = useRegister({
     onSuccess: () => {
-       if (redirectPath) {
+      const params = preserveRegisterSuccessParam(
+        new URLSearchParams(searchParams.toString()),
+      );
+      params.set(META_REGISTER_SUCCESS_QUERY_KEY, "1");
+      params.delete("tab");
+
+      if (redirectPath) {
         setSuccessMessage("Registro exitoso. Iniciando sesión...");
       } else {
         setSelectedTab("login");
         setSuccessMessage(
           "Registro exitoso, ya puedes iniciar sesión con tus credenciales",
         );
-        updateUrlForTab("login");
-      } 
+      }
+
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     },
     redirectTo: redirectPath,
     referralCode: referralCodeFromUrl,

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useQuery } from "@apollo/client";
 import { useUser } from "kadesh/utils/UserContext";
 import { Routes } from "kadesh/core/routes";
+import { preserveRegisterSuccessParam } from "kadesh/utils/facebook-pixel";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   DashboardSquare01Icon,
@@ -290,7 +291,9 @@ function PanelControlSectionContent({ embedded = false }: PanelControlSectionPro
   );
 
   const handleTabChange = (key: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = preserveRegisterSuccessParam(
+      new URLSearchParams(searchParams.toString()),
+    );
     params.set("tab", key);
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
@@ -298,7 +301,9 @@ function PanelControlSectionContent({ embedded = false }: PanelControlSectionPro
   useEffect(() => {
     if (companyId && subscriptionLoading) return;
     if (!tabFromUrl || tabFromUrl !== selectedTab) {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = preserveRegisterSuccessParam(
+        new URLSearchParams(searchParams.toString()),
+      );
       params.set("tab", selectedTab);
       router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     }
