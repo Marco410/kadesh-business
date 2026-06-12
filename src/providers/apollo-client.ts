@@ -30,7 +30,6 @@ export const createApolloClient = () => {
   return new ApolloClient({
     link: ApolloLink.from([authLink, uploadLink]),
     cache: new InMemoryCache(),
-    credentials: "include",
     defaultOptions: {
       watchQuery: {
         fetchPolicy: "cache-and-network",

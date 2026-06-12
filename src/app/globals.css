@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-/* Carga tailwind.config.ts: plugin HeroUI, content de @heroui/theme (estilos y motion del DatePicker, etc.) */
-@config "../../tailwind.config.ts";
+/* Carga tailwind.config.mjs: plugin HeroUI, content de @heroui/theme (estilos y motion del DatePicker, etc.) */
+@config "../../tailwind.config.mjs";
 
 /* Configurar dark mode para Tailwind v4 */
 @variant dark (.dark &);

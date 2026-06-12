@@ -2,6 +2,7 @@ allowBuilds:
   '@heroui/shared-utils': true
   core-js: true
   sharp: true
+  unrs-resolver: true
 
 overrides:
   '@internationalized/date': ^3.10.0
