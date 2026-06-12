@@ -96,13 +96,16 @@ export default function DatePickerField({
   const isDay = granularity === "day";
   const parsedValue = isDay ? safeParseDate(value) : safeParseDateTime(value);
   const a11y = ariaLabel || label || "Fecha";
+  const placeholderValue = (
+    isDay ? placeholderDay : placeholderDateTime
+  ) as unknown as ComponentProps<typeof DatePicker>["placeholderValue"];
 
   return (
     <DatePicker
       id={id}
       label={label}
       aria-label={label ? undefined : a11y}
-      placeholderValue={isDay ? placeholderDay : placeholderDateTime}
+      placeholderValue={placeholderValue}
       value={parsedValue as ComponentProps<typeof DatePicker>["value"]}
       granularity={granularity}
       isDisabled={isDisabled}

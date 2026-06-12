@@ -33,13 +33,23 @@ export default function StatusDatePicker({
   errorMessage,
   popoverScopeClass = 'status-date-picker-popover',
 }: StatusDatePickerProps) {
+  const now = dateToCalendarDateTime(new Date()) as unknown as ComponentProps<
+    typeof DatePicker
+  >['placeholderValue'];
+
   return (
     <DatePicker
       label=""
-      placeholderValue={dateToCalendarDateTime(new Date())}
-      value={value ? parseDateTime(value) : null}
-      defaultValue={dateToCalendarDateTime(new Date())}
-      maxValue={dateToCalendarDateTime(new Date()) as ComponentProps<typeof DatePicker>['maxValue']}
+      placeholderValue={now}
+      value={
+        value
+          ? (parseDateTime(value) as unknown as ComponentProps<
+              typeof DatePicker
+            >['value'])
+          : null
+      }
+      defaultValue={now}
+      maxValue={now as ComponentProps<typeof DatePicker>['maxValue']}
       granularity="minute"
       isDisabled={isDisabled}
       isInvalid={!!errorMessage}
