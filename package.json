@@ -22,6 +22,7 @@
     "@hugeicons/react": "^1.1.1",
     "@internationalized/date": "^3.10.0",
     "@keystone-6/document-renderer": "^1.1.2",
+    "@react-aria/i18n": "3.12.15",
     "@react-google-maps/api": "^2.20.7",
     "@stripe/react-stripe-js": "^5.6.1",
     "@stripe/stripe-js": "^8.9.0",
