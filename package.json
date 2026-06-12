@@ -2,6 +2,7 @@
   "name": "kadesh-landing",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.6.0",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -37,10 +38,6 @@
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "sileo": "^0.1.5"
-  },
-  "resolutions": {
-    "@internationalized/date": "^3.10.0",
-    "@react-aria/i18n": "3.12.15"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",

@@ -17,7 +17,7 @@ Landing page para KADESH, un santuario digital para animales, construido con Nex
 ## Configuración
 1. Instala dependencias:
    ```bash
-   npm install
+   pnpm install
    ```
 2. Crea un archivo `.env.local` en la raíz del proyecto con:
    ```env
@@ -25,7 +25,7 @@ Landing page para KADESH, un santuario digital para animales, construido con Nex
    ```
 3. Inicia el servidor de desarrollo:
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
 ## Personalización
@@ -51,13 +51,7 @@ Hecho con ❤️ para los animales.
 First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

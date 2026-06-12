@@ -65,7 +65,7 @@ You are an expert full-stack developer proficient in TypeScript, React, Next.js,
 
 ### Environment and Configuration
 
-- **Package manager**: Always use **yarn** for installing dependencies and running scripts (e.g. `yarn install`, `yarn add`, `yarn dev`). Do not use npm or pnpm.
+- **Package manager**: Always use **pnpm** for installing dependencies and running scripts (e.g. `pnpm install`, `pnpm add`, `pnpm dev`). Do not use npm or yarn.
 - Use **environment variables** for API URLs, keys, and feature flags. Prefix client-exposed values with `NEXT_PUBLIC_`; never expose secrets to the client.
 - Keep config that depends on env in a single place (e.g. `next.config.ts` or a small `src/core/config.ts`) when possible.
 - Prefer **Node/Next.js** conventions: `next.config.ts`, `tsconfig.json` path alias `kadesh/*`, and script names `dev`, `build`, `start`, `lint`.
