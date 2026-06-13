@@ -6,22 +6,47 @@ export default function HeroSection() {
   return (
     <section
       id="inicio"
-      className="relative w-full min-h-0 flex items-center justify-center bg-gradient-to-br from-orange-500 via-orange-400 to-orange-600 dark:from-[#121212] dark:via-[#1a1a1a] dark:to-[#121212] overflow-hidden py-20"
+      className="relative w-full min-h-0 flex items-center justify-center overflow-hidden py-20 bg-gradient-to-br from-orange-500 via-orange-400 to-orange-600 dark:from-[#121212] dark:via-[#1a1a1a] dark:to-[#121212]"
     >
-      {/* Animated background orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-20 w-72 h-72 bg-orange-400/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-orange-600/15 rounded-full blur-3xl" />
+      {/* Light-mode depth: soft highlights + shadow vignettes */}
+      <div className="absolute inset-0 pointer-events-none dark:hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_20%,rgba(255,255,255,0.22),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_85%_75%,rgba(251,146,60,0.45),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_100%,rgba(194,65,12,0.18),transparent_45%)]" />
       </div>
-      {/* Subtle grid (dark mode) */}
+
+      {/* Dark-mode depth */}
+      <div className="absolute inset-0 pointer-events-none hidden dark:block">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_15%_30%,rgba(251,146,60,0.12),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_90%_70%,rgba(234,88,12,0.1),transparent_45%)]" />
+      </div>
+
+      {/* Background orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[12%] -left-16 w-80 h-80 rounded-full blur-3xl bg-white/25 dark:bg-orange-400/20" />
+        <div className="absolute bottom-[8%] -right-24 w-[28rem] h-[28rem] rounded-full blur-3xl bg-orange-800/30 dark:bg-orange-600/15" />
+        <div className="absolute top-1/2 right-[18%] w-56 h-56 rounded-full blur-3xl bg-white/15 dark:bg-orange-500/10 hidden sm:block" />
+        <div className="absolute bottom-[30%] left-[35%] w-40 h-40 rounded-full blur-2xl bg-orange-700/20 dark:hidden" />
+      </div>
+
+      {/* Grid overlay — stronger in light mode */}
       <div
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
+        className="absolute inset-0 pointer-events-none opacity-[0.09] dark:opacity-[0.06]"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)
+            linear-gradient(rgba(255,255,255,0.85) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.85) 1px, transparent 1px)
           `,
           backgroundSize: "48px 48px",
+        }}
+      />
+
+      {/* Dot pattern — light mode only */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.14] dark:hidden"
+        style={{
+          backgroundImage: "radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
         }}
       />
 
@@ -68,7 +93,7 @@ export default function HeroSection() {
                 </Link>
                 <Link
                   href="/#agendar-demo"
-                  className="inline-flex h-11 items-center justify-center px-6 text-sm font-semibold rounded-lg border border-white/40 text-white bg-white/5 hover:bg-white/10 transition-colors w-full sm:w-auto"
+                  className="inline-flex h-11 items-center justify-center px-6 text-sm font-semibold rounded-lg border border-white/70 text-white bg-white/15 hover:bg-white/25 shadow-sm transition-colors w-full sm:w-auto dark:border-white/40 dark:bg-white/5 dark:hover:bg-white/10"
                 >
                   Solicitar demo
                 </Link>
