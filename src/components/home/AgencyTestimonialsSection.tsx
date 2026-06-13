@@ -63,10 +63,11 @@ export default function AgencyTestimonialsSection() {
           className="text-center mb-12"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
-            Lo que dicen las agencias
+            Desarrollan su empresa con KADESH
           </h2>
           <p className="text-[#616161] dark:text-[#b0b0b0] max-w-2xl mx-auto">
-            Equipos de ventas B2B que ya usan KADESH para prospectar por categoría y ahorrar tiempo.
+            Equipos de ventas B2B que ya prospectan por categoría, ahorran
+            tiempo y cierran más con datos reales.
           </p>
         </motion.div>
 

@@ -5,10 +5,13 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Tick02Icon } from "@hugeicons/core-free-icons";
 
 const BADGES = [
-  "Leads únicos",
-  "Nuevos leads cada mes",
-  "Datos reales de negocios",
-  "CRM integrado para seguimiento",
+  "Leads únicos sin duplicados",
+  "400+ leads nuevos cada mes",
+  "Datos reales de Google Maps",
+  "CRM + calendario + cotizaciones",
+  "Equipos y comisiones de vendedores",
+  "Comparte scripts y procesos con tu equipo",
+  "Tableros Kanban por equipo o cliente",
 ];
 
 export default function HeroDifferentiatorsBadges() {

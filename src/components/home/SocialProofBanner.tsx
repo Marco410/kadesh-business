@@ -11,9 +11,16 @@ export default function SocialProofBanner() {
       transition={{ duration: 0.5 }}
       className="py-12 sm:py-16 bg-orange-500 dark:bg-orange-600"
     >
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <p className="text-xl sm:text-2xl font-bold text-white">
-          Ideal para Agencias, Freelancers y Equipos de Ventas B2B
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/80 mb-3">
+          Confían en KADESH
+        </p>
+        <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2">
+          Agencias, freelancers y equipos de ventas B2B en México
+        </p>
+        <p className="text-white/85 text-base sm:text-lg">
+          Desde prospección local hasta operaciones con miles de leads y
+          múltiples vendedores.
         </p>
       </div>
     </motion.section>

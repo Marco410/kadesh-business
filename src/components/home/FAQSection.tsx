@@ -7,6 +7,16 @@ import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 
 const FAQ_ITEMS = [
   {
+    question: "¿Puedo recomendar KADESH y ganar comisiones?",
+    answer:
+      "Sí. Contamos con un programa de referidos con comisiones por primer pago e ingresos recurrentes mientras tus referidos sigan activos. Obtienes tu enlace y código al registrarte.",
+  },
+  {
+    question: "¿Qué incluye el CRM además de los leads?",
+    answer:
+      "Pipeline de ventas, calendario de seguimientos, cotizaciones en PDF, gestión de vendedores y comisiones, proyectos, archivos compartidos y espacios de trabajo tipo Kanban. Todo integrado sin pagar herramientas adicionales.",
+  },
+  {
     question: "¿Los leads se repiten?",
     answer:
       "No. Antes de agregar un negocio a tu cuenta, el sistema verifica si ya lo tienes registrado. Si el negocio ya existe, no se vuelve a agregar ni consume tu cuota mensual.",
