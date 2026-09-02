@@ -51,13 +51,13 @@ export default function AlliesSection() {
                 className="group flex h-full flex-col items-center rounded-2xl border border-[#e0e0e0] bg-[#f8f8f8] p-6 transition-all duration-300 hover:border-orange-500/40 hover:shadow-lg dark:border-[#2a2a2a] dark:bg-[#1e1e1e] dark:hover:border-orange-500/40 sm:min-w-[280px] sm:p-8"
                 aria-label={`Visitar sitio web de ${ally.name}`}
               >
-                <span className="mb-2 flex h-24 w-full items-center justify-center rounded-xl px-6 py-4">
+                <span className="mb-5 flex h-24 w-full items-center justify-center px-4 py-2">
                   <Image
                     src={ally.logoSrc}
                     alt={ally.logoAlt}
-                    width={190}
-                    height={38}
-                    className="h-auto max-h-14 w-auto max-w-[160px] object-contain transition-transform duration-300 group-hover:scale-[1.04]"
+                    width={220}
+                    height={64}
+                    className={`h-auto max-h-14 w-auto max-w-[220px] object-contain transition-transform duration-300 group-hover:scale-[1.02]${ally.themeAdaptiveLogo ? " brightness-0 dark:invert" : ""}`}
                   />
                 </span>
                 {/* <span className="mb-1 text-center text-lg font-bold text-[#212121] dark:text-white">
