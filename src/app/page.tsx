@@ -18,6 +18,7 @@ import {
   FinalCTASection,
   FAQSection,
 } from "kadesh/components/home";
+import { AlliesSection } from "kadesh/components/allies";
 import { Footer, Navigation } from "kadesh/components/layout";
 import { FloatingWhatsAppButton } from "kadesh/components/shared";
 
@@ -40,6 +41,7 @@ export default function HomePage() {
         <ScheduleDemoSection />
         <GrowthValueSection />
         <SocialProofBanner />
+        <AlliesSection />
         <AgencyTestimonialsSection />
         <LandingPricingSection />
         <ReferralSection />
