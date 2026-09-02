@@ -56,9 +56,7 @@ export default function ObtenerClientesPageContent({
     <SubscriptionProvider companyId={companyId}>
       <div
         className={
-          embedded
-            ? undefined
-            : "mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8"
+          embedded ? undefined : "mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8"
         }
       >
         <ObtenerClientesSection onLeadsSyncSuccess={onLeadsSyncSuccess} />

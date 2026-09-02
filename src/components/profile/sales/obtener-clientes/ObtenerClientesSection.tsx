@@ -19,26 +19,71 @@ import { useUser } from "kadesh/utils/UserContext";
 import { isAdminCompanyUser } from "kadesh/utils/user-roles";
 import { sileo } from "sileo";
 import { Routes } from "kadesh/core/routes";
-import { Autocomplete, type AutocompleteOption } from "kadesh/components/shared";
+import {
+  Autocomplete,
+  type AutocompleteOption,
+} from "kadesh/components/shared";
 import LeadsStatsCards, { type LeadsStatsCardsHandle } from "./LeadsStatsCards";
 import { useRouter } from "next/navigation";
 
-const CATEGORY_OPTIONS: AutocompleteOption[] = GOOGLE_PLACE_CATEGORIES.map((opt) => ({
-  id: opt.value,
-  label: opt.label,
-}));
+const CATEGORY_OPTIONS: AutocompleteOption[] = GOOGLE_PLACE_CATEGORIES.map(
+  (opt) => ({
+    id: opt.value,
+    label: opt.label,
+  }),
+);
 
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+const MAPLIBRE_CSS = "https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css";
+const MAPLIBRE_JS = "https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js";
+const MAPLIBRE_LEAFLET_JS =
+  "https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js";
 
-const LEAD_MAP_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+/** Liberty en ambos modos; el aspecto dark se logra con filtros CSS (estilo Google dark). */
+const LEAD_MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 
-const LEAD_MAP_TILE_URL =
-  "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+function getLeadMapStyle(): string {
+  return LEAD_MAP_STYLE;
+}
+
+const LEAD_MAP_PIN_SIZE = { width: 36, height: 44 } as const;
+
+function createLeadMapPinIcon(L: NonNullable<Window["L"]>) {
+  const pinSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 44" width="36" height="44" aria-hidden="true">
+      <path
+        fill="#e07c3a"
+        stroke="#ffffff"
+        stroke-width="2"
+        d="M18 2C10.82 2 5 7.82 5 15c0 9.75 13 25.5 13 25.5S31 24.75 31 15C31 7.82 25.18 2 18 2z"
+      />
+      <circle cx="18" cy="15" r="5.5" fill="#ffffff" />
+      <circle cx="18" cy="15" r="3" fill="#f7945e" />
+    </svg>
+  `.trim();
+
+  return L.divIcon({
+    className: "lead-map-pin-icon",
+    html: pinSvg,
+    iconSize: [LEAD_MAP_PIN_SIZE.width, LEAD_MAP_PIN_SIZE.height],
+    iconAnchor: [LEAD_MAP_PIN_SIZE.width / 2, LEAD_MAP_PIN_SIZE.height],
+  });
+}
+
+function raiseLeadMapOverlays(
+  marker: LeafletMarker | null,
+  circle: LeafletCircle | null,
+) {
+  circle?.bringToFront?.();
+  marker?.bringToFront?.();
+}
 
 function isDarkMapTheme(resolvedTheme: string | undefined): boolean {
-  if (typeof document !== "undefined" && document.documentElement.classList.contains("dark")) {
+  if (
+    typeof document !== "undefined" &&
+    document.documentElement.classList.contains("dark")
+  ) {
     return true;
   }
   return resolvedTheme === "dark";
@@ -46,7 +91,7 @@ function isDarkMapTheme(resolvedTheme: string | undefined): boolean {
 
 function applyLeadMapThemeClass(
   container: HTMLElement | null,
-  resolvedTheme: string | undefined
+  resolvedTheme: string | undefined,
 ) {
   if (!container) return;
   const isDark = isDarkMapTheme(resolvedTheme);
@@ -80,14 +125,12 @@ function isBusinessSearchTermValid(value: string): boolean {
 
 function loadExternalResource(
   tag: "link" | "script",
-  attrs: Record<string, string>
+  attrs: Record<string, string>,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     const attrKey = tag === "link" ? "href" : "src";
     const attrVal = attrs[attrKey];
-    const existing = document.querySelector(
-      `${tag}[${attrKey}="${attrVal}"]`
-    );
+    const existing = document.querySelector(`${tag}[${attrKey}="${attrVal}"]`);
     if (existing) {
       resolve();
       return;
@@ -100,34 +143,61 @@ function loadExternalResource(
   });
 }
 
-interface LeafletTileLayer {
-  addTo(map: LeafletMap): LeafletTileLayer;
-  remove(): void;
+interface LeafletDivIcon {
+  options: {
+    className: string;
+    html: string;
+    iconSize: [number, number];
+    iconAnchor: [number, number];
+  };
 }
+interface LeafletLayer {
+  addTo(map: LeafletMap): void;
+  remove(): void;
+  bringToBack?(): LeafletLayer;
+  bringToFront?(): LeafletLayer;
+}
+interface LeafletTileLayer extends LeafletLayer {}
 interface LeafletMap {
   setView(center: [number, number], zoom: number): LeafletMap;
   getZoom(): number;
   fitBounds(bounds: unknown, options?: { padding?: [number, number] }): void;
-  on(event: string, fn: (e: { latlng: { lat: number; lng: number } }) => void): void;
+  on(
+    event: string,
+    fn: (e: { latlng: { lat: number; lng: number } }) => void,
+  ): void;
   removeLayer(layer: LeafletTileLayer): LeafletMap;
   invalidateSize(): void;
   remove(): void;
+  createPane(name: string): void;
+  getPane(name: string): HTMLElement | undefined;
 }
 interface LeafletMarker {
   setLatLng(latlng: [number, number]): LeafletMarker;
   addTo(map: LeafletMap): LeafletMarker;
+  bringToFront?(): LeafletMarker;
 }
 interface LeafletCircle {
   setLatLng(latlng: [number, number]): LeafletCircle;
   setRadius(m: number): LeafletCircle;
   getBounds(): unknown;
   addTo(map: LeafletMap): LeafletCircle;
+  bringToFront?(): LeafletCircle;
 }
 declare global {
   interface Window {
     L?: {
       map(el: HTMLElement): LeafletMap;
-      marker(latlng: [number, number]): LeafletMarker;
+      divIcon(options: {
+        className: string;
+        html: string;
+        iconSize: [number, number];
+        iconAnchor: [number, number];
+      }): LeafletDivIcon;
+      marker(
+        latlng: [number, number],
+        options?: { icon: LeafletDivIcon },
+      ): LeafletMarker;
       circle(
         latlng: [number, number],
         options: {
@@ -137,12 +207,13 @@ declare global {
           fillOpacity?: number;
           weight?: number;
           dashArray?: string;
-        }
+        },
       ): LeafletCircle;
       tileLayer(
         url: string,
-        options: { attribution: string; subdomains?: string; maxZoom?: number }
+        options: { attribution: string; subdomains?: string; maxZoom?: number },
       ): LeafletTileLayer;
+      maplibreGL(options: { style: string; pane?: string }): LeafletTileLayer;
     };
   }
 }
@@ -152,7 +223,9 @@ export default function ObtenerClientesSection({
 }: {
   onLeadsSyncSuccess?: () => void | Promise<void>;
 } = {}) {
-  const [searchMode, setSearchMode] = useState<"category" | "custom">("category");
+  const [searchMode, setSearchMode] = useState<"category" | "custom">(
+    "category",
+  );
   const [category, setCategory] = useState("");
   const [customSearch, setCustomSearch] = useState("");
   const [radiusKm, setRadiusKm] = useState<number>(DEFAULT_RADIUS_KM);
@@ -161,7 +234,10 @@ export default function ObtenerClientesSection({
   const [hasSearched, setHasSearched] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [pin, setPin] = useState<{ lat: number; lng: number }>(DEFAULT_CENTER);
-  const [message, setMessage] = useState<{ type: "ok" | "error"; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "ok" | "error";
+    text: string;
+  } | null>(null);
   const [stats, setStats] = useState<{
     created: number;
     alreadyInDb: number;
@@ -172,7 +248,11 @@ export default function ObtenerClientesSection({
   const [leafletReady, setLeafletReady] = useState(false);
   const [locatingUser, setLocatingUser] = useState(false);
 
-  const { syncLeadsArea, loading: isLoading, error: syncError } = useSyncLeadsArea();
+  const {
+    syncLeadsArea,
+    loading: isLoading,
+    error: syncError,
+  } = useSyncLeadsArea();
   const { user, loading: userLoading } = useUser();
   const { resolvedTheme } = useTheme();
   const [themeMounted, setThemeMounted] = useState(false);
@@ -185,22 +265,52 @@ export default function ObtenerClientesSection({
   const circleRef = useRef<LeafletCircle | null>(null);
   const filtersPopoverRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  
+
   useEffect(() => {
     setThemeMounted(true);
   }, []);
 
+  const applyLeadMapBaseLayer = useCallback(() => {
+    const L = window.L;
+    const map = mapRef.current;
+    if (!L?.maplibreGL || !map) return;
+
+    if (tileLayerRef.current) {
+      map.removeLayer(tileLayerRef.current);
+    }
+
+    const baseLayer = L.maplibreGL({
+      style: getLeadMapStyle(),
+      pane: "leadMapBase",
+    });
+    baseLayer.addTo(map);
+    baseLayer.bringToBack?.();
+    tileLayerRef.current = baseLayer;
+
+    raiseLeadMapOverlays(markerRef.current, circleRef.current);
+  }, []);
+
   useEffect(() => {
-    if (!themeMounted || !leafletReady) return;
+    if (!themeMounted || !leafletReady || !mapRef.current) return;
     applyLeadMapThemeClass(mapContainerRef.current, resolvedTheme);
+    raiseLeadMapOverlays(markerRef.current, circleRef.current);
   }, [themeMounted, leafletReady, resolvedTheme]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        await loadExternalResource("link", { rel: "stylesheet", href: LEAFLET_CSS });
+        await loadExternalResource("link", {
+          rel: "stylesheet",
+          href: LEAFLET_CSS,
+        });
+        await loadExternalResource("link", {
+          rel: "stylesheet",
+          href: MAPLIBRE_CSS,
+        });
         await loadExternalResource("script", { src: LEAFLET_JS });
+        await loadExternalResource("script", { src: MAPLIBRE_JS });
+        await loadExternalResource("script", { src: MAPLIBRE_LEAFLET_JS });
         if (!cancelled) setLeafletReady(true);
       } catch (e) {
         console.error("Leaflet load error", e);
@@ -220,7 +330,9 @@ export default function ObtenerClientesSection({
       if (markerRef.current) {
         markerRef.current.setLatLng([lat, lng]);
       } else {
-        markerRef.current = L.marker([lat, lng]).addTo(map);
+        markerRef.current = L.marker([lat, lng], {
+          icon: createLeadMapPinIcon(L),
+        }).addTo(map);
       }
 
       const radiusM = rKm * 1000;
@@ -229,18 +341,20 @@ export default function ObtenerClientesSection({
       } else {
         circleRef.current = L.circle([lat, lng], {
           radius: radiusM,
-          color: "#ea580c",
-          fillColor: "#ea580c",
-          fillOpacity: 0.1,
+          color: "#e07c3a",
+          fillColor: "#f7945e",
+          fillOpacity: 0.14,
           weight: 3,
           dashArray: "6, 6",
         }).addTo(map);
       }
 
+      raiseLeadMapOverlays(markerRef.current, circleRef.current);
+
       const currentZoom = map.getZoom();
       map.setView([lat, lng], currentZoom);
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -250,16 +364,17 @@ export default function ObtenerClientesSection({
 
     const map = L.map(container).setView(
       [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
-      DEFAULT_ZOOM
+      DEFAULT_ZOOM,
     );
     mapRef.current = map;
 
-    tileLayerRef.current = L.tileLayer(LEAD_MAP_TILE_URL, {
-      attribution: LEAD_MAP_ATTRIBUTION,
-      subdomains: "abcd",
-      maxZoom: 20,
-    }).addTo(map);
+    map.createPane("leadMapBase");
+    const basePane = map.getPane("leadMapBase");
+    if (basePane) {
+      basePane.style.zIndex = "200";
+    }
 
+    applyLeadMapBaseLayer();
     applyLeadMapThemeClass(container, resolvedTheme);
 
     map.on("click", (e: { latlng: { lat: number; lng: number } }) => {
@@ -280,7 +395,7 @@ export default function ObtenerClientesSection({
       markerRef.current = null;
       circleRef.current = null;
     };
-  }, [leafletReady, updateMapOverlays]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [leafletReady, updateMapOverlays, applyLeadMapBaseLayer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (pin && mapRef.current) {
@@ -319,17 +434,21 @@ export default function ObtenerClientesSection({
       },
       () => {
         sileo.error({
-          title: "No se pudo obtener tu ubicación. Verifica los permisos del navegador.",
+          title:
+            "No se pudo obtener tu ubicación. Verifica los permisos del navegador.",
         });
         setLocatingUser(false);
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 10000 },
     );
   }, []);
 
   const centerOnMexicoCity = useCallback(() => {
     setPin(DEFAULT_CENTER);
-    mapRef.current?.setView([DEFAULT_CENTER.lat, DEFAULT_CENTER.lng], DEFAULT_ZOOM);
+    mapRef.current?.setView(
+      [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
+      DEFAULT_ZOOM,
+    );
   }, []);
 
   const runSync = async () => {
@@ -351,7 +470,10 @@ export default function ObtenerClientesSection({
       });
       return;
     }
-    if (searchMode === "custom" && !isBusinessSearchTermValid(activeSearchTerm)) {
+    if (
+      searchMode === "custom" &&
+      !isBusinessSearchTermValid(activeSearchTerm)
+    ) {
       sileo.error({
         title: "Búsqueda no válida",
         description: `Escribe al menos ${CUSTOM_SEARCH_MIN_LENGTH} caracteres usando letras.`,
@@ -362,7 +484,8 @@ export default function ObtenerClientesSection({
     const categoryLabel =
       searchMode === "custom"
         ? activeSearchTerm
-        : GOOGLE_PLACE_CATEGORIES.find((c) => c.value === category)?.label ?? category;
+        : (GOOGLE_PLACE_CATEGORIES.find((c) => c.value === category)?.label ??
+          category);
 
     const fetchData = async () => {
       const result = await syncLeadsArea({
@@ -407,7 +530,9 @@ export default function ObtenerClientesSection({
     };
 
     sileo.promise(fetchData(), {
-      loading: { title: `Buscando leads de ${categoryLabel.toLowerCase()} en la zona…` },
+      loading: {
+        title: `Buscando leads de ${categoryLabel.toLowerCase()} en la zona…`,
+      },
       success: (data) => {
         const count = data.syncedLeadsCount;
         if (count === 0) {
@@ -453,7 +578,7 @@ export default function ObtenerClientesSection({
     <div className="space-y-6">
       {/* Vista inmersiva: mapa a pantalla completa + controles flotantes */}
       <div
-        className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen h-[calc(100vh-64px)] min-h-[480px] overflow-visible bg-gray-100 dark:bg-gray-900"
+        className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen h-[calc(100vh-64px)] min-h-[480px] overflow-visible bg-[#eef3f8] dark:bg-[#1e2a3a]"
         aria-label="Búsqueda de leads en mapa"
       >
         {/* Capa del mapa */}
@@ -468,8 +593,10 @@ export default function ObtenerClientesSection({
           aria-label="Mapa interactivo. Haz clic para mover el punto de búsqueda."
         />
         {!leafletReady && (
-          <div className="absolute inset-0 z-[1] flex items-center justify-center bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-sm">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Cargando mapa…</p>
+          <div className="absolute inset-0 z-[1] flex items-center justify-center bg-[#eef3f8]/90 dark:bg-[#1e2a3a]/90 backdrop-blur-sm">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Cargando mapa…
+            </p>
           </div>
         )}
 
@@ -551,7 +678,9 @@ export default function ObtenerClientesSection({
                       type="text"
                       value={customSearch}
                       onChange={(e) =>
-                        setCustomSearch(sanitizeBusinessSearchTerm(e.target.value))
+                        setCustomSearch(
+                          sanitizeBusinessSearchTerm(e.target.value),
+                        )
                       }
                       disabled={isLoading}
                       placeholder="Ej. Constructoras, Clínicas..."
@@ -599,7 +728,12 @@ export default function ObtenerClientesSection({
                   disabled={isLoading}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-orange-600 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
                 >
-                  <HugeiconsIcon icon={Radar01Icon} size={16} className="text-white" aria-hidden />
+                  <HugeiconsIcon
+                    icon={Radar01Icon}
+                    size={16}
+                    className="text-white"
+                    aria-hidden
+                  />
                   <span className="whitespace-nowrap">
                     {isLoading ? "Buscando…" : "Buscar Leads"}
                   </span>
@@ -617,7 +751,11 @@ export default function ObtenerClientesSection({
                 aria-controls="obtener-clientes-advanced-filters"
                 title="Filtros avanzados"
               >
-                <HugeiconsIcon icon={FilterHorizontalIcon} size={20} aria-hidden />
+                <HugeiconsIcon
+                  icon={FilterHorizontalIcon}
+                  size={20}
+                  aria-hidden
+                />
               </button>
 
               {showAdvancedFilters && (
@@ -667,7 +805,11 @@ export default function ObtenerClientesSection({
                               key={star}
                               type="button"
                               onClick={() =>
-                                setMinRating(star <= minRating && minRating === 1 ? 0 : star)
+                                setMinRating(
+                                  star <= minRating && minRating === 1
+                                    ? 0
+                                    : star,
+                                )
                               }
                               disabled={isLoading}
                               className={`inline-flex size-8 items-center justify-center rounded-lg border transition-colors ${
@@ -697,7 +839,9 @@ export default function ObtenerClientesSection({
                         min={0}
                         step={1}
                         value={minReviews}
-                        onChange={(e) => setMinReviews(Number(e.target.value) || 0)}
+                        onChange={(e) =>
+                          setMinReviews(Number(e.target.value) || 0)
+                        }
                         disabled={isLoading}
                         placeholder="Ej. 10, 50, 100"
                         className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-500/50 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
@@ -728,7 +872,9 @@ export default function ObtenerClientesSection({
           <HugeiconsIcon
             icon={CenterFocusIcon}
             size={22}
-            className={locatingUser ? "animate-pulse text-orange-500" : undefined}
+            className={
+              locatingUser ? "animate-pulse text-orange-500" : undefined
+            }
           />
         </button>
 
@@ -749,7 +895,6 @@ export default function ObtenerClientesSection({
             <span>Ver mis nuevos clientes</span>
           </button>
         )}
-
       </div>
 
       {message && !showZeroResultsHint && (
@@ -783,14 +928,16 @@ export default function ObtenerClientesSection({
               </p>
               <ul className="list-inside list-disc space-y-1 text-sm text-purple-700 dark:text-purple-300/90">
                 <li>
-                  <strong>Amplía o reduce el radio</strong> (por ejemplo, más o menos de {radiusKm}{" "}
-                  km).
+                  <strong>Amplía o reduce el radio</strong> (por ejemplo, más o
+                  menos de {radiusKm} km).
                 </li>
                 <li>
-                  <strong>Prueba otro tipo de negocio</strong> en la barra de búsqueda.
+                  <strong>Prueba otro tipo de negocio</strong> en la barra de
+                  búsqueda.
                 </li>
                 <li>
-                  <strong>Haz clic en otra zona del mapa</strong> y vuelve a buscar.
+                  <strong>Haz clic en otra zona del mapa</strong> y vuelve a
+                  buscar.
                 </li>
               </ul>
             </div>
@@ -800,8 +947,8 @@ export default function ObtenerClientesSection({
 
       {stats && hasSearched && (
         <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-          Última búsqueda: {stats.created} nuevos · {stats.alreadyInDb} ya en base ·{" "}
-          {stats.skippedLowRating} omitidos por rating
+          Última búsqueda: {stats.created} nuevos · {stats.alreadyInDb} ya en
+          base · {stats.skippedLowRating} omitidos por rating
         </p>
       )}
 
