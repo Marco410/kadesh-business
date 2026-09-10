@@ -8,7 +8,6 @@ import {
   CallIcon,
   Location01Icon,
   Tag01Icon,
-  CheckmarkCircle02Icon,
 } from "@hugeicons/core-free-icons";
 import { LANDING_SECTION_IMAGES } from "kadesh/components/home/constants";
 
@@ -49,22 +48,14 @@ export default function RealDataSection() {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5 }}
           >
-            <div className="inline-flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-4 py-1.5 mb-6">
-              <HugeiconsIcon
-                icon={CheckmarkCircle02Icon}
-                size={18}
-                className="text-green-600 dark:text-green-400"
-              />
-              <span className="text-sm font-semibold text-green-700 dark:text-green-300">
-                Datos en tiempo real
-              </span>
-            </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
-              Datos reales de Google Maps, listos para vender
+              ¿Qué datos incluye cada lead de Google Maps?
             </h2>
-            <p className="text-[#616161] dark:text-[#b0b0b0] text-lg mb-8 leading-relaxed">
-              Cada negocio incluye teléfono, dirección, categoría, rating y
-              reseñas. Contacta en segundos sin buscar manualmente en el mapa.
+            <p className="text-[#424242] dark:text-[#d6d6d6] text-lg mb-8 leading-relaxed">
+              Cada negocio extraído incluye teléfono, dirección, categoría,
+              rating y reseñas públicas de Google Maps. Contactas en segundos
+              sin buscar ficha por ficha: los datos llegan al CRM listos para
+              llamar o enviar WhatsApp.
             </p>
 
             <div className="grid sm:grid-cols-2 gap-4">

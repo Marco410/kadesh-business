@@ -1,0 +1,23 @@
+# Kadesh
+
+> Kadesh es una plataforma SaaS B2B que extrae clientes potenciales reales de Google Maps —con teléfono, dirección, categoría y rating— y los guarda en un CRM integrado. Opera en México con prueba de 7 días y 50 leads gratis, sin tarjeta.
+
+## Producto
+
+- [Inicio](https://kadesh.com.mx/): qué es Kadesh, cómo extraer leads de Google Maps y comparativa de costo por lead
+- [Precios](https://kadesh.com.mx/precios): planes Starter 399 MXN, Pro 799 MXN y Agencia 1,999 MXN
+- [Conócenos](https://kadesh.com.mx/conocenos): quién está detrás de Kadesh
+- [Novedades](https://kadesh.com.mx/novedades): changelog del producto
+- [Contacto](https://kadesh.com.mx/contacto): formulario y correo contacto@kadesh.com.mx
+- [Crear cuenta](https://kadesh.com.mx/auth/register): prueba de 7 días con 50 leads
+
+## Nichos
+
+- [Clientes para agencias de marketing](https://kadesh.com.mx/clientes-para-agencias-de-marketing): prospectar giros locales para agencias
+- [Clientes para abogados](https://kadesh.com.mx/clientes-para-abogados): listas de negocios para despachos legales
+- [Clientes para contadores](https://kadesh.com.mx/clientes-para-contadores): prospectos B2B para despachos contables
+
+## Legal
+
+- [Términos](https://kadesh.com.mx/terminos)
+- [Privacidad](https://kadesh.com.mx/privacidad)

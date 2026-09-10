@@ -3,10 +3,11 @@ import { Metadata, Viewport } from 'next';
 export const metadata: Metadata = {
   metadataBase: new URL('https://kadesh.com.mx'),
   title: {
-    default: 'KADESH - Tu próxima lista de clientes está a un clic de distancia.',
+    default: 'Leads B2B de Google Maps con teléfono y CRM | KADESH',
     template: '%s | KADESH',
   },
-  description: 'Plataforma SaaS B2B para extraer clientes potenciales reales de Google Maps con teléfono y CRM integrado. Kadesh ofrece prueba gratuita de 7 días con 50 leads gratis.',
+  description:
+    'Kadesh extrae leads B2B de Google Maps con teléfono, rating y dirección, y los gestiona en un CRM integrado. Prueba 7 días con 50 leads gratis, sin tarjeta.',
   keywords: [
     'KADESH',
     'KADESH Negocios',
@@ -36,8 +37,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'KADESH - Tu próxima lista de clientes está a un clic de distancia.',
-    description: 'Plataforma SaaS B2B para extraer clientes potenciales de Google Maps con teléfono y CRM integrado. Prueba gratuita de 7 días con 50 leads gratis.',
+    title: 'Leads B2B de Google Maps con teléfono y CRM | KADESH',
+    description:
+      'Kadesh extrae leads B2B de Google Maps con teléfono, rating y dirección, y los gestiona en un CRM. Prueba 7 días con 50 leads gratis, sin tarjeta.',
     url: 'https://kadesh.com.mx/',
     siteName: 'Kadesh',
     images: [
@@ -45,7 +47,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'KADESH - Tu próxima lista de clientes está a un clic de distancia.',
+        alt: 'Kadesh extrae leads B2B de Google Maps con teléfono y CRM integrado',
       },
     ],
     locale: 'es_MX',
@@ -53,8 +55,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'KADESH - Tu próxima lista de clientes está a un clic de distancia.',
-    description: 'Extrae clientes potenciales de Google Maps con teléfono y CRM integrado. Prueba gratuita de 7 días con 50 leads gratis.',
+    title: 'Leads B2B de Google Maps con teléfono y CRM | KADESH',
+    description:
+      'Extrae leads B2B de Google Maps con teléfono y CRM integrado. Prueba 7 días con 50 leads gratis, sin tarjeta.',
     images: ['/og-image.png'],
   },
   alternates: {

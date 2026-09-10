@@ -7,7 +7,6 @@ import {
   Tick02Icon,
   Add01Icon,
   ArrowRight01Icon,
-  CheckmarkCircle02Icon,
 } from "@hugeicons/core-free-icons";
 
 const FLOW_STEPS = [
@@ -32,32 +31,16 @@ export default function UniqueLeadsSection() {
       className="py-16 sm:py-24 bg-[#f8f8f8] dark:bg-[#0d0d0d]"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
-          <div className="inline-flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 dark:bg-green-500/10 px-4 py-1.5 mb-6">
-            <HugeiconsIcon
-              icon={CheckmarkCircle02Icon}
-              size={18}
-              className="text-green-500 dark:text-green-400"
-            />
-            <span className="text-sm font-semibold text-green-700 dark:text-green-300">
-              Sin duplicados
-            </span>
-          </div>
+        <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
-            Leads únicos garantizados
+            ¿Kadesh agrega el mismo negocio dos veces?
           </h2>
-          <p className="text-[#616161] dark:text-[#b0b0b0] max-w-2xl mx-auto text-lg">
-            Nuestro sistema verifica automáticamente si un negocio ya existe en
-            tu cuenta antes de agregarlo. Esto significa que nunca gastarás tu
-            cuota mensual en negocios duplicados.
+          <p className="text-[#424242] dark:text-[#d6d6d6] max-w-2xl mx-auto text-lg">
+            No. Antes de guardar un negocio, Kadesh comprueba si ya está en tu
+            cuenta. Si existe, no se vuelve a agregar ni consume tu cuota
+            mensual, así cada ciclo suma prospectos nuevos y no duplicados.
           </p>
-        </motion.div>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
