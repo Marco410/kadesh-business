@@ -25,11 +25,15 @@ const globalGeoJsonLd = {
   '@graph': [
     {
       '@type': 'Organization',
+      '@id': 'https://kadesh.com.mx/#organization',
       name: 'Kadesh',
       legalName: 'Kadesh',
       url: 'https://kadesh.com.mx',
       logo: 'https://kadesh.com.mx/logo.png',
       email: 'contacto@kadesh.com.mx',
+      sameAs: [
+        'https://www.facebook.com/profile.php?id=61576878181992',
+      ],
       address: {
         '@type': 'PostalAddress',
         addressLocality: 'Morelia',
@@ -40,13 +44,30 @@ const globalGeoJsonLd = {
         '@type': 'Country',
         name: 'México',
       },
+      contactPoint: {
+        '@type': 'ContactPoint',
+        email: 'contacto@kadesh.com.mx',
+        contactType: 'customer support',
+        availableLanguage: ['Spanish'],
+      },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://kadesh.com.mx/#website',
+      url: 'https://kadesh.com.mx',
+      name: 'Kadesh',
+      inLanguage: 'es-MX',
+      publisher: { '@id': 'https://kadesh.com.mx/#organization' },
     },
     {
       '@type': 'SoftwareApplication',
+      '@id': 'https://kadesh.com.mx/#software',
       name: 'Kadesh',
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'Web',
       url: 'https://kadesh.com.mx',
+      publisher: { '@id': 'https://kadesh.com.mx/#organization' },
+      provider: { '@id': 'https://kadesh.com.mx/#organization' },
       areaServed: 'MX',
       offers: [
         {
@@ -107,11 +128,6 @@ const globalGeoJsonLd = {
         'Prueba gratuita de 7 días con 50 leads gratis',
       ],
       trialAvailability: 'Prueba gratuita de 7 días con 50 leads gratis',
-      provider: {
-        '@type': 'Organization',
-        name: 'Kadesh',
-        url: 'https://kadesh.com.mx',
-      },
     },
   ],
 };
