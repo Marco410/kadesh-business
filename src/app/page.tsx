@@ -1,6 +1,8 @@
 import {
   HeroSection,
   HeroDifferentiatorsBadges,
+  WhatIsKadeshSection,
+  HomeJsonLd,
   CategoriesMarqueeSection,
   WhyKadeshSection,
   LeadCostComparisonSection,
@@ -25,11 +27,13 @@ import { FloatingWhatsAppButton } from "kadesh/components/shared";
 export default function HomePage() {
   return (
     <>
+      <HomeJsonLd />
       <FloatingWhatsAppButton />
       <main className="min-h-screen">
         <Navigation />
         <HeroSection />
         <HeroDifferentiatorsBadges />
+        <WhatIsKadeshSection />
         <CategoriesMarqueeSection />
         <WhyKadeshSection />
         <LeadCostComparisonSection />

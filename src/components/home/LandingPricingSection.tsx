@@ -23,12 +23,12 @@ export default function LandingPricingSection({
         <SubscriptionProvider companyId={null}>
           <PlansSection
             hideBackLink
-            sectionHeadingLevel={isPage ? "h2" : "h1"}
-            sectionTitle={isPage ? "Compara planes" : "Planes"}
+            sectionHeadingLevel="h2"
+            sectionTitle={isPage ? "Compara planes" : "¿Cuánto cuesta extraer leads con Kadesh?"}
             sectionSubtitle={
               isPage
                 ? "Precios en pesos mexicanos (MXN). Facturación mensual o anual con descuento."
-                : "Elige el plan que mejor se adapte a tu negocio. Free, Starter, Pro o Agencia."
+                : "Planes en MXN: Free, Starter 399, Pro 799 y Agencia 1,999. Prueba 7 días con 50 leads, sin tarjeta."
             }
             showBtnStart={false}
             sectionTitleId={isPage ? "comparar-planes-heading" : undefined}

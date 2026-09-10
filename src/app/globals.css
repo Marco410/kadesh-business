@@ -92,6 +92,22 @@
   html.dark a:hover {
     color: #f8a274;
   }
+
+  ::selection {
+    background: #f7945e;
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid #e07c3a;
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html:focus-within {
+      scroll-behavior: auto;
+    }
+  }
 }
 
 @layer components {

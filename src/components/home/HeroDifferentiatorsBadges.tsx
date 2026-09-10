@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Tick02Icon } from "@hugeicons/core-free-icons";
 
@@ -16,13 +15,7 @@ const BADGES = [
 
 export default function HeroDifferentiatorsBadges() {
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.4 }}
-      className="py-8 sm:py-10 bg-white dark:bg-[#0d0d0d] border-b border-[#e5e5e5] dark:border-white/5"
-    >
+    <section className="py-8 sm:py-10 bg-white dark:bg-[#0d0d0d] border-b border-[#e5e5e5] dark:border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
           {BADGES.map((label) => (
@@ -42,6 +35,6 @@ export default function HeroDifferentiatorsBadges() {
           ))}
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }

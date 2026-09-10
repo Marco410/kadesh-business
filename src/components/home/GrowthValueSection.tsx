@@ -33,11 +33,13 @@ export default function GrowthValueSection() {
           className="text-center mb-12"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
-            Nunca te quedas sin prospectos para contactar
+            ¿Cuántos leads nuevos obtengo cada mes?
           </h2>
-          <p className="text-[#616161] dark:text-[#b0b0b0] max-w-2xl mx-auto text-lg">
-            Tu cuota se renueva cada mes y el sistema evita duplicados. Un solo
-            cliente nuevo puede pagar meses de suscripción.
+          <p className="text-[#424242] dark:text-[#d6d6d6] max-w-2xl mx-auto text-lg">
+            Con el plan Pro son 400 leads nuevos al mes. La cuota se renueva
+            automáticamente y el sistema evita duplicados, así a los seis meses
+            puedes acumular más de 2,400 prospectos distintos. Un cliente
+            cerrado puede cubrir varios meses de suscripción.
           </p>
         </motion.div>
 

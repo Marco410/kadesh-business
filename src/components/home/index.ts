@@ -1,4 +1,6 @@
 export { default as HeroSection } from './HeroSection';
+export { default as WhatIsKadeshSection } from './WhatIsKadeshSection';
+export { default as HomeJsonLd } from './HomeJsonLd';
 export { default as ScheduleDemoSection } from './ScheduleDemoSection';
 export { default as HeroDifferentiatorsBadges } from './HeroDifferentiatorsBadges';
 export { default as CategoriesMarqueeSection } from './CategoriesMarqueeSection';
