@@ -533,3 +533,86 @@ html.dark
 button[data-sileo-toast] {
   background: transparent !important;
 }
+
+@property --ai-border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes ai-border-spin {
+  to {
+    --ai-border-angle: 360deg;
+  }
+}
+
+:root {
+  --ai-urim-purple: #8b5cf6;
+  --ai-urim-blue: #38bdf8;
+}
+
+.ai-live-ring {
+  --ai-live-gradient: conic-gradient(
+    from var(--ai-border-angle),
+    #38bdf8 0%,
+    #4ade80 14%,
+    #fde047 28%,
+    #f87171 42%,
+    #8b5cf6 58%,
+    #38bdf8 78%,
+    #4ade80 100%
+  );
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  padding: 2px;
+  background: var(--ai-live-gradient);
+  animation: ai-border-spin 4s linear infinite;
+}
+
+.ai-live-ring::before,
+.ai-live-ring::after {
+  content: "";
+  position: absolute;
+  border-radius: inherit;
+  background: var(--ai-live-gradient);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Aura corta, pegada al perímetro */
+.ai-live-ring::before {
+  inset: -1px;
+  filter: blur(6px);
+  opacity: 0.8;
+}
+
+.ai-live-ring::after {
+  inset: -2px;
+  filter: blur(10px);
+  opacity: 0.28;
+}
+
+html.dark .ai-live-ring::before {
+  opacity: 0.95;
+}
+
+html.dark .ai-live-ring::after {
+  opacity: 0.38;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-live-ring {
+    animation: none;
+  }
+}
+
+.ai-urim-icon {
+  display: inline-flex;
+  color: var(--ai-urim-purple);
+}
+
+.ai-urim-icon svg,
+.ai-urim-icon svg [stroke] {
+  stroke: url(#kadesh-urim-icon-gradient) !important;
+}

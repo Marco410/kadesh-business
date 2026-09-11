@@ -16,6 +16,7 @@ import {
 } from "kadesh/utils/queries";
 import { Routes } from "kadesh/core/routes";
 import { PaletteColorPicker } from "kadesh/components/shared";
+import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
 
 const INPUT_CLASS =
   "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
@@ -487,7 +488,14 @@ export default function ProfileCompanySection({
           <div>
             <h3 className="text-lg font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">Información</h3>
             <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mb-5">
-              Esta información se usará para personalizar el onboarding de tus clientes en una futura versión de Kadesh.
+              Esta información ya alimenta {KADESH_URIM_AI_NAME} de tu empresa: Kadesh la usa en cada respuesta para conocer qué vendes, a quién y cómo cierras.{" "}
+              <Link
+                href={Routes.panelAi}
+                className="font-medium text-orange-500 hover:underline dark:text-orange-400"
+              >
+                Configurar {KADESH_URIM_AI_NAME}
+              </Link>
+              .
             </p>
             <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2 flex items-center gap-1.5">
               <HugeiconsIcon

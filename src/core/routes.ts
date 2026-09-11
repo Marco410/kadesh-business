@@ -32,6 +32,7 @@ export const Routes = {
   // Profile
   panel: '/panel',
   panelProfile: '/panel?tab=profile',
+  panelAi: '/panel?tab=ai',
   panelLead: (id: string): string => `/panel/clientes/lead/${id}`,
   panelProject: (id: string): string => `/panel/clientes/proyecto/${id}`,
   panelQuotation: (id: string): string => `/panel/cotizacion/${id}`,
