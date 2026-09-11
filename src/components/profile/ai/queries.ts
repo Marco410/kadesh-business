@@ -13,6 +13,7 @@ export const COMPANY_AI_SETTINGS_QUERY = gql`
       onboardingIdealCustomer
       onboardingAvgTicketValue
       onboardingSalesPain
+      allowedGooglePlaceCategories
     }
   }
 `;
@@ -28,6 +29,7 @@ export interface CompanyAiSettings {
   onboardingIdealCustomer: string | null;
   onboardingAvgTicketValue: string | null;
   onboardingSalesPain: string | null;
+  allowedGooglePlaceCategories: string[] | null;
 }
 
 export interface CompanyAiSettingsResponse {
@@ -211,6 +213,61 @@ export interface GenerateDailyDigestResponse {
 }
 
 export interface GenerateDailyDigestVariables {
+  companyId: string;
+  force?: boolean | null;
+}
+
+export const AI_PLAYBOOK_QUERY = gql`
+  query AiPlaybook($companyId: ID!) {
+    aiPlaybook(companyId: $companyId) {
+      success
+      message
+      cached
+      creditsCharged
+      insight {
+        id
+        referenceKey
+        content
+        generatedAt
+        actions {
+          title
+          detail
+        }
+      }
+    }
+  }
+`;
+
+export interface AiPlaybookQueryResponse {
+  aiPlaybook: DailyDigestResult;
+}
+
+export const GENERATE_AI_PLAYBOOK_MUTATION = gql`
+  mutation GenerateAiPlaybook($companyId: ID!, $force: Boolean) {
+    generateAiPlaybook(companyId: $companyId, force: $force) {
+      success
+      message
+      cached
+      creditsCharged
+      insight {
+        id
+        referenceKey
+        content
+        generatedAt
+        actions {
+          title
+          detail
+        }
+      }
+    }
+  }
+`;
+
+export interface GenerateAiPlaybookResponse {
+  generateAiPlaybook: DailyDigestResult;
+}
+
+export interface GenerateAiPlaybookVariables {
   companyId: string;
   force?: boolean | null;
 }

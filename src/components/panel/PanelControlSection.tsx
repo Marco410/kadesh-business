@@ -21,7 +21,7 @@ import {
   SparklesIcon,
 } from "@hugeicons/core-free-icons";
 import ProfileData from "kadesh/components/profile/ProfileData";
-import { AiSettingsSection } from "kadesh/components/profile/ai/AiSettingsSection";
+import { AiSection } from "kadesh/components/profile/ai/AiSection";
 import SalesSection from "kadesh/components/profile/sales/SalesSection";
 import VendedoresSection from "kadesh/components/profile/sales/vendedores/VendedoresSection";
 import ArchivosSection from "kadesh/components/profile/sales/archivos/ArchivosSection";
@@ -469,7 +469,11 @@ function PanelControlSectionContent({
 
               {selectedTab === "ai" &&
                 (canManageAi ? (
-                  <AiSettingsSection companyId={companyId} />
+                  <AiSection
+                    companyId={companyId}
+                    canManageAi={canManageAi}
+                    isCompanyWide={hasCompanyWideLeadScope}
+                  />
                 ) : (
                   <RoleAccessDeniedSection
                     title={`Solo el administrador configura ${KADESH_URIM_AI_NAME}`}

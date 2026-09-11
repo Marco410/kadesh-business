@@ -486,9 +486,12 @@ export default function ProfileCompanySection({
           </div>
 
           <div>
+            {/* Copy de IA: no hablar de “cada llamada”. Ver src/components/profile/ai/README.md */}
             <h3 className="text-lg font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">Información</h3>
             <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mb-5">
-              Esta información ya alimenta {KADESH_URIM_AI_NAME} de tu empresa: Kadesh la usa en cada respuesta para conocer qué vendes, a quién y cómo cierras.{" "}
+              {KADESH_URIM_AI_NAME} ya conoce tu negocio con lo que vas
+              capturando aquí y usando Kadesh: qué vendes, a quién y cómo
+              cierras.{" "}
               <Link
                 href={Routes.panelAi}
                 className="font-medium text-orange-500 hover:underline dark:text-orange-400"

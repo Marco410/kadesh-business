@@ -1,0 +1,31 @@
+---
+description: Documentar decisiones de producto, UX y copy en el README del módulo que se modifica.
+alwaysApply: true
+---
+
+# Documentar el módulo que tocas
+
+Si el cambio no es trivial (typo, lint, rename), actualiza o crea un `README.md` **en la carpeta del feature** (`src/components/<feature>/`, o el módulo de backend equivalente). Hazlo en el mismo cambio, no “luego”.
+
+## Qué documentar
+
+Decisiones que el siguiente agente o humano no puede inferir del código:
+
+- Cómo se presenta la feature al usuario (promesa, tabs, estados vacíos, default).
+- Copy y tono: qué decimos y **qué nunca decimos** (filtrado de implementación, proveedores, prompts).
+- Acceso (roles, plan, admin vs vendedor) y dónde vive la UI (`?tab=`, no una ruta nueva).
+- Por qué un componente se reutiliza en dos pantallas, o por qué no se exporta del barrel.
+
+No documentes firmas de funciones ni el diff. Sí el *por qué* y las reglas de producto.
+
+## Cómo
+
+- Un `README.md` por feature. Secciones cortas. Español, como el producto.
+- Si el copy vive en dos sitios, di cuáles deben quedar alineados.
+- Si el README ya existe, **edítalo**: no dejes decisiones viejas.
+
+## Al terminar un cambio de producto
+
+1. Lee el `README.md` del módulo.
+2. Actualízalo si cambió comportamiento, copy o arquitectura.
+3. No dejes la decisión solo en el chat.

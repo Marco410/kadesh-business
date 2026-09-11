@@ -44,11 +44,36 @@ export const DEFAULT_AI_MODELS: Record<AiProviderKey, string> = {
 };
 
 export const ONBOARDING_CONTEXT_FIELDS = [
-  { key: "onboardingMainOffer", label: "Oferta principal" },
-  { key: "onboardingIdealCustomer", label: "Cliente ideal" },
-  { key: "onboardingAvgTicketValue", label: "Ticket o valor" },
-  { key: "onboardingSalesPain", label: "Adquisición y dolores al vender" },
+  {
+    key: "onboardingMainOffer",
+    label: "Oferta principal",
+    title: 'El "Qué" — Oferta principal',
+    placeholder:
+      "En una o dos oraciones: ¿qué servicio o producto principal vendes?",
+  },
+  {
+    key: "onboardingIdealCustomer",
+    label: "Cliente ideal",
+    title: 'El "Quién" — Cliente ideal',
+    placeholder: "Ej. clínicas dentales, constructoras, restaurantes…",
+  },
+  {
+    key: "onboardingAvgTicketValue",
+    label: "Ticket o valor",
+    title: 'El "Cuánto" — Ticket o valor',
+    placeholder:
+      "Precio promedio, o cuánto ayudas a ganar o ahorrar a tus clientes",
+  },
+  {
+    key: "onboardingSalesPain",
+    label: "Adquisición y dolores al vender",
+    title: 'El "Cómo" — Adquisición y dolores al vender',
+    placeholder: "¿Cómo consigues clientes hoy y qué te cuesta más al vender?",
+  },
 ] as const;
+
+export type OnboardingContextKey =
+  (typeof ONBOARDING_CONTEXT_FIELDS)[number]["key"];
 
 export function isAiBillingMode(value: string): value is AiBillingMode {
   return value === AI_BILLING_MODE.BYOK || value === AI_BILLING_MODE.MANAGED;

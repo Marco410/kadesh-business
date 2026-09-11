@@ -29,6 +29,7 @@ type DailyDigestCardProps = {
   isCompanyWide: boolean;
   remainingQuota?: number | null;
   onGenerated?: () => void;
+  onConfigure?: () => void;
 };
 
 const DIGEST_SOURCES = [
@@ -77,6 +78,7 @@ export function DailyDigestCard({
   isCompanyWide,
   remainingQuota,
   onGenerated,
+  onConfigure,
 }: DailyDigestCardProps) {
   const {
     isAiLive,
@@ -190,15 +192,28 @@ export function DailyDigestCard({
               </p>
             ) : null}
             {canManageAi ? (
-              <Link
-                href={Routes.panelAi}
-                className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-orange-600 dark:text-orange-400 hover:underline"
-              >
-                {configured
-                  ? "Probar conexión"
-                  : `Configurar ${KADESH_URIM_AI_NAME}`}
-                <HugeiconsIcon icon={ArrowRight01Icon} size={12} />
-              </Link>
+              onConfigure ? (
+                <button
+                  type="button"
+                  onClick={onConfigure}
+                  className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-orange-600 hover:underline dark:text-orange-400"
+                >
+                  {configured
+                    ? "Probar conexión"
+                    : `Configurar ${KADESH_URIM_AI_NAME}`}
+                  <HugeiconsIcon icon={ArrowRight01Icon} size={12} />
+                </button>
+              ) : (
+                <Link
+                  href={Routes.panelAi}
+                  className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-orange-600 hover:underline dark:text-orange-400"
+                >
+                  {configured
+                    ? "Probar conexión"
+                    : `Configurar ${KADESH_URIM_AI_NAME}`}
+                  <HugeiconsIcon icon={ArrowRight01Icon} size={12} />
+                </Link>
+              )
             ) : (
               <p className="mt-2 text-sm text-[#9e9e9e] dark:text-[#7a7a7a]">
                 Pide al administrador de la empresa que active{" "}

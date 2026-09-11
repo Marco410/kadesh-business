@@ -10,7 +10,6 @@ import {
   Delete02Icon,
   EyeIcon,
   FlashIcon,
-  SparklesIcon,
   ViewOffIcon,
 } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
@@ -60,12 +59,16 @@ function defaultModelForProvider(provider: string): string {
 
 export interface AiSettingsSectionProps {
   companyId: string | null;
+  onOpenCompanyInfo?: () => void;
 }
 
 /**
  * Settings de Kadesh Urim AI a nivel empresa: BYOK vs administrado, proveedor, API key y prueba de conexión.
  */
-export function AiSettingsSection({ companyId }: AiSettingsSectionProps) {
+export function AiSettingsSection({
+  companyId,
+  onOpenCompanyInfo,
+}: AiSettingsSectionProps) {
   const { data, loading, refetch } = useQuery<
     CompanyAiSettingsResponse,
     CompanyAiSettingsVariables
@@ -259,8 +262,10 @@ export function AiSettingsSection({ companyId }: AiSettingsSectionProps) {
         ],
       });
       const payload = result.data?.testCompanyAiConnection;
-      const message = payload?.message || "No se pudo probar la conexión.";
       const success = payload?.success ?? false;
+      const message = success
+        ? `Conexión OK con ${KADESH_URIM_AI_NAME}`
+        : payload?.message || "No se pudo probar la conexión.";
       setTestResult({ success, message });
       if (success) {
         sileo.success({ title: message });
@@ -274,27 +279,6 @@ export function AiSettingsSection({ companyId }: AiSettingsSectionProps) {
       sileo.error({ title: message });
     }
   };
-
-  if (!companyId) {
-    return (
-      <div className="rounded-2xl border border-[#e0e0e0] bg-white p-6 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-8">
-        <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
-          {KADESH_URIM_AI_NAME}
-        </h2>
-        <p className="mt-2 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
-          No hay una empresa vinculada a tu cuenta. Crea o asocia un negocio en
-          tu perfil para configurar la IA.
-        </p>
-        <Link
-          href={Routes.panelProfile}
-          className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-        >
-          Ir al perfil
-          <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
-        </Link>
-      </div>
-    );
-  }
 
   if (loading && !saved) {
     return (
@@ -311,24 +295,6 @@ export function AiSettingsSection({ companyId }: AiSettingsSectionProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <div className="flex items-start gap-3">
-          <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/15 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400">
-            <HugeiconsIcon icon={SparklesIcon} size={22} />
-          </span>
-          <div>
-            <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
-              {KADESH_URIM_AI_NAME}
-            </h2>
-            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
-              Configura cómo tu empresa usa inteligencia artificial. Esta
-              modalidad aplica a todo el equipo: los vendedores no ven esta
-              pantalla, pero usarán la IA con lo que guardes aquí.
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div
         className={`rounded-2xl border p-5 sm:p-6 ${
           contextComplete
@@ -341,8 +307,8 @@ export function AiSettingsSection({ companyId }: AiSettingsSectionProps) {
         </h3>
         <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
           {contextComplete
-            ? "La oferta, el cliente ideal, el ticket y cómo vendes ya alimentan cada llamada de IA."
-            : "Completa la información de tu empresa para que la IA conozca qué vendes, a quién y cómo cierras."}
+            ? `${KADESH_URIM_AI_NAME} ya tiene el perfil de tu empresa: oferta, cliente ideal, ticket y cómo vendes.`
+            : `Cuéntale a ${KADESH_URIM_AI_NAME} qué vendes, a quién y cómo cierras. Lo que agregues aquí y lo que uses en Kadesh es lo que ya sabe de tu negocio.`}
         </p>
         {!contextComplete && (
           <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-[#616161] dark:text-[#b0b0b0]">
@@ -351,13 +317,24 @@ export function AiSettingsSection({ companyId }: AiSettingsSectionProps) {
             ))}
           </ul>
         )}
-        <Link
-          href={Routes.panelProfile}
-          className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-        >
-          {contextComplete ? "Editar en el perfil" : "Completar en el perfil"}
-          <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
-        </Link>
+        {onOpenCompanyInfo ? (
+          <button
+            type="button"
+            onClick={onOpenCompanyInfo}
+            className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+          >
+            {contextComplete ? "Editar información" : "Completar información"}
+            <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+          </button>
+        ) : (
+          <Link
+            href={Routes.panelProfile}
+            className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+          >
+            {contextComplete ? "Editar en el perfil" : "Completar en el perfil"}
+            <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+          </Link>
+        )}
       </div>
 
       <div className="rounded-2xl border border-[#e0e0e0] bg-white p-6 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-8">
