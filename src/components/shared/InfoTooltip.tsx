@@ -15,11 +15,14 @@ interface InfoTooltipProps {
  * Icono de información que muestra un tooltip con el texto indicado.
  * Accesible: el tooltip aparece también al enfocar el icono (teclado).
  */
-export default function InfoTooltip({ text, className = "" }: InfoTooltipProps) {
+export default function InfoTooltip({
+  text,
+  className = "",
+}: InfoTooltipProps) {
   const id = useId();
   return (
     <span
-      className={`group relative inline-flex align-middle z-10000 ${className}`}
+      className={`group relative inline-flex align-middle z-50 ${className}`}
     >
       <span
         aria-describedby={id}
@@ -31,7 +34,7 @@ export default function InfoTooltip({ text, className = "" }: InfoTooltipProps) 
       <span
         id={id}
         role="tooltip"
-        className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs font-normal text-white bg-[#212121] dark:bg-[#333] rounded-lg shadow-lg max-w-[240px] sm:max-w-[320px] whitespace-normal text-left opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-opacity z-100"
+        className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs font-normal text-white bg-[#212121] dark:bg-[#333] rounded-lg shadow-lg max-w-[240px] sm:max-w-[320px] whitespace-normal text-left opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-opacity z-50"
       >
         {text}
       </span>

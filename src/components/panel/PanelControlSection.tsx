@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useQuery } from "@apollo/client";
 import { useUser } from "kadesh/utils/UserContext";
@@ -12,9 +11,6 @@ import {
   DashboardSquare01Icon,
   UserIcon,
   Chart01Icon,
-  Add01Icon,
-  ArrowRight01Icon,
-  FileAttachmentIcon,
   FileIcon,
   FolderIcon,
   CalendarIcon,
@@ -42,10 +38,7 @@ import {
 } from "kadesh/components/profile/sales/queries";
 import { hasPlanFeature } from "kadesh/components/profile/sales/helpers/plan-features";
 import { Footer, Navigation } from "kadesh/components/layout";
-import {
-  ReferralSection as PublicReferralSection,
-  ReferralLinkSection,
-} from "kadesh/components/home";
+import { CompanyDashboard } from "kadesh/components/panel/dashboard";
 import { PLAN_FEATURE_KEYS, Role } from "kadesh/constants/constans";
 import FeatureLockedSection from "kadesh/components/profile/sales/FeatureLockedSection";
 import RoleAccessDeniedSection from "kadesh/components/profile/sales/RoleAccessDeniedSection";
@@ -55,7 +48,6 @@ import ReferralDashboardSection from "kadesh/components/profile/referral/Referra
 import WorkspacesTab from "kadesh/components/profile/sales/workspaces/WorkspacesTab";
 import CreateWorkspaceModal from "kadesh/components/profile/sales/workspaces/CreateWorkspaceModal";
 import { NovedadesPage } from "../changelog";
-import { SupportContactSection } from "../shared";
 import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
 import { useCompanyAiLive } from "kadesh/components/profile/ai/useCompanyAiLive";
 import { cn } from "kadesh/utils/cn";
@@ -282,85 +274,6 @@ function DashboardSidebar({
   );
 }
 
-function DashboardWelcome({ userName }: { userName: string }) {
-  const firstName = userName?.split(/\s+/)[0] || "Usuario";
-  return (
-    <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/10 to-orange-600/5 dark:from-orange-500/20 dark:to-transparent p-6 sm:p-8">
-      <h2 className="text-2xl sm:text-3xl font-bold text-[#212121] dark:text-white">
-        Hola, {firstName}
-      </h2>
-      <p className="mt-1 text-[#616161] dark:text-[#b0b0b0]">
-        Bienvenido a tu panel. Desde aquí gestionas tu perfil y ventas.
-      </p>
-    </div>
-  );
-}
-
-function QuickActions({
-  hasVendedorRole,
-  canManageAi,
-}: {
-  hasVendedorRole: boolean;
-  canManageAi: boolean;
-}) {
-  const actions = [
-    { label: "Editar mi perfil", href: Routes.panelProfile, icon: UserIcon },
-    { label: "Ver novedades", href: Routes.novedades, icon: FlashIcon },
-    ...(canManageAi
-      ? [
-          {
-            label: KADESH_URIM_AI_NAME,
-            href: Routes.panelAi,
-            icon: SparklesIcon,
-          },
-        ]
-      : []),
-    ...(hasVendedorRole
-      ? [
-          {
-            label: "Ver leads",
-            href: `${Routes.panel}?tab=clientes`,
-            icon: Chart01Icon,
-          },
-          {
-            label: "Planes y precios",
-            href: Routes.panelPlans,
-            icon: FileAttachmentIcon,
-          },
-        ]
-      : []),
-  ];
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {actions.map((action) => (
-        <Link
-          key={action.href}
-          href={action.href}
-          className="group flex items-center gap-4 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-5 shadow-sm hover:border-orange-500/50 dark:hover:border-orange-500/50 hover:shadow-md transition-all"
-        >
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 dark:bg-orange-500/20 text-orange-500 dark:text-orange-400">
-            <HugeiconsIcon icon={action.icon} size={24} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold text-[#212121] dark:text-white">
-              {action.label}
-            </p>
-            <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5 flex items-center gap-1">
-              Ir{" "}
-              <HugeiconsIcon
-                icon={ArrowRight01Icon}
-                size={12}
-                className="opacity-70"
-              />
-            </p>
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
-}
-
 type PanelControlSectionProps = {
   embedded?: boolean;
 };
@@ -378,9 +291,12 @@ function PanelControlSectionContent({
     user?.roles?.some((r) => r.name === Role.VENDEDOR) ?? false;
   const isAdminCompany =
     user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const isUserCompany =
+    user?.roles?.some((r) => r.name === Role.USER_COMPANY) ?? false;
+  const hasCompanyWideLeadScope = isAdminCompany || isUserCompany;
   const canManageAi = canManageCompanyAi(user);
 
-  const { data: userData } = useQuery<
+  const { data: userData, refetch: refetchUserCompany } = useQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {
@@ -512,7 +428,7 @@ function PanelControlSectionContent({
             </div>
           )}
 
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col lg:flex-row gap-6">
             <DashboardSidebar
               selectedTab={selectedTab}
               onTabChange={handleTabChange}
@@ -527,48 +443,22 @@ function PanelControlSectionContent({
 
             <main className="flex-1 min-w-0">
               {selectedTab === "inicio" && (
-                <div className="space-y-8">
-                  <DashboardWelcome userName={user.name ?? ""} />
-                  <div>
-                    <h3 className="text-lg font-semibold text-[#212121] dark:text-white mb-4">
-                      Acciones rápidas
-                    </h3>
-                    <QuickActions
-                      hasVendedorRole={hasVendedorRole}
-                      canManageAi={canManageAi}
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-[#212121] dark:text-white mb-4">
-                      Referidos y comisiones
-                    </h3>
-                    <ReferralLinkSection
-                      userId={user.id}
-                      referralCode={userData?.user?.referralCode ?? ""}
-                      bank={userData?.user?.bank}
-                      clabe={userData?.user?.clabe}
-                      cardNumber={userData?.user?.cardNumber}
-                    />
-                  </div>
-                  <div className="rounded-2xl overflow-hidden border border-[#e0e0e0] dark:border-[#3a3a3a]">
-                    <PublicReferralSection />
-                    <SupportContactSection
-                      whatsappMessage="Hola KADESH, tengo una consulta sobre mis referidos y comisiones."
-                      emailSubject="Consulta sobre referidos y comisiones — KADESH"
-                    />
-                  </div>
-
-                  {hasAdminRole && (
-                    <div className="pt-2 flex justify-center">
-                      <Link
-                        href="/panel/clientes/admin"
-                        className="text-xs text-[#616161] dark:text-[#b0b0b0] underline decoration-dotted opacity-70 hover:opacity-100 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
-                      >
-                        Admin: verificar suscripciones (debug)
-                      </Link>
-                    </div>
-                  )}
-                </div>
+                <CompanyDashboard
+                  userId={user.id}
+                  userName={user.name ?? ""}
+                  companyId={companyId}
+                  hasCompanyWideLeadScope={hasCompanyWideLeadScope}
+                  isAdminCompany={isAdminCompany}
+                  hasVendedorRole={hasVendedorRole}
+                  canManageAi={canManageAi}
+                  hasAdminRole={hasAdminRole}
+                  subscription={subscription}
+                  referralCode={userData?.user?.referralCode ?? ""}
+                  bank={userData?.user?.bank}
+                  clabe={userData?.user?.clabe}
+                  cardNumber={userData?.user?.cardNumber}
+                  onCompanyCreated={refetchUserCompany}
+                />
               )}
 
               {selectedTab === "profile" && (
