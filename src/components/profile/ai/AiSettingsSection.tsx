@@ -20,9 +20,14 @@ import {
   KADESH_URIM_AI_NAME,
   AI_BILLING_MODE,
   AI_BILLING_MODE_OPTIONS,
+  AI_MANAGED_MAX_PER_DAY,
+  AI_MANAGED_MAX_PER_MINUTE,
+  AI_OUTPUT_TOKEN_WEIGHT,
   AI_PROVIDER_OPTIONS,
+  AI_TOKENS_PER_CREDIT,
   DEFAULT_AI_MODELS,
   ONBOARDING_CONTEXT_FIELDS,
+  TYPICAL_DIGEST_CREDITS,
   isAiBillingMode,
   isAiProviderKey,
   type AiBillingMode,
@@ -387,8 +392,8 @@ export function AiSettingsSection({
               Saldo de créditos
             </p>
             <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
-              Es la misma bolsa que usas para extraer leads. Un digest diario
-              típico cuesta 4 créditos; la prueba de conexión no cobra.
+              Es la misma bolsa que usas para extraer leads. Probar la conexión
+              no cobra.
             </p>
             <p className="mt-4 text-3xl font-bold tabular-nums text-[#212121] dark:text-white">
               {creditsLoading ? "…" : (remainingQuota ?? "—")}
@@ -428,6 +433,29 @@ export function AiSettingsSection({
                 </div>
               )}
             </dl>
+            <div className="mt-4 space-y-3 border-t border-[#ececec] pt-4 dark:border-[#2a2a2a]">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                  Cómo se cobra
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+                  1 crédito cubre {AI_TOKENS_PER_CREDIT.toLocaleString("es-MX")}{" "}
+                  tokens. Los tokens es lo que le mandamos a{" "}
+                  {KADESH_URIM_AI_NAME}.
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                  Tope de uso
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+                  Hasta {AI_MANAGED_MAX_PER_MINUTE} consultas por minuto y{" "}
+                  {AI_MANAGED_MAX_PER_DAY} al día. Si se llena, espera un
+                  momento o usa tu API key: ahí no hay este tope ni se
+                  descuentan créditos de Kadesh.
+                </p>
+              </div>
+            </div>
             <Link
               href={Routes.panelCredits}
               className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"

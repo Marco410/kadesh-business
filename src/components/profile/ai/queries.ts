@@ -271,3 +271,82 @@ export interface GenerateAiPlaybookVariables {
   companyId: string;
   force?: boolean | null;
 }
+
+export const COMPANY_AI_BRIEF_QUERY = gql`
+  query CompanyAiBrief($companyId: ID!) {
+    companyAiBrief(companyId: $companyId) {
+      success
+      message
+      cached
+      creditsCharged
+      insight {
+        id
+        generatedAt
+        sourceHash
+        pillars {
+          key
+          title
+          summary
+          gaps
+        }
+      }
+    }
+  }
+`;
+
+export type CompanyAiBriefPillar = {
+  key: string;
+  title: string;
+  summary: string;
+  gaps: string[];
+};
+
+export type CompanyAiBriefInsight = {
+  id: string;
+  generatedAt: string | null;
+  sourceHash: string;
+  pillars: CompanyAiBriefPillar[];
+};
+
+export type CompanyAiBriefResult = {
+  success: boolean;
+  message: string;
+  cached: boolean;
+  creditsCharged: number | null;
+  insight: CompanyAiBriefInsight | null;
+};
+
+export interface CompanyAiBriefQueryResponse {
+  companyAiBrief: CompanyAiBriefResult;
+}
+
+export const GENERATE_COMPANY_AI_BRIEF_MUTATION = gql`
+  mutation GenerateCompanyAiBrief($companyId: ID!, $force: Boolean) {
+    generateCompanyAiBrief(companyId: $companyId, force: $force) {
+      success
+      message
+      cached
+      creditsCharged
+      insight {
+        id
+        generatedAt
+        sourceHash
+        pillars {
+          key
+          title
+          summary
+          gaps
+        }
+      }
+    }
+  }
+`;
+
+export interface GenerateCompanyAiBriefResponse {
+  generateCompanyAiBrief: CompanyAiBriefResult;
+}
+
+export interface GenerateCompanyAiBriefVariables {
+  companyId: string;
+  force?: boolean | null;
+}

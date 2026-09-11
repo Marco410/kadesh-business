@@ -17,6 +17,7 @@ import {
 import { Routes } from "kadesh/core/routes";
 import { PaletteColorPicker } from "kadesh/components/shared";
 import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
+import { useRefreshCompanyAiBrief } from "kadesh/components/profile/ai/useRefreshCompanyAiBrief";
 
 const INPUT_CLASS =
   "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
@@ -108,6 +109,9 @@ export default function ProfileCompanySection({
   });
 
   const savedCompany = data?.user?.company ?? null;
+  const { refresh: refreshBrief } = useRefreshCompanyAiBrief(
+    savedCompany?.id ?? null,
+  );
 
   const [companyName, setCompanyName] = useState("");
   const [termsQuotation, settermsQuotation] = useState("");
@@ -252,7 +256,16 @@ export default function ProfileCompanySection({
       return;
     }
     setCompanySaveError("");
-    await updateCompany({
+    const onboardingChanged =
+      (onboardingMainOffer || "") !==
+        (savedCompany.onboardingMainOffer ?? "") ||
+      (onboardingIdealCustomer || "") !==
+        (savedCompany.onboardingIdealCustomer ?? "") ||
+      (onboardingAvgTicketValue || "") !==
+        (savedCompany.onboardingAvgTicketValue ?? "") ||
+      (onboardingSalesPain || "") !==
+        (savedCompany.onboardingSalesPain ?? "");
+    const result = await updateCompany({
       variables: {
         where: { id: savedCompany.id },
         data: {
@@ -270,6 +283,9 @@ export default function ProfileCompanySection({
         },
       },
     });
+    if (result.data?.updateSaasCompany && onboardingChanged) {
+      void refreshBrief({ force: true });
+    }
   };
 
   const companyLogoDisplayUrl =

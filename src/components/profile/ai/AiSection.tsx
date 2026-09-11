@@ -68,9 +68,9 @@ export function AiSection({
   ];
   const subtitle =
     tab === "dashboard"
-      ? "Resumen del día y recomendaciones según tu industria y lo que ya sabemos de tu negocio."
+      ? "Hoy y el perfil de tu negocio."
       : tab === "info"
-        ? `Qué vendes, a quién y cómo cierras. ${KADESH_URIM_AI_NAME} ya lo tiene de lo que vas capturando en tu empresa y usando Kadesh.`
+        ? `Edita qué vendes, a quién y cómo cierras. Al guardar, el Dashboard actualiza el resumen de tu negocio.`
         : "Esta modalidad aplica a todo el equipo: los vendedores no ven esta pantalla, pero usarán la IA con lo que guardes aquí.";
 
   return (
@@ -126,7 +126,10 @@ export function AiSection({
           onOpenCompanyInfo={() => setTab("info")}
         />
       ) : tab === "info" ? (
-        <AiCompanyInfoTab companyId={companyId} />
+        <AiCompanyInfoTab
+          companyId={companyId}
+          onOpenDashboard={() => setTab("dashboard")}
+        />
       ) : (
         <AiSettingsSection
           companyId={companyId}

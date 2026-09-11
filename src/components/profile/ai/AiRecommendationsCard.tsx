@@ -4,10 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  ArrowRight01Icon,
-  SparklesIcon,
-} from "@hugeicons/core-free-icons";
+import { ArrowRight01Icon, SparklesIcon } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
 import { formatDate } from "kadesh/utils/format-date";
 import { cn } from "kadesh/utils/cn";
@@ -19,6 +16,7 @@ import {
 } from "./constants";
 import { useCompanyAiLive } from "./useCompanyAiLive";
 import { buildProfileRecommendations } from "./profileRecommendations";
+import { ExpandableCopy } from "./ExpandableCopy";
 import {
   AI_PLAYBOOK_QUERY,
   COMPANY_AI_SETTINGS_QUERY,
@@ -148,14 +146,14 @@ export function AiRecommendationsCard({
             <span className="ai-urim-icon">
               <HugeiconsIcon icon={SparklesIcon} size={20} />
             </span>
-            <h3 className="text-lg font-semibold text-[#212121] dark:text-white">
-              Recomendaciones para tu negocio
+            <h3 className="text-base font-semibold text-[#212121] dark:text-white">
+              Recomendaciones
             </h3>
           </div>
-          <p className="mt-0.5 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-0.5 text-xs text-[#9e9e9e] dark:text-[#7a7a7a]">
             {insight?.generatedAt
-              ? `Generadas ${formatDate(insight.generatedAt).toLowerCase()} a partir de tu perfil e industria.`
-              : `Consejos anclados a lo que vendes, a quién se lo vendes y cómo consigues clientes.`}
+              ? formatDate(insight.generatedAt)
+              : "Según tu perfil"}
           </p>
         </div>
         {isAiLive && insight ? (
@@ -178,11 +176,11 @@ export function AiRecommendationsCard({
           Completa el perfil de empresa para ver recomendaciones a tu medida.
         </p>
       ) : (
-        <ol className="space-y-2.5">
+        <ol className="space-y-3">
           {items.map((item, index) => (
-            <li key={`${item.title}-${index}`} className="flex gap-3">
+            <li key={`${item.title}-${index}`} className="flex gap-2.5">
               <span
-                className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+                className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-white"
                 style={{
                   background:
                     "linear-gradient(135deg, var(--ai-urim-purple), var(--ai-urim-blue))",
@@ -191,19 +189,17 @@ export function AiRecommendationsCard({
                 {index + 1}
               </span>
               <span className="min-w-0">
-                <span className="block text-base font-medium text-[#212121] dark:text-white">
+                <span className="block text-sm font-medium text-[#212121] dark:text-white">
                   {item.title}
                 </span>
-                <span className="block text-sm text-[#616161] dark:text-[#b0b0b0]">
-                  {item.detail}
-                </span>
+                <ExpandableCopy text={item.detail} />
                 {"action" in item &&
                 item.action === "info" &&
                 onOpenCompanyInfo ? (
                   <button
                     type="button"
                     onClick={onOpenCompanyInfo}
-                    className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-orange-600 hover:underline dark:text-orange-400"
+                    className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-orange-600 hover:underline dark:text-orange-400"
                   >
                     Completar ahora
                     <HugeiconsIcon icon={ArrowRight01Icon} size={12} />
@@ -211,7 +207,7 @@ export function AiRecommendationsCard({
                 ) : "href" in item && item.href ? (
                   <Link
                     href={item.href}
-                    className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-orange-600 hover:underline dark:text-orange-400"
+                    className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-orange-600 hover:underline dark:text-orange-400"
                   >
                     Ir ahora
                     <HugeiconsIcon icon={ArrowRight01Icon} size={12} />
@@ -225,7 +221,9 @@ export function AiRecommendationsCard({
 
       {isAiLive && !insight ? (
         <div className="mt-4">
-          <p className="text-sm text-[#9e9e9e] dark:text-[#7a7a7a]">{creditHint}</p>
+          <p className="text-sm text-[#9e9e9e] dark:text-[#7a7a7a]">
+            {creditHint}
+          </p>
           <button
             type="button"
             onClick={() => void runGenerate(false)}

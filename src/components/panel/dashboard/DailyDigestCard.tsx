@@ -8,6 +8,7 @@ import { sileo } from "sileo";
 import { Routes } from "kadesh/core/routes";
 import { formatDate } from "kadesh/utils/format-date";
 import { cn } from "kadesh/utils/cn";
+import { ExpandableCopy } from "kadesh/components/profile/ai/ExpandableCopy";
 import {
   AI_BILLING_MODE,
   KADESH_URIM_AI_NAME,
@@ -234,15 +235,13 @@ export function DailyDigestCard({
             <span className="ai-urim-icon">
               <HugeiconsIcon icon={SparklesIcon} size={20} />
             </span>
-            <h3 className="text-lg font-semibold text-[#212121] dark:text-white">
+            <h3 className="text-base font-semibold text-[#212121] dark:text-white">
               {title}
             </h3>
           </div>
-          {insight ? (
-            <p className="mt-0.5 text-sm text-[#616161] dark:text-[#b0b0b0]">
-              {insight.generatedAt
-                ? `Generado ${formatDate(insight.generatedAt).toLowerCase()}.`
-                : "Tres siguientes pasos para hoy."}
+          {insight?.generatedAt ? (
+            <p className="mt-0.5 text-xs text-[#9e9e9e] dark:text-[#7a7a7a]">
+              {formatDate(insight.generatedAt)}
             </p>
           ) : null}
         </div>
@@ -267,11 +266,11 @@ export function DailyDigestCard({
       ) : digestQuery.loading && !insight ? (
         <div className="h-24 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
       ) : actions.length > 0 ? (
-        <ol className="space-y-2.5">
+        <ol className="space-y-3">
           {actions.map((action, index) => (
-            <li key={`${action.title}-${index}`} className="flex gap-3">
+            <li key={`${action.title}-${index}`} className="flex gap-2.5">
               <span
-                className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+                className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-white"
                 style={{
                   background:
                     "linear-gradient(135deg, var(--ai-urim-purple), var(--ai-urim-blue))",
@@ -279,13 +278,11 @@ export function DailyDigestCard({
               >
                 {index + 1}
               </span>
-              <span>
-                <span className="block text-base font-medium text-[#212121] dark:text-white">
+              <span className="min-w-0">
+                <span className="block text-sm font-medium text-[#212121] dark:text-white">
                   {action.title}
                 </span>
-                <span className="block text-sm text-[#616161] dark:text-[#b0b0b0]">
-                  {action.detail}
-                </span>
+                <ExpandableCopy text={action.detail} />
               </span>
             </li>
           ))}

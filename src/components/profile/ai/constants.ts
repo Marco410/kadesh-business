@@ -19,7 +19,7 @@ export const AI_BILLING_MODE_OPTIONS = [
     value: AI_BILLING_MODE.MANAGED,
     label: "Administrado por Kadesh",
     description:
-      "Kadesh llama al modelo. Se cobra de la misma bolsa de créditos que la extracción de leads. 1 crédito = 1000 tokens de IA.",
+      "Kadesh llama al modelo. Se cobra de la misma bolsa de créditos que la extracción de leads.",
   },
 ] as const;
 
@@ -48,27 +48,35 @@ export const ONBOARDING_CONTEXT_FIELDS = [
     key: "onboardingMainOffer",
     label: "Oferta principal",
     title: 'El "Qué" — Oferta principal',
+    shortLabel: "Qué",
     placeholder:
       "En una o dos oraciones: ¿qué servicio o producto principal vendes?",
+    hint: "Escríbelo en el recuadro: qué vendes y qué resultado le das al cliente.",
   },
   {
     key: "onboardingIdealCustomer",
     label: "Cliente ideal",
     title: 'El "Quién" — Cliente ideal',
+    shortLabel: "Quién",
     placeholder: "Ej. clínicas dentales, constructoras, restaurantes…",
+    hint: "Quién te compra de verdad: industria, cargo o tipo de empresa.",
   },
   {
     key: "onboardingAvgTicketValue",
     label: "Ticket o valor",
     title: 'El "Cuánto" — Ticket o valor',
+    shortLabel: "Cuánto",
     placeholder:
       "Precio promedio, o cuánto ayudas a ganar o ahorrar a tus clientes",
+    hint: "Precio, rango o valor. Si puedes, incluye moneda y si es mensual o por proyecto.",
   },
   {
     key: "onboardingSalesPain",
     label: "Adquisición y dolores al vender",
     title: 'El "Cómo" — Adquisición y dolores al vender',
+    shortLabel: "Cómo",
     placeholder: "¿Cómo consigues clientes hoy y qué te cuesta más al vender?",
+    hint: "Cómo llegan hoy los clientes y qué se traba al cerrar.",
   },
 ] as const;
 
@@ -102,5 +110,13 @@ export function isCompanyAiConfigured(
   return Boolean(company.aiApiKeyPreview?.trim());
 }
 
+/**
+ * Cobro y cupo de IA administrada. Deben coincidir con kadesh-back
+ * (`tokenCredits.ts` y el primer eslabón de `MANAGED_GEMINI_FALLBACK`).
+ */
+export const AI_TOKENS_PER_CREDIT = 1_000;
+export const AI_OUTPUT_TOKEN_WEIGHT = 5;
 /** Créditos típicos de un digest diario corto en modalidad administrada. */
 export const TYPICAL_DIGEST_CREDITS = 4;
+export const AI_MANAGED_MAX_PER_MINUTE = 15;
+export const AI_MANAGED_MAX_PER_DAY = 500;
