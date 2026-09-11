@@ -28,6 +28,7 @@ import { formatDate, formatDateShort } from "kadesh/utils/format-date";
 import { cn } from "kadesh/utils/cn";
 import type { SubscriptionData } from "kadesh/components/profile/sales/queries";
 import { PipelineBars, ShareBars, WeeklyBars } from "./charts";
+import { DailyDigestCard } from "./DailyDigestCard";
 import { useCompanyDashboard } from "./useCompanyDashboard";
 import type { DashboardStats } from "./aggregate";
 
@@ -338,25 +339,53 @@ export function CompanyDashboard({
   }
 
   if (loading || !stats) {
-    return <DashboardSkeleton />;
+    return (
+      <div className="space-y-4">
+        <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/10 to-orange-600/5 dark:from-orange-500/20 dark:to-transparent px-5 py-4">
+          <p className="text-sm capitalize text-[#616161] dark:text-[#b0b0b0]">
+            {todayLabel}
+          </p>
+          <h2 className="mt-0.5 text-2xl font-bold text-[#212121] dark:text-white">
+            Hola, {firstName}
+          </h2>
+        </div>
+        <DailyDigestCard
+          companyId={companyId}
+          canManageAi={canManageAi}
+          isCompanyWide={hasCompanyWideLeadScope}
+          remainingQuota={credits.remainingQuota}
+          onGenerated={() => void credits.refetch()}
+        />
+        <DashboardSkeleton />
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className={panelClass}>
-        <h2 className="text-lg font-semibold text-[#212121] dark:text-white">
-          No se pudo cargar el dashboard
-        </h2>
-        <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
-          Revisa tu conexión e inténtalo de nuevo.
-        </p>
-        <button
-          type="button"
-          onClick={() => void refetch()}
-          className="mt-4 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
-        >
-          Reintentar
-        </button>
+      <div className="space-y-4">
+        <DailyDigestCard
+          companyId={companyId}
+          canManageAi={canManageAi}
+          isCompanyWide={hasCompanyWideLeadScope}
+          remainingQuota={credits.remainingQuota}
+          onGenerated={() => void credits.refetch()}
+        />
+        <div className={panelClass}>
+          <h2 className="text-lg font-semibold text-[#212121] dark:text-white">
+            No se pudo cargar el dashboard
+          </h2>
+          <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+            Revisa tu conexión e inténtalo de nuevo.
+          </p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="mt-4 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+          >
+            Reintentar
+          </button>
+        </div>
       </div>
     );
   }
@@ -390,6 +419,14 @@ export function CompanyDashboard({
           />
         </div>
       </div>
+
+      <DailyDigestCard
+        companyId={companyId}
+        canManageAi={canManageAi}
+        isCompanyWide={hasCompanyWideLeadScope}
+        remainingQuota={remainingQuota}
+        onGenerated={() => void credits.refetch()}
+      />
 
       <section className={cn(panelClass, "overflow-visible")}>
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-px bg-[#ececec] dark:bg-[#2e2e2e] rounded-xl overflow-visible">

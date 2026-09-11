@@ -76,3 +76,6 @@ export function isCompanyAiConfigured(
   if (company.aiBillingMode === AI_BILLING_MODE.MANAGED) return true;
   return Boolean(company.aiApiKeyPreview?.trim());
 }
+
+/** Créditos típicos de un digest diario corto en modalidad administrada. */
+export const TYPICAL_DIGEST_CREDITS = 4;

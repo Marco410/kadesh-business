@@ -25,6 +25,8 @@ export function useCompanyAiLive(companyId: string | null) {
 
   return {
     isAiLive: configured && connectionTested,
+    configured,
+    billingMode: data?.saasCompany?.aiBillingMode ?? null,
     loading,
   };
 }

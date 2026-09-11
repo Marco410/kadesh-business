@@ -134,3 +134,83 @@ export interface CompanyAiLiveStatusResponse {
 export interface CompanyAiLiveStatusVariables {
   companyId: string;
 }
+
+export const DAILY_DIGEST_QUERY = gql`
+  query DailyDigest($companyId: ID!) {
+    dailyDigest(companyId: $companyId) {
+      success
+      message
+      cached
+      creditsCharged
+      insight {
+        id
+        referenceKey
+        content
+        generatedAt
+        actions {
+          title
+          detail
+        }
+      }
+    }
+  }
+`;
+
+export interface DailyDigestAction {
+  title: string;
+  detail: string;
+}
+
+export interface DailyDigestInsight {
+  id: string;
+  referenceKey: string;
+  content: string | null;
+  generatedAt: string | null;
+  actions: DailyDigestAction[];
+}
+
+export interface DailyDigestResult {
+  success: boolean;
+  message: string;
+  cached: boolean;
+  creditsCharged: number | null;
+  insight: DailyDigestInsight | null;
+}
+
+export interface DailyDigestQueryResponse {
+  dailyDigest: DailyDigestResult;
+}
+
+export interface DailyDigestQueryVariables {
+  companyId: string;
+}
+
+export const GENERATE_DAILY_DIGEST_MUTATION = gql`
+  mutation GenerateDailyDigest($companyId: ID!, $force: Boolean) {
+    generateDailyDigest(companyId: $companyId, force: $force) {
+      success
+      message
+      cached
+      creditsCharged
+      insight {
+        id
+        referenceKey
+        content
+        generatedAt
+        actions {
+          title
+          detail
+        }
+      }
+    }
+  }
+`;
+
+export interface GenerateDailyDigestResponse {
+  generateDailyDigest: DailyDigestResult;
+}
+
+export interface GenerateDailyDigestVariables {
+  companyId: string;
+  force?: boolean | null;
+}

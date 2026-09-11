@@ -23,7 +23,9 @@ pnpm-debug.log*
 *.tgz
 
 # IDEs
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tailwind.css-data.json
 .idea/ 
 tsconfig.tsbuildinfo
 tsconfig.tsbuildinfo
