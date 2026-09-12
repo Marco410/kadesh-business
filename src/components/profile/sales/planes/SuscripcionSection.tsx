@@ -22,7 +22,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft01Icon,
   CheckmarkCircle02Icon,
+  SparklesIcon,
 } from "@hugeicons/core-free-icons";
+import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
 import { SupportContactSection } from "kadesh/components/shared";
 import { useSubscriptionPayment } from "./hooks/useSubscriptionPayment";
 import EmptyCompanySection from "../EmptyCompanySection";
@@ -258,18 +260,39 @@ export default function SuscripcionSection() {
             <ul className="mt-8 space-y-2">
               {plan.planFeatures
                 .filter((f: PlanFeatureItem) => f.included)
-                .map((f: PlanFeatureItem) => (
-                  <li key={f.key} className="flex items-center gap-3 text-sm">
-                    <HugeiconsIcon
-                      icon={CheckmarkCircle02Icon}
-                      size={20}
-                      className="flex-shrink-0 text-orange-500 dark:text-orange-400"
-                    />
-                    <span className="text-[#212121] dark:text-[#e0e0e0]">
-                      {f.name}
-                    </span>
-                  </li>
-                ))}
+                .sort((a, b) => {
+                  if (a.key === "kadesh_ai") return -1;
+                  if (b.key === "kadesh_ai") return 1;
+                  return 0;
+                })
+                .map((f: PlanFeatureItem) => {
+                  const isAi = f.key === "kadesh_ai";
+                  return (
+                    <li key={f.key} className="flex items-center gap-3 text-sm">
+                      {isAi ? (
+                        <span className="ai-urim-fill inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold shadow-[0_6px_14px_rgba(139,92,246,0.28)]">
+                          <HugeiconsIcon
+                            icon={SparklesIcon}
+                            size={16}
+                            className="shrink-0 text-white"
+                          />
+                          {KADESH_URIM_AI_NAME}
+                        </span>
+                      ) : (
+                        <>
+                          <HugeiconsIcon
+                            icon={CheckmarkCircle02Icon}
+                            size={20}
+                            className="flex-shrink-0 text-orange-500 dark:text-orange-400"
+                          />
+                          <span className="text-[#212121] dark:text-[#e0e0e0]">
+                            {f.name}
+                          </span>
+                        </>
+                      )}
+                    </li>
+                  );
+                })}
             </ul>
           )}
           <div className="mt-6">

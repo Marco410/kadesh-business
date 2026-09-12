@@ -228,19 +228,23 @@ function DashboardSidebar({
             )
               return null;
             const isActive = selectedTab === item.key;
+            const isAi = item.key === "ai";
             return (
               <button
                 key={item.key}
                 type="button"
                 onClick={() => onTabChange(item.key)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium transition-colors ${
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-orange-500 text-white dark:bg-orange-500 dark:text-white"
-                    : "text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
-                }`}
+                    ? isAi
+                      ? "ai-urim-fill shadow-[0_6px_14px_rgba(139,92,246,0.28)]"
+                      : "bg-orange-500 text-white dark:bg-orange-500 dark:text-white"
+                    : "text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]",
+                )}
               >
                 <span
-                  className={item.key === "ai" ? "ai-urim-icon" : undefined}
+                  className={isAi && !isActive ? "ai-urim-icon" : undefined}
                 >
                   <HugeiconsIcon icon={item.icon} size={20} />
                 </span>
