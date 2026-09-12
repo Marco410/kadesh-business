@@ -633,13 +633,28 @@ html.dark .ai-live-ring::after {
   animation: dashboard-bar-grow-y 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+@keyframes whatsapp-fab-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.whatsapp-fab-pulse {
+  animation: whatsapp-fab-pulse 2.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ai-live-ring {
     animation: none;
   }
 
   .dashboard-bar-grow,
-  .dashboard-bar-grow-y {
+  .dashboard-bar-grow-y,
+  .whatsapp-fab-pulse {
     animation: none;
   }
 }
@@ -666,8 +681,8 @@ html.dark .ai-live-ring::after {
 .font-scale-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   border-radius: 999px;
   background: currentColor;
   border: 2px solid #fff;
@@ -676,8 +691,8 @@ html.dark .ai-live-ring::after {
 
 .font-scale-slider::-moz-range-thumb {
   appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   border: 2px solid #fff;
   border-radius: 999px;
   background: currentColor;

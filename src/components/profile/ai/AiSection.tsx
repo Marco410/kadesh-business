@@ -14,6 +14,7 @@ import { Routes } from "kadesh/core/routes";
 import { AiCompanyInfoTab } from "./AiCompanyInfoTab";
 import { AiDashboardTab } from "./AiDashboardTab";
 import { AiSettingsSection } from "./AiSettingsSection";
+import { cn } from "kadesh/utils/cn";
 import { KADESH_URIM_AI_NAME } from "./constants";
 import { useCompanyAiLive } from "./useCompanyAiLive";
 
@@ -76,7 +77,7 @@ export function AiSection({
   return (
     <div className="space-y-5">
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/15 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400">
+        <span className="ai-urim-fill mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl shadow-[0_6px_14px_rgba(139,92,246,0.28)]">
           <HugeiconsIcon icon={SparklesIcon} size={22} />
         </span>
         <div>
@@ -101,11 +102,12 @@ export function AiSection({
             role="tab"
             aria-selected={tab === item.key}
             onClick={() => setTab(item.key)}
-            className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
+            className={cn(
+              "flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",
               tab === item.key
-                ? "bg-orange-500 text-white shadow-sm"
-                : "text-[#616161] hover:bg-[#f5f5f5] dark:text-[#9e9e9e] dark:hover:bg-[#2a2a2a]"
-            }`}
+                ? "ai-urim-fill shadow-sm"
+                : "text-[#616161] hover:bg-[#f5f5f5] dark:text-[#9e9e9e] dark:hover:bg-[#2a2a2a]",
+            )}
           >
             <HugeiconsIcon icon={item.icon} size={16} className="shrink-0" />
             <span className="truncate">{item.label}</span>

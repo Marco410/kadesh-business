@@ -33,6 +33,7 @@ import {
   type AiBillingMode,
   type AiProviderKey,
 } from "./constants";
+import { ByokApiKeyGuide } from "./ByokApiKeyGuide";
 import {
   COMPANY_AI_SETTINGS_QUERY,
   COMPANY_AI_LIVE_QUERY,
@@ -285,6 +286,70 @@ export function AiSettingsSection({
     }
   };
 
+  const saveAndTest = (
+    <>
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <button
+          type="button"
+          onClick={() => void handleSave()}
+          disabled={busy || !isDirty}
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {saving ? (
+            <>
+              <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              Guardando...
+            </>
+          ) : (
+            "Guardar configuración"
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() => void handleTestConnection()}
+          disabled={busy || isDirty}
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#e0e0e0] px-5 py-2.5 text-sm font-semibold text-[#212121] transition-colors hover:bg-[#f5f5f5] disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
+        >
+          {testing ? (
+            <>
+              <span className="size-4 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
+              Probando...
+            </>
+          ) : (
+            <>
+              <HugeiconsIcon icon={FlashIcon} size={16} />
+              Probar conexión
+            </>
+          )}
+        </button>
+      </div>
+      {isDirty && (
+        <p className="mt-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
+          Guarda los cambios para poder probar la conexión con la configuración
+          nueva.
+        </p>
+      )}
+      {testResult && (
+        <div
+          className={`mt-5 rounded-xl border p-4 text-sm ${
+            testResult.success
+              ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
+              : "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-300"
+          }`}
+        >
+          <p className="flex items-start gap-2 font-medium">
+            <HugeiconsIcon
+              icon={testResult.success ? CheckmarkCircle02Icon : FlashIcon}
+              size={18}
+              className="mt-0.5 shrink-0"
+            />
+            {testResult.message}
+          </p>
+        </div>
+      )}
+    </>
+  );
+
   if (loading && !saved) {
     return (
       <div className="flex items-center justify-center rounded-2xl border border-[#e0e0e0] bg-white py-16 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
@@ -387,283 +452,232 @@ export function AiSettingsSection({
         </fieldset>
 
         {isManaged ? (
-          <div className="mt-8 rounded-xl border border-[#e0e0e0] bg-[#fafafa] p-5 dark:border-[#3a3a3a] dark:bg-[#252525]">
-            <p className="text-sm font-semibold text-[#212121] dark:text-white">
-              Saldo de créditos
-            </p>
-            <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
-              Es la misma bolsa que usas para extraer leads. Probar la conexión
-              no cobra.
-            </p>
-            <p className="mt-4 text-3xl font-bold tabular-nums text-[#212121] dark:text-white">
-              {creditsLoading ? "…" : (remainingQuota ?? "—")}
-              <span className="ml-2 text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
-                créditos disponibles
-              </span>
-            </p>
-            <dl className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
-              {planLeadLimit != null && (
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
-                    Incluidos en el plan
-                  </dt>
-                  <dd className="font-semibold tabular-nums text-[#212121] dark:text-white">
-                    {planLeadLimit}
-                  </dd>
-                </div>
-              )}
-              {extraCredits != null && (
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
-                    Recargas extra
-                  </dt>
-                  <dd className="font-semibold tabular-nums text-[#212121] dark:text-white">
-                    {extraCredits}
-                  </dd>
-                </div>
-              )}
-              {creditPeriod && (
-                <div className="sm:col-span-2">
-                  <dt className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
-                    Periodo
-                  </dt>
-                  <dd className="capitalize text-[#212121] dark:text-white">
-                    {creditPeriod}
-                  </dd>
-                </div>
-              )}
-            </dl>
-            <div className="mt-4 space-y-3 border-t border-[#ececec] pt-4 dark:border-[#2a2a2a]">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
-                  Cómo se cobra
-                </p>
-                <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
-                  1 crédito cubre {AI_TOKENS_PER_CREDIT.toLocaleString("es-MX")}{" "}
-                  tokens. Los tokens es lo que le mandamos a{" "}
-                  {KADESH_URIM_AI_NAME}.
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
-                  Tope de uso
-                </p>
-                <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
-                  Hasta {AI_MANAGED_MAX_PER_MINUTE} consultas por minuto y{" "}
-                  {AI_MANAGED_MAX_PER_DAY} al día. Si se llena, espera un
-                  momento o usa tu API key: ahí no hay este tope ni se
-                  descuentan créditos de Kadesh.
-                </p>
-              </div>
-            </div>
-            <Link
-              href={Routes.panelCredits}
-              className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-            >
-              Comprar créditos
-              <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
-            </Link>
-          </div>
-        ) : (
-          <div className="mt-8 space-y-5">
-            <div>
-              <label
-                htmlFor="ai-provider"
-                className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]"
-              >
-                Proveedor
-              </label>
-              <select
-                id="ai-provider"
-                value={provider}
-                onChange={(e) => setProvider(e.target.value)}
-                disabled={busy}
-                className={INPUT_CLASS}
-              >
-                <option value="">Selecciona un proveedor</option>
-                {AI_PROVIDER_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label
-                htmlFor="ai-api-key"
-                className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]"
-              >
-                API key
-              </label>
-              <div className="relative">
-                <input
-                  id="ai-api-key"
-                  type={showApiKey ? "text" : "password"}
-                  value={apiKey}
-                  onChange={(e) => {
-                    setApiKey(e.target.value);
-                    setConfirmClearKey(false);
-                  }}
-                  autoComplete="new-password"
-                  spellCheck={false}
-                  disabled={busy}
-                  placeholder={
-                    hasSavedKey
-                      ? `Key guardada: ${saved?.aiApiKeyPreview}`
-                      : "Pega tu API key"
-                  }
-                  className={`${INPUT_CLASS} pr-12`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowApiKey((prev) => !prev)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#616161] transition-colors hover:bg-[#f0f0f0] hover:text-[#212121] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a] dark:hover:text-white"
-                  aria-label={
-                    showApiKey ? "Ocultar API key" : "Mostrar API key"
-                  }
-                >
-                  <HugeiconsIcon
-                    icon={showApiKey ? ViewOffIcon : EyeIcon}
-                    className="size-5"
-                  />
-                </button>
-              </div>
-              <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
-                La key nunca se muestra completa. Déjala vacía para conservar la
-                actual; escríbela solo si quieres reemplazarla.
+          <>
+            <div className="mt-8 rounded-xl border border-[#e0e0e0] bg-[#fafafa] p-5 dark:border-[#3a3a3a] dark:bg-[#252525]">
+              <p className="text-sm font-semibold text-[#212121] dark:text-white">
+                Saldo de créditos
               </p>
-              {hasSavedKey && saved?.aiKeyUpdatedAt && (
-                <p className="mt-1 text-xs text-[#9e9e9e] dark:text-[#888]">
-                  Actualizada {formatDateShort(saved.aiKeyUpdatedAt)}.
-                </p>
-              )}
-              {hasSavedKey && (
-                <div className="mt-3">
-                  {confirmClearKey ? (
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-sm text-[#616161] dark:text-[#b0b0b0]">
-                        ¿Quitar la API key guardada?
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => void handleClearKey()}
-                        disabled={busy}
-                        className="rounded-lg bg-red-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
-                      >
-                        Sí, quitar
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setConfirmClearKey(false)}
-                        disabled={busy}
-                        className="rounded-lg border border-[#e0e0e0] px-3 py-1.5 text-sm font-medium text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setConfirmClearKey(true)}
-                      disabled={busy}
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
-                    >
-                      <HugeiconsIcon icon={Delete02Icon} size={16} />
-                      Quitar API key guardada
-                    </button>
-                  )}
+              <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+                Es la misma bolsa que usas para extraer leads. Probar la
+                conexión no cobra.
+              </p>
+              <p className="mt-4 text-3xl font-bold tabular-nums text-[#212121] dark:text-white">
+                {creditsLoading ? "…" : (remainingQuota ?? "—")}
+                <span className="ml-2 text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+                  créditos disponibles
+                </span>
+              </p>
+              <dl className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+                {planLeadLimit != null && (
+                  <div>
+                    <dt className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                      Incluidos en el plan
+                    </dt>
+                    <dd className="font-semibold tabular-nums text-[#212121] dark:text-white">
+                      {planLeadLimit}
+                    </dd>
+                  </div>
+                )}
+                {extraCredits != null && (
+                  <div>
+                    <dt className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                      Recargas extra
+                    </dt>
+                    <dd className="font-semibold tabular-nums text-[#212121] dark:text-white">
+                      {extraCredits}
+                    </dd>
+                  </div>
+                )}
+                {creditPeriod && (
+                  <div className="sm:col-span-2">
+                    <dt className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                      Periodo
+                    </dt>
+                    <dd className="capitalize text-[#212121] dark:text-white">
+                      {creditPeriod}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+              <div className="mt-4 space-y-3 border-t border-[#ececec] pt-4 dark:border-[#2a2a2a]">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                    Cómo se cobra
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+                    1 crédito cubre{" "}
+                    {AI_TOKENS_PER_CREDIT.toLocaleString("es-MX")} tokens. Los
+                    tokens es lo que le mandamos a {KADESH_URIM_AI_NAME}.
+                  </p>
                 </div>
-              )}
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                    Tope de uso
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+                    Hasta {AI_MANAGED_MAX_PER_MINUTE} consultas por minuto y{" "}
+                    {AI_MANAGED_MAX_PER_DAY} al día. Si se llena, espera un
+                    momento o usa tu API key: ahí no hay este tope ni se
+                    descuentan créditos de Kadesh.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href={Routes.panelCredits}
+                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+              >
+                Comprar créditos
+                <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+              </Link>
             </div>
-          </div>
-        )}
+            {saveAndTest}
+          </>
+        ) : (
+          <div className="mt-8 grid grid-cols-1 items-start gap-8 lg:grid-cols-2">
+            <div className="min-w-0 space-y-5">
+              <div>
+                <label
+                  htmlFor="ai-provider"
+                  className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]"
+                >
+                  Proveedor
+                </label>
+                <select
+                  id="ai-provider"
+                  value={provider}
+                  onChange={(e) => setProvider(e.target.value)}
+                  disabled={busy}
+                  className={INPUT_CLASS}
+                >
+                  <option value="">Selecciona un proveedor</option>
+                  {AI_PROVIDER_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-        {!isManaged && (
-          <div className="mt-8">
-            <label
-              htmlFor="ai-model"
-              className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]"
-            >
-              Modelo (opcional)
-            </label>
-            <input
-              id="ai-model"
-              type="text"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
+              <div>
+                <label
+                  htmlFor="ai-api-key"
+                  className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]"
+                >
+                  API key
+                </label>
+                <div className="relative">
+                  <input
+                    id="ai-api-key"
+                    type={showApiKey ? "text" : "password"}
+                    value={apiKey}
+                    onChange={(e) => {
+                      setApiKey(e.target.value);
+                      setConfirmClearKey(false);
+                    }}
+                    autoComplete="new-password"
+                    spellCheck={false}
+                    disabled={busy}
+                    placeholder={
+                      hasSavedKey
+                        ? `Key guardada: ${saved?.aiApiKeyPreview}`
+                        : "Pega tu API key"
+                    }
+                    className={`${INPUT_CLASS} pr-12`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#616161] transition-colors hover:bg-[#f0f0f0] hover:text-[#212121] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a] dark:hover:text-white"
+                    aria-label={
+                      showApiKey ? "Ocultar API key" : "Mostrar API key"
+                    }
+                  >
+                    <HugeiconsIcon
+                      icon={showApiKey ? ViewOffIcon : EyeIcon}
+                      className="size-5"
+                    />
+                  </button>
+                </div>
+                <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  La key nunca se muestra completa. Déjala vacía para conservar
+                  la actual; escríbela solo si quieres reemplazarla.
+                </p>
+                {hasSavedKey && saved?.aiKeyUpdatedAt && (
+                  <p className="mt-1 text-xs text-[#9e9e9e] dark:text-[#888]">
+                    Actualizada {formatDateShort(saved.aiKeyUpdatedAt)}.
+                  </p>
+                )}
+                {hasSavedKey && (
+                  <div className="mt-3">
+                    {confirmClearKey ? (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                          ¿Quitar la API key guardada?
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => void handleClearKey()}
+                          disabled={busy}
+                          className="rounded-lg bg-red-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
+                        >
+                          Sí, quitar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmClearKey(false)}
+                          disabled={busy}
+                          className="rounded-lg border border-[#e0e0e0] px-3 py-1.5 text-sm font-medium text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setConfirmClearKey(true)}
+                        disabled={busy}
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
+                      >
+                        <HugeiconsIcon icon={Delete02Icon} size={16} />
+                        Quitar API key guardada
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="ai-model"
+                  className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]"
+                >
+                  Modelo (opcional)
+                </label>
+                <input
+                  id="ai-model"
+                  type="text"
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  disabled={busy}
+                  placeholder={modelPlaceholder}
+                  className={INPUT_CLASS}
+                />
+                <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  Vacío usa el default del proveedor
+                  {isAiProviderKey(provider)
+                    ? ` (${DEFAULT_AI_MODELS[provider as AiProviderKey]})`
+                    : ""}
+                  .
+                </p>
+              </div>
+              {saveAndTest}
+            </div>
+            <ByokApiKeyGuide
+              provider={provider}
               disabled={busy}
-              placeholder={modelPlaceholder}
-              className={INPUT_CLASS}
+              onSelectProvider={setProvider}
+              className="w-full lg:sticky lg:top-28"
             />
-            <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
-              Vacío usa el default del proveedor
-              {isAiProviderKey(provider)
-                ? ` (${DEFAULT_AI_MODELS[provider as AiProviderKey]})`
-                : ""}
-              .
-            </p>
-          </div>
-        )}
-
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <button
-            type="button"
-            onClick={() => void handleSave()}
-            disabled={busy || !isDirty}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {saving ? (
-              <>
-                <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                Guardando...
-              </>
-            ) : (
-              "Guardar configuración"
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => void handleTestConnection()}
-            disabled={busy || isDirty}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#e0e0e0] px-5 py-2.5 text-sm font-semibold text-[#212121] transition-colors hover:bg-[#f5f5f5] disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
-          >
-            {testing ? (
-              <>
-                <span className="size-4 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
-                Probando...
-              </>
-            ) : (
-              <>
-                <HugeiconsIcon icon={FlashIcon} size={16} />
-                Probar conexión
-              </>
-            )}
-          </button>
-        </div>
-        {isDirty && (
-          <p className="mt-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
-            Guarda los cambios para poder probar la conexión con la
-            configuración nueva.
-          </p>
-        )}
-
-        {testResult && (
-          <div
-            className={`mt-5 rounded-xl border p-4 text-sm ${
-              testResult.success
-                ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
-                : "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-300"
-            }`}
-          >
-            <p className="flex items-start gap-2 font-medium">
-              <HugeiconsIcon
-                icon={testResult.success ? CheckmarkCircle02Icon : FlashIcon}
-                size={18}
-                className="mt-0.5 shrink-0"
-              />
-              {testResult.message}
-            </p>
           </div>
         )}
       </div>
