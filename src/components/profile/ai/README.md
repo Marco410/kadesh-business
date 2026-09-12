@@ -27,6 +27,10 @@ Al usuario: Kadesh **ya sabe** de su empresa por lo que van capturando (perfil /
 
 Misma regla en `ProfileCompanySection` (bloque Información del perfil) y en la tarjeta “Contexto de tu negocio” de Configuración. Los campos y labels canónicos están en `ONBOARDING_CONTEXT_FIELDS`.
 
+## Landing
+
+La sección `#kadesh-ai` (`KadeshAiSection` en home, después de la vitrina de plataforma) explica el mismo flujo: perfil → pipeline → 3 pasos de hoy. El mock del resumen es **ejemplo**, no datos reales. Misma marca y mismas prohibiciones de copy. CTA a registro.
+
 ## Lo que sabe de la empresa (columna derecha)
 
 Por cada pilar (Qué, Quién, Cuánto, Cómo): un **resumen** de lo que ya quedó escrito y **puntos exactos** que aún no mencionó.

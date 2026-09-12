@@ -19,8 +19,8 @@ export default function FAQSection() {
             Preguntas frecuentes sobre extraer leads de Google Maps
           </h2>
           <p className="text-[#424242] dark:text-[#d6d6d6] max-w-2xl mx-auto">
-            Respuestas directas sobre legalidad, duplicados, CRM, precios y
-            países donde Kadesh puede prospectar negocios B2B.
+            Respuestas directas sobre legalidad, duplicados, CRM, Kadesh AI,
+            precios y países donde Kadesh puede prospectar negocios B2B.
           </p>
         </div>
 

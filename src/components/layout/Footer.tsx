@@ -6,6 +6,7 @@ import { Routes } from 'kadesh/core/routes';
 const FOOTER_LINKS = {
   producto: [
     { label: "Cómo funciona", href: "/#demo" },
+    { label: "Kadesh AI", href: "/#kadesh-ai" },
     { label: "Conócenos", href: Routes.conocenos },
     { label: "Planes y precios", href: Routes.precios },
     { label: "Novedades", href: Routes.novedades },

@@ -65,6 +65,11 @@ export const PRICING_FAQ_ITEMS = [
       "Sí. Todos los planes se facturan en MXN. Si tu equipo opera en México, ves el costo real sin conversión de divisas.",
   },
   {
+    question: "¿Kadesh AI está en todos los planes?",
+    answer:
+      "Sí. Kadesh AI está incluido en Free, Starter, Pro y Agencia. El administrador lo configura en el panel; el equipo ve el resumen del día en Inicio. Puedes usar los créditos de tu plan o conectar tu propia API key.",
+  },
+  {
     question: "¿Puedo cambiar de plan después?",
     answer:
       "Sí. Puedes subir o bajar de plan según tu volumen de prospección. Al actualizar, obtienes la nueva cuota de leads y funciones del plan superior de forma inmediata en el siguiente ciclo o al momento del cambio, según la política de facturación activa.",

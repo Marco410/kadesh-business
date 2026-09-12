@@ -9,7 +9,10 @@ import {
   Shield01Icon,
   FlashIcon,
   Tick02Icon,
+  SparklesIcon,
+  ArrowRight01Icon,
 } from "@hugeicons/core-free-icons";
+import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
 import { gsap, useGSAP } from "kadesh/components/home/register-gsap";
 
 const TRUST_BADGES = [
@@ -67,9 +70,14 @@ export default function HeroSection() {
               0.12,
             )
             .from(
+              ".hero-ai-chip",
+              { y: 12, duration: 0.4 },
+              0.2,
+            )
+            .from(
               ".hero-badge",
               { y: 14, autoAlpha: 0, stagger: 0.06, duration: 0.4 },
-              0.22,
+              0.26,
             )
             .from(
               ".hero-cta",
@@ -157,11 +165,28 @@ export default function HeroSection() {
               Extrae leads B2B de Google Maps y conviértelos en clientes
             </h1>
 
-            <p className="hero-lead text-base sm:text-lg text-white/90 mb-6 leading-relaxed max-w-lg mx-auto lg:mx-0">
+            <p className="hero-lead text-base sm:text-lg text-white/90 mb-5 leading-relaxed max-w-lg mx-auto lg:mx-0">
               Kadesh extrae negocios reales de Google Maps con teléfono, rating
-              y dirección, y los gestiona en un CRM integrado. Prueba 7 días
-              con 50 leads gratis, sin tarjeta.
+              y dirección, y los gestiona en un CRM integrado.{" "}
+              <Link
+                href={`${Routes.home}${Routes.navigation.kadeshAi}`}
+                className="ai-urim-fill mx-0.5 inline-flex translate-y-px items-center gap-1 rounded-full px-2 py-0.5 text-sm font-semibold text-white no-underline shadow-[0_6px_14px_rgba(139,92,246,0.35)] hover:text-white hover:opacity-90"
+              >
+                <HugeiconsIcon icon={SparklesIcon} size={14} />
+                {KADESH_URIM_AI_NAME}
+              </Link>{" "}
+              revisa tu pipeline y te propone qué hacer hoy: está en todos los
+              planes. Prueba 7 días con 50 leads gratis, sin tarjeta.
             </p>
+
+            <Link
+              href={`${Routes.home}${Routes.navigation.kadeshAi}`}
+              className="hero-ai-chip ai-urim-fill mb-4 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold shadow-[0_8px_20px_rgba(139,92,246,0.4)] transition-opacity hover:opacity-90 hover:text-white"
+            >
+              <HugeiconsIcon icon={SparklesIcon} size={16} />
+              {KADESH_URIM_AI_NAME} · En todos los planes
+              <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
+            </Link>
 
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-7">
               {TRUST_BADGES.map((badge) => (
