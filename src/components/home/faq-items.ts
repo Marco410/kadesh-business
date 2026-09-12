@@ -35,6 +35,11 @@ export const FAQ_ITEMS = [
       "El CRM incluye pipeline de ventas, calendario de seguimientos, cotizaciones en PDF, gestión de vendedores y comisiones, proyectos, archivos compartidos y espacios de trabajo tipo Kanban. Todo está integrado en Kadesh, así no pagas herramientas extra para pasar del primer contacto al cierre.",
   },
   {
+    question: "¿Qué es Kadesh AI y cómo funciona?",
+    answer:
+      "Kadesh AI ya conoce tu negocio —qué vendes, a quién y cómo cierras— y revisa tu CRM cada día. Te propone tres siguientes pasos: a quién contactar, qué cotización empujar y qué seguimiento no puede esperar. Está disponible en todos los planes. El administrador lo configura en el panel; el equipo ve el resumen en Inicio. Puedes usar los créditos de tu plan o conectar tu propia API key.",
+  },
+  {
     question: "¿Puedo exportar los leads a Excel?",
     answer:
       "Sí. Desde el plan Pro puedes exportar los leads a Excel en la sección de clientes del CRM. La exportación incluye los datos del negocio para compartirlos con tu equipo o cruzarlos con otras herramientas, sin perder el seguimiento que ya registraste dentro de Kadesh.",

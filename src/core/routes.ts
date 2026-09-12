@@ -21,6 +21,7 @@ export const Routes = {
     stories: '#historias',
     donations: '#donaciones',
     howItWorks: '#como-funciona',
+    kadeshAi: '#kadesh-ai',
     roadmap: '#roadmap',
   },
   

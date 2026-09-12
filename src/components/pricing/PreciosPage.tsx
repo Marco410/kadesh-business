@@ -1,18 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Footer, Navigation } from "kadesh/components/layout";
 import { LandingPricingSection } from "kadesh/components/home";
 import { Routes } from "kadesh/core/routes";
 import { buildPreciosStructuredData } from "./constants";
 import PricingFaqSection from "./PricingFaqSection";
-
-const fadeInUp = {
-  initial: { opacity: 0, y: 24 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5 },
-};
 
 const VALUE_PROPS = [
   {
@@ -45,35 +38,11 @@ export default function PreciosPage() {
       <main className="min-h-screen bg-[#f5f5f5] dark:bg-[#0a0a0a]">
         <Navigation />
 
-        <header className="relative w-full overflow-hidden bg-gradient-to-br from-orange-500 via-orange-400 to-orange-600 dark:from-[#121212] dark:via-[#1a1a1a] dark:to-[#121212]">
-          <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute top-1/4 -left-20 h-72 w-72 rounded-full bg-orange-400/20 blur-3xl" />
-            <div className="absolute bottom-1/4 -right-20 h-96 w-96 rounded-full bg-orange-600/15 blur-3xl" />
-          </div>
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-            <motion.div {...fadeInUp} className="max-w-3xl">
-              <p className="text-orange-100 dark:text-orange-300/90 text-sm font-semibold uppercase tracking-wide mb-3">
-                Planes SaaS B2B · México
-              </p>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
-                Planes y precios de KADESH Negocios
-              </h1>
-              <p className="text-lg sm:text-xl text-orange-50 leading-relaxed mb-4">
-                Software de prospección B2B para extraer clientes potenciales
-                desde Google Maps y gestionarlos en un CRM integrado. Compara
-                Free, Starter, Pro y Agencia en pesos mexicanos.
-              </p>
-              <p className="text-base text-orange-100/90 leading-relaxed">
-                Elige facturación mensual o anual, empieza con prueba gratuita
-                y escala cuando tu embudo de ventas lo necesite.
-              </p>
-            </motion.div>
-          </div>
-        </header>
+        <LandingPricingSection variant="page" />
 
         <section
           aria-labelledby="pricing-value-heading"
-          className="py-12 sm:py-16 bg-white dark:bg-[#121212] border-b border-[#e0e0e0] dark:border-[#2a2a2a]"
+          className="py-12 sm:py-16 bg-white dark:bg-[#121212] border-y border-[#e0e0e0] dark:border-[#2a2a2a]"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2
@@ -99,8 +68,6 @@ export default function PreciosPage() {
             </ul>
           </div>
         </section>
-
-        <LandingPricingSection variant="page" />
 
         <PricingFaqSection />
 
