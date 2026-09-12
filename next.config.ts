@@ -3,7 +3,10 @@ import path from "node:path";
 import type { NextConfig } from "next";
 
 /** Una sola instancia en el bundle (evita dos I18nContext y placeholders en-US en HeroUI DatePicker). */
-const reactAriaI18nRoot = path.join(process.cwd(), "node_modules/@react-aria/i18n");
+const reactAriaI18nRoot = path.join(
+  process.cwd(),
+  "node_modules/@react-aria/i18n",
+);
 const internationalizedDateRoot = path.join(
   process.cwd(),
   "node_modules/@internationalized/date",
@@ -34,7 +37,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "http",
         hostname: "localhost",
-        port: "3001",
+        port: "3002",
         pathname: "/**",
       },
       {

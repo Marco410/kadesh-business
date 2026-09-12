@@ -17,6 +17,7 @@ import {
   type SaasCreditsResponse,
 } from "kadesh/components/profile/sales/queries";
 import { Routes } from "kadesh/core/routes";
+import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
 import { HoverTooltip, SupportContactSection } from "kadesh/components/shared";
 import { cn } from "kadesh/utils/cn";
 import { useUser } from "kadesh/utils/UserContext";
@@ -71,9 +72,15 @@ const CREDIT_PACKAGE_PERSONAS: Record<string, string> = {
 const CREDIT_PACKAGE_FEATURES = [
   {
     key: "extra-credits",
-    name: "Créditos extra para extracción B2B",
+    name: "Créditos extra para extracción B2B e IA",
     description:
-      "Cada crédito te permite sincronizar un lead nuevo desde Google Maps y 5 créditos te permiten extraer leads de LinkedIn.",
+      "Cada crédito te permite sincronizar un lead nuevo desde Google Maps y 5 créditos te permiten extraer leads de LinkedIn. En modalidad administrada, las mismas recargas pagan las llamadas de IA (por tokens).",
+  },
+  {
+    key: "ai-managed",
+    name: "Misma bolsa para IA administrada",
+    description:
+      `Si usas ${KADESH_URIM_AI_NAME} administrado por Kadesh, el gasto se descuenta de estos créditos. Traer tu propia API key (BYOK) no consume saldo.`,
   },
   {
     key: "monthly-quota",

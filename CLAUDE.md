@@ -36,7 +36,7 @@ import { AnimalCard } from "kadesh/components/animals";
 ### Directory layout
 
 - `src/app/` — Next.js App Router pages/layouts. Route groups are thin: most pages just render one section component from `src/components/`.
-- `src/components/<feature>/` — feature code, colocated: components, `hooks/`, `queries.ts`/`mutations.ts`, `constants.ts`, `types.ts`, and a barrel `index.ts` exposing the feature's public API. Import other features via that barrel, not internal file paths.
+- `src/components/<feature>/` — feature code, colocated: components, `hooks/`, `queries.ts`/`mutations.ts`, `constants.ts`, `types.ts`, a barrel `index.ts` exposing the feature's public API, and a `README.md` for product/UX/copy decisions that the code does not make obvious. Import other features via that barrel, not internal file paths. Exception: `profile/ai` does not barrel-export React components (import the file).
 - `src/core/routes.ts` — the single source of truth for every internal path (`Routes.panel`, `Routes.panelLead(id)`, etc.). Always link/navigate through `Routes`, never hardcode a path string.
 - `src/providers/` — `apollo-client.ts` (Apollo Client + KeystoneJS session-token auth header + upload link) and `ThemeProvider`. Never instantiate a second Apollo client in a component.
 - `src/utils/` — pure helpers, `UserContext` (client-side auth state), `getAuthUser.ts`, formatters. No UI here.
@@ -72,4 +72,4 @@ Subscription plans gate CRM functionality via `PLAN_FEATURE_KEYS`/`PLAN_FEATURES
 
 ## Other `.cursor/rules/`
 
-Beyond `basic.mdc` (code style, always applied), this repo also has Cursor rules for marketing/growth tasks that trigger contextually rather than on code changes: `pricing-strategy.mdc`, `content-strategy.mdc`, `referral-program.mdc`, and `ai-seo.mdc` (AEO/GEO optimization for LLM answer engines). These are relevant if asked to work on pricing, content strategy, referral programs, or SEO/AI-discoverability for this site rather than on app code itself.
+Beyond `basic.mdc` (code style, always applied) and `module-docs.mdc` (keep a feature `README.md` in sync with product/UX changes), this repo also has Cursor rules for marketing/growth tasks that trigger contextually rather than on code changes: `pricing-strategy.mdc`, `content-strategy.mdc`, `referral-program.mdc`, and `ai-seo.mdc` (AEO/GEO optimization for LLM answer engines). These are relevant if asked to work on pricing, content strategy, referral programs, or SEO/AI-discoverability for this site rather than on app code itself.

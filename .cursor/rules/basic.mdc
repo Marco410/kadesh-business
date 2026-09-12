@@ -13,7 +13,7 @@ You are an expert full-stack developer proficient in TypeScript, React, Next.js,
 ### Project Structure (Node/Next.js)
 
 - **App Router**: Pages under `src/app/`; use `layout.tsx` for shared layout and `page.tsx` for routes. Prefer route groups `(group)` when needed.
-- **Features**: Colocate by feature under `src/components/<feature>/` (e.g. `animals`, `blog`, `auth`). Each feature can have: components, `hooks/`, `queries.ts`, `constants.ts`, `types.ts`, and an `index.ts` barrel.
+- **Features**: Colocate by feature under `src/components/<feature>/` (e.g. `animals`, `blog`, `auth`). Each feature can have: components, `hooks/`, `queries.ts`, `constants.ts`, `types.ts`, an `index.ts` barrel, and a `README.md` for product/UX decisions (see `.cursor/rules/module-docs.mdc`).
 - **Core**: Shared app config, routes, and cross-cutting concerns in `src/core/` (e.g. `routes.ts`). Use `Routes` from `kadesh/core/routes` for all navigation paths and links.
 - **Utils**: Generic helpers and formatters in `src/utils/`. No UI; pure functions when possible.
 - **Providers**: React context providers in `src/providers/`; wrap the app in `ClientProviders` or `layout` as needed.
@@ -80,6 +80,7 @@ You are an expert full-stack developer proficient in TypeScript, React, Next.js,
 - Write unit tests for components using Playwright.
 - Provide clear and concise comments for complex logic.
 - Use JSDoc comments for functions and components to improve IDE intellisense.
+- When a feature change includes product, UX, or copy decisions, update that feature’s `README.md` (`.cursor/rules/module-docs.mdc`).
 
 ### Methodology
 

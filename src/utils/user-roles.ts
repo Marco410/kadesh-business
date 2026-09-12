@@ -12,3 +12,8 @@ export function userHasRole(
 export function isAdminCompanyUser(user: User | undefined): boolean {
   return userHasRole(user, Role.ADMIN_COMPANY);
 }
+
+/** Admin de empresa o admin de plataforma: pueden configurar Kadesh Urim AI. */
+export function canManageCompanyAi(user: User | undefined): boolean {
+  return userHasRole(user, Role.ADMIN) || isAdminCompanyUser(user);
+}
