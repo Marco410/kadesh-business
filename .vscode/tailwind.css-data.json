@@ -1,0 +1,37 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "@theme",
+      "description": "Tailwind CSS v4: define design tokens (colors, fonts, spacing) as CSS variables."
+    },
+    {
+      "name": "@config",
+      "description": "Tailwind CSS v4: load a JavaScript config file (plugins, content, theme)."
+    },
+    {
+      "name": "@variant",
+      "description": "Tailwind CSS v4: define a custom variant (e.g. dark mode)."
+    },
+    {
+      "name": "@custom-variant",
+      "description": "Tailwind CSS v4: register a custom variant."
+    },
+    {
+      "name": "@plugin",
+      "description": "Tailwind CSS v4: load a Tailwind plugin from CSS."
+    },
+    {
+      "name": "@source",
+      "description": "Tailwind CSS v4: register extra source files for class detection."
+    },
+    {
+      "name": "@utility",
+      "description": "Tailwind CSS v4: define a custom utility class."
+    },
+    {
+      "name": "@reference",
+      "description": "Tailwind CSS v4: import Tailwind without emitting CSS, for @apply in other files."
+    }
+  ]
+}

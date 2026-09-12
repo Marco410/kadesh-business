@@ -34,6 +34,8 @@ export function useRemainingCredits(companyId: string | null) {
     remainingQuota: credits?.remainingQuota ?? null,
     syncedCount: credits?.syncedCount ?? null,
     leadLimit: credits?.leadLimit ?? null,
+    planLeadLimit: credits?.planLeadLimit ?? null,
+    extraCredits: credits?.extraCredits ?? null,
     success: credits?.success ?? false,
     message: credits?.message ?? null,
     year: credits?.year ?? null,

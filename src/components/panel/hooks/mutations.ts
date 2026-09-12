@@ -8,6 +8,8 @@ export const REMAINING_CREDITS_MUTATION = gql`
       remainingQuota
       syncedCount
       leadLimit
+      planLeadLimit
+      extraCredits
       year
       month
     }
@@ -20,6 +22,8 @@ export interface RemainingCreditsResult {
   remainingQuota: number;
   syncedCount: number;
   leadLimit: number | null;
+  planLeadLimit: number | null;
+  extraCredits: number;
   year: number;
   month: number;
 }

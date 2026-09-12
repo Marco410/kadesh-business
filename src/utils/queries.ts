@@ -234,8 +234,16 @@ export const AUTHENTICATE_USER_WITH_GOOGLE_MUTATION = gql`
 `;
 
 export const REGISTER_USER_MUTATION = gql`
-  mutation RegisterUser($data: UserCreateInput!, $referrerCode: String) {
-    registerUser(data: $data, referrerCode: $referrerCode) {
+  mutation RegisterUser(
+    $data: UserCreateInput!
+    $referrerCode: String
+    $companyName: String
+  ) {
+    registerUser(
+      data: $data
+      referrerCode: $referrerCode
+      companyName: $companyName
+    ) {
       name
       lastName
       email
@@ -430,6 +438,7 @@ export interface RegisterUserVariables {
     roles?: { connect: Array<{ id: string }> };
   };
   referrerCode?: string | null;
+  companyName?: string | null;
 }
 
 export interface RegisterUserResponse {

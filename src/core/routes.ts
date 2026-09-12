@@ -30,8 +30,10 @@ export const Routes = {
   contact: '/contacto',
   
   // Profile
+  /** `/panel` sin `?tab=` es Extracción B2B. Cualquier `?tab=` abre Panel de control. */
   panel: '/panel',
   panelProfile: '/panel?tab=profile',
+  panelAi: '/panel?tab=ai',
   panelLead: (id: string): string => `/panel/clientes/lead/${id}`,
   panelProject: (id: string): string => `/panel/clientes/proyecto/${id}`,
   panelQuotation: (id: string): string => `/panel/cotizacion/${id}`,

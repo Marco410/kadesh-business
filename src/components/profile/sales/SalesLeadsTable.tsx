@@ -1,16 +1,13 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { TechBusinessLeadsResponse } from "kadesh/components/profile/sales/queries";
-import {
-  PIPELINE_STATUS_COLORS,
-} from "kadesh/constants/constans";
+import { PIPELINE_STATUS_COLORS } from "kadesh/constants/constans";
 import { Routes } from "kadesh/core/routes";
 import { getCategoryLabel } from "./helpers/category";
 import { ApolloError } from "@apollo/client";
-
-
 
 const DEFAULT_PIPELINE_COLOR =
   "bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300";
@@ -60,7 +57,8 @@ export default function SalesLeadsTable({
   }, [someSelected, allSelected]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-  const effectivePage = totalCount > 0 ? Math.min(currentPage, totalPages) : currentPage;
+  const effectivePage =
+    totalCount > 0 ? Math.min(currentPage, totalPages) : currentPage;
   const from = totalCount === 0 ? 0 : (effectivePage - 1) * pageSize + 1;
   const to = Math.min(effectivePage * pageSize, totalCount);
   const showPagination = totalCount > pageSize && onPageChange != null;
@@ -75,29 +73,53 @@ export default function SalesLeadsTable({
       <div className="flex flex-col items-center justify-center w-full space-y-4">
         <div className="flex flex-col items-center justify-center px-8 py-10 rounded-xl border bg-white dark:bg-[#18181b] border-gray-200 dark:border-gray-800 shadow-md w-full">
           <span className="mx-auto mb-4 flex items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30 size-14 ">
-            <svg width={32} height={32} fill="none" viewBox="0 0 32 32" className="text-orange-500 dark:text-orange-400">
-              <circle cx="16" cy="16" r="15" stroke="currentColor" strokeWidth="2" className="opacity-30"/>
-              <path d="M12 14h8M12 18h5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              <rect x="6" y="6" width="20" height="20" rx="5" stroke="currentColor" strokeWidth="2" className="opacity-50"/>
+            <svg
+              width={32}
+              height={32}
+              fill="none"
+              viewBox="0 0 32 32"
+              className="text-orange-500 dark:text-orange-400"
+            >
+              <circle
+                cx="16"
+                cy="16"
+                r="15"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="opacity-30"
+              />
+              <path
+                d="M12 14h8M12 18h5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <rect
+                x="6"
+                y="6"
+                width="20"
+                height="20"
+                rx="5"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="opacity-50"
+              />
             </svg>
           </span>
-          <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">No hay leads en esta vista</div>
+          <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+            No hay leads en esta vista
+          </div>
           <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Intenta cambiar los filtros o parámetros de búsqueda.
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              router.push(Routes.panel);
-            }}
+          <Link
+            href={Routes.panel}
             className="mt-4 inline-flex items-center px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold shadow hover:bg-orange-600 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-400 dark:bg-orange-700 dark:hover:bg-orange-800"
-            aria-label="Ir a Extracción B2B"
           >
             Ir a Extracción B2B
-          </button>
+          </Link>
         </div>
       </div>
- 
     );
   }
 
@@ -120,194 +142,217 @@ export default function SalesLeadsTable({
   return (
     <div className="w-full space-y-4">
       <div className="overflow-x-auto rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e]">
-      <table className="w-full min-w-[900px] text-sm border-collapse">
-        <thead>
-          <tr className="border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a]">
-            {assignMode && (
-              <th className="w-10 px-2 py-3 text-left">
-                <input
-                  type="checkbox"
-                  ref={selectAllRef}
-                  checked={allSelected}
-                  onChange={() => onToggleAll?.(leadIds)}
-                  onClick={(e) => e.stopPropagation()}
-                  className="rounded border-[#e0e0e0] dark:border-[#3a3a3a] text-orange-500 focus:ring-orange-500"
-                  aria-label="Seleccionar todos"
-                />
-              </th>
-            )}
-            <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
-              Empresa
-            </th>
-            <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
-              Categoría
-            </th>
-            <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
-              Pipeline
-            </th>
-            <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
-              Teléfono
-            </th>
-            <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
-              Ciudad
-            </th>
-            <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
-              Estado
-            </th>
-            <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
-              País
-            </th>
-            <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
-              Oportunidad
-            </th>
-            <th className="text-center px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
-              Rating
-            </th>
-            <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
-              Fuente
-            </th>
-            <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
-              Asignado a
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {leads.map((lead) => {
-            const statuses = Array.isArray(lead.status)
-              ? lead.status
-              : lead.status
-                ? [lead.status]
-                : [];
-            const leadStatus = statuses[0] ?? null;
-            return (
-            <tr
-              key={lead.id}
-              role={assignMode ? undefined : "button"}
-              tabIndex={assignMode ? undefined : 0}
-              onClick={() => !assignMode && router.push(Routes.panelLead(lead.id))}
-              onKeyDown={(e) => {
-                if (!assignMode && (e.key === "Enter" || e.key === " ")) {
-                  e.preventDefault();
-                  router.push(Routes.panelLead(lead.id));
-                }
-              }}
-              className={`border-b border-[#e0e0e0] dark:border-[#3a3a3a] transition-colors ${
-                assignMode ? "" : "hover:bg-[#fafafa] dark:hover:bg-[#252525] cursor-pointer"
-              } ${selectedLeadIds.has(lead.id) ? "bg-orange-50/50 dark:bg-orange-900/10" : ""}`}
-            >
+        <table className="w-full min-w-[900px] text-sm border-collapse">
+          <thead>
+            <tr className="border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a]">
               {assignMode && (
-                <td className="w-10 px-2 py-3" onClick={(e) => e.stopPropagation()}>
+                <th className="w-10 px-2 py-3 text-left">
                   <input
                     type="checkbox"
-                    checked={selectedLeadIds.has(lead.id)}
-                    onChange={() => onToggleLead?.(lead.id)}
+                    ref={selectAllRef}
+                    checked={allSelected}
+                    onChange={() => onToggleAll?.(leadIds)}
+                    onClick={(e) => e.stopPropagation()}
                     className="rounded border-[#e0e0e0] dark:border-[#3a3a3a] text-orange-500 focus:ring-orange-500"
-                    aria-label={`Seleccionar ${lead.businessName}`}
+                    aria-label="Seleccionar todos"
                   />
-                </td>
+                </th>
               )}
-              <td className="px-4 py-3 text-[#212121] dark:text-[#ffffff] font-medium">
-                {lead.businessName || "—"}
-              </td>
-              <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
-                {getCategoryLabel(lead.category)}
-              </td>
-              <td className="px-4 py-3">
-                {leadStatus?.pipelineStatus ? (
-                 <div className="flex flex-col items-center">
-                    <span
-                      className={`inline-flex px-2 py-1 rounded-md text-xs font-medium whitespace-nowrap ${
-                        PIPELINE_STATUS_COLORS[leadStatus.pipelineStatus] ??
-                        DEFAULT_PIPELINE_COLOR
-                      }`}
-                    >
-                      {leadStatus.pipelineStatus}
-                    </span>
-                    <span className="text-[9px] text-[#616161] dark:text-[#b0b0b0]">
-                      Aplicado por: {leadStatus.salesPerson?.name ?? "—"}
-                  </span>
-                  </div>
-                ) : (
-                  <span className="text-[#616161] dark:text-[#b0b0b0]">—</span>
-                )}
-              </td>
-              <td
-                className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0] whitespace-nowrap"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {lead.phone ? (
-                  <a
-                    href={`tel:${lead.phone.replace(/\s/g, "")}`}
-                    className="text-orange-500 dark:text-orange-400 hover:underline focus:outline-none focus:ring-2 focus:ring-orange-500 rounded"
-                  >
-                    {lead.phone}
-                  </a>
-                ) : (
-                  "—"
-                )}
-              </td>
-              <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
-                {lead.city ?? "—"}
-              </td>
-              <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
-                {lead.state ?? "—"}
-              </td>
-              <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
-                {lead.country ?? "—"}
-              </td>
-              <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
-                {leadStatus?.opportunityLevel ?? "—"}
-              </td>
-              <td className="px-4 py-3 text-center text-[#212121] dark:text-[#ffffff]">
-                {lead.rating != null ? lead.rating : "—"}
-              </td>
-              <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
-                {lead.source ?? "—"}
-              </td>
-              <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
-                {(() => {
-                  const persons = lead.salesPerson ?? [];
-                  const count = persons.length;
-                  if (isAdminCompany && count > 1) {
-                    const names = persons
-                      .map((sp) => {
-                        const full = [sp?.name, sp?.lastName].filter(Boolean).join(" ").trim();
-                        return full || "Sin nombre";
-                      })
-                      .join(", ");
-                    const tooltipText = names || `${count} vendedores asignados`;
-                    return (
-                      <span className="group relative inline-flex">
-                        <span
-                          aria-describedby={lead.id ? `tooltip-${lead.id}-sp` : undefined}
-                          className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-orange-500/15 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 dark:border-orange-400/30 cursor-help"
-                          tabIndex={0}
-                        >
-                          {count} asignado{count !== 1 ? "s" : ""}
-                        </span>
-                        <span
-                          id={lead.id ? `tooltip-${lead.id}-sp` : undefined}
-                          role="tooltip"
-                          className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs font-normal text-white bg-[#212121] dark:bg-[#333] rounded-lg shadow-lg max-w-[200px] whitespace-normal text-center opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-opacity z-50"
-                        >
-                          {tooltipText}
-                        </span>
-                      </span>
-                    );
-                  }
-                  if (isAdminCompany && count === 1) {
-                    const sp = persons[0];
-                    return [sp?.name, sp?.lastName].filter(Boolean).join(" ").trim() || "—";
-                  }
-                  if (isAdminCompany && count === 0) return "—";
-                  return `${lead.salesPerson?.[0]?.name ?? ""} ${lead.salesPerson?.[0]?.lastName ?? ""}`.trim() || "—";
-                })()}
-              </td>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                Empresa
+              </th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                Categoría
+              </th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                Pipeline
+              </th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                Teléfono
+              </th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                Ciudad
+              </th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                Estado
+              </th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                País
+              </th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                Oportunidad
+              </th>
+              <th className="text-center px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                Rating
+              </th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                Fuente
+              </th>
+              <th className="text-left px-4 py-3 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                Asignado a
+              </th>
             </tr>
-          );
-          })}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {leads.map((lead) => {
+              const statuses = Array.isArray(lead.status)
+                ? lead.status
+                : lead.status
+                  ? [lead.status]
+                  : [];
+              const leadStatus = statuses[0] ?? null;
+              return (
+                <tr
+                  key={lead.id}
+                  role={assignMode ? undefined : "button"}
+                  tabIndex={assignMode ? undefined : 0}
+                  onClick={() =>
+                    !assignMode && router.push(Routes.panelLead(lead.id))
+                  }
+                  onKeyDown={(e) => {
+                    if (!assignMode && (e.key === "Enter" || e.key === " ")) {
+                      e.preventDefault();
+                      router.push(Routes.panelLead(lead.id));
+                    }
+                  }}
+                  className={`border-b border-[#e0e0e0] dark:border-[#3a3a3a] transition-colors ${
+                    assignMode
+                      ? ""
+                      : "hover:bg-[#fafafa] dark:hover:bg-[#252525] cursor-pointer"
+                  } ${selectedLeadIds.has(lead.id) ? "bg-orange-50/50 dark:bg-orange-900/10" : ""}`}
+                >
+                  {assignMode && (
+                    <td
+                      className="w-10 px-2 py-3"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedLeadIds.has(lead.id)}
+                        onChange={() => onToggleLead?.(lead.id)}
+                        className="rounded border-[#e0e0e0] dark:border-[#3a3a3a] text-orange-500 focus:ring-orange-500"
+                        aria-label={`Seleccionar ${lead.businessName}`}
+                      />
+                    </td>
+                  )}
+                  <td className="px-4 py-3 text-[#212121] dark:text-[#ffffff] font-medium">
+                    {lead.businessName || "—"}
+                  </td>
+                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                    {getCategoryLabel(lead.category)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {leadStatus?.pipelineStatus ? (
+                      <div className="flex flex-col items-center">
+                        <span
+                          className={`inline-flex px-2 py-1 rounded-md text-xs font-medium whitespace-nowrap ${
+                            PIPELINE_STATUS_COLORS[leadStatus.pipelineStatus] ??
+                            DEFAULT_PIPELINE_COLOR
+                          }`}
+                        >
+                          {leadStatus.pipelineStatus}
+                        </span>
+                        <span className="text-[9px] text-[#616161] dark:text-[#b0b0b0]">
+                          Aplicado por: {leadStatus.salesPerson?.name ?? "—"}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-[#616161] dark:text-[#b0b0b0]">
+                        —
+                      </span>
+                    )}
+                  </td>
+                  <td
+                    className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0] whitespace-nowrap"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {lead.phone ? (
+                      <a
+                        href={`tel:${lead.phone.replace(/\s/g, "")}`}
+                        className="text-orange-500 dark:text-orange-400 hover:underline focus:outline-none focus:ring-2 focus:ring-orange-500 rounded"
+                      >
+                        {lead.phone}
+                      </a>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                    {lead.city ?? "—"}
+                  </td>
+                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                    {lead.state ?? "—"}
+                  </td>
+                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                    {lead.country ?? "—"}
+                  </td>
+                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                    {leadStatus?.opportunityLevel ?? "—"}
+                  </td>
+                  <td className="px-4 py-3 text-center text-[#212121] dark:text-[#ffffff]">
+                    {lead.rating != null ? lead.rating : "—"}
+                  </td>
+                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                    {lead.source ?? "—"}
+                  </td>
+                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                    {(() => {
+                      const persons = lead.salesPerson ?? [];
+                      const count = persons.length;
+                      if (isAdminCompany && count > 1) {
+                        const names = persons
+                          .map((sp) => {
+                            const full = [sp?.name, sp?.lastName]
+                              .filter(Boolean)
+                              .join(" ")
+                              .trim();
+                            return full || "Sin nombre";
+                          })
+                          .join(", ");
+                        const tooltipText =
+                          names || `${count} vendedores asignados`;
+                        return (
+                          <span className="group relative inline-flex">
+                            <span
+                              aria-describedby={
+                                lead.id ? `tooltip-${lead.id}-sp` : undefined
+                              }
+                              className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-orange-500/15 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 dark:border-orange-400/30 cursor-help"
+                              tabIndex={0}
+                            >
+                              {count} asignado{count !== 1 ? "s" : ""}
+                            </span>
+                            <span
+                              id={lead.id ? `tooltip-${lead.id}-sp` : undefined}
+                              role="tooltip"
+                              className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs font-normal text-white bg-[#212121] dark:bg-[#333] rounded-lg shadow-lg max-w-[200px] whitespace-normal text-center opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-opacity z-50"
+                            >
+                              {tooltipText}
+                            </span>
+                          </span>
+                        );
+                      }
+                      if (isAdminCompany && count === 1) {
+                        const sp = persons[0];
+                        return (
+                          [sp?.name, sp?.lastName]
+                            .filter(Boolean)
+                            .join(" ")
+                            .trim() || "—"
+                        );
+                      }
+                      if (isAdminCompany && count === 0) return "—";
+                      return (
+                        `${lead.salesPerson?.[0]?.name ?? ""} ${lead.salesPerson?.[0]?.lastName ?? ""}`.trim() ||
+                        "—"
+                      );
+                    })()}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
       {showPagination && (
         <div className="flex flex-wrap items-center justify-between gap-3 py-3 px-4 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525]">
@@ -352,7 +397,9 @@ export default function SalesLeadsTable({
             </div>
             <button
               type="button"
-              onClick={() => onPageChange(Math.min(totalPages, effectivePage + 1))}
+              onClick={() =>
+                onPageChange(Math.min(totalPages, effectivePage + 1))
+              }
               disabled={effectivePage >= totalPages}
               className="px-3 py-1.5 rounded-lg text-sm font-medium border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-[#ffffff] hover:bg-[#f5f5f5] dark:hover:bg-[#333] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-[#2a2a2a]"
             >
