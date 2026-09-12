@@ -359,6 +359,8 @@ function PanelControlSectionContent({
 
   useEffect(() => {
     if (companyId && subscriptionLoading) return;
+    // En el panel embebido, `/panel` sin `tab` es Extracción B2B. No reescribir a inicio.
+    if (embedded && !tabFromUrl) return;
     if (!tabFromUrl || tabFromUrl !== selectedTab) {
       const params = preserveRegisterSuccessParam(
         new URLSearchParams(searchParams.toString()),
@@ -368,6 +370,7 @@ function PanelControlSectionContent({
     }
   }, [
     companyId,
+    embedded,
     subscriptionLoading,
     tabFromUrl,
     selectedTab,
