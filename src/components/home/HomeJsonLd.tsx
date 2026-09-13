@@ -10,7 +10,7 @@ const HOME_JSON_LD = {
       name: "Leads B2B de Google Maps con teléfono y CRM | KADESH",
       description:
         "Kadesh extrae leads B2B de Google Maps con teléfono, rating y dirección, y los gestiona en un CRM integrado. Prueba 7 días con 50 leads gratis, sin tarjeta.",
-      dateModified: "2026-09-10",
+      dateModified: "2026-09-12",
       inLanguage: "es-MX",
       isPartOf: { "@id": "https://kadesh.com.mx/#website" },
       about: { "@id": "https://kadesh.com.mx/#software" },
@@ -62,6 +62,33 @@ const HOME_JSON_LD = {
           position: 4,
           name: "Guarda los leads en el CRM",
           text: "Teléfono, dirección, categoría y rating quedan listos para seguimiento.",
+        },
+      ],
+    },
+    {
+      "@type": "HowTo",
+      "@id": "https://kadesh.com.mx/#howto-kadesh-ai",
+      name: "Cómo funciona Kadesh AI",
+      description:
+        "Kadesh AI ya conoce tu negocio y revisa el CRM cada día para proponerte tres siguientes pasos: a quién contactar, qué cotización empujar y qué seguimiento no puede esperar.",
+      step: [
+        {
+          "@type": "HowToStep",
+          position: 1,
+          name: "Cuéntale qué vendes",
+          text: "Completa oferta, cliente ideal, ticket y cómo cierras. Con lo que capturas en el perfil, Kadesh AI ya sabe de tu empresa.",
+        },
+        {
+          "@type": "HowToStep",
+          position: 2,
+          name: "Revisa el pipeline",
+          text: "Kadesh AI mira cotizaciones sin respuesta, clientes sin primer contacto, seguimientos vencidos y leads que se enfriaron.",
+        },
+        {
+          "@type": "HowToStep",
+          position: 3,
+          name: "Recibe tres siguientes pasos",
+          text: "Cada día te dice a quién contactar, qué cotización empujar y qué seguimiento no puede esperar. El resumen también aparece en Inicio.",
         },
       ],
     },

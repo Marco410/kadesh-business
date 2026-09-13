@@ -10,6 +10,7 @@ export { default as LeadCostComparisonSection } from './LeadCostComparisonSectio
 export { default as RealDataSection } from './RealDataSection';
 export { default as UniqueLeadsSection } from './UniqueLeadsSection';
 export { default as PlatformShowcaseSection } from './PlatformShowcaseSection';
+export { default as KadeshAiSection } from './KadeshAiSection';
 export { default as PersonaBenefitsSection } from './PersonaBenefitsSection';
 export { default as GrowthValueSection } from './GrowthValueSection';
 export { default as SocialProofBanner } from './SocialProofBanner';

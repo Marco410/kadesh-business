@@ -48,7 +48,7 @@ export default function WhyKadeshSection() {
               <p className="text-white/90 leading-relaxed">
                 Genera listas de prospectos reales en minutos, sin anuncios
                 caros ni semanas construyendo bases de datos a mano. Con el
-                plan Pro el costo por lead queda por debajo de 1 MXN.
+                plan Pro el costo por lead queda en unos 1.60 MXN.
               </p>
             </div>
           </div>

@@ -10,6 +10,7 @@ import {
   RealDataSection,
   UniqueLeadsSection,
   PlatformShowcaseSection,
+  KadeshAiSection,
   PersonaBenefitsSection,
   ScheduleDemoSection,
   GrowthValueSection,
@@ -41,6 +42,7 @@ export default function HomePage() {
         <RealDataSection />
         <UniqueLeadsSection />
         <PlatformShowcaseSection />
+        <KadeshAiSection />
         <PersonaBenefitsSection />
         <ScheduleDemoSection />
         <GrowthValueSection />

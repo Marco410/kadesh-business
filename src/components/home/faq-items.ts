@@ -27,12 +27,17 @@ export const FAQ_ITEMS = [
   {
     question: "¿Cada mes obtengo nuevos leads?",
     answer:
-      "Sí. Cada plan incluye una cuota mensual de leads que se renueva automáticamente. Con el plan Pro son 400 leads nuevos al mes, y el detector de duplicados evita gastar esa cuota en negocios que ya tienes. Puedes prospectar la misma zona o expandirte a otras ciudades sin empezar de cero.",
+      "Sí. Cada plan incluye una cuota mensual de leads que se renueva automáticamente. Con el plan Pro son 500 leads nuevos al mes, y el detector de duplicados evita gastar esa cuota en negocios que ya tienes. Puedes prospectar la misma zona o expandirte a otras ciudades sin empezar de cero.",
   },
   {
     question: "¿Qué incluye el CRM además de los leads?",
     answer:
       "El CRM incluye pipeline de ventas, calendario de seguimientos, cotizaciones en PDF, gestión de vendedores y comisiones, proyectos, archivos compartidos y espacios de trabajo tipo Kanban. Todo está integrado en Kadesh, así no pagas herramientas extra para pasar del primer contacto al cierre.",
+  },
+  {
+    question: "¿Qué es Kadesh AI y cómo funciona?",
+    answer:
+      "Kadesh AI ya conoce tu negocio —qué vendes, a quién y cómo cierras— y revisa tu CRM cada día. Te propone tres siguientes pasos: a quién contactar, qué cotización empujar y qué seguimiento no puede esperar. Está disponible en todos los planes. El administrador lo configura en el panel; el equipo ve el resumen en Inicio. Si usas la modalidad administrada, descuenta de los mismos créditos que extraer leads (un resumen del día suele ser 4). Pro y Agencia dan más créditos, así hay más margen. Si conectas tu API key, la IA no descuenta créditos de Kadesh.",
   },
   {
     question: "¿Puedo exportar los leads a Excel?",
@@ -72,7 +77,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Cuánto cuesta un lead con Kadesh frente a Meta Ads?",
     answer:
-      "Con el plan Pro de Kadesh el costo por lead queda por debajo de 1 MXN, porque recibes negocios con teléfono, dirección y rating listos para contactar. En Meta Ads un lead suele costar entre 150 y 300 MXN y no siempre incluye un teléfono verificable. Los montos de anuncios varían por campaña y sector.",
+      "Con el plan Pro de Kadesh (799 MXN y 500 créditos al mes) el costo por lead queda en unos 1.60 MXN, porque recibes negocios con teléfono, dirección y rating listos para contactar. En Meta Ads un lead suele costar entre 150 y 300 MXN y no siempre incluye un teléfono verificable. Los montos de anuncios varían por campaña y sector.",
   },
   {
     question: "¿Puedo recomendar Kadesh y ganar comisiones?",

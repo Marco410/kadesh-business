@@ -4,8 +4,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Tick02Icon } from "@hugeicons/core-free-icons";
 
 const BADGES = [
+  "Kadesh AI: 3 pasos para hoy",
   "Leads únicos sin duplicados",
-  "400+ leads nuevos cada mes",
+  "500+ leads nuevos cada mes",
   "Datos reales de Google Maps",
   "CRM + calendario + cotizaciones",
   "Equipos y comisiones de vendedores",

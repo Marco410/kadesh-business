@@ -19,7 +19,12 @@ import {
   ArrowLeft01Icon,
   CheckmarkCircle02Icon,
   Cancel01Icon,
+  SparklesIcon,
 } from "@hugeicons/core-free-icons";
+import {
+  KADESH_URIM_AI_NAME,
+  KADESH_AI_CREDIT_HINT,
+} from "kadesh/components/profile/ai/constants";
 import { useUser } from "kadesh/utils/UserContext";
 
 function formatPrice(
@@ -58,7 +63,10 @@ function normalizePlanBaseKey(name: string): string {
 }
 
 function displayTierNameFromPlanName(name: string): string {
-  return name.trim().replace(/\s+anual\s*$/i, "").trim();
+  return name
+    .trim()
+    .replace(/\s+anual\s*$/i, "")
+    .trim();
 }
 
 type SaasPlanPair = {
@@ -83,13 +91,16 @@ function groupPaidPlansIntoPairs(paidPlans: SaasPlanItem[]): SaasPlanPair[] {
     const entry = map.get(key) ?? {};
     if (isMonthlyFrequency(p.frequency)) {
       entry.monthly = p;
-      entry.displayName = entry.displayName ?? displayTierNameFromPlanName(p.name);
+      entry.displayName =
+        entry.displayName ?? displayTierNameFromPlanName(p.name);
     } else if (isAnnualFrequency(p.frequency)) {
       entry.annual = p;
-      entry.displayName = entry.displayName ?? displayTierNameFromPlanName(p.name);
+      entry.displayName =
+        entry.displayName ?? displayTierNameFromPlanName(p.name);
     } else {
       entry.monthly = entry.monthly ?? p;
-      entry.displayName = entry.displayName ?? displayTierNameFromPlanName(p.name);
+      entry.displayName =
+        entry.displayName ?? displayTierNameFromPlanName(p.name);
     }
     map.set(key, entry);
   }
@@ -168,7 +179,9 @@ function PlanPriceLine({
           {formatPrice(oldPrice, currency, "monthly")}
         </span>
       )}
-      <p className={cn("flex items-baseline gap-1 whitespace-nowrap", rowClass)}>
+      <p
+        className={cn("flex items-baseline gap-1 whitespace-nowrap", rowClass)}
+      >
         <span className="text-4xl font-bold tabular-nums tracking-tight text-[#212121] dark:text-[#ffffff]">
           {formatPrice(price, currency, "monthly")}
         </span>
@@ -213,7 +226,10 @@ function getPlanPersona(name: string): string | null {
   return PLAN_PERSONAS[name.trim().toLowerCase()] ?? null;
 }
 
-function getPlanPersonaForTier(baseKey: string, displayName: string): string | null {
+function getPlanPersonaForTier(
+  baseKey: string,
+  displayName: string,
+): string | null {
   return PLAN_PERSONAS[baseKey] ?? getPlanPersona(displayName);
 }
 
@@ -224,20 +240,46 @@ function getPlanCta(name: string, isCurrentPlan: boolean): string {
   return PLAN_CTA[name.trim().toLowerCase()] ?? "Iniciar suscripción";
 }
 
+const KADESH_AI_FEATURE_KEY = "kadesh_ai";
+
+function isKadeshAiFeature(feature: PlanFeatureItem): boolean {
+  return feature.key === KADESH_AI_FEATURE_KEY;
+}
+
+function includedPlanFeatures(
+  features: PlanFeatureItem[] | null | undefined,
+): PlanFeatureItem[] {
+  return (features?.filter((f) => f.included) ?? []).sort((a, b) => {
+    if (isKadeshAiFeature(a)) return -1;
+    if (isKadeshAiFeature(b)) return 1;
+    return 0;
+  });
+}
+
 function FeatureChip({ feature }: { feature: PlanFeatureItem }) {
+  const isAi = isKadeshAiFeature(feature);
+  const hint = isAi ? KADESH_AI_CREDIT_HINT : feature.description;
   return (
     <li>
       <span
-        title={feature.description}
-        className="inline-flex items-center gap-1.5 rounded-full border border-[#e0e0e0] bg-[#f5f5f5] px-2.5 py-1 text-xs text-[#616161] dark:border-[#3a3a3a] dark:bg-[#2a2a2a] dark:text-[#b0b0b0]"
+        title={hint}
+        className={
+          isAi
+            ? "ai-urim-fill inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold shadow-[0_6px_14px_rgba(139,92,246,0.28)]"
+            : "inline-flex items-center gap-1.5 rounded-full border border-[#e0e0e0] bg-[#f5f5f5] px-2.5 py-1 text-xs text-[#616161] dark:border-[#3a3a3a] dark:bg-[#2a2a2a] dark:text-[#b0b0b0]"
+        }
       >
         <HugeiconsIcon
-          icon={CheckmarkCircle02Icon}
+          icon={isAi ? SparklesIcon : CheckmarkCircle02Icon}
           size={14}
-          className="shrink-0 text-orange-600 dark:text-orange-400"
+          className={
+            isAi
+              ? "shrink-0 text-white"
+              : "shrink-0 text-orange-600 dark:text-orange-400"
+          }
           aria-hidden
         />
-        {feature.name}
+        {isAi ? KADESH_URIM_AI_NAME : feature.name}
       </span>
     </li>
   );
@@ -247,6 +289,8 @@ function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLSpanElement>(null);
   const tooltipId = useId();
+  const isAi = isKadeshAiFeature(feature);
+  const hint = isAi ? KADESH_AI_CREDIT_HINT : feature.description;
 
   useEffect(() => {
     if (!open) return;
@@ -270,48 +314,86 @@ function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
 
   return (
     <li className={cn("flex items-start gap-3", open && "relative z-20")}>
-      <span className="mt-0.5 flex-shrink-0" aria-hidden>
-        {feature.included ? (
-          <HugeiconsIcon
-            icon={CheckmarkCircle02Icon}
-            size={20}
-            className="text-orange-700 dark:text-orange-400"
-          />
-        ) : (
-          <HugeiconsIcon
-            icon={Cancel01Icon}
-            size={20}
-            className="text-red-500 dark:text-red-400"
-          />
-        )}
-      </span>
-      <span ref={wrapperRef} className="relative inline group/name">
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setOpen((v) => !v);
-          }}
-          className="cursor-help text-left text-sm text-[#616161] dark:text-[#b0b0b0] border-b border-dotted border-[#616161] dark:border-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#e0e0e0] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#121212] rounded-sm"
-          title={feature.description}
-          aria-expanded={open}
-          aria-describedby={open ? tooltipId : undefined}
-        >
-          {feature.name}
-        </button>
-        <span
-          id={tooltipId}
-          role="tooltip"
-          className={cn(
-            "absolute left-0 bottom-full z-10 mb-1.5 max-w-[240px] rounded-lg bg-[#212121] dark:bg-[#2a2a2a] px-3 py-2 text-xs text-white dark:text-[#e0e0e0] shadow-lg transition-opacity duration-150",
-            "opacity-0 group-hover/name:opacity-100",
-            open && "opacity-100 pointer-events-none",
-          )}
-        >
-          {feature.description}
+      {isAi ? (
+        <span ref={wrapperRef} className="relative inline-flex group/name">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setOpen((v) => !v);
+            }}
+            className="ai-urim-fill inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold shadow-[0_6px_14px_rgba(139,92,246,0.28)] transition-opacity hover:opacity-90 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ai-urim-purple)] focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#1e1e1e]"
+            title={hint}
+            aria-expanded={open}
+            aria-describedby={open ? tooltipId : undefined}
+          >
+            <HugeiconsIcon
+              icon={SparklesIcon}
+              size={16}
+              className="shrink-0 text-white"
+              aria-hidden
+            />
+            {KADESH_URIM_AI_NAME}
+          </button>
+          <span
+            id={tooltipId}
+            role="tooltip"
+            className={cn(
+              "absolute left-0 bottom-full z-10 mb-1.5 max-w-[240px] rounded-lg bg-[#212121] dark:bg-[#2a2a2a] px-3 py-2 text-xs font-normal text-white dark:text-[#e0e0e0] shadow-lg transition-opacity duration-150",
+              "opacity-0 group-hover/name:opacity-100",
+              open && "opacity-100 pointer-events-none",
+            )}
+          >
+            {hint}
+          </span>
         </span>
-      </span>
+      ) : (
+        <>
+          <span className="mt-0.5 flex-shrink-0" aria-hidden>
+            {feature.included ? (
+              <HugeiconsIcon
+                icon={CheckmarkCircle02Icon}
+                size={20}
+                className="text-orange-700 dark:text-orange-400"
+              />
+            ) : (
+              <HugeiconsIcon
+                icon={Cancel01Icon}
+                size={20}
+                className="text-red-500 dark:text-red-400"
+              />
+            )}
+          </span>
+          <span ref={wrapperRef} className="relative inline group/name">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpen((v) => !v);
+              }}
+              className="cursor-help text-left text-sm text-[#616161] dark:text-[#b0b0b0] border-b border-dotted border-[#616161] dark:border-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#e0e0e0] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#121212] rounded-sm"
+              title={feature.description}
+              aria-expanded={open}
+              aria-describedby={open ? tooltipId : undefined}
+            >
+              {feature.name}
+            </button>
+            <span
+              id={tooltipId}
+              role="tooltip"
+              className={cn(
+                "absolute left-0 bottom-full z-10 mb-1.5 max-w-[240px] rounded-lg bg-[#212121] dark:bg-[#2a2a2a] px-3 py-2 text-xs text-white dark:text-[#e0e0e0] shadow-lg transition-opacity duration-150",
+                "opacity-0 group-hover/name:opacity-100",
+                open && "opacity-100 pointer-events-none",
+              )}
+            >
+              {feature.description}
+            </span>
+          </span>
+        </>
+      )}
     </li>
   );
 }
@@ -357,7 +439,7 @@ function BillingToggle({
           </button>
         </span>
       </div>
-      { value === "annual" && (
+      {value === "annual" && (
         <span className="inline-flex items-center rounded-full bg-orange-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
           Ahorra 2 meses 🎁
         </span>
@@ -385,21 +467,24 @@ function PairedPlanCard({
   const planForMeta = annual ?? monthly;
   const isActive = planForMeta?.active ?? false;
   const highlighted = isCurrentPlan === true;
-  const bestSeller = monthly?.bestSeller === true || annual?.bestSeller === true;
+  const bestSeller =
+    monthly?.bestSeller === true || annual?.bestSeller === true;
 
   const persona = getPlanPersonaForTier(baseKey, displayName);
   const includedSource = annual ?? monthly;
-  const includedFeatures =
-    includedSource?.planFeatures?.filter((f) => f.included) ?? [];
+  const includedFeatures = includedPlanFeatures(includedSource?.planFeatures);
 
   const planToSubscribe: SaasPlanItem | null =
     billingPeriod === "annual" ? annual : monthly;
   const canSubscribe =
-    planToSubscribe != null && planToSubscribe.active && planToSubscribe.cost > 0;
+    planToSubscribe != null &&
+    planToSubscribe.active &&
+    planToSubscribe.cost > 0;
 
   const savings = annualSavingsVsMonthly(monthly, annual);
 
-  const leadLimit = planToSubscribe?.leadLimit ?? monthly?.leadLimit ?? annual?.leadLimit;
+  const leadLimit =
+    planToSubscribe?.leadLimit ?? monthly?.leadLimit ?? annual?.leadLimit;
 
   let mainPrice = 0;
   let mainOldPrice: number | null = null;
@@ -420,14 +505,26 @@ function PairedPlanCard({
   } else {
     if (annual) {
       mainPrice = annual.cost / 12;
-      mainOldPrice =
+      const monthlyList = monthly?.cost ?? null;
+      const annualOldMonthly =
         annual.costOld != null ? annual.costOld / 12 : null;
+      if (monthlyList != null && monthlyList > mainPrice + 0.005) {
+        mainOldPrice = monthlyList;
+      } else if (annualOldMonthly != null && annualOldMonthly > mainPrice) {
+        mainOldPrice = annualOldMonthly;
+      } else {
+        mainOldPrice = null;
+      }
       currency = annual.currency;
       priceAria = `Equivalente mensual del plan ${displayName} con pago anual: ${formatPrice(mainPrice, annual.currency, "monthly")} al mes; cobro anual ${formatPrice(annual.cost, annual.currency, annual.frequency)}`;
       if (mainOldPrice != null && mainOldPrice > mainPrice) {
-        priceAria = `Equivalente mensual del plan ${displayName} con pago anual: antes ${formatPrice(mainOldPrice, annual.currency, "monthly")}, ahora ${formatPrice(mainPrice, annual.currency, "monthly")} al mes; cobro anual ${formatPrice(annual.cost, annual.currency, annual.frequency)}`;
+        priceAria = `Equivalente mensual del plan ${displayName} con pago anual: antes ${formatPrice(mainOldPrice, annual.currency, "monthly")} al mes (precio mensual), ahora ${formatPrice(mainPrice, annual.currency, "monthly")} al mes; cobro anual ${formatPrice(annual.cost, annual.currency, annual.frequency)}`;
       }
-      const payOnce = formatPrice(annual.cost, annual.currency, annual.frequency);
+      const payOnce = formatPrice(
+        annual.cost,
+        annual.currency,
+        annual.frequency,
+      );
       if (savings != null && savings > 0) {
         const saveFmt = formatPrice(savings, annual.currency, annual.frequency);
         annualDisclaimer = `Cobrado anualmente en un solo pago de ${payOnce}. Ahorras ${saveFmt} frente a 12 meses al precio mensual.`;
@@ -445,8 +542,11 @@ function PairedPlanCard({
   const effectiveCostForPerLead =
     billingPeriod === "annual" && annual
       ? annual.cost / 12
-      : monthly?.cost ?? annual?.cost ?? 0;
-  const costPerLead = formatCostPerLead(effectiveCostForPerLead, leadLimit ?? null);
+      : (monthly?.cost ?? annual?.cost ?? 0);
+  const costPerLead = formatCostPerLead(
+    effectiveCostForPerLead,
+    leadLimit ?? null,
+  );
 
   return (
     <div
@@ -525,10 +625,11 @@ function PairedPlanCard({
             <strong className="text-[#212121] dark:text-[#e0e0e0]">
               {leadLimit}
             </strong>{" "}
-            nuevos créditos para extraer leads
+            créditos al mes para extraer leads. Kadesh AI administrada usa esa
+            misma bolsa; con tu API key no descuenta.
           </p>
         )}
-       {/*  {costPerLead && (
+        {/*  {costPerLead && (
           <p className="mt-2 text-xs font-semibold text-orange-700 dark:text-orange-400">
             Solo {costPerLead} {currency} por lead
           </p>
@@ -662,7 +763,7 @@ function PlanCard({
 
   const persona = getPlanPersona(plan.name);
   const costPerLead = formatCostPerLead(plan.cost, plan.leadLimit);
-  const includedFeatures = plan.planFeatures?.filter((f) => f.included) ?? [];
+  const includedFeatures = includedPlanFeatures(plan.planFeatures);
 
   const headerBlock = (
     <>
@@ -695,10 +796,11 @@ function PlanCard({
             <strong className="text-[#212121] dark:text-[#e0e0e0]">
               {plan.leadLimit}
             </strong>{" "}
-            nuevos créditos para extraer leads
+            créditos al mes para extraer leads. Kadesh AI administrada usa esa
+            misma bolsa; con tu API key no descuenta.
           </p>
         )}
-      {/*   {costPerLead && (
+        {/*   {costPerLead && (
           <p className="mt-2 text-xs font-semibold text-orange-700 dark:text-orange-400">
             Solo {costPerLead} {plan.currency} por lead
           </p>
@@ -713,22 +815,26 @@ function PlanCard({
         </ul>
       )}
 
-      {isActive && onSubscribe && plan.cost !== 0 && user?.id && showBtnStart && (
-        <button
-          type="button"
-          onClick={() => onSubscribe(plan)}
-          disabled={isCurrentPlan}
-          className={cn(
-            "mt-8 w-full rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-60",
-            highlighted
-              ? "bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
-              : "border-2 border-orange-600 text-orange-700 hover:bg-orange-500/10 dark:border-orange-500 dark:text-orange-400 dark:hover:bg-orange-500/20",
-            isCurrentPlan && "hover:bg-orange-500 dark:hover:bg-orange-500",
-          )}
-        >
-          {getPlanCta(plan.name, isCurrentPlan ?? false)}
-        </button>
-      )}
+      {isActive &&
+        onSubscribe &&
+        plan.cost !== 0 &&
+        user?.id &&
+        showBtnStart && (
+          <button
+            type="button"
+            onClick={() => onSubscribe(plan)}
+            disabled={isCurrentPlan}
+            className={cn(
+              "mt-8 w-full rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-60",
+              highlighted
+                ? "bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
+                : "border-2 border-orange-600 text-orange-700 hover:bg-orange-500/10 dark:border-orange-500 dark:text-orange-400 dark:hover:bg-orange-500/20",
+              isCurrentPlan && "hover:bg-orange-500 dark:hover:bg-orange-500",
+            )}
+          >
+            {getPlanCta(plan.name, isCurrentPlan ?? false)}
+          </button>
+        )}
     </>
   );
 
@@ -796,10 +902,10 @@ function PlanCard({
                   <strong className="text-[#212121] dark:text-[#e0e0e0]">
                     {plan.leadLimit}
                   </strong>{" "}
-                  créditos/mes
+                  créditos/mes. Kadesh AI administrada usa esa misma bolsa.
                 </p>
               )}
-             {/*  {costPerLead && (
+              {/*  {costPerLead && (
                 <p className="mt-2 text-xs font-semibold text-orange-700 dark:text-orange-400">
                   Solo {costPerLead} {plan.currency} por lead
                 </p>
@@ -811,7 +917,7 @@ function PlanCard({
                   </p>
                   {plan.leadLimit != null && (
                     <p className="text-xs font-semibold text-[#18653c] dark:text-green-400">
-                      Incluye {" "}
+                      Incluye{" "}
                       <strong className="text-[#212121] dark:text-[#e0e0e0]">
                         {plan.leadLimit}
                       </strong>{" "}
@@ -820,7 +926,6 @@ function PlanCard({
                   )}
                 </div>
               )}
-         
             </div>
 
             {isActive && onSubscribe && plan.cost !== 0 && (
@@ -909,7 +1014,11 @@ export default function PlansSection({
         </div>
       )}
 
-      <section id="planes" className="text-center" aria-labelledby={sectionTitleId}>
+      <section
+        id="planes"
+        className="text-center"
+        aria-labelledby={sectionTitleId}
+      >
         {sectionHeadingLevel === "h2" ? (
           <h2
             id={sectionTitleId}
