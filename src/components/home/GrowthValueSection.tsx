@@ -7,14 +7,14 @@ import { Chart01Icon, Calendar03Icon, ArrowRight01Icon } from "@hugeicons/core-f
 import { Routes } from "kadesh/core/routes";
 
 const GROWTH_STEPS = [
-  { month: "Mes 1", count: "400 negocios nuevos", detail: "Tu cuota mensual se activa" },
-  { month: "Mes 2", count: "400 negocios más", detail: "Sin duplicados, solo leads frescos" },
-  { month: "Mes 6", count: "+2,400 prospectos", detail: "Base sólida para tu equipo" },
+  { month: "Mes 1", count: "500 negocios nuevos", detail: "Tu cuota mensual se activa" },
+  { month: "Mes 2", count: "500 negocios más", detail: "Sin duplicados, solo leads frescos" },
+  { month: "Mes 6", count: "+3,000 prospectos", detail: "Base sólida para tu equipo" },
 ];
 
 const ROI_STEPS = [
-  { value: "400 leads mensuales", label: "Tu cuota con plan Pro" },
-  { value: "20 negocios contactados", label: "Si contactas solo el 5%" },
+  { value: "500 leads mensuales", label: "Tu cuota con plan Pro" },
+  { value: "25 negocios contactados", label: "Si contactas solo el 5%" },
   { value: "1 cliente nuevo", label: "Puede cubrir muchas veces el costo del plan" },
 ];
 
@@ -36,9 +36,9 @@ export default function GrowthValueSection() {
             ¿Cuántos leads nuevos obtengo cada mes?
           </h2>
           <p className="text-[#424242] dark:text-[#d6d6d6] max-w-2xl mx-auto text-lg">
-            Con el plan Pro son 400 leads nuevos al mes. La cuota se renueva
+            Con el plan Pro son 500 leads nuevos al mes. La cuota se renueva
             automáticamente y el sistema evita duplicados, así a los seis meses
-            puedes acumular más de 2,400 prospectos distintos. Un cliente
+            puedes acumular más de 3,000 prospectos distintos. Un cliente
             cerrado puede cubrir varios meses de suscripción.
           </p>
         </motion.div>

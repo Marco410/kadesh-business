@@ -5,9 +5,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Calendar03Icon } from "@hugeicons/core-free-icons";
 
 const MONTHS = [
-  { month: "Mes 1", count: "400 negocios" },
-  { month: "Mes 2", count: "400 nuevos negocios" },
-  { month: "Mes 6", count: "+2400 prospectos totales" },
+  { month: "Mes 1", count: "500 negocios" },
+  { month: "Mes 2", count: "500 nuevos negocios" },
+  { month: "Mes 6", count: "+3,000 prospectos totales" },
 ];
 
 export default function NewProspectsMonthlySection() {
