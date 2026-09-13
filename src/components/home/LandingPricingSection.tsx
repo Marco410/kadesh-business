@@ -35,7 +35,7 @@ export default function LandingPricingSection({
             }
             sectionSubtitle={
               isPage
-                ? "Precios en MXN. Facturación mensual o anual. Kadesh AI está en todos los planes."
+                ? "Precios en MXN. Anual = 2 meses de descuento. Kadesh AI está en todos los planes: administrada usa créditos del plan; con tu API key no descuenta."
                 : "Planes en MXN: Free, Starter 399, Pro 799 y Agencia 1,999. Prueba 7 días con 50 leads, sin tarjeta."
             }
             showBtnStart={false}

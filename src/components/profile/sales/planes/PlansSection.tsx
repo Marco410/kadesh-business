@@ -21,7 +21,10 @@ import {
   Cancel01Icon,
   SparklesIcon,
 } from "@hugeicons/core-free-icons";
-import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
+import {
+  KADESH_URIM_AI_NAME,
+  KADESH_AI_CREDIT_HINT,
+} from "kadesh/components/profile/ai/constants";
 import { useUser } from "kadesh/utils/UserContext";
 
 function formatPrice(
@@ -60,7 +63,10 @@ function normalizePlanBaseKey(name: string): string {
 }
 
 function displayTierNameFromPlanName(name: string): string {
-  return name.trim().replace(/\s+anual\s*$/i, "").trim();
+  return name
+    .trim()
+    .replace(/\s+anual\s*$/i, "")
+    .trim();
 }
 
 type SaasPlanPair = {
@@ -85,13 +91,16 @@ function groupPaidPlansIntoPairs(paidPlans: SaasPlanItem[]): SaasPlanPair[] {
     const entry = map.get(key) ?? {};
     if (isMonthlyFrequency(p.frequency)) {
       entry.monthly = p;
-      entry.displayName = entry.displayName ?? displayTierNameFromPlanName(p.name);
+      entry.displayName =
+        entry.displayName ?? displayTierNameFromPlanName(p.name);
     } else if (isAnnualFrequency(p.frequency)) {
       entry.annual = p;
-      entry.displayName = entry.displayName ?? displayTierNameFromPlanName(p.name);
+      entry.displayName =
+        entry.displayName ?? displayTierNameFromPlanName(p.name);
     } else {
       entry.monthly = entry.monthly ?? p;
-      entry.displayName = entry.displayName ?? displayTierNameFromPlanName(p.name);
+      entry.displayName =
+        entry.displayName ?? displayTierNameFromPlanName(p.name);
     }
     map.set(key, entry);
   }
@@ -170,7 +179,9 @@ function PlanPriceLine({
           {formatPrice(oldPrice, currency, "monthly")}
         </span>
       )}
-      <p className={cn("flex items-baseline gap-1 whitespace-nowrap", rowClass)}>
+      <p
+        className={cn("flex items-baseline gap-1 whitespace-nowrap", rowClass)}
+      >
         <span className="text-4xl font-bold tabular-nums tracking-tight text-[#212121] dark:text-[#ffffff]">
           {formatPrice(price, currency, "monthly")}
         </span>
@@ -215,7 +226,10 @@ function getPlanPersona(name: string): string | null {
   return PLAN_PERSONAS[name.trim().toLowerCase()] ?? null;
 }
 
-function getPlanPersonaForTier(baseKey: string, displayName: string): string | null {
+function getPlanPersonaForTier(
+  baseKey: string,
+  displayName: string,
+): string | null {
   return PLAN_PERSONAS[baseKey] ?? getPlanPersona(displayName);
 }
 
@@ -244,10 +258,11 @@ function includedPlanFeatures(
 
 function FeatureChip({ feature }: { feature: PlanFeatureItem }) {
   const isAi = isKadeshAiFeature(feature);
+  const hint = isAi ? KADESH_AI_CREDIT_HINT : feature.description;
   return (
     <li>
       <span
-        title={feature.description}
+        title={hint}
         className={
           isAi
             ? "ai-urim-fill inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold shadow-[0_6px_14px_rgba(139,92,246,0.28)]"
@@ -275,6 +290,7 @@ function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
   const wrapperRef = useRef<HTMLSpanElement>(null);
   const tooltipId = useId();
   const isAi = isKadeshAiFeature(feature);
+  const hint = isAi ? KADESH_AI_CREDIT_HINT : feature.description;
 
   useEffect(() => {
     if (!open) return;
@@ -308,7 +324,7 @@ function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
               setOpen((v) => !v);
             }}
             className="ai-urim-fill inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold shadow-[0_6px_14px_rgba(139,92,246,0.28)] transition-opacity hover:opacity-90 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ai-urim-purple)] focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#1e1e1e]"
-            title={feature.description}
+            title={hint}
             aria-expanded={open}
             aria-describedby={open ? tooltipId : undefined}
           >
@@ -329,7 +345,7 @@ function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
               open && "opacity-100 pointer-events-none",
             )}
           >
-            {feature.description}
+            {hint}
           </span>
         </span>
       ) : (
@@ -423,7 +439,7 @@ function BillingToggle({
           </button>
         </span>
       </div>
-      { value === "annual" && (
+      {value === "annual" && (
         <span className="inline-flex items-center rounded-full bg-orange-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
           Ahorra 2 meses 🎁
         </span>
@@ -451,7 +467,8 @@ function PairedPlanCard({
   const planForMeta = annual ?? monthly;
   const isActive = planForMeta?.active ?? false;
   const highlighted = isCurrentPlan === true;
-  const bestSeller = monthly?.bestSeller === true || annual?.bestSeller === true;
+  const bestSeller =
+    monthly?.bestSeller === true || annual?.bestSeller === true;
 
   const persona = getPlanPersonaForTier(baseKey, displayName);
   const includedSource = annual ?? monthly;
@@ -460,11 +477,14 @@ function PairedPlanCard({
   const planToSubscribe: SaasPlanItem | null =
     billingPeriod === "annual" ? annual : monthly;
   const canSubscribe =
-    planToSubscribe != null && planToSubscribe.active && planToSubscribe.cost > 0;
+    planToSubscribe != null &&
+    planToSubscribe.active &&
+    planToSubscribe.cost > 0;
 
   const savings = annualSavingsVsMonthly(monthly, annual);
 
-  const leadLimit = planToSubscribe?.leadLimit ?? monthly?.leadLimit ?? annual?.leadLimit;
+  const leadLimit =
+    planToSubscribe?.leadLimit ?? monthly?.leadLimit ?? annual?.leadLimit;
 
   let mainPrice = 0;
   let mainOldPrice: number | null = null;
@@ -485,14 +505,26 @@ function PairedPlanCard({
   } else {
     if (annual) {
       mainPrice = annual.cost / 12;
-      mainOldPrice =
+      const monthlyList = monthly?.cost ?? null;
+      const annualOldMonthly =
         annual.costOld != null ? annual.costOld / 12 : null;
+      if (monthlyList != null && monthlyList > mainPrice + 0.005) {
+        mainOldPrice = monthlyList;
+      } else if (annualOldMonthly != null && annualOldMonthly > mainPrice) {
+        mainOldPrice = annualOldMonthly;
+      } else {
+        mainOldPrice = null;
+      }
       currency = annual.currency;
       priceAria = `Equivalente mensual del plan ${displayName} con pago anual: ${formatPrice(mainPrice, annual.currency, "monthly")} al mes; cobro anual ${formatPrice(annual.cost, annual.currency, annual.frequency)}`;
       if (mainOldPrice != null && mainOldPrice > mainPrice) {
-        priceAria = `Equivalente mensual del plan ${displayName} con pago anual: antes ${formatPrice(mainOldPrice, annual.currency, "monthly")}, ahora ${formatPrice(mainPrice, annual.currency, "monthly")} al mes; cobro anual ${formatPrice(annual.cost, annual.currency, annual.frequency)}`;
+        priceAria = `Equivalente mensual del plan ${displayName} con pago anual: antes ${formatPrice(mainOldPrice, annual.currency, "monthly")} al mes (precio mensual), ahora ${formatPrice(mainPrice, annual.currency, "monthly")} al mes; cobro anual ${formatPrice(annual.cost, annual.currency, annual.frequency)}`;
       }
-      const payOnce = formatPrice(annual.cost, annual.currency, annual.frequency);
+      const payOnce = formatPrice(
+        annual.cost,
+        annual.currency,
+        annual.frequency,
+      );
       if (savings != null && savings > 0) {
         const saveFmt = formatPrice(savings, annual.currency, annual.frequency);
         annualDisclaimer = `Cobrado anualmente en un solo pago de ${payOnce}. Ahorras ${saveFmt} frente a 12 meses al precio mensual.`;
@@ -510,8 +542,11 @@ function PairedPlanCard({
   const effectiveCostForPerLead =
     billingPeriod === "annual" && annual
       ? annual.cost / 12
-      : monthly?.cost ?? annual?.cost ?? 0;
-  const costPerLead = formatCostPerLead(effectiveCostForPerLead, leadLimit ?? null);
+      : (monthly?.cost ?? annual?.cost ?? 0);
+  const costPerLead = formatCostPerLead(
+    effectiveCostForPerLead,
+    leadLimit ?? null,
+  );
 
   return (
     <div
@@ -590,10 +625,11 @@ function PairedPlanCard({
             <strong className="text-[#212121] dark:text-[#e0e0e0]">
               {leadLimit}
             </strong>{" "}
-            nuevos créditos para extraer leads
+            créditos al mes para extraer leads. Kadesh AI administrada usa esa
+            misma bolsa; con tu API key no descuenta.
           </p>
         )}
-       {/*  {costPerLead && (
+        {/*  {costPerLead && (
           <p className="mt-2 text-xs font-semibold text-orange-700 dark:text-orange-400">
             Solo {costPerLead} {currency} por lead
           </p>
@@ -760,10 +796,11 @@ function PlanCard({
             <strong className="text-[#212121] dark:text-[#e0e0e0]">
               {plan.leadLimit}
             </strong>{" "}
-            nuevos créditos para extraer leads
+            créditos al mes para extraer leads. Kadesh AI administrada usa esa
+            misma bolsa; con tu API key no descuenta.
           </p>
         )}
-      {/*   {costPerLead && (
+        {/*   {costPerLead && (
           <p className="mt-2 text-xs font-semibold text-orange-700 dark:text-orange-400">
             Solo {costPerLead} {plan.currency} por lead
           </p>
@@ -778,22 +815,26 @@ function PlanCard({
         </ul>
       )}
 
-      {isActive && onSubscribe && plan.cost !== 0 && user?.id && showBtnStart && (
-        <button
-          type="button"
-          onClick={() => onSubscribe(plan)}
-          disabled={isCurrentPlan}
-          className={cn(
-            "mt-8 w-full rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-60",
-            highlighted
-              ? "bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
-              : "border-2 border-orange-600 text-orange-700 hover:bg-orange-500/10 dark:border-orange-500 dark:text-orange-400 dark:hover:bg-orange-500/20",
-            isCurrentPlan && "hover:bg-orange-500 dark:hover:bg-orange-500",
-          )}
-        >
-          {getPlanCta(plan.name, isCurrentPlan ?? false)}
-        </button>
-      )}
+      {isActive &&
+        onSubscribe &&
+        plan.cost !== 0 &&
+        user?.id &&
+        showBtnStart && (
+          <button
+            type="button"
+            onClick={() => onSubscribe(plan)}
+            disabled={isCurrentPlan}
+            className={cn(
+              "mt-8 w-full rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-60",
+              highlighted
+                ? "bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
+                : "border-2 border-orange-600 text-orange-700 hover:bg-orange-500/10 dark:border-orange-500 dark:text-orange-400 dark:hover:bg-orange-500/20",
+              isCurrentPlan && "hover:bg-orange-500 dark:hover:bg-orange-500",
+            )}
+          >
+            {getPlanCta(plan.name, isCurrentPlan ?? false)}
+          </button>
+        )}
     </>
   );
 
@@ -861,10 +902,10 @@ function PlanCard({
                   <strong className="text-[#212121] dark:text-[#e0e0e0]">
                     {plan.leadLimit}
                   </strong>{" "}
-                  créditos/mes
+                  créditos/mes. Kadesh AI administrada usa esa misma bolsa.
                 </p>
               )}
-             {/*  {costPerLead && (
+              {/*  {costPerLead && (
                 <p className="mt-2 text-xs font-semibold text-orange-700 dark:text-orange-400">
                   Solo {costPerLead} {plan.currency} por lead
                 </p>
@@ -876,7 +917,7 @@ function PlanCard({
                   </p>
                   {plan.leadLimit != null && (
                     <p className="text-xs font-semibold text-[#18653c] dark:text-green-400">
-                      Incluye {" "}
+                      Incluye{" "}
                       <strong className="text-[#212121] dark:text-[#e0e0e0]">
                         {plan.leadLimit}
                       </strong>{" "}
@@ -885,7 +926,6 @@ function PlanCard({
                   )}
                 </div>
               )}
-         
             </div>
 
             {isActive && onSubscribe && plan.cost !== 0 && (
@@ -974,7 +1014,11 @@ export default function PlansSection({
         </div>
       )}
 
-      <section id="planes" className="text-center" aria-labelledby={sectionTitleId}>
+      <section
+        id="planes"
+        className="text-center"
+        aria-labelledby={sectionTitleId}
+      >
         {sectionHeadingLevel === "h2" ? (
           <h2
             id={sectionTitleId}
