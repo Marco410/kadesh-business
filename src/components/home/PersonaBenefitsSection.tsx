@@ -33,7 +33,7 @@ const PERSONAS = [
     label: "Equipo de ventas",
     title: "Llena tu pipeline sin depender de marketing",
     benefits: [
-      "400+ leads nuevos cada mes con tu plan",
+      "500+ leads nuevos cada mes con tu plan",
       "Pipeline visual: Contactado, En propuesta, Cerrado",
       "Datos con teléfono y rating para priorizar llamadas",
       "Exporta a Excel y comparte con tu equipo",

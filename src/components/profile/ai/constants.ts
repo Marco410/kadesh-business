@@ -160,5 +160,9 @@ export const AI_TOKENS_PER_CREDIT = 1_000;
 export const AI_OUTPUT_TOKEN_WEIGHT = 5;
 /** Créditos típicos de un digest diario corto en modalidad administrada. */
 export const TYPICAL_DIGEST_CREDITS = 4;
+
+/** Copy de empaque en precios y tooltips: IA en todos los planes, misma bolsa que leads. */
+export const KADESH_AI_CREDIT_HINT =
+  "Incluido. La modalidad administrada usa los mismos créditos que extraer leads. Con tu API key no se descuentan.";
 export const AI_MANAGED_MAX_PER_MINUTE = 15;
 export const AI_MANAGED_MAX_PER_DAY = 500;

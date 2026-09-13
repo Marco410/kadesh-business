@@ -5,8 +5,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Chart01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 
 const ROI_STEPS = [
-  { value: "400 leads mensuales", label: "Tu cuota" },
-  { value: "20 negocios contactados", label: "Si contactas solo el 5%" },
+  { value: "500 leads mensuales", label: "Tu cuota" },
+  { value: "25 negocios contactados", label: "Si contactas solo el 5%" },
   {
     value: "1 nuevo cliente",
     label: "Puede cubrir muchas veces el costo del plan",
@@ -53,7 +53,7 @@ export default function ConvertProspectsSection() {
                 />
               </span>
               <span className="font-semibold text-[#212121] dark:text-white text-lg">
-                Ejemplo con 400 leads mensuales
+                Ejemplo con 500 leads mensuales
               </span>
             </div>
             <ul className="space-y-4">

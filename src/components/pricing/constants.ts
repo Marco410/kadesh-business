@@ -1,4 +1,11 @@
-/** Static plan tiers for JSON-LD (aligned with global layout offers and saas_plan seed). */
+/** Cifras públicas del plan Pro (mensual). Deben coincidir con el saas_plan. */
+export const PRO_PLAN_PUBLIC = {
+  monthlyMxn: 799,
+  leadLimit: 500,
+  /** 799 / 500. Mostrar como ~1.60 MXN, no “menos de 1”. */
+  costPerLeadMxn: 1.6,
+} as const;
+
 export const PRICING_PLAN_OFFERS = [
   {
     name: "Plan Free",
@@ -67,7 +74,7 @@ export const PRICING_FAQ_ITEMS = [
   {
     question: "¿Kadesh AI está en todos los planes?",
     answer:
-      "Sí. Kadesh AI está incluido en Free, Starter, Pro y Agencia. El administrador lo configura en el panel; el equipo ve el resumen del día en Inicio. Puedes usar los créditos de tu plan o conectar tu propia API key.",
+      "Sí. Kadesh AI está incluido en Free, Starter, Pro y Agencia. El administrador lo configura en el panel; el equipo ve el resumen del día en Inicio. Si usas la modalidad administrada, descuenta de los mismos créditos que extraer leads (un resumen del día suele ser 4). Pro y Agencia dan más créditos, así hay más margen para extraer y para la IA. Si conectas tu API key, la IA no descuenta créditos de Kadesh.",
   },
   {
     question: "¿Puedo cambiar de plan después?",
@@ -145,28 +152,27 @@ export function buildPreciosStructuredData() {
         "@id": `${BASE_URL}/precios#offers`,
         name: "Planes KADESH Negocios",
         url: `${BASE_URL}/precios`,
-        itemListElement: [
-          ...PRICING_PLAN_OFFERS,
-          ...PRICING_CREDIT_OFFERS,
-        ].map((offer, index) => ({
-          "@type": "Offer",
-          position: index + 1,
-          name: offer.name,
-          price: offer.price,
-          priceCurrency: "MXN",
-          description: offer.description,
-          url: `${BASE_URL}/precios`,
-          availability: "https://schema.org/InStock",
-          eligibleRegion: {
-            "@type": "Country",
-            name: "México",
-          },
-          offeredBy: {
-            "@type": "Organization",
-            name: "KADESH Negocios",
-            url: BASE_URL,
-          },
-        })),
+        itemListElement: [...PRICING_PLAN_OFFERS, ...PRICING_CREDIT_OFFERS].map(
+          (offer, index) => ({
+            "@type": "Offer",
+            position: index + 1,
+            name: offer.name,
+            price: offer.price,
+            priceCurrency: "MXN",
+            description: offer.description,
+            url: `${BASE_URL}/precios`,
+            availability: "https://schema.org/InStock",
+            eligibleRegion: {
+              "@type": "Country",
+              name: "México",
+            },
+            offeredBy: {
+              "@type": "Organization",
+              name: "KADESH Negocios",
+              url: BASE_URL,
+            },
+          }),
+        ),
       },
       {
         "@type": "FAQPage",
