@@ -50,6 +50,7 @@ const MAX_LEADS_EXPORT = 10_000;
 const SALES_LEADS_URL_KEYS = [
   "pipeline",
   "category",
+  "source",
   "vendedor",
   "q",
   "city",
@@ -61,6 +62,7 @@ const SALES_LEADS_URL_KEYS = [
 interface SalesLeadsUrlFilters {
   selectedPipeline: string | null;
   selectedCategory: string | null;
+  selectedSource: string | null;
   filterByVendedorId: string | null;
   debouncedSearch: string;
   debouncedCity: string;
@@ -75,6 +77,7 @@ function parseSalesFiltersFromSearchParams(
   return {
     selectedPipeline: sp.get("pipeline"),
     selectedCategory: sp.get("category"),
+    selectedSource: sp.get("source"),
     filterByVendedorId: sp.get("vendedor"),
     debouncedSearch: sp.get("q") ?? "",
     debouncedCity: sp.get("city") ?? "",
@@ -94,6 +97,7 @@ function applySalesFiltersToUrlSearchParams(
   if (state.page > 1) params.set("page", String(state.page));
   if (state.selectedPipeline) params.set("pipeline", state.selectedPipeline);
   if (state.selectedCategory) params.set("category", state.selectedCategory);
+  if (state.selectedSource) params.set("source", state.selectedSource);
   if (state.filterByVendedorId) params.set("vendedor", state.filterByVendedorId);
   if (state.debouncedSearch) params.set("q", state.debouncedSearch);
   if (state.debouncedCity) params.set("city", state.debouncedCity);
@@ -107,6 +111,7 @@ function salesFilterFieldsMatchUrl(
   s: {
     selectedPipeline: string | null;
     selectedCategory: string | null;
+    selectedSource: string | null;
     filterByVendedorId: string | null;
     debouncedSearch: string;
     debouncedCity: string;
@@ -118,6 +123,7 @@ function salesFilterFieldsMatchUrl(
   return (
     f.selectedPipeline === s.selectedPipeline &&
     f.selectedCategory === s.selectedCategory &&
+    f.selectedSource === s.selectedSource &&
     f.filterByVendedorId === s.filterByVendedorId &&
     f.debouncedSearch === s.debouncedSearch &&
     f.debouncedCity === s.debouncedCity &&
@@ -153,6 +159,9 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
     initialFromUrl.selectedCategory
   );
+  const [selectedSource, setSelectedSource] = useState<string | null>(
+    initialFromUrl.selectedSource
+  );
   const [filterByVendedorId, setFilterByVendedorId] = useState<string | null>(
     initialFromUrl.filterByVendedorId
   );
@@ -186,6 +195,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     const f = parseSalesFiltersFromSearchParams(searchParams);
     setSelectedPipeline(f.selectedPipeline);
     setSelectedCategory(f.selectedCategory);
+    setSelectedSource(f.selectedSource);
     setFilterByVendedorId(f.filterByVendedorId);
     setSearchInput(f.debouncedSearch);
     setDebouncedSearch(f.debouncedSearch);
@@ -283,6 +293,9 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     ...(selectedCategory != null && selectedCategory !== "" && {
       category: { equals: selectedCategory },
     }),
+    ...(selectedSource != null && selectedSource !== "" && {
+      source: { equals: selectedSource },
+    }),
     ...(debouncedSearch.length > 0 && {
       businessName: {
         contains: normalizeSearch(debouncedSearch),
@@ -307,6 +320,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       applySalesFiltersToUrlSearchParams(params, {
         selectedPipeline,
         selectedCategory,
+        selectedSource,
         filterByVendedorId,
         debouncedSearch,
         debouncedCity,
@@ -325,6 +339,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       router,
       selectedPipeline,
       selectedCategory,
+      selectedSource,
       filterByVendedorId,
       debouncedSearch,
       debouncedCity,
@@ -350,6 +365,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       salesFilterFieldsMatchUrl(searchParams, {
         selectedPipeline,
         selectedCategory,
+        selectedSource,
         filterByVendedorId,
         debouncedSearch,
         debouncedCity,
@@ -364,6 +380,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     searchParams,
     selectedPipeline,
     selectedCategory,
+    selectedSource,
     filterByVendedorId,
     debouncedSearch,
     debouncedCity,
@@ -629,6 +646,8 @@ export default function SalesSection({ userId }: SalesSectionProps) {
           onPipelineChange={setSelectedPipeline}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
+          selectedSource={selectedSource}
+          onSourceChange={setSelectedSource}
           searchQuery={searchInput}
           onSearchChange={setSearchInput}
           cityQuery={cityInput}

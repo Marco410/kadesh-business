@@ -15,6 +15,23 @@ export const SYNC_LEADS_FRONT_MUTATION = gql`
   }
 `;
 
+export const SYNC_LEADS_FROM_INEGI_MUTATION = gql`
+  mutation SyncLeadsFromInegi($input: SyncLeadsFromInegiInput!) {
+    syncLeadsFromInegi(input: $input) {
+      leadLimit
+      message
+      success
+      syncedCount
+      created
+      alreadyInDb
+      skippedLowRating
+      syncedLeadsCount
+    }
+  }
+`;
+
+export type LeadSyncSource = "google" | "inegi";
+
 export interface SyncLeadsFrontInput {
   category: string | null;
   lat: number | null;
@@ -25,6 +42,15 @@ export interface SyncLeadsFrontInput {
   minReviews: number | null;
 }
 
+export interface SyncLeadsFromInegiInput {
+  category: string;
+  lat: number;
+  lng: number;
+  maxResults?: number | null;
+  radius: number;
+}
+
+/** Mismo shape que SyncLeadsFrontResult / SyncLeadsFromInegiResult. */
 export interface SyncLeadsFrontResult {
   leadLimit: number | null;
   message: string;
@@ -38,4 +64,8 @@ export interface SyncLeadsFrontResult {
 
 export interface SyncLeadsFrontMutationResponse {
   syncLeadsFront: SyncLeadsFrontResult;
+}
+
+export interface SyncLeadsFromInegiMutationResponse {
+  syncLeadsFromInegi: SyncLeadsFrontResult;
 }

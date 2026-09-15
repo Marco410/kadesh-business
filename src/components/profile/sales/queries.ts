@@ -181,6 +181,7 @@ export interface TechBusinessLeadsVariables {
       };
     };
     category?: { equals: string } | { in: string[] };
+    source?: { equals: string };
     businessName?: { contains: string; mode?: "insensitive" };
     city?: { contains: string; mode?: "insensitive" };
     state?: { contains: string; mode?: "insensitive" };
@@ -363,6 +364,7 @@ export interface TechBusinessLeadsCountVariables {
       };
     };
     category?: { equals: string } | { in: string[] };
+    source?: { equals: string };
     businessName?: { contains: string; mode?: "insensitive" };
     city?: { contains: string; mode?: "insensitive" };
     state?: { contains: string; mode?: "insensitive" };

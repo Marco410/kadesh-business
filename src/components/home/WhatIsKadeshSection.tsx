@@ -8,7 +8,8 @@ const STEPS = [
   },
   {
     title: "Selecciona la categoría",
-    detail: "Dentistas, abogados, restaurantes u otro giro listado en Google Maps.",
+    detail:
+      "Dentistas, abogados, restaurantes u otro giro en Google Maps o INEGI.",
   },
   {
     title: "Define el radio",
@@ -16,7 +17,7 @@ const STEPS = [
   },
   {
     title: "Guarda los leads en el CRM",
-    detail: "Teléfono, dirección, categoría y rating quedan listos para seguimiento.",
+    detail: "Teléfono, dirección y categoría quedan listos para seguimiento.",
   },
 ] as const;
 
@@ -31,14 +32,14 @@ export default function WhatIsKadeshSection() {
           ¿Qué es Kadesh?
         </h2>
         <p className="text-sm text-[#757575] dark:text-[#9e9e9e] mb-5">
-          <time dateTime="2026-09-10">Actualizado el 10 de septiembre de 2026</time>
+          <time dateTime="2026-09-15">Actualizado el 15 de septiembre de 2026</time>
         </p>
         <p className="text-lg text-[#424242] dark:text-[#d6d6d6] leading-relaxed max-w-3xl mb-4">
           Kadesh es una plataforma SaaS B2B que extrae clientes potenciales
-          reales de Google Maps —con teléfono, dirección, categoría y rating—
+          reales de Google Maps e INEGI —con teléfono, dirección y categoría—
           y los guarda en un CRM integrado. Eliges un punto en el mapa, una
-          categoría y un radio; en minutos tienes negocios listos para
-          contactar, con prueba de 7 días y 50 leads gratis.
+          categoría, un radio y la fuente; en minutos tienes negocios listos
+          para contactar, con prueba de 7 días y 50 leads gratis.
         </p>
         <p className="text-[#616161] dark:text-[#b0b0b0] leading-relaxed max-w-3xl mb-12">
           Sirve a agencias, freelancers, equipos de ventas y consultores en
@@ -48,13 +49,13 @@ export default function WhatIsKadeshSection() {
         </p>
 
         <h3 className="text-2xl font-bold text-[#212121] dark:text-white mb-3">
-          ¿Cómo extraer leads de Google Maps con Kadesh?
+          ¿Cómo extraer leads de Google Maps e INEGI con Kadesh?
         </h3>
         <p className="text-[#424242] dark:text-[#d6d6d6] leading-relaxed max-w-3xl mb-8">
           Creas tu cuenta, eliges un punto en el mapa, seleccionas la categoría
-          del negocio y defines el radio. Kadesh extrae en tiempo real nombre,
-          teléfono, dirección y valoración, y deja los prospectos en el CRM
-          para llamar, dar seguimiento y cotizar.
+          del negocio, defines el radio y la fuente (Google Maps o INEGI).
+          Kadesh extrae en tiempo real nombre, teléfono y dirección, y deja los
+          prospectos en el CRM para llamar, dar seguimiento y cotizar.
         </p>
 
         <ol className="grid sm:grid-cols-2 gap-4 mb-10">

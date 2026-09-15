@@ -7,7 +7,6 @@ import {
   type UserCompanyCategoriesResponse,
   type UserCompanyCategoriesVariables,
 } from "kadesh/components/profile/sales/queries";
-import { GOOGLE_PLACE_CATEGORIES } from "kadesh/constants/constans";
 import { useUser } from "kadesh/utils/UserContext";
 import { getCategoryLabel } from "../helpers/category";
 import { SupportContactSection } from "kadesh/components/shared";
@@ -104,8 +103,6 @@ const LeadsStatsCards = forwardRef<LeadsStatsCardsHandle>(function LeadsStatsCar
   if (loading || !companyId) return null;
   if (total === 0) return null;
 
-  const allowedCategories = new Set<string>(GOOGLE_PLACE_CATEGORIES.map((c) => c.value));
-
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/5 to-transparent dark:from-orange-500/10 p-5 shadow-sm">
@@ -133,9 +130,7 @@ const LeadsStatsCards = forwardRef<LeadsStatsCardsHandle>(function LeadsStatsCar
               const label =
                 item.category === "sin_categoria"
                   ? "Sin categoría"
-                  : allowedCategories.has(item.category)
-                    ? getCategoryLabel(item.category)
-                    : item.category;
+                  : getCategoryLabel(item.category);
               const pct = total > 0 ? ((item.count / total) * 100).toFixed(0) : "0";
               return (
                 <div

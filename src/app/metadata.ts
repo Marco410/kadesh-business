@@ -3,11 +3,11 @@ import { Metadata, Viewport } from 'next';
 export const metadata: Metadata = {
   metadataBase: new URL('https://kadesh.com.mx'),
   title: {
-    default: 'Leads B2B de Google Maps con teléfono y CRM | KADESH',
+    default: 'Leads B2B de Google Maps e INEGI con teléfono y CRM | KADESH',
     template: '%s | KADESH',
   },
   description:
-    'Kadesh extrae leads B2B de Google Maps con teléfono, rating y dirección, y los gestiona en un CRM integrado. Prueba 7 días con 50 leads gratis, sin tarjeta.',
+    'Kadesh extrae leads B2B de Google Maps e INEGI con teléfono y dirección, y los gestiona en un CRM integrado. Prueba 7 días con 50 leads gratis, sin tarjeta.',
   keywords: [
     'KADESH',
     'KADESH Negocios',
@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     'CRM ventas',
     'prospección B2B',
     'extraer leads Google Maps',
+    'extraer leads INEGI',
     'software prospección México',
     'conseguir clientes B2B',
     'lista de prospectos',
@@ -37,9 +38,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Leads B2B de Google Maps con teléfono y CRM | KADESH',
+    title: 'Leads B2B de Google Maps e INEGI con teléfono y CRM | KADESH',
     description:
-      'Kadesh extrae leads B2B de Google Maps con teléfono, rating y dirección, y los gestiona en un CRM. Prueba 7 días con 50 leads gratis, sin tarjeta.',
+      'Kadesh extrae leads B2B de Google Maps e INEGI con teléfono y dirección, y los gestiona en un CRM. Prueba 7 días con 50 leads gratis, sin tarjeta.',
     url: 'https://kadesh.com.mx/',
     siteName: 'Kadesh',
     images: [
@@ -47,7 +48,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Kadesh extrae leads B2B de Google Maps con teléfono y CRM integrado',
+        alt: 'Kadesh extrae leads B2B de Google Maps e INEGI con teléfono y CRM integrado',
       },
     ],
     locale: 'es_MX',
@@ -55,9 +56,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Leads B2B de Google Maps con teléfono y CRM | KADESH',
+    title: 'Leads B2B de Google Maps e INEGI con teléfono y CRM | KADESH',
     description:
-      'Extrae leads B2B de Google Maps con teléfono y CRM integrado. Prueba 7 días con 50 leads gratis, sin tarjeta.',
+      'Extrae leads B2B de Google Maps e INEGI con teléfono y CRM integrado. Prueba 7 días con 50 leads gratis, sin tarjeta.',
     images: ['/og-image.png'],
   },
   alternates: {

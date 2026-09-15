@@ -14,6 +14,12 @@ import { Autocomplete, type AutocompleteOption } from "kadesh/components/shared"
 
 const PIPELINE_VALUES = Object.values(PIPELINE_STATUS);
 
+/** Valores exactos de `TechBusinessLead.source`. Un negocio puede existir como Google y como INEGI. */
+const LEAD_SOURCE_FILTER_OPTIONS = [
+  { value: "Google Maps", label: "Google Maps" },
+  { value: "INEGI", label: "INEGI" },
+] as const;
+
 export interface VendedorOption {
   id: string;
   name: string;
@@ -25,6 +31,8 @@ interface FiltersLeadsSectionProps {
   onPipelineChange: (value: string | null) => void;
   selectedCategory: string | null;
   onCategoryChange: (value: string | null) => void;
+  selectedSource: string | null;
+  onSourceChange: (value: string | null) => void;
   searchQuery: string;
   onSearchChange: (value: string) => void;
   cityQuery: string;
@@ -50,6 +58,8 @@ export default function FiltersLeadsSection({
   onPipelineChange,
   selectedCategory,
   onCategoryChange,
+  selectedSource,
+  onSourceChange,
   searchQuery,
   onSearchChange,
   cityQuery,
@@ -91,6 +101,7 @@ export default function FiltersLeadsSection({
   const handleClearFilters = () => {
     onPipelineChange(null);
     onCategoryChange(null);
+    onSourceChange(null);
     onSearchChange("");
     onCityChange("");
     onStateChange("");
@@ -241,6 +252,28 @@ export default function FiltersLeadsSection({
                 placeholder="Todas las categorías"
                 className="min-w-[200px]"
               />
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <label
+                htmlFor="filter-source"
+                className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0] shrink-0"
+              >
+                Fuente
+              </label>
+              <select
+                id="filter-source"
+                value={selectedSource ?? ""}
+                onChange={(e) => onSourceChange(e.target.value || null)}
+                className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-1.5 text-sm text-[#212121] dark:text-[#ffffff] focus:ring-2 focus:ring-orange-500 focus:border-orange-500 min-w-[160px]"
+                aria-label="Filtrar por fuente"
+              >
+                <option value="">Todas las fuentes</option>
+                {LEAD_SOURCE_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
             {vendedores.length > 0 &&
               hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.ASSIGN_SALES_PERSON) &&

@@ -23,6 +23,7 @@ import FeatureLockedSection from "../FeatureLockedSection";
 
 const LEAD_SOURCE_OPTIONS = [
   { value: "Google Maps", label: "Google Maps" },
+  { value: "INEGI", label: "INEGI" },
   { value: "Referido", label: "Referido" },
   { value: "Redes sociales", label: "Redes sociales" },
   { value: "Sitio web", label: "Sitio web" },

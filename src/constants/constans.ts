@@ -1,6 +1,10 @@
 export const SOCIAL_LINKS = [
-    { label: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61576878181992', icon: '/icons/fb.svg' },
-  ];
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/profile.php?id=61576878181992",
+    icon: "/icons/fb.svg",
+  },
+];
 
 export const DEFAULT_ANIMALS_PER_PAGE = 12;
 export const DEFAULT_RADIUS = 30;
@@ -11,7 +15,6 @@ export const RADIUS_OPTIONS_VETERINARIES = [5, 10, 15, 20, 30] as const;
 
 export const VETERINARIES_PER_PAGE = 10;
 export const FETCH_LIMIT_VETERINARIES = 100;
-
 
 export enum Role {
   ADMIN = "admin",
@@ -116,11 +119,10 @@ export const GOOGLE_PLACE_CATEGORIES = [
   { value: "tiendas de materiales", label: "Tiendas de materiales" },
   { value: "distribuidoras", label: "Distribuidoras" },
 
-    // ── INDUSTRIA Y PRODUCCIÓN ─────────────────────────────
-    { value: "fábricas", label: "Fábricas" },
-    { value: "procesadoras", label: "Procesadoras" },
-    { value: "servicio de distribución", label: "Servicio de distribución" },
-  
+  // ── INDUSTRIA Y PRODUCCIÓN ─────────────────────────────
+  { value: "fábricas", label: "Fábricas" },
+  { value: "procesadoras", label: "Procesadoras" },
+  { value: "servicio de distribución", label: "Servicio de distribución" },
 
   // ── SERVICIOS AL HOGAR ─────────────────────────────────
   { value: "plomeros", label: "Plomeros" },
@@ -181,260 +183,672 @@ export const GOOGLE_PLACE_CATEGORIES = [
   { value: "funerarias", label: "Funerarias" },
   { value: "asilos y casas de reposo", label: "Asilos y casas de reposo" },
   { value: "orfanatos", label: "Orfanatos" },
-  { value: "organizaciones sin fines de lucro", label: "ONG / Sin fines de lucro" },
+  {
+    value: "organizaciones sin fines de lucro",
+    label: "ONG / Sin fines de lucro",
+  },
 
   // ── OTROS ──────────────────────────────────────────────
   { value: "negocios locales", label: "Negocios locales" },
   { value: "otra", label: "Otra" },
 ] as const;
 
+export {
+  INEGI_DENUE_CATEGORIES,
+  getInegiDenueKeyword,
+  toInegiDenueKeyword,
+} from "./inegiDenueCategories";
 
 /**
  * Mapa de relaciones para SEO Programático.
  * La llave (key) es el slug de la URL (ej: 'agencias-de-marketing').
- * El valor contiene el título amigable y un array con los 'values' de GOOGLE_PLACE_CATEGORIES 
+ * El valor contiene el título amigable y un array con los 'values' de GOOGLE_PLACE_CATEGORIES
  * que representan a los clientes ideales para ese nicho.
  */
-export const NICHE_TARGET_MAPPING: Record<string, { title: string; idealClients: string[] }> = {
-
+export const NICHE_TARGET_MAPPING: Record<
+  string,
+  { title: string; idealClients: string[] }
+> = {
   // ── SERVICIOS PROFESIONALES ────────────────────────────
   "agencias-de-marketing": {
     title: "Agencias de Marketing Digital",
-    idealClients: ["médicos", "clínicas", "dentistas", "restaurantes", "gimnasios", "abogados", "inmobiliarias", "hoteles", "spa", "medicina estética"],
+    idealClients: [
+      "médicos",
+      "clínicas",
+      "dentistas",
+      "restaurantes",
+      "gimnasios",
+      "abogados",
+      "inmobiliarias",
+      "hoteles",
+      "spa",
+      "medicina estética",
+    ],
   },
   "agencias-de-diseno": {
     title: "Agencias de Diseño y Freelancers",
-    idealClients: ["dentistas", "psicólogos", "cafeterías", "spa", "hoteles", "gimnasios", "salones de belleza", "barberías", "nutriólogos", "medicina estética"],
+    idealClients: [
+      "dentistas",
+      "psicólogos",
+      "cafeterías",
+      "spa",
+      "hoteles",
+      "gimnasios",
+      "salones de belleza",
+      "barberías",
+      "nutriólogos",
+      "medicina estética",
+    ],
   },
   "agencias-de-publicidad": {
     title: "Agencias de Publicidad",
-    idealClients: ["restaurantes", "hoteles", "agencias de autos", "constructoras", "tiendas de ropa", "gimnasios", "salones de eventos", "inmobiliarias"],
+    idealClients: [
+      "restaurantes",
+      "hoteles",
+      "agencias de autos",
+      "constructoras",
+      "tiendas de ropa",
+      "gimnasios",
+      "salones de eventos",
+      "inmobiliarias",
+    ],
   },
   "fotografia-y-video": {
     title: "Fotógrafos y Videógrafos",
-    idealClients: ["salones de eventos", "restaurantes", "hoteles", "tiendas de novias", "inmobiliarias", "agencias de marketing", "medicina estética", "cirujanos plásticos"],
+    idealClients: [
+      "salones de eventos",
+      "restaurantes",
+      "hoteles",
+      "tiendas de novias",
+      "inmobiliarias",
+      "agencias de marketing",
+      "medicina estética",
+      "cirujanos plásticos",
+    ],
   },
-  "imprentas": {
+  imprentas: {
     title: "Imprentas y Diseño Gráfico",
-    idealClients: ["restaurantes", "escuelas", "agencias de marketing", "inmobiliarias", "abogados", "contadores", "hoteles", "gimnasios", "tiendas de ropa"],
+    idealClients: [
+      "restaurantes",
+      "escuelas",
+      "agencias de marketing",
+      "inmobiliarias",
+      "abogados",
+      "contadores",
+      "hoteles",
+      "gimnasios",
+      "tiendas de ropa",
+    ],
   },
   "estudio-de-grabacion": {
     title: "Estudios de Grabación y Producción",
-    idealClients: ["grupos de música", "agencias de publicidad", "escuelas", "iglesias", "salones de eventos", "agencias de marketing"],
+    idealClients: [
+      "grupos de música",
+      "agencias de publicidad",
+      "escuelas",
+      "iglesias",
+      "salones de eventos",
+      "agencias de marketing",
+    ],
   },
 
   // ── LEGAL Y FINANCIERO ─────────────────────────────────
-  "abogados": {
+  abogados: {
     title: "Abogados y Despachos Legales",
-    idealClients: ["constructoras", "inmobiliarias", "fábricas", "hospitales", "servicio de distribución", "agencias de autos", "desarrolladoras", "notarías"],
+    idealClients: [
+      "constructoras",
+      "inmobiliarias",
+      "fábricas",
+      "hospitales",
+      "servicio de distribución",
+      "agencias de autos",
+      "desarrolladoras",
+      "notarías",
+    ],
   },
-  "contadores": {
+  contadores: {
     title: "Contadores y Despachos Contables",
-    idealClients: ["restaurantes", "tiendas de ropa", "farmacias", "ferreterías", "agencias de marketing", "constructoras", "distribuidoras", "gimnasios", "clínicas"],
+    idealClients: [
+      "restaurantes",
+      "tiendas de ropa",
+      "farmacias",
+      "ferreterías",
+      "agencias de marketing",
+      "constructoras",
+      "distribuidoras",
+      "gimnasios",
+      "clínicas",
+    ],
   },
-  "notarias": {
+  notarias: {
     title: "Notarías",
-    idealClients: ["inmobiliarias", "constructoras", "desarrolladoras", "abogados", "agencias de autos", "valuadores"],
+    idealClients: [
+      "inmobiliarias",
+      "constructoras",
+      "desarrolladoras",
+      "abogados",
+      "agencias de autos",
+      "valuadores",
+    ],
   },
-  "seguros": {
+  seguros: {
     title: "Agentes y Agencias de Seguros",
-    idealClients: ["médicos", "constructoras", "agencias de autos", "escuelas", "talleres mecánicos", "restaurantes", "gimnasios", "hospitales", "colegios privados"],
+    idealClients: [
+      "médicos",
+      "constructoras",
+      "agencias de autos",
+      "escuelas",
+      "talleres mecánicos",
+      "restaurantes",
+      "gimnasios",
+      "hospitales",
+      "colegios privados",
+    ],
   },
-  "gestoria": {
+  gestoria: {
     title: "Gestorías y Trámites Empresariales",
-    idealClients: ["constructoras", "fábricas", "distribuidoras", "agencias de autos", "restaurantes", "inmobiliarias", "transportistas"],
+    idealClients: [
+      "constructoras",
+      "fábricas",
+      "distribuidoras",
+      "agencias de autos",
+      "restaurantes",
+      "inmobiliarias",
+      "transportistas",
+    ],
   },
   "consultoras-empresariales": {
     title: "Consultoras Empresariales",
-    idealClients: ["restaurantes", "gimnasios", "clínicas", "hoteles", "constructoras", "agencias de marketing", "distribuidoras", "fábricas"],
+    idealClients: [
+      "restaurantes",
+      "gimnasios",
+      "clínicas",
+      "hoteles",
+      "constructoras",
+      "agencias de marketing",
+      "distribuidoras",
+      "fábricas",
+    ],
   },
 
   // ── SALUD ──────────────────────────────────────────────
-  "medicos": {
+  medicos: {
     title: "Médicos Generales y Especialistas",
-    idealClients: ["laboratorios", "farmacias", "hospitales", "centros de diagnóstico", "ópticas", "centros de rehabilitación"],
+    idealClients: [
+      "laboratorios",
+      "farmacias",
+      "hospitales",
+      "centros de diagnóstico",
+      "ópticas",
+      "centros de rehabilitación",
+    ],
   },
-  "dentistas": {
+  dentistas: {
     title: "Dentistas y Clínicas Dentales",
-    idealClients: ["laboratorios", "farmacias", "escuelas", "guarderías", "colegios privados", "empresas corporativas"],
+    idealClients: [
+      "laboratorios",
+      "farmacias",
+      "escuelas",
+      "guarderías",
+      "colegios privados",
+      "empresas corporativas",
+    ],
   },
-  "veterinarias": {
+  veterinarias: {
     title: "Veterinarias y Clínicas de Mascotas",
-    idealClients: ["tiendas de mascotas", "guarderías de mascotas", "parques de diversiones", "hoteles"],
+    idealClients: [
+      "tiendas de mascotas",
+      "guarderías de mascotas",
+      "parques de diversiones",
+      "hoteles",
+    ],
   },
-  "nutriologos": {
+  nutriologos: {
     title: "Nutriólogos y Coaches de Salud",
-    idealClients: ["gimnasios", "estudios de yoga", "estudios de pilates", "spa", "escuelas", "hospitales"],
+    idealClients: [
+      "gimnasios",
+      "estudios de yoga",
+      "estudios de pilates",
+      "spa",
+      "escuelas",
+      "hospitales",
+    ],
   },
-  "fisioterapeutas": {
+  fisioterapeutas: {
     title: "Fisioterapeutas y Rehabilitación",
-    idealClients: ["gimnasios", "canchas deportivas", "hospitales", "clínicas", "agencias de autos", "constructoras"],
+    idealClients: [
+      "gimnasios",
+      "canchas deportivas",
+      "hospitales",
+      "clínicas",
+      "agencias de autos",
+      "constructoras",
+    ],
   },
   "medicina-estetica": {
     title: "Medicina Estética y Cirugía Plástica",
-    idealClients: ["salones de belleza", "spa", "gimnasios", "centros de depilación", "uñas y estética", "barberías"],
+    idealClients: [
+      "salones de belleza",
+      "spa",
+      "gimnasios",
+      "centros de depilación",
+      "uñas y estética",
+      "barberías",
+    ],
   },
-  "laboratorios": {
+  laboratorios: {
     title: "Laboratorios de Análisis Clínicos",
-    idealClients: ["médicos", "clínicas", "hospitales", "pediatras", "ginecólogos", "centros de diagnóstico"],
+    idealClients: [
+      "médicos",
+      "clínicas",
+      "hospitales",
+      "pediatras",
+      "ginecólogos",
+      "centros de diagnóstico",
+    ],
   },
 
   // ── EDUCACIÓN ──────────────────────────────────────────
   "academias-de-idiomas": {
     title: "Academias de Idiomas",
-    idealClients: ["escuelas", "colegios privados", "universidades", "hoteles", "agencias de viajes", "empresas corporativas"],
+    idealClients: [
+      "escuelas",
+      "colegios privados",
+      "universidades",
+      "hoteles",
+      "agencias de viajes",
+      "empresas corporativas",
+    ],
   },
   "academias-de-musica": {
     title: "Academias de Música y Arte",
-    idealClients: ["escuelas", "colegios privados", "guarderías", "iglesias", "salones de eventos"],
+    idealClients: [
+      "escuelas",
+      "colegios privados",
+      "guarderías",
+      "iglesias",
+      "salones de eventos",
+    ],
   },
   "academias-de-baile": {
     title: "Academias de Baile y Danza",
-    idealClients: ["salones de eventos", "escuelas", "gimnasios", "hoteles", "quinceañeras y bodas"],
+    idealClients: [
+      "salones de eventos",
+      "escuelas",
+      "gimnasios",
+      "hoteles",
+      "quinceañeras y bodas",
+    ],
   },
   "centros-de-capacitacion": {
     title: "Centros de Capacitación Empresarial",
-    idealClients: ["fábricas", "distribuidoras", "constructoras", "hospitales", "bancos", "hoteles", "restaurantes"],
+    idealClients: [
+      "fábricas",
+      "distribuidoras",
+      "constructoras",
+      "hospitales",
+      "bancos",
+      "hoteles",
+      "restaurantes",
+    ],
   },
 
   // ── ALIMENTACIÓN ───────────────────────────────────────
-  "restaurantes": {
+  restaurantes: {
     title: "Restaurantes y Negocios de Comida",
-    idealClients: ["carnicerías", "distribuidoras", "panaderías", "pastelerías", "lavanderías", "fumigación", "limpieza de hogares"],
+    idealClients: [
+      "carnicerías",
+      "distribuidoras",
+      "panaderías",
+      "pastelerías",
+      "lavanderías",
+      "fumigación",
+      "limpieza de hogares",
+    ],
   },
-  "hoteles": {
+  hoteles: {
     title: "Hoteles y Hospedaje",
-    idealClients: ["agencias de viajes", "restaurantes", "lavanderías", "limpieza de hogares", "grupos de música", "fotografía y video", "agencias de eventos"],
+    idealClients: [
+      "agencias de viajes",
+      "restaurantes",
+      "lavanderías",
+      "limpieza de hogares",
+      "grupos de música",
+      "fotografía y video",
+      "agencias de eventos",
+    ],
   },
 
   // ── BELLEZA Y BIENESTAR ────────────────────────────────
   "salones-de-belleza": {
     title: "Salones de Belleza y Estéticas",
-    idealClients: ["tiendas de novias", "medicina estética", "spa", "gimnasios", "hoteles", "quinceañeras"],
+    idealClients: [
+      "tiendas de novias",
+      "medicina estética",
+      "spa",
+      "gimnasios",
+      "hoteles",
+      "quinceañeras",
+    ],
   },
-  "gimnasios": {
+  gimnasios: {
     title: "Gimnasios y Centros Deportivos",
-    idealClients: ["nutriólogos", "fisioterapeutas", "tiendas de deportes", "medicina estética", "estudios de yoga", "centros de rehabilitación"],
+    idealClients: [
+      "nutriólogos",
+      "fisioterapeutas",
+      "tiendas de deportes",
+      "medicina estética",
+      "estudios de yoga",
+      "centros de rehabilitación",
+    ],
   },
-  "spa": {
+  spa: {
     title: "Spa y Centros de Bienestar",
-    idealClients: ["hoteles", "medicina estética", "salones de belleza", "gimnasios", "agencias de viajes"],
+    idealClients: [
+      "hoteles",
+      "medicina estética",
+      "salones de belleza",
+      "gimnasios",
+      "agencias de viajes",
+    ],
   },
 
   // ── SERVICIOS AL HOGAR ─────────────────────────────────
-  "plomeros": {
+  plomeros: {
     title: "Plomeros y Fontanería",
-    idealClients: ["constructoras", "inmobiliarias", "hoteles", "restaurantes", "hospitales", "colegios privados"],
+    idealClients: [
+      "constructoras",
+      "inmobiliarias",
+      "hoteles",
+      "restaurantes",
+      "hospitales",
+      "colegios privados",
+    ],
   },
-  "electricistas": {
+  electricistas: {
     title: "Electricistas e Instalaciones",
-    idealClients: ["constructoras", "inmobiliarias", "hoteles", "restaurantes", "fábricas", "hospitales", "colegios privados"],
+    idealClients: [
+      "constructoras",
+      "inmobiliarias",
+      "hoteles",
+      "restaurantes",
+      "fábricas",
+      "hospitales",
+      "colegios privados",
+    ],
   },
   "limpieza-de-hogares": {
     title: "Servicios de Limpieza y Mantenimiento",
-    idealClients: ["hoteles", "hospitales", "escuelas", "colegios privados", "gimnasios", "bancos", "restaurantes", "oficinas corporativas"],
+    idealClients: [
+      "hoteles",
+      "hospitales",
+      "escuelas",
+      "colegios privados",
+      "gimnasios",
+      "bancos",
+      "restaurantes",
+      "oficinas corporativas",
+    ],
   },
-  "fumigacion": {
+  fumigacion: {
     title: "Fumigación y Control de Plagas",
-    idealClients: ["restaurantes", "hoteles", "hospitales", "escuelas", "almacenes", "distribuidoras", "fábricas"],
+    idealClients: [
+      "restaurantes",
+      "hoteles",
+      "hospitales",
+      "escuelas",
+      "almacenes",
+      "distribuidoras",
+      "fábricas",
+    ],
   },
   "instalacion-de-alarmas": {
     title: "Instalación de Alarmas y Seguridad",
-    idealClients: ["inmobiliarias", "constructoras", "restaurantes", "hoteles", "escuelas", "joyerías", "bancos", "farmacias"],
+    idealClients: [
+      "inmobiliarias",
+      "constructoras",
+      "restaurantes",
+      "hoteles",
+      "escuelas",
+      "joyerías",
+      "bancos",
+      "farmacias",
+    ],
   },
-  "mudanzas": {
+  mudanzas: {
     title: "Servicios de Mudanzas",
-    idealClients: ["inmobiliarias", "constructoras", "desarrolladoras", "oficinas corporativas", "hoteles"],
+    idealClients: [
+      "inmobiliarias",
+      "constructoras",
+      "desarrolladoras",
+      "oficinas corporativas",
+      "hoteles",
+    ],
   },
 
   // ── AUTOMOTRIZ ─────────────────────────────────────────
   "talleres-mecanicos": {
     title: "Talleres Mecánicos y Autoservicio",
-    idealClients: ["agencias de autos", "distribuidoras", "constructoras", "fábricas", "transportistas", "renta de autos"],
+    idealClients: [
+      "agencias de autos",
+      "distribuidoras",
+      "constructoras",
+      "fábricas",
+      "transportistas",
+      "renta de autos",
+    ],
   },
   "agencias-de-autos": {
     title: "Agencias y Distribuidoras de Autos",
-    idealClients: ["seguros", "talleres mecánicos", "llanterías", "hojalatería y pintura", "gestorías", "verificaciones"],
+    idealClients: [
+      "seguros",
+      "talleres mecánicos",
+      "llanterías",
+      "hojalatería y pintura",
+      "gestorías",
+      "verificaciones",
+    ],
   },
-  "refaccionarias": {
+  refaccionarias: {
     title: "Refaccionarias y Auto Partes",
-    idealClients: ["talleres mecánicos", "agencias de autos", "transportistas", "constructoras", "fábricas"],
+    idealClients: [
+      "talleres mecánicos",
+      "agencias de autos",
+      "transportistas",
+      "constructoras",
+      "fábricas",
+    ],
   },
   "renta-de-autos": {
     title: "Renta de Autos y Transporte",
-    idealClients: ["hoteles", "agencias de viajes", "hospitales", "aeropuertos", "empresas corporativas"],
+    idealClients: [
+      "hoteles",
+      "agencias de viajes",
+      "hospitales",
+      "aeropuertos",
+      "empresas corporativas",
+    ],
   },
 
   // ── INMOBILIARIO Y CONSTRUCCIÓN ────────────────────────
-  "inmobiliarias": {
+  inmobiliarias: {
     title: "Inmobiliarias y Bienes Raíces",
-    idealClients: ["notarías", "abogados", "constructoras", "valuadores", "arquitectos", "diseñadores de interiores", "desarrolladoras"],
+    idealClients: [
+      "notarías",
+      "abogados",
+      "constructoras",
+      "valuadores",
+      "arquitectos",
+      "diseñadores de interiores",
+      "desarrolladoras",
+    ],
   },
-  "constructoras": {
+  constructoras: {
     title: "Constructoras y Contratistas",
-    idealClients: ["arquitectos", "ferreterías", "tiendas de materiales", "electricistas", "plomeros", "herrería", "pintura y construcción"],
+    idealClients: [
+      "arquitectos",
+      "ferreterías",
+      "tiendas de materiales",
+      "electricistas",
+      "plomeros",
+      "herrería",
+      "pintura y construcción",
+    ],
   },
-  "arquitectos": {
+  arquitectos: {
     title: "Arquitectos y Diseñadores",
-    idealClients: ["constructoras", "inmobiliarias", "desarrolladoras", "diseñadores de interiores", "ferreterías", "tiendas de materiales"],
+    idealClients: [
+      "constructoras",
+      "inmobiliarias",
+      "desarrolladoras",
+      "diseñadores de interiores",
+      "ferreterías",
+      "tiendas de materiales",
+    ],
   },
   "disenadores-de-interiores": {
     title: "Diseñadores de Interiores",
-    idealClients: ["mueblerías", "constructoras", "inmobiliarias", "hoteles", "restaurantes", "desarrolladoras"],
+    idealClients: [
+      "mueblerías",
+      "constructoras",
+      "inmobiliarias",
+      "hoteles",
+      "restaurantes",
+      "desarrolladoras",
+    ],
   },
 
   // ── TURISMO Y ENTRETENIMIENTO ──────────────────────────
   "agencias-de-viajes": {
     title: "Agencias de Viajes y Turismo",
-    idealClients: ["hoteles", "restaurantes", "renta de autos", "agencias de eventos", "grupos de música", "fotografía y video"],
+    idealClients: [
+      "hoteles",
+      "restaurantes",
+      "renta de autos",
+      "agencias de eventos",
+      "grupos de música",
+      "fotografía y video",
+    ],
   },
   "salones-de-eventos": {
     title: "Salones de Eventos y Banquetes",
-    idealClients: ["grupos de música", "fotografía y video", "pastelerías", "panaderías", "florerías", "agencias de marketing", "catering"],
+    idealClients: [
+      "grupos de música",
+      "fotografía y video",
+      "pastelerías",
+      "panaderías",
+      "florerías",
+      "agencias de marketing",
+      "catering",
+    ],
   },
   "grupos-de-musica": {
     title: "Grupos de Música y Entretenimiento",
-    idealClients: ["salones de eventos", "hoteles", "restaurantes", "iglesias", "agencias de eventos"],
+    idealClients: [
+      "salones de eventos",
+      "hoteles",
+      "restaurantes",
+      "iglesias",
+      "agencias de eventos",
+    ],
   },
   "recreacion-infantil": {
     title: "Recreación Infantil y Juegos",
-    idealClients: ["guarderías", "colegios privados", "salones de eventos", "escuelas", "restaurantes familiares"],
+    idealClients: [
+      "guarderías",
+      "colegios privados",
+      "salones de eventos",
+      "escuelas",
+      "restaurantes familiares",
+    ],
   },
 
   // ── DISTRIBUCIÓN E INDUSTRIA ───────────────────────────
   "servicio-de-distribucion": {
     title: "Servicios de Distribución y Paquetería",
-    idealClients: ["restaurantes", "farmacias", "tiendas de ropa", "joyerías", "papelerías", "distribuidoras", "supermercados", "carnicerías"],
+    idealClients: [
+      "restaurantes",
+      "farmacias",
+      "tiendas de ropa",
+      "joyerías",
+      "papelerías",
+      "distribuidoras",
+      "supermercados",
+      "carnicerías",
+    ],
   },
-  "distribuidoras": {
+  distribuidoras: {
     title: "Distribuidoras y Mayoristas",
-    idealClients: ["restaurantes", "hoteles", "hospitales", "supermercados", "farmacias", "tiendas de abarrotes", "carnicerías"],
+    idealClients: [
+      "restaurantes",
+      "hoteles",
+      "hospitales",
+      "supermercados",
+      "farmacias",
+      "tiendas de abarrotes",
+      "carnicerías",
+    ],
   },
-  "fabricas": {
+  fabricas: {
     title: "Fábricas y Manufactura",
-    idealClients: ["distribuidoras", "servicio de distribución", "talleres mecánicos", "constructoras", "abogados", "contadores"],
+    idealClients: [
+      "distribuidoras",
+      "servicio de distribución",
+      "talleres mecánicos",
+      "constructoras",
+      "abogados",
+      "contadores",
+    ],
   },
 
   // ── RELIGIOSO Y SOCIAL ─────────────────────────────────
-  "iglesias": {
+  iglesias: {
     title: "Iglesias y Organizaciones Religiosas",
-    idealClients: ["grupos de música", "salones de eventos", "fotografía y video", "pastelerías", "florerías", "imprentas"],
+    idealClients: [
+      "grupos de música",
+      "salones de eventos",
+      "fotografía y video",
+      "pastelerías",
+      "florerías",
+      "imprentas",
+    ],
   },
-  "funerarias": {
+  funerarias: {
     title: "Funerarias y Servicios Funerales",
-    idealClients: ["iglesias", "florerías", "imprentas", "asilos y casas de reposo"],
+    idealClients: [
+      "iglesias",
+      "florerías",
+      "imprentas",
+      "asilos y casas de reposo",
+    ],
   },
   "asilos-y-casas-de-reposo": {
     title: "Asilos y Casas de Reposo",
-    idealClients: ["médicos", "farmacias", "nutriólogos", "fisioterapeutas", "limpieza de hogares", "lavanderías"],
+    idealClients: [
+      "médicos",
+      "farmacias",
+      "nutriólogos",
+      "fisioterapeutas",
+      "limpieza de hogares",
+      "lavanderías",
+    ],
   },
 
   // ── SOFTWARE Y TECNOLOGÍA ──────────────────────────────
   "software-y-tecnologia": {
     title: "Empresas de Software (SaaS) y TI",
-    idealClients: ["restaurantes", "hoteles", "notarías", "inmobiliarias", "clínicas", "hospitales", "distribuidoras", "fábricas", "constructoras"],
+    idealClients: [
+      "restaurantes",
+      "hoteles",
+      "notarías",
+      "inmobiliarias",
+      "clínicas",
+      "hospitales",
+      "distribuidoras",
+      "fábricas",
+      "constructoras",
+    ],
   },
-
 } as const;
 
 export const PIPELINE_STATUS = {
@@ -745,7 +1159,6 @@ export const PLAN_FEATURES_MAP: Record<
   },
 };
 
-
 export const QUOTATION_STATUS = {
   DRAFT: "draft",
   SENT: "sent",
@@ -766,11 +1179,16 @@ export const QUOTATION_STATUS_OPTIONS = [
 ] as const;
 
 export const QUOTATION_STATUS_COLORS = {
-  [QUOTATION_STATUS.DRAFT]: "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-white",
-  [QUOTATION_STATUS.SENT]: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200",
-  [QUOTATION_STATUS.ACCEPTED]: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200",
-  [QUOTATION_STATUS.REJECTED]: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200",
-  [QUOTATION_STATUS.EXPIRED]: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200",
+  [QUOTATION_STATUS.DRAFT]:
+    "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-white",
+  [QUOTATION_STATUS.SENT]:
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200",
+  [QUOTATION_STATUS.ACCEPTED]:
+    "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200",
+  [QUOTATION_STATUS.REJECTED]:
+    "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200",
+  [QUOTATION_STATUS.EXPIRED]:
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200",
 } as const satisfies Record<QuotationStatus, string>;
 
 export const QUOTATION_DISCOUNT_TYPE = {

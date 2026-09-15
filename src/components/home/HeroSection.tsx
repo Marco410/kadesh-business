@@ -162,11 +162,11 @@ export default function HeroSection() {
         <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-14">
           <div className="hero-copy flex-1 text-center lg:text-left max-w-xl lg:max-w-2xl">
             <h1 className="hero-headline text-[2rem] sm:text-4xl lg:text-5xl xl:text-[3.35rem] font-bold text-white mb-5 leading-[1.12] tracking-tight">
-              Extrae leads B2B de Google Maps y conviértelos en clientes
+              Extrae leads B2B de Google Maps e INEGI y conviértelos en clientes
             </h1>
 
             <p className="hero-lead text-base sm:text-lg text-white/90 mb-5 leading-relaxed max-w-lg mx-auto lg:mx-0">
-              Kadesh extrae negocios reales de Google Maps con teléfono, rating
+              Kadesh extrae negocios reales de Google Maps e INEGI con teléfono
               y dirección, y los gestiona en un CRM integrado.{" "}
               <Link
                 href={`${Routes.home}${Routes.navigation.kadeshAi}`}

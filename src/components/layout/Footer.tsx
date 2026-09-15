@@ -36,7 +36,7 @@ export default function Footer() {
           <div>
             <Logo className="mb-4" />
             <p className="text-gray-400 text-sm leading-relaxed">
-              Prospección B2B inteligente. Extrae leads desde Google Maps y gestiona ventas en un CRM integrado.
+              Prospección B2B inteligente. Extrae leads desde Google Maps e INEGI y gestiona ventas en un CRM integrado.
             </p>
           </div>
 

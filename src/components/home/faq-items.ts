@@ -2,22 +2,22 @@ export const FAQ_ITEMS = [
   {
     question: "¿Qué es Kadesh y para qué sirve?",
     answer:
-      "Kadesh es una plataforma SaaS B2B que extrae clientes potenciales reales de Google Maps —con teléfono, dirección, categoría y rating— y los guarda en un CRM integrado. Eliges un punto en el mapa, una categoría y un radio; en minutos tienes negocios listos para contactar, con prueba de 7 días y 50 leads gratis.",
+      "Kadesh es una plataforma SaaS B2B que extrae clientes potenciales reales de Google Maps e INEGI —con teléfono, dirección y categoría— y los guarda en un CRM integrado. Eliges un punto en el mapa, una categoría, un radio y la fuente; en minutos tienes negocios listos para contactar, con prueba de 7 días y 50 leads gratis.",
   },
   {
-    question: "¿Cómo extraer leads de Google Maps con Kadesh?",
+    question: "¿Cómo extraer leads de Google Maps e INEGI con Kadesh?",
     answer:
-      "Creas tu cuenta, eliges un punto en el mapa, seleccionas la categoría del negocio (por ejemplo dentistas o abogados) y defines el radio de búsqueda. Kadesh extrae en tiempo real nombre, teléfono, dirección, categoría y valoración, y deja los prospectos listos en el CRM para llamar, dar seguimiento y cotizar.",
+      "Creas tu cuenta, eliges un punto en el mapa, seleccionas la categoría del negocio (por ejemplo dentistas o abogados), defines el radio y la fuente: Google Maps o INEGI. Kadesh extrae nombre, teléfono y dirección, y deja los prospectos listos en el CRM para llamar, dar seguimiento y cotizar.",
   },
   {
     question: "¿De dónde vienen los datos de los leads?",
     answer:
-      "Los datos se obtienen desde Google Maps en tiempo real: nombre del negocio, teléfonos, dirección, categoría y valoración. Solo eliges un punto en el mapa, la categoría y el radio; Kadesh extrae los leads y los deja listos en tu CRM. No construyes bases a mano ni compras listas genéricas desactualizadas.",
+      "Los datos salen de Google Maps e INEGI. En Google Maps: nombre, teléfonos, dirección, categoría y valoración. En INEGI (México): nombre, teléfono, dirección y categoría. Eliges un punto en el mapa, la categoría, el radio y la fuente; Kadesh deja los leads en tu CRM. No construyes bases a mano ni compras listas genéricas desactualizadas.",
   },
   {
-    question: "¿Es legal extraer leads de Google Maps?",
+    question: "¿Es legal extraer leads de Google Maps e INEGI?",
     answer:
-      "Sí. Kadesh usa información pública que Google Maps muestra a cualquier usuario: nombre, teléfono, dirección, categoría y valoración. La plataforma está diseñada para prospección comercial B2B legítima y para gestionar esas oportunidades en un CRM, no para extraer datos privados ni para prácticas de spam.",
+      "Sí. Kadesh usa información pública: la que Google Maps muestra a cualquier usuario (nombre, teléfono, dirección, categoría y valoración) y la del directorio de establecimientos de INEGI en México. La plataforma está diseñada para prospección comercial B2B legítima y para gestionar esas oportunidades en un CRM, no para extraer datos privados ni para prácticas de spam.",
   },
   {
     question: "¿Los leads se repiten o consumen mi cuota dos veces?",
@@ -47,17 +47,17 @@ export const FAQ_ITEMS = [
   {
     question: "¿Qué tipo de negocios puedo encontrar?",
     answer:
-      "Puedes buscar prácticamente cualquier negocio listado en Google Maps: dentistas, abogados, restaurantes, agencias, tiendas, consultores y más. Seleccionas la categoría y el radio; Kadesh encuentra negocios en esa zona con teléfono y datos de contacto listos para prospectar.",
+      "Puedes buscar giros en Google Maps e INEGI: dentistas, abogados, restaurantes, agencias, tiendas, oficios, fruterías, zapaterías y más. Seleccionas la categoría, el radio y la fuente; Kadesh encuentra negocios en esa zona con datos de contacto listos para prospectar.",
   },
   {
     question: "¿En qué países funciona Kadesh?",
     answer:
-      "La plataforma funciona en cualquier país donde Google Maps tenga fichas de negocios. Puedes buscar leads en tu ciudad de México o en otra parte del mundo: eliges el punto, la categoría y el radio, y extraes prospectos con los datos públicos disponibles en ese mapa.",
+      "Google Maps funciona en cualquier país donde haya fichas de negocios. INEGI cubre establecimientos en México. Puedes buscar leads en tu ciudad o, con Google Maps, en otra parte del mundo: eliges el punto, la categoría, el radio y la fuente.",
   },
   {
     question: "¿Necesito conocimientos técnicos para usar Kadesh?",
     answer:
-      "No. El flujo es tres decisiones: un punto en el mapa, una categoría y un radio de búsqueda. En segundos tienes una lista de prospectos en el CRM para registrar llamadas, seguimientos y propuestas. No configuras scrapers, APIs ni hojas de cálculo para empezar a prospectar.",
+      "No. Eliges un punto en el mapa, una categoría, un radio y la fuente (Google Maps o INEGI). En segundos tienes una lista de prospectos en el CRM para registrar llamadas, seguimientos y propuestas. No configuras scrapers, APIs ni hojas de cálculo para empezar a prospectar.",
   },
   {
     question: "¿Puedo asignar leads a vendedores?",
@@ -77,7 +77,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Cuánto cuesta un lead con Kadesh frente a Meta Ads?",
     answer:
-      "Con el plan Pro de Kadesh (799 MXN y 500 créditos al mes) el costo por lead queda en unos 1.60 MXN, porque recibes negocios con teléfono, dirección y rating listos para contactar. En Meta Ads un lead suele costar entre 150 y 300 MXN y no siempre incluye un teléfono verificable. Los montos de anuncios varían por campaña y sector.",
+      "Con el plan Pro de Kadesh (799 MXN y 500 créditos al mes) el costo por lead queda en unos 1.60 MXN, porque recibes negocios de Google Maps o INEGI con teléfono y dirección listos para contactar. En Meta Ads un lead suele costar entre 150 y 300 MXN y no siempre incluye un teléfono verificable. Los montos de anuncios varían por campaña y sector.",
   },
   {
     question: "¿Puedo recomendar Kadesh y ganar comisiones?",
@@ -87,6 +87,6 @@ export const FAQ_ITEMS = [
   {
     question: "¿Para quién es esta plataforma?",
     answer:
-      "Kadesh está diseñada para agencias de marketing, freelancers, equipos de ventas, consultores y cualquier negocio que necesite encontrar clientes B2B rápido. Si tu oferta se dirige a negocios locales con ficha en Google Maps, extraes listas por giro y zona y las gestionas en el mismo CRM.",
+      "Kadesh está diseñada para agencias de marketing, freelancers, equipos de ventas, consultores y cualquier negocio que necesite encontrar clientes B2B rápido. Si tu oferta se dirige a negocios locales con ficha en Google Maps o en INEGI, extraes listas por giro y zona y las gestionas en el mismo CRM.",
   },
 ] as const;
