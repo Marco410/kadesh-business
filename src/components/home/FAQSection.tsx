@@ -16,7 +16,7 @@ export default function FAQSection() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
-            Preguntas frecuentes sobre extraer leads de Google Maps
+            Preguntas frecuentes sobre extraer leads de Google Maps e INEGI
           </h2>
           <p className="text-[#424242] dark:text-[#d6d6d6] max-w-2xl mx-auto">
             Respuestas directas sobre legalidad, duplicados, CRM, Kadesh AI,

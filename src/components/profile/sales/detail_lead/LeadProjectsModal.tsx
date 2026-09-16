@@ -74,7 +74,7 @@ export default function LeadProjectsModal({
                     id="lead-projects-modal-title"
                     className="text-lg font-bold text-[#212121] dark:text-white"
                   >
-                    Proyectos del lead
+                    Proyectos del cliente
                   </h2>
                   {leadBusinessName ? (
                     <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5 truncate">

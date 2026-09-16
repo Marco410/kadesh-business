@@ -12,7 +12,7 @@ const SECONDARY = [
     icon: Shield01Icon,
     title: "Datos públicos y legales",
     description:
-      "Extraemos información pública de Google Maps para prospección B2B legítima. Sin bots y sin riesgo para tu cuenta personal.",
+      "Extraemos información pública de Google Maps e INEGI para prospección B2B legítima. Sin bots y sin riesgo para tu cuenta personal.",
   },
   {
     icon: KanbanIcon,
@@ -35,8 +35,8 @@ export default function WhyKadeshSection() {
               ¿Por qué usar Kadesh para conseguir clientes B2B?
             </h2>
             <p className="text-lg text-[#424242] dark:text-[#d6d6d6] leading-relaxed mb-8">
-              Kadesh no es solo un extractor de Google Maps: genera listas de
-              prospectos reales en minutos, con teléfono y rating, y las
+              Kadesh no es solo un extractor de Google Maps e INEGI: genera listas de
+              prospectos reales en minutos, con teléfono y dirección, y las
               gestiona en un CRM. Evitas anuncios caros y semanas armando bases
               a mano; un flujo cubre búsqueda, contacto y cierre.
             </p>
