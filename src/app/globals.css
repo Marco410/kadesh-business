@@ -623,6 +623,44 @@ html.dark .ai-live-ring::after {
   }
 }
 
+@keyframes clientes-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes clientes-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.clientes-row-in {
+  animation: clientes-row-in 280ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+.clientes-pop-in {
+  animation: clientes-pop-in 180ms cubic-bezier(0.2, 0, 0, 1) both;
+  transform-origin: top center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clientes-row-in,
+  .clientes-pop-in {
+    animation: none;
+  }
+}
+
 .dashboard-bar-grow {
   transform-origin: left center;
   animation: dashboard-bar-grow 420ms cubic-bezier(0.22, 1, 0.36, 1) both;

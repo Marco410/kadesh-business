@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useCallback,
+} from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useApolloClient } from "@apollo/client";
 import {
@@ -30,7 +36,7 @@ import SalesLeadsTable from "kadesh/components/profile/sales/SalesLeadsTable";
 import EmptyCompanySection from "kadesh/components/profile/sales/EmptyCompanySection";
 import StatsSection from "./StatsSection";
 import FiltersLeadsSection from "./FiltersLeadsSection";
-import CurrentPlanSection from "./CurrentPlanSection";
+import AssignLeadsBar from "./AssignLeadsBar";
 import { SubscriptionProvider, useSubscription } from "./SubscriptionContext";
 import { useUser } from "kadesh/utils/UserContext";
 import { Role } from "kadesh/constants/constans";
@@ -43,8 +49,13 @@ import { hasPlanFeature } from "./helpers/plan-features";
 import { downloadLeadsExcel } from "./exportLeadsExcel";
 import { buildClientLeadsQueryVariables } from "./helpers/client-leads-query";
 import { SupportContactSection } from "kadesh/components/shared";
+import {
+  DEFAULT_LEADS_PAGE_SIZE,
+  parseLeadsPageSize,
+  type LeadsPageSize,
+} from "./leadsPagination";
+import { gsap, useGSAP } from "kadesh/components/home/register-gsap";
 
-const LEADS_PAGE_SIZE = 10;
 const MAX_LEADS_EXPORT = 10_000;
 
 const SALES_LEADS_URL_KEYS = [
@@ -57,6 +68,7 @@ const SALES_LEADS_URL_KEYS = [
   "estado",
   "country",
   "page",
+  "limit",
 ] as const;
 
 interface SalesLeadsUrlFilters {
@@ -69,10 +81,11 @@ interface SalesLeadsUrlFilters {
   debouncedState: string;
   debouncedCountry: string;
   page: number;
+  pageSize: LeadsPageSize;
 }
 
 function parseSalesFiltersFromSearchParams(
-  sp: Pick<URLSearchParams, "get">
+  sp: Pick<URLSearchParams, "get">,
 ): SalesLeadsUrlFilters {
   return {
     selectedPipeline: sp.get("pipeline"),
@@ -84,21 +97,25 @@ function parseSalesFiltersFromSearchParams(
     debouncedState: sp.get("estado") ?? "",
     debouncedCountry: sp.get("country") ?? "",
     page: parsePageParam(sp.get("page")),
+    pageSize: parseLeadsPageSize(sp.get("limit")),
   };
 }
 
 function applySalesFiltersToUrlSearchParams(
   params: URLSearchParams,
-  state: SalesLeadsUrlFilters
+  state: SalesLeadsUrlFilters,
 ) {
   for (const k of SALES_LEADS_URL_KEYS) {
     params.delete(k);
   }
   if (state.page > 1) params.set("page", String(state.page));
+  if (state.pageSize !== DEFAULT_LEADS_PAGE_SIZE)
+    params.set("limit", String(state.pageSize));
   if (state.selectedPipeline) params.set("pipeline", state.selectedPipeline);
   if (state.selectedCategory) params.set("category", state.selectedCategory);
   if (state.selectedSource) params.set("source", state.selectedSource);
-  if (state.filterByVendedorId) params.set("vendedor", state.filterByVendedorId);
+  if (state.filterByVendedorId)
+    params.set("vendedor", state.filterByVendedorId);
   if (state.debouncedSearch) params.set("q", state.debouncedSearch);
   if (state.debouncedCity) params.set("city", state.debouncedCity);
   if (state.debouncedState) params.set("estado", state.debouncedState);
@@ -117,7 +134,7 @@ function salesFilterFieldsMatchUrl(
     debouncedCity: string;
     debouncedState: string;
     debouncedCountry: string;
-  }
+  },
 ): boolean {
   const f = parseSalesFiltersFromSearchParams(sp);
   return (
@@ -143,9 +160,7 @@ function parsePageParam(value: string | null): number {
 
 /** Normaliza texto para búsqueda: quita acentos y diacríticos. */
 function normalizeSearch(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "");
+  return value.normalize("NFD").replace(/\p{Diacritic}/gu, "");
 }
 
 export default function SalesSection({ userId }: SalesSectionProps) {
@@ -154,36 +169,53 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const searchParams = useSearchParams();
   const initialFromUrl = parseSalesFiltersFromSearchParams(searchParams);
   const [selectedPipeline, setSelectedPipeline] = useState<string | null>(
-    initialFromUrl.selectedPipeline
+    initialFromUrl.selectedPipeline,
   );
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    initialFromUrl.selectedCategory
+    initialFromUrl.selectedCategory,
   );
   const [selectedSource, setSelectedSource] = useState<string | null>(
-    initialFromUrl.selectedSource
+    initialFromUrl.selectedSource,
   );
   const [filterByVendedorId, setFilterByVendedorId] = useState<string | null>(
-    initialFromUrl.filterByVendedorId
+    initialFromUrl.filterByVendedorId,
   );
-  const [searchInput, setSearchInput] = useState(initialFromUrl.debouncedSearch);
-  const [debouncedSearch, setDebouncedSearch] = useState(initialFromUrl.debouncedSearch);
+  const [searchInput, setSearchInput] = useState(
+    initialFromUrl.debouncedSearch,
+  );
+  const [debouncedSearch, setDebouncedSearch] = useState(
+    initialFromUrl.debouncedSearch,
+  );
   const [cityInput, setCityInput] = useState(initialFromUrl.debouncedCity);
-  const [debouncedCity, setDebouncedCity] = useState(initialFromUrl.debouncedCity);
+  const [debouncedCity, setDebouncedCity] = useState(
+    initialFromUrl.debouncedCity,
+  );
   const [stateInput, setStateInput] = useState(initialFromUrl.debouncedState);
-  const [debouncedState, setDebouncedState] = useState(initialFromUrl.debouncedState);
-  const [countryInput, setCountryInput] = useState(initialFromUrl.debouncedCountry);
-  const [debouncedCountry, setDebouncedCountry] = useState(initialFromUrl.debouncedCountry);
-  const [assignToVendedorId, setAssignToVendedorId] = useState<string | null>(null);
-  const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
+  const [debouncedState, setDebouncedState] = useState(
+    initialFromUrl.debouncedState,
+  );
+  const [countryInput, setCountryInput] = useState(
+    initialFromUrl.debouncedCountry,
+  );
+  const [debouncedCountry, setDebouncedCountry] = useState(
+    initialFromUrl.debouncedCountry,
+  );
+  const [assignToVendedorId, setAssignToVendedorId] = useState<string | null>(
+    null,
+  );
+  const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(
+    new Set(),
+  );
   const [assigning, setAssigning] = useState(false);
   const [exportingExcel, setExportingExcel] = useState(false);
   const { user, refreshUser } = useUser();
   const { subscription } = useSubscription();
 
   const page = parsePageParam(searchParams.get("page"));
-
+  const pageSize = parseLeadsPageSize(searchParams.get("limit"));
 
   const lastSyncedSearchParamsRef = useRef<string | null>(null);
+  const clientesShellRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const serialized = searchParams.toString();
     if (lastSyncedSearchParamsRef.current === null) {
@@ -234,8 +266,35 @@ export default function SalesSection({ userId }: SalesSectionProps) {
 
   const companyId = userData?.user?.company?.id ?? null;
 
-  const isAdminCompany = user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
-  const isUserCompany = user?.roles?.some((r) => r.name === Role.USER_COMPANY) ?? false;
+  useGSAP(
+    () => {
+      if (!companyId) return;
+      const mm = gsap.matchMedia();
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const bands = gsap.utils.toArray<HTMLElement>(".clientes-band");
+        if (bands.length === 0) return;
+        gsap.fromTo(
+          bands,
+          { autoAlpha: 0, y: 16 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.32,
+            stagger: 0.055,
+            ease: "cubic-bezier(0.2, 0, 0, 1)",
+            clearProps: "transform,opacity,visibility",
+          },
+        );
+      });
+      return () => mm.revert();
+    },
+    { scope: clientesShellRef, dependencies: [companyId] },
+  );
+
+  const isAdminCompany =
+    user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const isUserCompany =
+    user?.roles?.some((r) => r.name === Role.USER_COMPANY) ?? false;
   const hasCompanyWideLeadScope = isAdminCompany || isUserCompany;
 
   const { data: vendedoresData } = useQuery<
@@ -262,7 +321,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     saasCompany?: { id: { equals: string } };
     pipelineStatus?: { equals: string };
   }> = [];
-  
+
   if (!hasCompanyWideLeadScope) {
     statusSomeConditions.push({ salesPerson: { id: { equals: userId } } });
   }
@@ -272,8 +331,14 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   if (selectedPipeline != null) {
     statusSomeConditions.push({ pipelineStatus: { equals: selectedPipeline } });
   }
-  if (filterByVendedorId != null && filterByVendedorId !== "" && filterByVendedorId !== "sin_asignar") {
-      statusSomeConditions.push({ salesPerson: { id: { equals: filterByVendedorId } } });
+  if (
+    filterByVendedorId != null &&
+    filterByVendedorId !== "" &&
+    filterByVendedorId !== "sin_asignar"
+  ) {
+    statusSomeConditions.push({
+      salesPerson: { id: { equals: filterByVendedorId } },
+    });
   }
 
   const where = {
@@ -290,12 +355,14 @@ export default function SalesSection({ userId }: SalesSectionProps) {
         some: { AND: statusSomeConditions },
       },
     }),
-    ...(selectedCategory != null && selectedCategory !== "" && {
-      category: { equals: selectedCategory },
-    }),
-    ...(selectedSource != null && selectedSource !== "" && {
-      source: { equals: selectedSource },
-    }),
+    ...(selectedCategory != null &&
+      selectedCategory !== "" && {
+        category: { equals: selectedCategory },
+      }),
+    ...(selectedSource != null &&
+      selectedSource !== "" && {
+        source: { equals: selectedSource },
+      }),
     ...(debouncedSearch.length > 0 && {
       businessName: {
         contains: normalizeSearch(debouncedSearch),
@@ -303,19 +370,27 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       },
     }),
     ...(debouncedCity.length > 0 && {
-      city: { contains: normalizeSearch(debouncedCity), mode: "insensitive" as const },
+      city: {
+        contains: normalizeSearch(debouncedCity),
+        mode: "insensitive" as const,
+      },
     }),
     ...(debouncedState.length > 0 && {
-      state: { contains: normalizeSearch(debouncedState), mode: "insensitive" as const },
+      state: {
+        contains: normalizeSearch(debouncedState),
+        mode: "insensitive" as const,
+      },
     }),
     ...(debouncedCountry.length > 0 && {
-      country: { contains: normalizeSearch(debouncedCountry), mode: "insensitive" as const },
+      country: {
+        contains: normalizeSearch(debouncedCountry),
+        mode: "insensitive" as const,
+      },
     }),
   };
 
-
   const navigateLeadsUrl = useCallback(
-    (newPage: number, replace: boolean) => {
+    (newPage: number, replace: boolean, nextPageSize: LeadsPageSize = pageSize) => {
       const params = new URLSearchParams(searchParams.toString());
       applySalesFiltersToUrlSearchParams(params, {
         selectedPipeline,
@@ -327,6 +402,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
         debouncedState,
         debouncedCountry,
         page: newPage,
+        pageSize: nextPageSize,
       });
       const q = params.toString();
       const href = q ? `${pathname}?${q}` : pathname;
@@ -345,7 +421,8 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       debouncedCity,
       debouncedState,
       debouncedCountry,
-    ]
+      pageSize,
+    ],
   );
 
   const navigateLeadsUrlRef = useRef(navigateLeadsUrl);
@@ -353,6 +430,10 @@ export default function SalesSection({ userId }: SalesSectionProps) {
 
   const pushLeadsPage = useCallback((newPage: number) => {
     navigateLeadsUrlRef.current(newPage, false);
+  }, []);
+
+  const pushLeadsPageSize = useCallback((nextPageSize: LeadsPageSize) => {
+    navigateLeadsUrlRef.current(1, true, nextPageSize);
   }, []);
 
   const isFirstMount = useRef(true);
@@ -397,7 +478,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   });
 
   const totalCount = countData?.techBusinessLeadsCount ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalCount / LEADS_PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const effectivePage = totalCount > 0 ? Math.min(page, totalPages) : page;
 
   const leadsQueryVariables = buildClientLeadsQueryVariables({
@@ -405,20 +486,28 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     companyId,
     hasCompanyWideLeadScope,
     userId,
-    take: LEADS_PAGE_SIZE,
-    skip: (effectivePage - 1) * LEADS_PAGE_SIZE,
+    take: pageSize,
+    skip: (effectivePage - 1) * pageSize,
     orderBy: [{ createdAt: "desc" }],
   });
 
-  const { data, loading, error, refetch: refetchLeads } = useQuery<
-    TechBusinessLeadsResponse,
-    TechBusinessLeadsVariables
-  >(TECH_BUSINESS_LEADS_QUERY, {
-    variables: leadsQueryVariables,
-    skip: !userId,
-  });
+  const {
+    data,
+    previousData,
+    loading,
+    error,
+    refetch: refetchLeads,
+  } = useQuery<TechBusinessLeadsResponse, TechBusinessLeadsVariables>(
+    TECH_BUSINESS_LEADS_QUERY,
+    {
+      variables: leadsQueryVariables,
+      skip: !userId,
+      notifyOnNetworkStatusChange: true,
+    },
+  );
 
-  const leads = data?.techBusinessLeads ?? [];
+  const leads =
+    data?.techBusinessLeads ?? previousData?.techBusinessLeads ?? [];
 
   const client = useApolloClient();
 
@@ -509,7 +598,8 @@ export default function SalesSection({ userId }: SalesSectionProps) {
 
   const handleToggleAll = useCallback((leadIds: string[]) => {
     setSelectedLeadIds((prev) => {
-      const allSelected = leadIds.length > 0 && leadIds.every((id) => prev.has(id));
+      const allSelected =
+        leadIds.length > 0 && leadIds.every((id) => prev.has(id));
       if (allSelected) return new Set<string>();
       return new Set(leadIds);
     });
@@ -533,8 +623,8 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       });
       const leadIdsWithExistingStatus = new Set(
         (existingStatusData?.techStatusBusinessLeads ?? []).map(
-          (s) => s.businessLead.id
-        )
+          (s) => s.businessLead.id,
+        ),
       );
 
       for (const leadId of selectedLeadIds) {
@@ -550,7 +640,9 @@ export default function SalesSection({ userId }: SalesSectionProps) {
               data: {
                 businessLead: { connect: { id: leadId } },
                 salesPerson: { connect: { id: assignToVendedorId } },
-                saasCompany: companyId ? { connect: { id: companyId } } : undefined,
+                saasCompany: companyId
+                  ? { connect: { id: companyId } }
+                  : undefined,
                 pipelineStatus: PIPELINE_STATUS.DETECTADO,
                 opportunityLevel: null,
               },
@@ -568,10 +660,19 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     } catch (e) {
       sileo.error({
         title: "Error al asignar",
-        description: e instanceof Error ? e.message : "No se pudieron asignar los leads.",
+        description:
+          e instanceof Error ? e.message : "No se pudieron asignar los leads.",
       });
     }
-  }, [assignToVendedorId, selectedLeadIds, updateLead, createLeadStatus, refetchLeads, client, companyId]);
+  }, [
+    assignToVendedorId,
+    selectedLeadIds,
+    updateLead,
+    createLeadStatus,
+    refetchLeads,
+    client,
+    companyId,
+  ]);
 
   const handleAssign = useCallback(async () => {
     setAssigning(true);
@@ -587,8 +688,45 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       navigateLeadsUrlRef.current(totalPages, true);
   }, [countData, totalPages, page]);
 
-  const hasAddOwnLeadsFeature = hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.ADD_OWN_LEADS);
-  const hasExportLeadsFeature = hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.EXPORT_EXCEL);
+  useEffect(() => {
+    if (!userId || loading || !data) return;
+    const ctx = exportLeadsContextRef.current;
+    const prefetchPage = (targetPage: number) => {
+      void client.query<
+        TechBusinessLeadsResponse,
+        TechBusinessLeadsVariables
+      >({
+        query: TECH_BUSINESS_LEADS_QUERY,
+        variables: {
+          where: ctx.where,
+          statusWhere: ctx.statusWhere ?? {},
+          salesPersonWhere2: ctx.salesPersonWhere2 ?? {},
+          take: pageSize,
+          skip: (targetPage - 1) * pageSize,
+          orderBy: [{ createdAt: "desc" }],
+        },
+        fetchPolicy: "cache-first",
+      });
+    };
+    if (effectivePage < totalPages) prefetchPage(effectivePage + 1);
+    if (effectivePage > 1) prefetchPage(effectivePage - 1);
+  }, [data, loading, userId, effectivePage, totalPages, pageSize, client]);
+
+  const hasAddOwnLeadsFeature = hasPlanFeature(
+    subscription?.planFeatures,
+    PLAN_FEATURE_KEYS.ADD_OWN_LEADS,
+  );
+  const hasExportLeadsFeature = hasPlanFeature(
+    subscription?.planFeatures,
+    PLAN_FEATURE_KEYS.EXPORT_EXCEL,
+  );
+  const canAssign =
+    hasCompanyWideLeadScope &&
+    vendedores.length > 0 &&
+    hasPlanFeature(
+      subscription?.planFeatures,
+      PLAN_FEATURE_KEYS.ASSIGN_SALES_PERSON,
+    );
 
   if (!companyId) {
     return (
@@ -604,89 +742,113 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   return (
     <SubscriptionProvider companyId={companyId}>
       <div className="w-full space-y-6">
-      
-
-      <div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-          <div className="flex flex-row items-center gap-5">
-            <h2 className="text-xl font-bold text-[#212121] dark:text-[#ffffff]">
-              Clientes ({totalCount}) | {userData?.user?.company?.name ?? '--'}
-            </h2>
-            {hasExportLeadsFeature && (
-              <button
-                type="button"
-                onClick={() => void handleExportExcel()}
-                disabled={totalCount === 0 || loading || exportingExcel}
-                className="inline-flex items-center justify-center gap-2 px-4 py-1 rounded-lg text-sm font-semibold border border-green-200 dark:border-green-800/80 bg-green-50 dark:bg-green-950/50 text-green-800 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-900/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-50 dark:disabled:hover:bg-green-950/50"
-              >
-                {exportingExcel ? (
-                  <span className="size-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin shrink-0" />
-                ) : (
-                  <HugeiconsIcon icon={Download04Icon} size={16} strokeWidth={2} />
-                )}
-                Exportar a Excel
-              </button>
-            )}
+        <div ref={clientesShellRef} className="space-y-4">
+          <div className="clientes-band flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <h2 className="text-2xl font-bold tracking-tight text-[#212121] dark:text-white">
+                Clientes
+              </h2>
+              <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+                <span className="font-medium text-[#212121] dark:text-white">
+                  {userData?.user?.company?.name ?? "Tu empresa"}
+                </span>
+                {" · "}
+                <span className="tabular-nums font-semibold text-orange-600 dark:text-orange-400">
+                  {totalCount.toLocaleString("es-MX")}
+                </span>{" "}
+                {totalCount === 1 ? "cliente" : "clientes"}
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto shrink-0">
+              {hasExportLeadsFeature && (
+                <button
+                  type="button"
+                  onClick={() => void handleExportExcel()}
+                  disabled={totalCount === 0 || exportingExcel}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border border-orange-200/80 dark:border-orange-800/50 bg-orange-50/80 dark:bg-orange-950/30 text-orange-800 dark:text-orange-200 hover:bg-orange-100 dark:hover:bg-orange-900/40 hover:-translate-y-px active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-[transform,background-color,border-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                >
+                  {exportingExcel ? (
+                    <span className="size-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin shrink-0" />
+                  ) : (
+                    <HugeiconsIcon
+                      icon={Download04Icon}
+                      size={16}
+                      strokeWidth={2}
+                    />
+                  )}
+                  Exportar
+                </button>
+              )}
+              {hasAddOwnLeadsFeature && (
+                <button
+                  type="button"
+                  onClick={() => router.push(Routes.panelAddLead)}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-green-500 hover:bg-green-600 active:bg-green-700 hover:-translate-y-px active:scale-[0.98] shadow-sm shadow-green-500/20 hover:shadow-md hover:shadow-green-500/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-[transform,box-shadow,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)]"
+                >
+                  <HugeiconsIcon icon={Add01Icon} size={18} strokeWidth={2} />
+                  Agregar cliente
+                </button>
+              )}
+            </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto shrink-0">
-            {hasAddOwnLeadsFeature && (
-              <button
-                type="button"
-                onClick={() => router.push(Routes.panelAddLead)}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-green-500 hover:bg-green-600 active:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors w-full sm:w-auto"
-              >
-                <HugeiconsIcon icon={Add01Icon} size={18} strokeWidth={2} />
-                Agregar nuevo cliente
-              </button>
-            )}
+          <div className="clientes-band">
+          <FiltersLeadsSection
+            selectedPipeline={selectedPipeline}
+            onPipelineChange={setSelectedPipeline}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            selectedSource={selectedSource}
+            onSourceChange={setSelectedSource}
+            searchQuery={searchInput}
+            onSearchChange={setSearchInput}
+            cityQuery={cityInput}
+            onCityChange={setCityInput}
+            stateQuery={stateInput}
+            onStateChange={setStateInput}
+            countryQuery={countryInput}
+            onCountryChange={setCountryInput}
+            filterByVendedorId={filterByVendedorId}
+            onFilterByVendedorChange={setFilterByVendedorId}
+            vendedores={vendedores}
+            isAdminCompany={hasCompanyWideLeadScope}
+          />
+          </div>
+          {canAssign && (
+            <div className="clientes-band">
+            <AssignLeadsBar
+              vendedores={vendedores}
+              assignToVendedorId={assignToVendedorId}
+              onAssignToVendedorChange={setAssignToVendedorId}
+              selectedLeadCount={selectedLeadIds.size}
+              onAssign={handleAssign}
+              isAssigning={assigning}
+              onCancelAssign={() => {
+                setAssignToVendedorId(null);
+                setSelectedLeadIds(new Set());
+              }}
+            />
+            </div>
+          )}
+          <div className="clientes-band">
+          <SalesLeadsTable
+            leads={leads}
+            loading={loading}
+            error={error}
+            selectable={canAssign}
+            selectedLeadIds={selectedLeadIds}
+            onToggleLead={handleToggleLead}
+            onToggleAll={handleToggleAll}
+            totalCount={totalCount}
+            pageSize={pageSize}
+            currentPage={effectivePage}
+            onPageChange={pushLeadsPage}
+            onPageSizeChange={pushLeadsPageSize}
+            isAdminCompany={hasCompanyWideLeadScope}
+          />
           </div>
         </div>
-        <FiltersLeadsSection
-          selectedPipeline={selectedPipeline}
-          onPipelineChange={setSelectedPipeline}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-          selectedSource={selectedSource}
-          onSourceChange={setSelectedSource}
-          searchQuery={searchInput}
-          onSearchChange={setSearchInput}
-          cityQuery={cityInput}
-          onCityChange={setCityInput}
-          stateQuery={stateInput}
-          onStateChange={setStateInput}
-          countryQuery={countryInput}
-          onCountryChange={setCountryInput}
-          filterByVendedorId={filterByVendedorId}
-          onFilterByVendedorChange={setFilterByVendedorId}
-          vendedores={vendedores}
-          assignToVendedorId={assignToVendedorId}
-          onAssignToVendedorChange={setAssignToVendedorId}
-          selectedLeadCount={selectedLeadIds.size}
-          onAssign={handleAssign}
-          isAssigning={assigning}
-          onCancelAssign={() => {
-            setAssignToVendedorId(null);
-            setSelectedLeadIds(new Set());
-          }}
-          isAdminCompany={hasCompanyWideLeadScope}
-        />
-        <SalesLeadsTable
-          leads={leads}
-          loading={loading}
-          error={error}
-          assignMode={assignToVendedorId != null}
-          selectedLeadIds={selectedLeadIds}
-          onToggleLead={handleToggleLead}
-          onToggleAll={handleToggleAll}
-          totalCount={totalCount}
-          pageSize={LEADS_PAGE_SIZE}
-          currentPage={effectivePage}
-          onPageChange={pushLeadsPage}
-          isAdminCompany={hasCompanyWideLeadScope}
-        />
-      </div>
 
-      <StatsSection
+        <StatsSection
           userId={userId}
           companyId={companyId}
           isAdminCompany={isAdminCompany}
@@ -698,7 +860,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
           whatsappMessage="Hola KADESH, tengo una consulta sobre mis clientes."
           emailSubject="Consulta sobre clientes — KADESH"
         />
-    </div>
+      </div>
     </SubscriptionProvider>
   );
 }
