@@ -27,11 +27,14 @@ import {
 } from "kadesh/constants/constans";
 import { Routes } from "kadesh/core/routes";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon, ArrowRight01Icon, FolderIcon } from "@hugeicons/core-free-icons";
+import { Add01Icon, ArrowLeft01Icon, FolderIcon } from "@hugeicons/core-free-icons";
 import LeadCrmActions from "./LeadCrmActions";
 import LeadDetailCalendar from "./LeadDetailCalendar";
 import LeadPipelineNotesFields from "./LeadPipelineNotesFields";
 import LeadProjectsModal from "./LeadProjectsModal";
+import { Field, SectionCard, asExternalHref, leadInputClassName } from "./LeadDetailCard";
+import { LeadGoogleInfoCard, LeadInegiInfoCard } from "./LeadSourceInfoCards";
+import { GoogleMapsMark, InegiMark } from "../obtener-clientes/SourceMarks";
 import { getCategoryLabel } from "../helpers/category";
 import { sileo } from "sileo";
 import { useUser } from "kadesh/utils/UserContext";
@@ -47,60 +50,6 @@ function whatsappDigitsFromPhone(raw: string): string | null {
   return digits;
 }
 
-function Field({
-  label,
-  value,
-  children,
-}: {
-  label: string;
-  value?: React.ReactNode;
-  children?: React.ReactNode;
-}) {
-  return (
-    <div className="grid grid-cols-[100px_1fr] gap-2 py-1.5 text-sm border-b border-[#e8e8e8] dark:border-[#333] last:border-0">
-      <dt className="font-medium text-[#616161] dark:text-[#b0b0b0] shrink-0">
-        {label}
-      </dt>
-      <dd className="text-[#212121] dark:text-[#ffffff] min-w-0 break-words">
-        {children ?? (value != null && value !== "" ? String(value) : "—")}
-      </dd>
-    </div>
-  );
-}
-
-function SectionCard({
-  title,
-  headerClassName,
-  headerPipelineStatus,
-  children,
-}: {
-  title: string;
-  headerClassName?: string;
-  /** Encabezado con degradado en el mismo tono que el pipeline del lead. */
-  headerPipelineStatus?: string;
-  children: React.ReactNode;
-}) {
-  const baseHeader =
-    "px-3 py-2 text-xs font-semibold uppercase tracking-wide border-b";
-
-  const headerClasses =
-    headerPipelineStatus !== undefined
-      ? `${baseHeader} ${
-          headerPipelineStatus && PIPELINE_STATUS_SECTION_HEADER[headerPipelineStatus]
-            ? PIPELINE_STATUS_SECTION_HEADER[headerPipelineStatus]
-            : DEFAULT_PIPELINE_SECTION_HEADER
-        }`
-      : (headerClassName ??
-        `${baseHeader} text-[#616161] dark:text-[#b0b0b0] bg-[#f5f5f5] dark:bg-[#2a2a2a] border-[#e0e0e0] dark:border-[#3a3a3a]`);
-
-  return (
-    <div className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden">
-      <h2 className={headerClasses}>{title}</h2>
-      <div className="px-3 py-2">{children}</div>
-    </div>
-  );
-}
-
 function SaveLeadButton({
   saving,
   handleSaveLead,
@@ -109,15 +58,57 @@ function SaveLeadButton({
   handleSaveLead: () => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-3 pt-4 pb-4 justify-end">
-      <button
-        type="button"
-        onClick={handleSaveLead}
-        disabled={saving}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:opacity-50 disabled:cursor-not-allowed"
+    <button
+      type="button"
+      onClick={handleSaveLead}
+      disabled={saving}
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium hover:bg-orange-600 hover:-translate-y-px active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)]"
+    >
+      {saving ? "Guardando..." : "Guardar cambios"}
+    </button>
+  );
+}
+
+function SocialRow({
+  id,
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+}) {
+  const href = asExternalHref(value);
+  return (
+    <div className="flex items-center gap-2 py-1.5 border-b border-[#e8e8e8] dark:border-[#333] last:border-0">
+      <label
+        htmlFor={id}
+        className="w-24 shrink-0 text-sm font-medium text-[#616161] dark:text-[#b0b0b0]"
       >
-        {saving ? "Guardando..." : "Guardar cambios"}
-      </button>
+        {label}
+      </label>
+      <input
+        id={id}
+        type="url"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={leadInputClassName}
+      />
+      {href ? (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 text-xs font-medium text-orange-500 dark:text-orange-400 hover:underline"
+        >
+          Abrir
+        </a>
+      ) : null}
     </div>
   );
 }
@@ -235,6 +226,7 @@ export default function DetailLeadSection() {
     lead?.tiktok,
     lead?.xTwitter,
     lead?.hasWebsite,
+    lead?.websiteUrl,
   ]);
 
   if (!id) {
@@ -248,7 +240,7 @@ export default function DetailLeadSection() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto" />
           <p className="mt-4 text-[#616161] dark:text-[#b0b0b0]">
-            Cargando lead...
+            Cargando cliente...
           </p>
         </div>
       </div>
@@ -259,7 +251,7 @@ export default function DetailLeadSection() {
     return (
       <div className="max-w-3xl mx-auto px-4 pt-24 pb-12">
         <p className="text-red-600 dark:text-red-400">
-          No se pudo cargar el lead o no existe.
+          No se pudo cargar el cliente o no existe.
         </p>
         <button
           type="button"
@@ -272,19 +264,79 @@ export default function DetailLeadSection() {
     );
   }
 
-  const topReviews = [
-    lead.topReview1,
-    lead.topReview2,
-    lead.topReview3,
-    lead.topReview4,
-    lead.topReview5,
-  ].filter(Boolean) as string[];
-
   const leadWhatsappDigits = lead.phone
     ? whatsappDigitsFromPhone(lead.phone)
     : null;
+  const isInegi = lead.source === "INEGI";
+  const isGoogleMaps = lead.source === "Google Maps";
+  const email = lead.email || lead.sourceEstablishment?.email || null;
+  const websiteHref = asExternalHref(websiteUrl);
 
   const saving = savingLead || savingStatus || creatingStatus;
+  const notesDirty = notes !== (status?.notes ?? "");
+
+  const persistStatus = async (overrides: {
+    pipelineStatus?: string;
+    notes?: string;
+  } = {}) => {
+    const nextPipeline = overrides.pipelineStatus ?? pipelineStatus;
+    const nextNotes = overrides.notes ?? notes;
+    const statusData: UpdateTechStatusBusinessLeadVariables["data"] = {};
+    if (nextPipeline) statusData.pipelineStatus = nextPipeline;
+    // notes no admite null en Keystone: omitir o mandar string (incluido "").
+    if (overrides.notes !== undefined || nextNotes.trim()) {
+      statusData.notes = nextNotes.trim();
+    }
+    const nextFirstContact = firstContactDate.trim().slice(0, 10);
+    if (nextFirstContact) statusData.firstContactDate = nextFirstContact;
+    if (productOffered.length > 0) statusData.productOffered = productOffered;
+    if (user?.id) statusData.salesPerson = { connect: { id: user.id } };
+    if (companyId) statusData.saasCompany = { connect: { id: companyId } };
+
+    if (status) {
+      await updateStatus({
+        variables: { where: { id: status.id }, data: statusData },
+      });
+      return;
+    }
+
+    await createStatus({
+      variables: {
+        data: {
+          businessLead: { connect: { id } },
+          ...statusData,
+        },
+      },
+    });
+  };
+
+  const handlePipelineStatusChange = async (value: string) => {
+    if (value === pipelineStatus) return;
+    const previous = pipelineStatus;
+    setPipelineStatus(value);
+    try {
+      await persistStatus({ pipelineStatus: value });
+      sileo.success({ title: "Estatus actualizado" });
+    } catch {
+      setPipelineStatus(previous);
+      sileo.error({
+        title: "No se pudo actualizar el estatus",
+        description: "Intenta de nuevo más tarde.",
+      });
+    }
+  };
+
+  const handleSaveNotes = async () => {
+    try {
+      await persistStatus({ notes });
+      sileo.success({ title: "Notas guardadas" });
+    } catch {
+      sileo.error({
+        title: "No se pudieron guardar las notas",
+        description: "Intenta de nuevo más tarde.",
+      });
+    }
+  };
 
   const handleSaveLead = async () => {
     if (!id) return;
@@ -304,32 +356,7 @@ export default function DetailLeadSection() {
         });
       }
 
-      const statusData: UpdateTechStatusBusinessLeadVariables["data"] = {};
-      if (pipelineStatus !== undefined)
-        statusData.pipelineStatus = pipelineStatus || null;
-      if (notes.length > 0) statusData.notes = notes;
-      if (productOffered.length > 0) statusData.productOffered = productOffered;
-      statusData.firstContactDate = firstContactDate.trim() ? firstContactDate.trim().slice(0, 10) : null;
-      if (user?.id) statusData.salesPerson = { connect: { id: user.id } };
-      if (companyId) statusData.saasCompany = { connect: { id: companyId } };
-
-      if (status) {
-        if (Object.keys(statusData).length > 0) {
-          await updateStatus({
-            variables: { where: { id: status.id }, data: statusData },
-          });
-        }
-      } else {
-        await createStatus({
-          variables: {
-            data: {
-              businessLead: { connect: { id } },
-              ...statusData,
-            },
-          },
-        });
-      }
-
+      await persistStatus();
       sileo.success({ title: "Cambios guardados" });
     } catch {
       sileo.error({
@@ -340,9 +367,9 @@ export default function DetailLeadSection() {
   };
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto px-15 pt-20 pb-8">
-      <div className="flex flex-wrap items-center gap-3 mb-4 justify-between">
-        <div className="flex flex-row gap-2">
+    <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-15 pt-20 pb-10 space-y-5">
+      <div className="flex flex-wrap items-center gap-3 justify-between">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => router.back()}
@@ -352,18 +379,26 @@ export default function DetailLeadSection() {
             Volver a Clientes
           </button>
           <h1 className="text-lg font-bold text-[#212121] dark:text-[#ffffff] truncate">
-            {lead.businessName || "Lead sin nombre"}
+            {lead.businessName || "Cliente sin nombre"}
           </h1>
+          {lead.source ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-2.5 py-1 text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+              {isInegi ? <InegiMark size={14} /> : null}
+              {isGoogleMaps ? <GoogleMapsMark size={14} /> : null}
+              {lead.source}
+            </span>
+          ) : null}
         </div>
         <SaveLeadButton saving={saving} handleSaveLead={handleSaveLead} />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         <SectionCard
           title="Información de la empresa"
           headerPipelineStatus={pipelineStatus}
+          className={`clientes-row-in ${isInegi || isGoogleMaps ? "lg:col-span-5" : "lg:col-span-6"}`}
         >
-          <dl className="space-y-0">
+          <dl>
             <Field label="Empresa" value={lead.businessName} />
             <Field label="Categoría">{getCategoryLabel(lead.category)}</Field>
             <Field label="Teléfono">
@@ -390,176 +425,168 @@ export default function DetailLeadSection() {
                 "—"
               )}
             </Field>
+            {email ? (
+              <Field label="Email">
+                <a
+                  href={`mailto:${email}`}
+                  className="text-orange-500 dark:text-orange-400 hover:underline break-all"
+                >
+                  {email}
+                </a>
+              </Field>
+            ) : (
+              <Field label="Email" value={null} />
+            )}
             <Field label="Dirección" value={lead.address} />
             <Field label="Ciudad" value={lead.city} />
             <Field label="Estado" value={lead.state} />
+            {lead.country ? <Field label="País" value={lead.country} /> : null}
             <Field label="Oportunidad" value={status?.opportunityLevel} />
-            <Field label="Fuente" value={lead.source} />
-            <Field label="Sitio web" value={hasWebsite ? "Si" : "No"} />
-            <div className="grid grid-cols-[100px_1fr] gap-2 py-1.5 text-sm border-b border-[#e8e8e8] dark:border-[#333] items-center">
-              <label
-                htmlFor="lead-product-offered"
-                className="font-medium text-[#616161] dark:text-[#b0b0b0] shrink-0"
-              >
-                Website{" "}
-                {websiteUrl && (
+            <Field label="Sitio web">
+              <span className="inline-flex items-center gap-2">
+                <span>{hasWebsite ? "Sí" : "No"}</span>
+                {websiteHref ? (
                   <a
-                    href={websiteUrl}
+                    href={websiteHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-orange-500 dark:text-orange-400 hover:underline"
+                    className="text-xs font-medium text-orange-500 dark:text-orange-400 hover:underline"
                   >
-                    Ir
+                    Abrir
                   </a>
-                )}
+                ) : null}
+              </span>
+            </Field>
+            <div className="grid grid-cols-[7.5rem_1fr] gap-x-3 py-1.5 text-sm items-center">
+              <label
+                htmlFor="lead-website-url"
+                className="font-medium text-[#616161] dark:text-[#b0b0b0]"
+              >
+                URL
               </label>
               <input
-                id="lead-product-offered"
-                type="text"
+                id="lead-website-url"
+                type="url"
                 value={websiteUrl}
                 onChange={(e) => setWebsiteUrl(e.target.value)}
-                placeholder="https://www.example.com"
-                className="w-full min-w-0 rounded border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-2 py-1.5 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                placeholder="https://..."
+                className={leadInputClassName}
               />
             </div>
-
           </dl>
         </SectionCard>
 
-        <SectionCard title="Info de Google" headerPipelineStatus={pipelineStatus}>
-          <dl className="space-y-0">
-            {lead.googleMapsUrl && (
-              <Field label="Mapa">
-                <a
-                  href={lead.googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-orange-500 dark:text-orange-400 hover:underline truncate block"
-                >
-                  Ver en mapa
-                </a>
-              </Field>
-            )}
-            <Field label="Rating" value={lead.rating} />
-            <Field label="Nº reseñas" value={lead.reviewCount} />
-            {topReviews.length > 0 && (
-              <div className="pt-1.5 border-b border-[#e8e8e8] dark:border-[#333] last:border-0">
-                <p className="text-[#616161] dark:text-[#b0b0b0] font-medium text-sm mb-1">
-                  Reseñas destacadas
-                </p>
-                <ul className="space-y-1 text-[#212121] dark:text-[#ffffff] text-sm">
-                  {topReviews.map((r, i) => (
-                    <li key={i} className="line-clamp-2">
-                      {r}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </dl>
-        </SectionCard>
+        {isInegi ? (
+          <LeadInegiInfoCard
+            lead={lead}
+            headerPipelineStatus={pipelineStatus}
+            className="clientes-row-in lg:col-span-4"
+          />
+        ) : null}
+        {isGoogleMaps ? (
+          <LeadGoogleInfoCard
+            lead={lead}
+            headerPipelineStatus={pipelineStatus}
+            className="clientes-row-in lg:col-span-3"
+          />
+        ) : null}
 
-        <SectionCard title="Redes sociales" headerPipelineStatus={pipelineStatus}>
-          <div className="space-y-0">
-            <div className="grid grid-cols-[100px_1fr] gap-2 py-1.5 text-sm border-b border-[#e8e8e8] dark:border-[#333] last:border-0 items-center">
-              <label
-                htmlFor="lead-facebook"
-                className="font-medium text-[#616161] dark:text-[#b0b0b0] shrink-0"
-              >
-                Facebook
-              </label>
-              <input
+        <SectionCard
+          title="Presencia y fechas"
+          headerPipelineStatus={pipelineStatus}
+          className={`clientes-row-in ${
+            isInegi ? "lg:col-span-3" : isGoogleMaps ? "lg:col-span-4" : "lg:col-span-6"
+          }`}
+        >
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#777]">
+                Redes
+              </p>
+              <SocialRow
                 id="lead-facebook"
-                type="url"
+                label="Facebook"
                 value={facebook}
-                onChange={(e) => setFacebook(e.target.value)}
-                placeholder="https://facebook.com/..."
-                className="w-full min-w-0 rounded border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-2 py-1.5 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                onChange={setFacebook}
+                placeholder="facebook.com/..."
               />
-            </div>
-            <div className="grid grid-cols-[100px_1fr] gap-2 py-1.5 text-sm border-b border-[#e8e8e8] dark:border-[#333] last:border-0 items-center">
-              <label
-                htmlFor="lead-instagram"
-                className="font-medium text-[#616161] dark:text-[#b0b0b0] shrink-0"
-              >
-                Instagram
-              </label>
-              <input
+              <SocialRow
                 id="lead-instagram"
-                type="url"
+                label="Instagram"
                 value={instagram}
-                onChange={(e) => setInstagram(e.target.value)}
-                placeholder="https://instagram.com/..."
-                className="w-full min-w-0 rounded border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-2 py-1.5 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                onChange={setInstagram}
+                placeholder="instagram.com/..."
               />
-            </div>
-            <div className="grid grid-cols-[100px_1fr] gap-2 py-1.5 text-sm border-b border-[#e8e8e8] dark:border-[#333] last:border-0 items-center">
-              <label
-                htmlFor="lead-tiktok"
-                className="font-medium text-[#616161] dark:text-[#b0b0b0] shrink-0"
-              >
-                TikTok
-              </label>
-              <input
+              <SocialRow
                 id="lead-tiktok"
-                type="url"
+                label="TikTok"
                 value={tiktok}
-                onChange={(e) => setTiktok(e.target.value)}
-                placeholder="https://tiktok.com/..."
-                className="w-full min-w-0 rounded border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-2 py-1.5 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                onChange={setTiktok}
+                placeholder="tiktok.com/..."
+              />
+              <SocialRow
+                id="lead-xtwitter"
+                label="X"
+                value={xTwitter}
+                onChange={setXTwitter}
+                placeholder="x.com/..."
               />
             </div>
-            <div className="grid grid-cols-[100px_1fr] gap-2 py-1.5 text-sm border-b border-[#e8e8e8] dark:border-[#333] last:border-0 items-center">
-              <label
-                htmlFor="lead-xtwitter"
-                className="font-medium text-[#616161] dark:text-[#b0b0b0] shrink-0"
-              >
-                X / Twitter
-              </label>
-              <input
-                id="lead-xtwitter"
-                type="url"
-                value={xTwitter}
-                onChange={(e) => setXTwitter(e.target.value)}
-                placeholder="https://x.com/..."
-                className="w-full min-w-0 rounded border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-2 py-1.5 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              />
+            <div>
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#777]">
+                Fechas
+              </p>
+              <div className="relative pl-4 before:absolute before:left-[3px] before:top-2 before:bottom-2 before:w-px before:bg-[#e8e8e8] dark:before:bg-[#333]">
+                <div className="relative mb-3 grid grid-cols-[1fr_auto] items-center gap-2">
+                  <span className="absolute -left-4 top-2 size-1.5 rounded-full bg-orange-500" />
+                  <label
+                    htmlFor="lead-first-contact"
+                    className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]"
+                  >
+                    Primer contacto
+                  </label>
+                  <input
+                    id="lead-first-contact"
+                    type="date"
+                    value={firstContactDate}
+                    onChange={(e) => setFirstContactDate(e.target.value)}
+                    className={`${leadInputClassName} w-[10.5rem]`}
+                  />
+                </div>
+                <div className="relative mb-3">
+                  <span className="absolute -left-4 top-1.5 size-1.5 rounded-full bg-emerald-500" />
+                  <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+                    Próximo seguimiento
+                  </p>
+                  <p className="text-sm text-[#212121] dark:text-white">
+                    {formatDateShort(status?.nextFollowUpDate)}
+                  </p>
+                </div>
+                <div className="relative mb-3">
+                  <span className="absolute -left-4 top-1.5 size-1.5 rounded-full bg-[#bdbdbd] dark:bg-[#666]" />
+                  <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+                    Alta
+                  </p>
+                  <p className="text-sm text-[#212121] dark:text-white">
+                    {formatDateShort(lead.createdAt, false)}
+                  </p>
+                </div>
+                <div className="relative">
+                  <span className="absolute -left-4 top-1.5 size-1.5 rounded-full bg-[#bdbdbd] dark:bg-[#666]" />
+                  <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+                    Actualizado
+                  </p>
+                  <p className="text-sm text-[#212121] dark:text-white">
+                    {formatDateShort(lead.updatedAt)}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </SectionCard>
-
-        <SectionCard title="Fechas" headerPipelineStatus={pipelineStatus}>
-          <dl className="space-y-0">
-            <div className="grid grid-cols-[100px_1fr] gap-2 py-1.5 text-sm border-b border-[#e8e8e8] dark:border-[#333] last:border-0 items-center">
-              <label
-                htmlFor="lead-first-contact"
-                className="font-medium text-[#616161] dark:text-[#b0b0b0] shrink-0"
-              >
-                Primer contacto
-              </label>
-              <input
-                id="lead-first-contact"
-                type="date"
-                value={firstContactDate}
-                onChange={(e) => setFirstContactDate(e.target.value)}
-                className="w-full min-w-0 rounded border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-2 py-1.5 text-[#212121] dark:text-[#ffffff] text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              />
-            </div>
-            <Field
-              label="Próx. seguimiento"
-              value={formatDateShort(status?.nextFollowUpDate)}
-            />
-            <Field
-              label="Última actualización"
-              value={lead.updatedAt ? formatDateShort(lead.updatedAt) : "—"}
-            />
-          </dl>
-        </SectionCard>
       </div>
 
-      <SaveLeadButton saving={saving} handleSaveLead={handleSaveLead} />
-
-      <div className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden">
+      <div className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden clientes-row-in">
         <h2
           className={`px-4 py-3 text-sm font-semibold uppercase tracking-wide border-b ${
             pipelineStatus && PIPELINE_STATUS_SECTION_HEADER[pipelineStatus]
@@ -567,43 +594,48 @@ export default function DetailLeadSection() {
               : DEFAULT_PIPELINE_SECTION_HEADER
           }`}
         >
-          Acciones, proyectos y edición
+          Pipeline y trabajo
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#e0e0e0] dark:divide-[#3a3a3a]">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-6 p-5 lg:gap-8 lg:items-start">
-            <LeadPipelineNotesFields
-              pipelineStatus={pipelineStatus}
-              onPipelineStatusChange={setPipelineStatus}
-              notes={notes}
-              onNotesChange={setNotes}
-              className="min-w-0 p-0 lg:pr-2"
-            />
-            <aside
-              className="flex flex-col gap-2 justify-center lg:justify-end lg:pt-1"
-              aria-label={`${projectsCount} ${projectsCount === 1 ? "proyecto" : "proyectos"} vinculados a este lead`}
+        <div className="p-3 sm:p-4 space-y-3">
+          <LeadPipelineNotesFields
+            pipelineStatus={pipelineStatus}
+            onPipelineStatusChange={(value) => {
+              void handlePipelineStatusChange(value);
+            }}
+            notes={notes}
+            onNotesChange={setNotes}
+            className="min-w-0 p-0"
+            saving={savingStatus || creatingStatus}
+            notesDirty={notesDirty}
+            onSaveNotes={() => {
+              void handleSaveNotes();
+            }}
+          />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            <button
+              type="button"
+              onClick={() => setIsProjectsModalOpen(true)}
+              aria-label="Añadir o ver proyectos de este cliente"
+              className="flex min-w-0 items-center gap-2.5 rounded-xl border border-yellow-200/80 dark:border-yellow-500/25 bg-gradient-to-br from-yellow-500/12 to-transparent dark:from-yellow-500/15 dark:to-transparent px-3 py-2.5 text-left text-yellow-700 dark:text-yellow-400 shadow-sm ring-1 ring-inset ring-yellow-500/10 dark:ring-yellow-400/10 hover:-translate-y-px hover:border-orange-400/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 transition-[transform,border-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)]"
             >
-              <div className="w-full max-w-[200px] lg:w-40 lg:max-w-none rounded-2xl border border-yellow-200/80 dark:border-yellow-500/25 bg-gradient-to-br from-yellow-500/12 to-transparent dark:from-yellow-500/15 dark:to-transparent px-4 py-4 text-center shadow-sm ring-1 ring-inset ring-yellow-500/10 dark:ring-yellow-400/10">
-                <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/20 text-yellow-600 dark:text-yellow-400">
-                  <HugeiconsIcon icon={FolderIcon} size={22} />
-                </div>
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0]">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-yellow-500/20">
+                <HugeiconsIcon icon={FolderIcon} size={18} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[11px] font-medium text-[#616161] dark:text-[#b0b0b0]">
                   Proyectos
-                </p>
-                <p className="mt-1 tabular-nums text-3xl font-bold tracking-tight text-[#212121] dark:text-white">
+                </span>
+                <span className="tabular-nums text-lg font-bold leading-none text-[#212121] dark:text-white">
                   {projectsCount}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsProjectsModalOpen(true)}
-                className="inline-flex w-full max-w-[200px] lg:max-w-none items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white/80 dark:bg-[#2a2a2a]/80 px-3 py-2.5 text-sm font-semibold text-[#212121] dark:text-white shadow-sm hover:border-orange-400/60 dark:hover:border-orange-500/40 hover:bg-orange-500/[0.08] dark:hover:bg-orange-500/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors"
-              >
-                Ver proyectos
-                <HugeiconsIcon icon={ArrowRight01Icon} size={16} className="opacity-70" />
-              </button>
-            </aside>
+                </span>
+              </span>
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-white/70 px-2 py-1 text-xs font-semibold dark:bg-black/25">
+                <HugeiconsIcon icon={Add01Icon} size={14} />
+                Añadir
+              </span>
+            </button>
+            <LeadCrmActions leadId={id} userId={user?.id ?? ""} />
           </div>
-          <LeadCrmActions leadId={id} userId={user?.id ?? ""} />
         </div>
       </div>
 
@@ -619,16 +651,14 @@ export default function DetailLeadSection() {
         }}
       />
 
-      <SaveLeadButton saving={saving} handleSaveLead={handleSaveLead} />
-
-      {hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.CALENDAR_CRM) && (
+      {hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.CALENDAR_CRM) ? (
         <LeadDetailCalendar
           leadId={id}
           userId={user?.id ?? ""}
           businessName={lead.businessName ?? ""}
           sellerName={[user?.name, user?.lastName].filter(Boolean).join(" ") || "—"}
         />
-      )}
+      ) : null}
     </div>
   );
 }

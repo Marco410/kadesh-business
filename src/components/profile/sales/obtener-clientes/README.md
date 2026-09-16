@@ -33,4 +33,4 @@ No hay loop de `promoteInegiEstablishmentToLead`. No llama `syncEstablishmentsFr
 
 ## Lista de clientes
 
-En Clientes hay un filtro **Fuente** (`Google Maps` | `INEGI`) alineado con `TechBusinessLead.source`. Al agregar un lead a mano, INEGI también está en el select de fuente. Rating, reseñas, `googlePlaceId` y `googleMapsUrl` pueden faltar en leads INEGI; la ficha y la tabla ya muestran “—” si no hay dato.
+En Clientes hay un filtro **Fuente** (`Google Maps` | `INEGI`) alineado con `TechBusinessLead.source`. Al agregar un lead a mano, INEGI también está en el select de fuente. En la ficha, INEGI no muestra **Info de Google**: muestra **Registro INEGI** (razón social, actividad, empleados, dirección, mapa). Rating y reseñas solo en fuente Google Maps.

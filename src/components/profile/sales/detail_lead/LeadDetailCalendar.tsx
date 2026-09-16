@@ -173,8 +173,9 @@ export default function LeadDetailCalendar({
   return (
     <SalesCalendarView
       eventsByDate={eventsByDate}
-      title="Calendario"
-      className="mt-8"
+      title="Calendario de este cliente"
+      variant="compact"
+      className="clientes-row-in"
     />
   );
 }

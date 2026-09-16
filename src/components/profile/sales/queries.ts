@@ -388,6 +388,10 @@ export const TECH_BUSINESS_LEAD_QUERY = gql`
       category
       city
       state
+      country
+      email
+      lat
+      lng
       createdAt
       facebook
       googleMapsUrl
@@ -406,6 +410,25 @@ export const TECH_BUSINESS_LEAD_QUERY = gql`
       topReview5
       updatedAt
       xTwitter
+      sourceEstablishment {
+        legalName
+        employeeStratum
+        street
+        exteriorNumber
+        interiorNumber
+        neighborhood
+        postalCode
+        locality
+        municipality
+        state
+        email
+        website
+        lat
+        lng
+        economicActivity {
+          name
+        }
+      }
       status(where: $statusWhere) {
         id
         estimatedValue
@@ -441,6 +464,24 @@ export interface TechBusinessLeadVariables {
   statusWhere?: TechStatusBusinessLeadWhereInputFilter | null;
 }
 
+export type TechInegiEstablishmentOnLead = {
+  legalName: string | null;
+  employeeStratum: string | null;
+  street: string | null;
+  exteriorNumber: string | null;
+  interiorNumber: string | null;
+  neighborhood: string | null;
+  postalCode: string | null;
+  locality: string | null;
+  municipality: string | null;
+  state: string | null;
+  email: string | null;
+  website: string | null;
+  lat: number | null;
+  lng: number | null;
+  economicActivity: { name: string | null } | null;
+};
+
 export interface TechBusinessLeadResponse {
   techBusinessLead: {
     id: string;
@@ -449,6 +490,10 @@ export interface TechBusinessLeadResponse {
     category: string | null;
     city: string | null;
     state: string | null;
+    country: string | null;
+    email: string | null;
+    lat: number | null;
+    lng: number | null;
     createdAt: string;
     facebook: string | null;
     googleMapsUrl: string | null;
@@ -466,6 +511,7 @@ export interface TechBusinessLeadResponse {
     topReview4: string | null;
     topReview5: string | null;
     updatedAt: string | null;
+    sourceEstablishment: TechInegiEstablishmentOnLead | null;
     xTwitter: string | null;
     status: Array<{
       id: string;
