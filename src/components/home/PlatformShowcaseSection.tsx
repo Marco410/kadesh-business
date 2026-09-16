@@ -23,7 +23,7 @@ const FEATURES = [
     title: "Extracción GEO",
     headline: "Encuentra negocios en el mapa por categoría y radio",
     description:
-      "Elige ciudad, giro y radio de búsqueda. KADESH extrae prospectos reales de Google Maps en segundos y los guarda en tu CRM.",
+      "Elige ciudad, giro, radio y fuente. KADESH extrae prospectos reales de Google Maps o INEGI en segundos y los guarda en tu CRM.",
     image: LANDING_SECTION_IMAGES.geoSearch,
     imageAlt: "Búsqueda geográfica de negocios por categoría en mapa de México",
   },

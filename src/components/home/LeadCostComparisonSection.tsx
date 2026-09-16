@@ -73,7 +73,7 @@ export default function LeadCostComparisonSection() {
           {PRO_PLAN_PUBLIC.monthlyMxn} MXN y {PRO_PLAN_PUBLIC.leadLimit}{" "}
           créditos al mes) el costo queda en unos{" "}
           {PRO_PLAN_PUBLIC.costPerLeadMxn.toFixed(2)} MXN por prospecto, con
-          teléfono, dirección y rating listos para contactar en minutos.
+          teléfono y dirección listos para contactar en minutos.
         </p>
 
         <div className="grid sm:grid-cols-[1fr_auto_1fr] gap-4 sm:gap-6 items-center mb-10">
@@ -150,7 +150,7 @@ export default function LeadCostComparisonSection() {
                   ~{PRO_PLAN_PUBLIC.costPerLeadMxn.toFixed(2)} MXN
                 </td>
                 <td className="px-4 py-3">
-                  Negocio de Google Maps con teléfono, dirección y rating
+                  Negocio de Google Maps o INEGI con teléfono y dirección
                 </td>
                 <td className="px-4 py-3">Minutos</td>
               </tr>

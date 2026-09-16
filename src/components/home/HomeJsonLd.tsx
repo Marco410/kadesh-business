@@ -7,10 +7,10 @@ const HOME_JSON_LD = {
       "@type": "WebPage",
       "@id": "https://kadesh.com.mx/#webpage",
       url: "https://kadesh.com.mx/",
-      name: "Leads B2B de Google Maps con teléfono y CRM | KADESH",
+      name: "Leads B2B de Google Maps e INEGI con teléfono y CRM | KADESH",
       description:
-        "Kadesh extrae leads B2B de Google Maps con teléfono, rating y dirección, y los gestiona en un CRM integrado. Prueba 7 días con 50 leads gratis, sin tarjeta.",
-      dateModified: "2026-09-12",
+        "Kadesh extrae leads B2B de Google Maps e INEGI con teléfono y dirección, y los gestiona en un CRM integrado. Prueba 7 días con 50 leads gratis, sin tarjeta.",
+      dateModified: "2026-09-15",
       inLanguage: "es-MX",
       isPartOf: { "@id": "https://kadesh.com.mx/#website" },
       about: { "@id": "https://kadesh.com.mx/#software" },
@@ -34,9 +34,9 @@ const HOME_JSON_LD = {
     {
       "@type": "HowTo",
       "@id": "https://kadesh.com.mx/#howto",
-      name: "Cómo extraer leads de Google Maps con Kadesh",
+      name: "Cómo extraer leads de Google Maps e INEGI con Kadesh",
       description:
-        "Creas tu cuenta, eliges un punto en el mapa, seleccionas la categoría del negocio y defines el radio. Kadesh extrae teléfono, dirección y rating y deja los prospectos en el CRM.",
+        "Creas tu cuenta, eliges un punto en el mapa, seleccionas la categoría, el radio y la fuente (Google Maps o INEGI). Kadesh extrae teléfono y dirección y deja los prospectos en el CRM.",
       totalTime: "PT1M",
       step: [
         {
@@ -49,7 +49,7 @@ const HOME_JSON_LD = {
           "@type": "HowToStep",
           position: 2,
           name: "Selecciona la categoría",
-          text: "Elige el giro listado en Google Maps, por ejemplo dentistas o abogados.",
+          text: "Elige el giro en Google Maps o INEGI, por ejemplo dentistas o abogados.",
         },
         {
           "@type": "HowToStep",
@@ -61,7 +61,7 @@ const HOME_JSON_LD = {
           "@type": "HowToStep",
           position: 4,
           name: "Guarda los leads en el CRM",
-          text: "Teléfono, dirección, categoría y rating quedan listos para seguimiento.",
+          text: "Teléfono, dirección y categoría quedan listos para seguimiento.",
         },
       ],
     },

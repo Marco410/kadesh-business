@@ -46,7 +46,7 @@ export const DEMO_STEPS: DemoStep[] = [
     image: "/images/demo/04-searching.png",
     title: "Busca leads",
     description:
-      "Pulsa «Buscar Leads» y Kadesh extrae negocios reales desde Google Maps en segundos.",
+      "Pulsa «Buscar Leads» y Kadesh extrae negocios reales desde Google Maps o INEGI en segundos.",
     duration: 3500,
     cursor: { from: { x: 52, y: 55 }, to: { x: 72, y: 24 }, clickAtEnd: true },
   },

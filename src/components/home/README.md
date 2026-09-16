@@ -1,6 +1,8 @@
 # Landing (home)
 
-La home en `src/app/page.tsx` es la promesa pública: extraer leads B2B de Google Maps y gestionarlos en el CRM. Las secciones van en ese orden; no insertes una feature nueva al inicio si el visitante aún no entiende extracción + CRM.
+La home en `src/app/page.tsx` es la promesa pública: extraer leads B2B de Google Maps e INEGI y gestionarlos en el CRM. Las secciones van en ese orden; no insertes una feature nueva al inicio si el visitante aún no entiende extracción + CRM.
+
+En copy: **INEGI**, nunca DENUE, SCIAN ni tokens. Rating y reseñas son de Google Maps; INEGI trae nombre, teléfono, dirección y categoría en México. Google Maps sigue siendo la fuente mundial.
 
 ## Kadesh AI (`#kadesh-ai`)
 

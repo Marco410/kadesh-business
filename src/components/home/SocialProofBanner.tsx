@@ -7,7 +7,7 @@ export default function SocialProofBanner() {
         </h2>
         <p className="text-white/90 text-base sm:text-lg leading-relaxed max-w-3xl mx-auto">
           Agencias, freelancers y equipos de ventas B2B usan Kadesh para
-          extraer leads de Google Maps y gestionarlos en el CRM, desde
+          extraer leads de Google Maps e INEGI y gestionarlos en el CRM, desde
           prospección local hasta operaciones con miles de contactos y varios
           vendedores.
         </p>

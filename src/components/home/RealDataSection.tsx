@@ -25,7 +25,7 @@ const DATA_POINTS = [
   {
     icon: Location01Icon,
     label: "Ubicación exacta",
-    description: "Dirección, ciudad y enlace directo a Google Maps.",
+    description: "Dirección y ciudad; en Google Maps, también enlace al mapa.",
   },
   {
     icon: Tag01Icon,
@@ -49,13 +49,13 @@ export default function RealDataSection() {
             transition={{ duration: 0.5 }}
           >
             <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
-              ¿Qué datos incluye cada lead de Google Maps?
+              ¿Qué datos incluye cada lead de Google Maps e INEGI?
             </h2>
             <p className="text-[#424242] dark:text-[#d6d6d6] text-lg mb-8 leading-relaxed">
-              Cada negocio extraído incluye teléfono, dirección, categoría,
-              rating y reseñas públicas de Google Maps. Contactas en segundos
-              sin buscar ficha por ficha: los datos llegan al CRM listos para
-              llamar o enviar WhatsApp.
+              En Google Maps cada negocio incluye teléfono, dirección, categoría,
+              rating y reseñas. En INEGI obtienes nombre, teléfono, dirección y
+              categoría de establecimientos en México. Los datos llegan al CRM
+              listos para llamar o enviar WhatsApp.
             </p>
 
             <div className="grid sm:grid-cols-2 gap-4">
@@ -97,7 +97,7 @@ export default function RealDataSection() {
             <div className="relative rounded-2xl border border-[#e0e0e0] dark:border-[#2a2a2a] overflow-hidden shadow-xl">
               <Image
                 src={LANDING_SECTION_IMAGES.leadDetail}
-                alt="Ficha de lead con datos de Google Maps, redes sociales y seguimiento de ventas en KADESH"
+                alt="Ficha de lead con datos de Google Maps e INEGI, redes sociales y seguimiento de ventas en KADESH"
                 width={1200}
                 height={800}
                 className="w-full h-auto"

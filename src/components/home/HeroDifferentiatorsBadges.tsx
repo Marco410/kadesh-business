@@ -7,7 +7,7 @@ const BADGES = [
   "Kadesh AI: 3 pasos para hoy",
   "Leads únicos sin duplicados",
   "500+ leads nuevos cada mes",
-  "Datos reales de Google Maps",
+  "Datos reales de Google Maps e INEGI",
   "CRM + calendario + cotizaciones",
   "Equipos y comisiones de vendedores",
   "Comparte scripts y procesos con tu equipo",

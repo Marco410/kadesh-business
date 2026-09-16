@@ -44,7 +44,7 @@ export default function FinalCTASection() {
           ¿Listo para extraer tu primera lista de leads B2B?
         </h2>
         <p className="text-lg text-white/90 mb-8 leading-relaxed">
-          Crea tu cuenta en menos de un minuto. 50 leads de Google Maps
+          Crea tu cuenta en menos de un minuto. 50 leads de Google Maps o INEGI
           incluidos, 7 días de prueba y sin tarjeta de crédito.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

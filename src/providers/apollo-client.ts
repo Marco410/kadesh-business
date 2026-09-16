@@ -29,7 +29,25 @@ const uploadLink = createUploadLink({
 export const createApolloClient = () => {
   return new ApolloClient({
     link: ApolloLink.from([authLink, uploadLink]),
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      typePolicies: {
+        Query: {
+          fields: {
+            // skip/take no deben fusionarse: cada página de Clientes es una entrada distinta.
+            techBusinessLeads: {
+              keyArgs: [
+                "where",
+                "statusWhere",
+                "salesPersonWhere2",
+                "orderBy",
+                "skip",
+                "take",
+              ],
+            },
+          },
+        },
+      },
+    }),
     defaultOptions: {
       watchQuery: {
         fetchPolicy: "cache-and-network",

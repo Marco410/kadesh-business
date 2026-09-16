@@ -11,7 +11,7 @@ export const PRICING_PLAN_OFFERS = [
     name: "Plan Free",
     price: 0,
     description:
-      "Prueba gratuita con leads limitados para evaluar la prospección B2B desde Google Maps.",
+      "Prueba gratuita con leads limitados para evaluar la prospección B2B desde Google Maps e INEGI.",
   },
   {
     name: "Plan Starter",
@@ -64,7 +64,7 @@ export const PRICING_FAQ_ITEMS = [
   {
     question: "¿Hay prueba gratuita o plan gratis?",
     answer:
-      "Sí. Puedes registrarte y usar el plan Free o la prueba promocional (7 días con 50 leads, según la oferta vigente) para validar la extracción de leads desde Google Maps y el CRM antes de contratar un plan de pago.",
+      "Sí. Puedes registrarte y usar el plan Free o la prueba promocional (7 días con 50 leads, según la oferta vigente) para validar la extracción de leads desde Google Maps e INEGI y el CRM antes de contratar un plan de pago.",
   },
   {
     question: "¿Los precios están en pesos mexicanos?",

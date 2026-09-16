@@ -24,6 +24,57 @@ export type CalendarEvent = {
   extra?: string;
 };
 
+function EventListItem({
+  event,
+  onOpen,
+  hideSeller,
+}: {
+  event: CalendarEvent;
+  onOpen: (event: CalendarEvent) => void;
+  hideSeller?: boolean;
+}) {
+  return (
+    <li
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpen(event)}
+      onKeyDown={(ev) => {
+        if (ev.key === "Enter" || ev.key === " ") {
+          ev.preventDefault();
+          onOpen(event);
+        }
+      }}
+      className="flex flex-col gap-1 p-3 rounded-lg bg-white dark:bg-[#1e1e1e] border border-[#e8e8e8] dark:border-[#333] cursor-pointer hover:border-orange-500/50 hover:ring-1 hover:ring-orange-500/30 transition-colors"
+    >
+      <div className="flex items-center gap-2 flex-wrap">
+        <span
+          className={`inline-flex px-2 py-0.5 rounded text-xs font-medium text-white ${EVENT_COLORS[event.type]}`}
+        >
+          {event.typeLabel}
+        </span>
+        {event.timeLabel ? (
+          <span className="text-xs text-[#616161] dark:text-[#b0b0b0] tabular-nums font-medium">
+            {event.timeLabel}
+          </span>
+        ) : null}
+        {event.extra ? (
+          <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+            {event.extra}
+          </span>
+        ) : null}
+      </div>
+      <span className="text-sm font-medium text-[#212121] dark:text-[#ffffff] block">
+        {event.businessName}
+      </span>
+      {hideSeller ? null : (
+        <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+          {event.sellerName}
+        </span>
+      )}
+    </li>
+  );
+}
+
 export interface SalesCalendarViewProps {
   /** Mapa de fecha (YYYY-MM-DD) a eventos del día. */
   eventsByDate: Map<string, CalendarEvent[]>;
@@ -31,18 +82,29 @@ export interface SalesCalendarViewProps {
   title?: string;
   /** Clases adicionales para el contenedor (ej. mt-8). */
   className?: string;
+  /** `compact` para la ficha del cliente; `full` para el calendario del panel. */
+  variant?: "full" | "compact";
+}
+
+function todayKey(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 export default function SalesCalendarView({
   eventsByDate,
   title = "Calendario",
   className = "",
+  variant = "full",
 }: SalesCalendarViewProps) {
+  const isCompact = variant === "compact";
   const [currentMonth, setCurrentMonth] = useState(() => {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1);
   });
-  const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
+  const [selectedDateKey, setSelectedDateKey] = useState<string | null>(() =>
+    isCompact ? todayKey() : null
+  );
   const [openedEvent, setOpenedEvent] = useState<{
     type: CalendarEvent["type"];
     recordId: string;
@@ -69,11 +131,11 @@ export default function SalesCalendarView({
 
   const prevMonth = () => {
     setCurrentMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
-    setSelectedDateKey(null);
+    if (!isCompact) setSelectedDateKey(null);
   };
   const nextMonth = () => {
     setCurrentMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
-    setSelectedDateKey(null);
+    if (!isCompact) setSelectedDateKey(null);
   };
 
   const goToToday = () => {
@@ -100,14 +162,27 @@ export default function SalesCalendarView({
   const hasFollowup = (dateKey: string) =>
     (eventsByDate.get(dateKey) ?? []).some((e) => e.type === "followup");
 
-  const todayDateKey = (() => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  })();
+  const todayDateKey = todayKey();
+
+  const upcomingEvents = useMemo(() => {
+    const all: CalendarEvent[] = [];
+    eventsByDate.forEach((list) => {
+      all.push(...list);
+    });
+    return all
+      .filter((e) => e.dateKey >= todayDateKey)
+      .sort((a, b) => {
+        if (a.dateKey !== b.dateKey) return a.dateKey.localeCompare(b.dateKey);
+        return (a.timeLabel ?? "").localeCompare(b.timeLabel ?? "");
+      })
+      .slice(0, 8);
+  }, [eventsByDate, todayDateKey]);
 
   return (
     <section
-      className={`w-full min-h-[calc(100vh-12rem)] rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden ${className}`.trim()}
+      className={`w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden ${
+        isCompact ? "" : "min-h-[calc(100vh-12rem)]"
+      } ${className}`.trim()}
     >
       <div className="px-4 py-3 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a] flex flex-wrap items-center justify-between gap-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0]">
@@ -158,7 +233,7 @@ export default function SalesCalendarView({
         </div>
       </div>
 
-      <div className="p-4 flex flex-col lg:flex-row gap-4 min-h-[500px]">
+      <div className={`p-4 flex flex-col lg:flex-row gap-4 ${isCompact ? "" : "min-h-[500px]"}`}>
         <div className="flex-1 min-w-0">
           <div className="grid grid-cols-7 gap-px bg-[#e0e0e0] dark:bg-[#3a3a3a] rounded-lg overflow-hidden">
             {WEEKDAYS.map((w) => (
@@ -174,7 +249,11 @@ export default function SalesCalendarView({
                 key={i}
                 type="button"
                 onClick={() => cell.dateKey && setSelectedDateKey(cell.dateKey)}
-                className={`min-h-[90px] sm:min-h-[120px] md:min-h-[140px] flex flex-col items-center justify-start p-1 sm:p-2 text-left bg-white dark:bg-[#1e1e1e] hover:bg-[#fafafa] dark:hover:bg-[#252525] transition-colors ${
+                className={`${
+                  isCompact
+                    ? "min-h-[48px] sm:min-h-[56px]"
+                    : "min-h-[90px] sm:min-h-[120px] md:min-h-[140px]"
+                } flex flex-col items-center justify-start p-1 sm:p-2 text-left bg-white dark:bg-[#1e1e1e] hover:bg-[#fafafa] dark:hover:bg-[#252525] transition-colors ${
                   cell.dateKey != null && selectedDateKey === cell.dateKey
                     ? "ring-2 ring-orange-500 ring-inset"
                     : ""
@@ -221,7 +300,9 @@ export default function SalesCalendarView({
         </div>
 
         {selectedDateKey ? (
-          <div className="w-full lg:w-[380px] xl:w-[420px] shrink-0 flex flex-col rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] overflow-hidden">
+          <div className={`w-full shrink-0 flex flex-col rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] overflow-hidden ${
+            isCompact ? "lg:w-[300px] xl:w-[320px] max-h-[420px]" : "lg:w-[380px] xl:w-[420px]"
+          }`}>
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f0f0f0] dark:bg-[#2a2a2a]">
               <h3 className="text-sm font-semibold text-[#212121] dark:text-[#ffffff] capitalize">
                 {new Date(selectedDateKey + "T12:00:00").toLocaleDateString("es-MX", {
@@ -231,16 +312,18 @@ export default function SalesCalendarView({
                   year: "numeric",
                 })}
               </h3>
-              <button
-                type="button"
-                onClick={() => setSelectedDateKey(null)}
-                className="p-1.5 rounded-lg text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#ffffff] hover:bg-[#e5e5e5] dark:hover:bg-[#333] transition-colors"
-                aria-label="Cerrar"
-              >
-                Cerrar
-              </button>
+              {isCompact ? null : (
+                <button
+                  type="button"
+                  onClick={() => setSelectedDateKey(null)}
+                  className="p-1.5 rounded-lg text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#ffffff] hover:bg-[#e5e5e5] dark:hover:bg-[#333] transition-colors"
+                  aria-label="Cerrar"
+                >
+                  Cerrar
+                </button>
+              )}
             </div>
-            <div className="p-4 overflow-y-auto flex-1">
+            <div className="p-4 overflow-y-auto flex-1 space-y-4">
               {selectedEvents.length === 0 ? (
                 <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
                   Sin eventos este día.
@@ -248,43 +331,63 @@ export default function SalesCalendarView({
               ) : (
                 <ul className="space-y-2">
                   {selectedEvents.map((e) => (
-                    <li
+                    <EventListItem
                       key={e.id}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setOpenedEvent({ type: e.type, recordId: e.recordId })}
-                      onKeyDown={(ev) => {
-                        if (ev.key === "Enter" || ev.key === " ") {
-                          ev.preventDefault();
-                          setOpenedEvent({ type: e.type, recordId: e.recordId });
+                      event={e}
+                      hideSeller={isCompact}
+                      onOpen={(item) =>
+                        setOpenedEvent({ type: item.type, recordId: item.recordId })
+                      }
+                    />
+                  ))}
+                </ul>
+              )}
+              {isCompact && upcomingEvents.filter((e) => e.dateKey !== selectedDateKey).length > 0 ? (
+                <div>
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#777]">
+                    Próximos
+                  </p>
+                  <ul className="space-y-2">
+                    {upcomingEvents
+                      .filter((e) => e.dateKey !== selectedDateKey)
+                      .map((e) => (
+                      <EventListItem
+                        key={`up-${e.id}`}
+                        event={e}
+                        hideSeller
+                        onOpen={(item) =>
+                          setOpenedEvent({ type: item.type, recordId: item.recordId })
                         }
-                      }}
-                      className="flex flex-col gap-1 p-3 rounded-lg bg-white dark:bg-[#1e1e1e] border border-[#e8e8e8] dark:border-[#333] cursor-pointer hover:border-orange-500/50 hover:ring-1 hover:ring-orange-500/30 transition-colors"
-                    >
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span
-                          className={`inline-flex px-2 py-0.5 rounded text-xs font-medium text-white ${EVENT_COLORS[e.type]}`}
-                        >
-                          {e.typeLabel}
-                        </span>
-                        {e.timeLabel && (
-                          <span className="text-xs text-[#616161] dark:text-[#b0b0b0] tabular-nums font-medium">
-                            {e.timeLabel}
-                          </span>
-                        )}
-                        {e.extra && (
-                          <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">
-                            {e.extra}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-sm font-medium text-[#212121] dark:text-[#ffffff] block">
-                        {e.businessName}
-                      </span>
-                      <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">
-                        {e.sellerName}
-                      </span>
-                    </li>
+                      />
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : isCompact ? (
+          <div className="w-full lg:w-[300px] xl:w-[320px] shrink-0 flex flex-col rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] overflow-hidden max-h-[420px]">
+            <div className="px-4 py-3 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f0f0f0] dark:bg-[#2a2a2a]">
+              <h3 className="text-sm font-semibold text-[#212121] dark:text-[#ffffff]">
+                Próximos
+              </h3>
+            </div>
+            <div className="p-4 overflow-y-auto flex-1">
+              {upcomingEvents.length === 0 ? (
+                <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                  No hay actividades, propuestas ni seguimientos próximos.
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {upcomingEvents.map((e) => (
+                    <EventListItem
+                      key={`up-${e.id}`}
+                      event={e}
+                      hideSeller
+                      onOpen={(item) =>
+                        setOpenedEvent({ type: item.type, recordId: item.recordId })
+                      }
+                    />
                   ))}
                 </ul>
               )}

@@ -35,6 +35,8 @@ interface AutocompleteProps {
   /** Evita sugerencias nativas del navegador (p. ej. Chrome autofill). */
   disableBrowserAutocomplete?: boolean;
   dropdownClassName?: string;
+  /** Oculta el <label> cuando el campo ya tiene etiqueta fuera del componente. */
+  hideLabel?: boolean;
 }
 
 export default function Autocomplete({
@@ -54,6 +56,7 @@ export default function Autocomplete({
   className = '',
   disableBrowserAutocomplete = false,
   dropdownClassName = '',
+  hideLabel = false,
 }: AutocompleteProps) {
   const [search, setSearch] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -131,9 +134,11 @@ export default function Autocomplete({
 
   return (
     <div className={`relative ${className}`} ref={containerRef}>
-      <label htmlFor={id} className="block text-sm font-medium text-[#212121] dark:text-[#ffffff] mb-2">
-        {label} {required ? <RequiredFieldMark /> : null}
-      </label>
+      {!hideLabel && (
+        <label htmlFor={id} className="block text-sm font-medium text-[#212121] dark:text-[#ffffff] mb-2">
+          {label} {required ? <RequiredFieldMark /> : null}
+        </label>
+      )}
       <div className="relative">
         <input
           ref={inputRef}
