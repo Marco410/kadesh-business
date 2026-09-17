@@ -4,4 +4,6 @@
 
 El resumen diario de Kadesh AI (`DailyDigestCard`) **también** está en `/panel?tab=ai` (Dashboard). No lo quites de Inicio al cambiar la pantalla de IA.
 
+El enlace **Operaciones** al pie solo lo ve el rol `admin` de plataforma (`src/components/admin/README.md`).
+
 Producto, copy y acceso de IA: `src/components/profile/ai/README.md`.

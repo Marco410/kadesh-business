@@ -903,10 +903,10 @@ export function CompanyDashboard({
       {hasAdminRole ? (
         <div className="pt-1 flex justify-center">
           <Link
-            href="/panel/clientes/admin"
+            href={Routes.panelAdmin}
             className="text-xs text-[#616161] dark:text-[#b0b0b0] underline decoration-dotted opacity-70 hover:opacity-100 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
           >
-            Admin: verificar suscripciones (debug)
+            Operaciones
           </Link>
         </div>
       ) : null}
