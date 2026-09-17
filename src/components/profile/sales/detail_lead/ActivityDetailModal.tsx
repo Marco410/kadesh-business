@@ -8,6 +8,7 @@ import {
   type TechSalesActivityResponse,
 } from "kadesh/components/profile/sales/queries";
 import { formatDateShort } from "kadesh/utils/format-date";
+import { ModalPortal } from "kadesh/components/shared";
 
 interface ActivityDetailModalProps {
   activityId: string | null;
@@ -33,13 +34,14 @@ export default function ActivityDetailModal({
   if (!isOpen) return null;
 
   return (
+    <ModalPortal>
     <AnimatePresence>
       <motion.div
         key="activity-detail-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 z-[70] flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
         onClick={onClose}
       />
       <motion.div
@@ -48,7 +50,7 @@ export default function ActivityDetailModal({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="fixed inset-0 z-[80] flex items-center justify-center p-4 pointer-events-none"
+        className="fixed inset-0 z-[110] flex items-center justify-center p-4 pointer-events-none"
       >
         <div
           className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-hidden pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a] flex flex-col"
@@ -176,5 +178,6 @@ export default function ActivityDetailModal({
         </div>
       </motion.div>
     </AnimatePresence>
+    </ModalPortal>
   );
 }

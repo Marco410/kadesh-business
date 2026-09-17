@@ -586,7 +586,7 @@ export default function DetailLeadSection() {
         </SectionCard>
       </div>
 
-      <div className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden clientes-row-in">
+      <div className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e]">
         <h2
           className={`px-4 py-3 text-sm font-semibold uppercase tracking-wide border-b ${
             pipelineStatus && PIPELINE_STATUS_SECTION_HEADER[pipelineStatus]

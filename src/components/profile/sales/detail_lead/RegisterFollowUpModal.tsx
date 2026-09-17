@@ -25,6 +25,7 @@ import {
 import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
 import FollowUpDetailModal from "./FollowUpDetailModal";
+import { ModalPortal } from "kadesh/components/shared";
 
 const FOLLOW_UP_STATUS_OPTIONS = Object.values(FOLLOW_UP_TASK_STATUS);
 const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
@@ -188,6 +189,7 @@ export default function RegisterFollowUpModal({
   };
 
   return (
+    <ModalPortal>
     <AnimatePresence>
       {isOpen && (
         <>
@@ -195,7 +197,7 @@ export default function RegisterFollowUpModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 z-[80] flex items-center justify-center p-4"
             onClick={onClose}
           />
           <motion.div
@@ -203,10 +205,10 @@ export default function RegisterFollowUpModal({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center p-4 pointer-events-none"
+            className="fixed inset-0 z-[90] flex items-center justify-center p-4 pointer-events-none"
           >
             <div
-              className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
+              className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[min(90vh,760px)] flex flex-col overflow-hidden pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-start p-6 pb-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
@@ -224,7 +226,7 @@ export default function RegisterFollowUpModal({
                 </button>
               </div>
 
-              <div className="px-6 pb-4 pt-4">
+              <div className="px-6 pb-6 pt-4 flex-1 overflow-y-auto min-h-0">
                 <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
                   Seguimientos programados
                 </p>
@@ -310,7 +312,6 @@ export default function RegisterFollowUpModal({
                     </table>
                   </div>
                 )}
-              </div>
 
               <FollowUpDetailModal
                 taskId={selectedId}
@@ -319,12 +320,12 @@ export default function RegisterFollowUpModal({
               />
 
               <div className="border-t border-[#e0e0e0] dark:border-[#3a3a3a] pt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-3 px-6">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-3">
                   {isEditing ? "Editar seguimiento" : "Nueva programación"}
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 pb-2">
                 <div>
                   <label
                     htmlFor="followup-scheduledDate"
@@ -439,10 +440,12 @@ export default function RegisterFollowUpModal({
                   </button>
                 </div>
               </form>
+              </div>
             </div>
           </motion.div>
         </>
       )}
     </AnimatePresence>
+    </ModalPortal>
   );
 }

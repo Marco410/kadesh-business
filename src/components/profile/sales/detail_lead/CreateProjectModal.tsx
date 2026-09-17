@@ -20,6 +20,7 @@ import {
   type UserCompanyCategoriesResponse,
   type UserCompanyCategoriesVariables,
 } from "../queries";
+import { ModalPortal } from "kadesh/components/shared";
 
 interface CreateProjectModalProps {
   proposalId: string | null;
@@ -131,6 +132,7 @@ export default function CreateProjectModal({
     setValues((prev) => ({ ...prev, ...next }));
 
   return (
+    <ModalPortal>
     <AnimatePresence>
       {isOpen ? (
         <>
@@ -194,5 +196,6 @@ export default function CreateProjectModal({
         </>
       ) : null}
     </AnimatePresence>
+    </ModalPortal>
   );
 }

@@ -9,6 +9,7 @@ export { default as RequiredFieldMark } from './RequiredFieldMark';
 export { default as ClientProjectAutocomplete } from './ClientProjectAutocomplete';
 export type { ClientProjectAutocompleteProps } from './ClientProjectAutocomplete';
 export { default as ConfirmModal } from './ConfirmModal';
+export { default as ModalPortal } from './ModalPortal';
 export { default as PaletteColorPicker } from './PaletteColorPicker';
 export type { PaletteColorPickerProps } from './PaletteColorPicker';
 export { PALETTE_COLOR_PRESETS } from './PaletteColorPicker';
