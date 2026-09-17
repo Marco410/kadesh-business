@@ -30,6 +30,7 @@ import { useSubscription } from "../SubscriptionContext";
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
 import { workspaceConnectPayload } from "kadesh/components/profile/sales/workspaces/workspace-connect";
 import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
+import { ModalPortal } from "kadesh/components/shared";
 
 const PROPOSAL_STATUS_OPTIONS = Object.values(PROPOSAL_STATUS);
 
@@ -228,6 +229,7 @@ export default function RegisterProposalModal({
   ) || false;
 
   return (
+    <ModalPortal>
     <AnimatePresence>
       {isOpen && (
         <>
@@ -235,7 +237,7 @@ export default function RegisterProposalModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 z-[80] flex items-center justify-center p-4"
             onClick={onClose}
           />
           <motion.div
@@ -243,10 +245,10 @@ export default function RegisterProposalModal({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center p-4 pointer-events-none"
+            className="fixed inset-0 z-[90] flex items-center justify-center p-4 pointer-events-none"
           >
             <div
-              className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
+              className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[min(90vh,760px)] flex flex-col overflow-hidden pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-start p-6 pb-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
@@ -264,7 +266,7 @@ export default function RegisterProposalModal({
                 </button>
               </div>
 
-              <div className="px-6 pb-4 pt-4">
+              <div className="px-6 pb-6 pt-4 flex-1 overflow-y-auto min-h-0">
                 <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
                   Propuestas registradas
                 </p>
@@ -364,7 +366,6 @@ export default function RegisterProposalModal({
                     </table>
                   </div>
                 )}
-              </div>
 
               <ProposalDetailModal
                 proposalId={selectedId}
@@ -385,12 +386,12 @@ export default function RegisterProposalModal({
               />
 
               <div className="border-t border-[#e0e0e0] dark:border-[#3a3a3a] pt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-3 px-6">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-3">
                   {isEditing ? "Editar Propuesta" : "Nueva propuesta"}
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 pb-2">
                 <div>
                   <label
                     htmlFor="proposal-sentDate"
@@ -564,10 +565,12 @@ export default function RegisterProposalModal({
                   </button>
                 </div>
               </form>
+              </div>
             </div>
           </motion.div>
         </>
       )}
     </AnimatePresence>
+    </ModalPortal>
   );
 }

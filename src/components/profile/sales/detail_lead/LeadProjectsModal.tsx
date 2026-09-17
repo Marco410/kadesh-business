@@ -9,6 +9,7 @@ import { Routes } from "kadesh/core/routes";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { PROJECT_STATUS_CLASSES } from "kadesh/constants/constans";
 import CreateProjectModal from "./CreateProjectModal";
+import { ModalPortal } from "kadesh/components/shared";
 
 export type LeadProjectListItem = {
   id: string;
@@ -44,6 +45,7 @@ export default function LeadProjectsModal({
   }, [isOpen]);
 
   return (
+    <ModalPortal>
     <AnimatePresence>
       {isOpen && (
         <>
@@ -182,5 +184,6 @@ export default function LeadProjectsModal({
         </>
       )}
     </AnimatePresence>
+    </ModalPortal>
   );
 }

@@ -8,7 +8,7 @@ Tres bandas, de arriba a abajo:
 
 1. **Identidad.** Nombre, pastilla de fuente (isotipo INEGI o Google Maps) y un solo **Guardar cambios**.
 2. **Datos del negocio.** Empresa a la izquierda. La tarjeta del medio depende de la fuente. A la derecha, **Presencia y fechas** (redes + línea de tiempo) en un solo bloque, no cuatro columnas vacías.
-3. **Pipeline y trabajo.** Tira compacta. Arriba: estatus (se guarda al elegir) y notas con **Guardar**. Abajo: cuatro pastillas con recuento **y un verbo** (Añadir / Registrar / Programar). **Añadir** proyecto abre el mismo formulario que en Proyectos (nombre basta; fechas y archivos plegados). El **Guardar cambios** de arriba sigue para redes, web y fechas.
+3. **Pipeline y trabajo.** Tira compacta. Arriba: estatus (se guarda al elegir) y notas con **Guardar**. Abajo: cuatro pastillas con recuento **y un verbo** (Añadir / Registrar / Programar). **Añadir** proyecto abre el mismo formulario que en Proyectos (nombre basta; fechas y archivos plegados). Los modales de actividad, propuesta, seguimiento y proyecto se pintan en `document.body` para no recortarse dentro de la tira. El **Guardar cambios** de arriba sigue para redes, web y fechas.
 4. **Calendario de este cliente** (si el plan tiene `CALENDAR_CRM`): mes compacto + día seleccionado y próximos eventos. El calendario grande de vendedores no se reutiliza a pantalla completa aquí.
 
 Vacío de redes: inputs compactos, no un muro. Vacío de Google: no se muestra la tarjeta. Carga: spinner. Error: volver a Clientes.
