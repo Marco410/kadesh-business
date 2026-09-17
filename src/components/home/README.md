@@ -15,3 +15,7 @@ Copy alineado con `src/components/profile/ai/README.md`: marca `Kadesh AI`; no p
 El hero nombra Kadesh AI **dentro del lead** (pastilla violeta–azul), un chip “Kadesh AI · En todos los planes”, y debajo las badges de confianza (datos públicos, sin tarjeta, listo en 60 s). No sustituye la promesa de extracción.
 
 Costo por lead y cuota Pro: `PRO_PLAN_PUBLIC` en `src/components/pricing/constants.ts` (500 créditos, ~1.60 MXN). No uses “400 leads” ni “menos de 1 MXN”.
+
+## Aliados (`#aliados`)
+
+Va después de prueba social y antes de testimonios. No es un logo wall de clientes: mezcla **familia Kadesh** (Pet y FOOD) con el aliado Bosco Agency. Detalle de copy y qué no va ahí: `src/components/allies/README.md`.
