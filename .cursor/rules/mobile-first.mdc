@@ -1,0 +1,37 @@
+---
+description: Todo UI se diseña e implementa mobile-first. El viewport pequeño es el default; sm/md/lg solo amplían.
+alwaysApply: true
+---
+
+# Mobile-first
+
+La base de cada layout, componente y flujo es **un teléfono (~375px)**. Desktop es una mejora, nunca el punto de partida.
+
+## Tailwind
+
+Las clases **sin prefijo** son el layout móvil. `sm:`, `md:` y `lg:` solo añaden columnas, más aire o nav completa.
+
+```tsx
+// ✅ Columna en móvil, tres columnas desde md
+<ul className="grid grid-cols-1 gap-6 md:grid-cols-3">
+
+// ✅ Padding del producto
+<div className="px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+
+// ❌ Desktop primero, luego parche con max-*
+<ul className="grid grid-cols-3 max-md:grid-cols-1">
+```
+
+No uses `max-sm:` / `max-md:` como estrategia principal. No fijes anchos de escritorio (`w-[1440px]`, `min-w-[1200px]`) ni `overflow-x-hidden` para esconder un layout que no cabe.
+
+## Interacción
+
+- Área táctil ≥ 44px. El tap es la acción primaria; el hover es extra.
+- No dejes acciones solo en hover (`group-hover` sin equivalente al tap).
+- En móvil: apilar (`flex-col`), menú compacto, tablas → lista o cards. En `md`/`lg`: filas, nav completa, grillas.
+
+## Cómo trabajar
+
+1. Implementa y revisa primero a ~375px (una columna, sin scroll horizontal, CTAs al alcance).
+2. Luego `sm` / `md` / `lg`. Si algo se rompe en móvil, no está listo.
+3. Marketing y panel: mismo ritmo `px-4 sm:px-6 lg:px-8` (`DESIGN.md`).
