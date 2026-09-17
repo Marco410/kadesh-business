@@ -41,7 +41,7 @@ You are an expert full-stack developer proficient in TypeScript, React, Next.js,
 - **Server vs Client**: Prefer React Server Components (RSC); add `'use client'` only when needed (hooks, browser APIs, event handlers, or client-only libs). Keep the client boundary as low as possible (e.g. wrap only the interactive part, not the whole page).
 - Minimize `useEffect` and `setState`; use server data (async `page`, `fetch`, or GraphQL in RSC) and pass props when possible.
 - Implement dynamic imports for code splitting and optimization (`next/dynamic` for heavy or below-the-fold components).
-- Use responsive design with a mobile-first approach.
+- **Mobile-first** (`.cursor/rules/mobile-first.mdc`): unprefixed Tailwind is the phone layout; `sm:` / `md:` / `lg:` only enhance. Do not design desktop-first and patch with `max-*`.
 - Optimize images: use Next.js `Image` with WebP, width/height when known, and lazy loading.
 
 ### Error Handling and Validation
