@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowDown01Icon,
@@ -31,6 +32,13 @@ import { PipelineBars, ShareBars, WeeklyBars } from "./charts";
 import { DailyDigestCard } from "./DailyDigestCard";
 import { useCompanyDashboard } from "./useCompanyDashboard";
 import type { DashboardStats } from "./aggregate";
+import {
+  DASHBOARD_EASE,
+  dashboardTransition,
+  dashboardViewport,
+  fadeUpVariants,
+  staggerContainer,
+} from "./motion";
 
 type CompanyDashboardProps = {
   userId: string;
@@ -50,10 +58,10 @@ type CompanyDashboardProps = {
 };
 
 const panelClass =
-  "rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm";
+  "h-full rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm";
 
 const kpiCellClass =
-  "relative z-0 hover:z-30 focus-within:z-30 bg-white dark:bg-[#1e1e1e] px-3 py-3 overflow-visible";
+  "relative z-0 hover:z-30 focus-within:z-30 h-full bg-white dark:bg-[#1e1e1e] px-3 py-3 overflow-visible";
 
 function pipelineShort(status: string | null | undefined): string {
   if (!status) return "Sin etapa";
@@ -65,16 +73,48 @@ function formatPct(value: number | null): string {
   return `${value.toFixed(0)}%`;
 }
 
+const MotionLink = motion.create(Link);
+
+function DashboardInView({
+  children,
+  className,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+}) {
+  const reduce = useReducedMotion();
+  return (
+    <motion.div
+      className={cn("h-full min-h-0", className)}
+      variants={fadeUpVariants(reduce)}
+      initial="hidden"
+      whileInView="show"
+      viewport={dashboardViewport}
+      transition={dashboardTransition(reduce, delay)}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 function DashboardSkeleton() {
   return (
-    <div className="space-y-4" aria-hidden>
+    <motion.div
+      className="space-y-4"
+      aria-hidden
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
+    >
       <div className="h-20 rounded-2xl bg-[#ececec] dark:bg-[#1e1e1e] animate-pulse" />
       <div className="h-24 rounded-2xl bg-[#ececec] dark:bg-[#1e1e1e] animate-pulse" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="h-52 rounded-2xl bg-[#ececec] dark:bg-[#1e1e1e] animate-pulse" />
         <div className="h-52 rounded-2xl bg-[#ececec] dark:bg-[#1e1e1e] animate-pulse" />
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -132,7 +172,7 @@ function KpiCell({
     return (
       <Link
         href={href}
-        className="block rounded-lg p-1 -m-1 hover:bg-[#f7f7f7] dark:hover:bg-[#2a2a2a] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+        className="block rounded-lg p-1 -m-1 hover:bg-[#f7f7f7] dark:hover:bg-[#2a2a2a] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
       >
         {content}
       </Link>
@@ -175,6 +215,7 @@ function QuickActions({
   hasVendedorRole: boolean;
   canManageAi: boolean;
 }) {
+  const reduce = useReducedMotion();
   const actions = [
     { label: "Editar perfil", href: Routes.panelProfile, icon: UserIcon },
     { label: "Novedades", href: Routes.novedades, icon: FlashIcon },
@@ -205,26 +246,42 @@ function QuickActions({
   ];
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <motion.div
+      className="flex flex-wrap gap-2"
+      variants={staggerContainer(reduce, 0.06)}
+      initial="hidden"
+      animate="show"
+    >
       {actions.map((action) => (
-        <Link
+        <motion.div
           key={action.href}
-          href={action.href}
-          className="inline-flex items-center gap-1.5 rounded-full border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 py-1.5 text-sm font-medium text-[#212121] dark:text-white hover:border-orange-500/60 hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+          variants={fadeUpVariants(reduce)}
+          transition={dashboardTransition(reduce)}
         >
-          <span
-            className={"ai" in action && action.ai ? "ai-urim-icon" : undefined}
+          <MotionLink
+            href={action.href}
+            whileHover={reduce ? undefined : { y: -1 }}
+            whileTap={reduce ? undefined : { scale: 0.98 }}
+            transition={{ duration: 0.12, ease: DASHBOARD_EASE }}
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 py-1.5 text-sm font-medium text-[#212121] dark:text-white hover:border-orange-500/60 hover:text-orange-600 dark:hover:text-orange-400"
           >
-            <HugeiconsIcon icon={action.icon} size={16} />
-          </span>
-          {action.label}
-        </Link>
+            <span
+              className={
+                "ai" in action && action.ai ? "ai-urim-icon" : undefined
+              }
+            >
+              <HugeiconsIcon icon={action.icon} size={16} />
+            </span>
+            {action.label}
+          </MotionLink>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }
 
 function AttentionList({ stats }: { stats: DashboardStats }) {
+  const reduce = useReducedMotion();
   const items: Array<{ label: string; detail: string; href: string }> = [];
 
   if (stats.overdueFollowUpsCount > 0) {
@@ -252,35 +309,43 @@ function AttentionList({ stats }: { stats: DashboardStats }) {
   if (items.length === 0) return null;
 
   return (
-    <section className={panelClass}>
-      <div className="flex items-baseline justify-between gap-3 mb-2">
-        <h3 className="text-lg font-semibold text-[#212121] dark:text-white">
-          Requiere atención
-        </h3>
-      </div>
-      <ul className="space-y-1.5">
-        {items.map((item) => (
-          <li key={item.label}>
-            <Link
-              href={item.href}
-              className="flex items-start gap-2.5 rounded-lg py-1 hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
-            >
-              <span className="mt-0.5 text-amber-600 dark:text-amber-400">
-                <HugeiconsIcon icon={InformationCircleIcon} size={18} />
-              </span>
-              <span>
-                <span className="block text-base font-medium text-[#212121] dark:text-white">
-                  {item.label}
+    <DashboardInView>
+      <section className={panelClass}>
+        <div className="flex items-baseline justify-between gap-3 mb-2">
+          <h3 className="text-lg font-semibold text-[#212121] dark:text-white">
+            Requiere atención
+          </h3>
+        </div>
+        <motion.ul
+          className="space-y-1.5"
+          variants={staggerContainer(reduce, 0)}
+          initial="hidden"
+          whileInView="show"
+          viewport={dashboardViewport}
+        >
+          {items.map((item) => (
+            <motion.li key={item.label} variants={fadeUpVariants(reduce)}>
+              <Link
+                href={item.href}
+                className="flex items-start gap-2.5 rounded-lg py-1 hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+              >
+                <span className="mt-0.5 text-amber-600 dark:text-amber-400">
+                  <HugeiconsIcon icon={InformationCircleIcon} size={18} />
                 </span>
-                <span className="block text-sm text-[#616161] dark:text-[#b0b0b0]">
-                  {item.detail}
+                <span>
+                  <span className="block text-base font-medium text-[#212121] dark:text-white">
+                    {item.label}
+                  </span>
+                  <span className="block text-sm text-[#616161] dark:text-[#b0b0b0]">
+                    {item.detail}
+                  </span>
                 </span>
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
+              </Link>
+            </motion.li>
+          ))}
+        </motion.ul>
+      </section>
+    </DashboardInView>
   );
 }
 
@@ -300,6 +365,7 @@ export function CompanyDashboard({
   cardNumber,
   onCompanyCreated,
 }: CompanyDashboardProps) {
+  const reduce = useReducedMotion();
   const firstName = userName?.split(/\s+/)[0] || "Usuario";
   const todayLabel = new Intl.DateTimeFormat("es-MX", {
     weekday: "long",
@@ -319,21 +385,25 @@ export function CompanyDashboard({
   if (!companyId) {
     return (
       <div className="space-y-5">
-        <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/10 to-orange-600/5 dark:from-orange-500/20 dark:to-transparent px-5 py-4">
-          <h2 className="text-2xl font-bold text-[#212121] dark:text-white">
-            Hola, {firstName}
-          </h2>
-          <p className="mt-0.5 text-sm text-[#616161] dark:text-[#b0b0b0]">
-            Crea tu empresa para ver el pulso de tus clientes, pipeline y
-            cotizaciones.
-          </p>
-        </div>
-        <EmptyCompanySection
-          userId={userId}
-          onSuccess={async () => {
-            await onCompanyCreated();
-          }}
-        />
+        <DashboardInView>
+          <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/10 to-orange-600/5 dark:from-orange-500/20 dark:to-transparent px-5 py-4">
+            <h2 className="text-2xl font-bold text-[#212121] dark:text-white">
+              Hola, {firstName}
+            </h2>
+            <p className="mt-0.5 text-sm text-[#616161] dark:text-[#b0b0b0]">
+              Crea tu empresa para ver el pulso de tus clientes, pipeline y
+              cotizaciones.
+            </p>
+          </div>
+        </DashboardInView>
+        <DashboardInView delay={0.06}>
+          <EmptyCompanySection
+            userId={userId}
+            onSuccess={async () => {
+              await onCompanyCreated();
+            }}
+          />
+        </DashboardInView>
       </div>
     );
   }
@@ -341,21 +411,25 @@ export function CompanyDashboard({
   if (loading || !stats) {
     return (
       <div className="space-y-4">
-        <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/10 to-orange-600/5 dark:from-orange-500/20 dark:to-transparent px-5 py-4">
-          <p className="text-sm capitalize text-[#616161] dark:text-[#b0b0b0]">
-            {todayLabel}
-          </p>
-          <h2 className="mt-0.5 text-2xl font-bold text-[#212121] dark:text-white">
-            Hola, {firstName}
-          </h2>
-        </div>
-        <DailyDigestCard
-          companyId={companyId}
-          canManageAi={canManageAi}
-          isCompanyWide={hasCompanyWideLeadScope}
-          remainingQuota={credits.remainingQuota}
-          onGenerated={() => void credits.refetch()}
-        />
+        <DashboardInView>
+          <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/10 to-orange-600/5 dark:from-orange-500/20 dark:to-transparent px-5 py-4">
+            <p className="text-sm capitalize text-[#616161] dark:text-[#b0b0b0]">
+              {todayLabel}
+            </p>
+            <h2 className="mt-0.5 text-2xl font-bold text-[#212121] dark:text-white">
+              Hola, {firstName}
+            </h2>
+          </div>
+        </DashboardInView>
+        <DashboardInView delay={0.04}>
+          <DailyDigestCard
+            companyId={companyId}
+            canManageAi={canManageAi}
+            isCompanyWide={hasCompanyWideLeadScope}
+            remainingQuota={credits.remainingQuota}
+            onGenerated={() => void credits.refetch()}
+          />
+        </DashboardInView>
         <DashboardSkeleton />
       </div>
     );
@@ -364,28 +438,32 @@ export function CompanyDashboard({
   if (error) {
     return (
       <div className="space-y-4">
-        <DailyDigestCard
-          companyId={companyId}
-          canManageAi={canManageAi}
-          isCompanyWide={hasCompanyWideLeadScope}
-          remainingQuota={credits.remainingQuota}
-          onGenerated={() => void credits.refetch()}
-        />
-        <div className={panelClass}>
-          <h2 className="text-lg font-semibold text-[#212121] dark:text-white">
-            No se pudo cargar el dashboard
-          </h2>
-          <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
-            Revisa tu conexión e inténtalo de nuevo.
-          </p>
-          <button
-            type="button"
-            onClick={() => void refetch()}
-            className="mt-4 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
-          >
-            Reintentar
-          </button>
-        </div>
+        <DashboardInView>
+          <DailyDigestCard
+            companyId={companyId}
+            canManageAi={canManageAi}
+            isCompanyWide={hasCompanyWideLeadScope}
+            remainingQuota={credits.remainingQuota}
+            onGenerated={() => void credits.refetch()}
+          />
+        </DashboardInView>
+        <DashboardInView delay={0.05}>
+          <div className={panelClass}>
+            <h2 className="text-lg font-semibold text-[#212121] dark:text-white">
+              No se pudo cargar el dashboard
+            </h2>
+            <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+              Revisa tu conexión e inténtalo de nuevo.
+            </p>
+            <button
+              type="button"
+              onClick={() => void refetch()}
+              className="mt-4 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+            >
+              Reintentar
+            </button>
+          </div>
+        </DashboardInView>
       </div>
     );
   }
@@ -399,79 +477,105 @@ export function CompanyDashboard({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/10 to-orange-600/5 dark:from-orange-500/20 dark:to-transparent px-5 py-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="min-w-0">
-            <p className="text-sm capitalize text-[#616161] dark:text-[#b0b0b0]">
-              {todayLabel}
-            </p>
-            <h2 className="mt-0.5 text-2xl font-bold text-[#212121] dark:text-white">
-              Hola, {firstName}
-            </h2>
-            <p className="mt-0.5 text-sm text-[#616161] dark:text-[#b0b0b0]">
-              {scopeLabel}
-              {planName ? ` · ${planName}` : ""}
-            </p>
-          </div>
-          <QuickActions
-            hasVendedorRole={hasVendedorRole}
-            canManageAi={canManageAi}
-          />
-        </div>
-      </div>
-
-      <DailyDigestCard
-        companyId={companyId}
-        canManageAi={canManageAi}
-        isCompanyWide={hasCompanyWideLeadScope}
-        remainingQuota={remainingQuota}
-        onGenerated={() => void credits.refetch()}
-      />
-
-      <section className={cn(panelClass, "overflow-visible")}>
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-px bg-[#ececec] dark:bg-[#2e2e2e] rounded-xl overflow-visible">
-          <div className={kpiCellClass}>
-            <KpiCell
-              label="Clientes"
-              value={String(stats.leadsCount)}
-              hint="Leads de la empresa en el alcance actual."
-              href={`${Routes.panel}?tab=clientes`}
-            />
-          </div>
-          <div className={kpiCellClass}>
-            <KpiCell
-              label="Nuevos este mes"
-              value={String(stats.leadsThisMonth)}
-              hint={`El mes pasado: ${stats.leadsLastMonth}.`}
-              delta={
-                stats.leadsMonthDeltaPct == null
-                  ? null
-                  : { value: stats.leadsMonthDeltaPct, suffix: "%" }
-              }
-            />
-          </div>
-          <div className={kpiCellClass}>
-            <KpiCell
-              label="Pipeline abierto"
-              value={formatCurrency(stats.openPipelineValue)}
-              hint="Suma del valor estimado en etapas abiertas (sin cerrados ni descartados)."
-            />
-          </div>
-          <div className={kpiCellClass}>
-            <KpiCell
-              label="Cerrados ganados"
-              value={String(stats.wonLeads)}
-              hint="Clientes en etapa Cerrado Ganado."
-            />
-          </div>
-          <div className={cn(kpiCellClass, "col-span-2 lg:col-span-1")}>
-            <KpiCell
-              label="Tasa de cierre"
-              value={formatPct(stats.closeRate)}
-              hint="Ganados entre ganados + perdidos. La conversión sobre el total de leads es otra métrica."
+      <DashboardInView>
+        <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/10 to-orange-600/5 dark:from-orange-500/20 dark:to-transparent px-5 py-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0">
+              <p className="text-sm capitalize text-[#616161] dark:text-[#b0b0b0]">
+                {todayLabel}
+              </p>
+              <h2 className="mt-0.5 text-2xl font-bold text-[#212121] dark:text-white">
+                Hola, {firstName}
+              </h2>
+              <p className="mt-0.5 text-sm text-[#616161] dark:text-[#b0b0b0]">
+                {scopeLabel}
+                {planName ? ` · ${planName}` : ""}
+              </p>
+            </div>
+            <QuickActions
+              hasVendedorRole={hasVendedorRole}
+              canManageAi={canManageAi}
             />
           </div>
         </div>
+      </DashboardInView>
+
+      <DashboardInView delay={0.05}>
+        <DailyDigestCard
+          companyId={companyId}
+          canManageAi={canManageAi}
+          isCompanyWide={hasCompanyWideLeadScope}
+          remainingQuota={remainingQuota}
+          onGenerated={() => void credits.refetch()}
+        />
+      </DashboardInView>
+
+      <DashboardInView delay={0.08}>
+        <section className={cn(panelClass, "overflow-visible")}>
+          <motion.div
+            className="grid grid-cols-2 lg:grid-cols-5 gap-px bg-[#ececec] dark:bg-[#2e2e2e] rounded-xl overflow-visible"
+            variants={staggerContainer(reduce, 0)}
+            initial="hidden"
+            whileInView="show"
+            viewport={dashboardViewport}
+          >
+            <motion.div
+              className={kpiCellClass}
+              variants={fadeUpVariants(reduce)}
+            >
+              <KpiCell
+                label="Clientes"
+                value={String(stats.leadsCount)}
+                hint="Leads de la empresa en el alcance actual."
+                href={`${Routes.panel}?tab=clientes`}
+              />
+            </motion.div>
+            <motion.div
+              className={kpiCellClass}
+              variants={fadeUpVariants(reduce)}
+            >
+              <KpiCell
+                label="Nuevos este mes"
+                value={String(stats.leadsThisMonth)}
+                hint={`El mes pasado: ${stats.leadsLastMonth}.`}
+                delta={
+                  stats.leadsMonthDeltaPct == null
+                    ? null
+                    : { value: stats.leadsMonthDeltaPct, suffix: "%" }
+                }
+              />
+            </motion.div>
+            <motion.div
+              className={kpiCellClass}
+              variants={fadeUpVariants(reduce)}
+            >
+              <KpiCell
+                label="Pipeline abierto"
+                value={formatCurrency(stats.openPipelineValue)}
+                hint="Suma del valor estimado en etapas abiertas (sin cerrados ni descartados)."
+              />
+            </motion.div>
+            <motion.div
+              className={kpiCellClass}
+              variants={fadeUpVariants(reduce)}
+            >
+              <KpiCell
+                label="Cerrados ganados"
+                value={String(stats.wonLeads)}
+                hint="Clientes en etapa Cerrado Ganado."
+              />
+            </motion.div>
+            <motion.div
+              className={cn(kpiCellClass, "col-span-2 lg:col-span-1")}
+              variants={fadeUpVariants(reduce)}
+            >
+              <KpiCell
+                label="Tasa de cierre"
+                value={formatPct(stats.closeRate)}
+                hint="Ganados entre ganados + perdidos. La conversión sobre el total de leads es otra métrica."
+              />
+            </motion.div>
+          </motion.div>
         <dl className="mt-3 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-1.5">
           <div className="flex items-baseline gap-2">
             <dt className="text-sm text-[#616161] dark:text-[#b0b0b0]">
@@ -506,12 +610,14 @@ export function CompanyDashboard({
             </dd>
           </div>
         </dl>
-      </section>
+        </section>
+      </DashboardInView>
 
       <AttentionList stats={stats} />
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <section className={cn(panelClass, "lg:col-span-3")}>
+        <DashboardInView className="lg:col-span-3">
+        <section className={panelClass}>
           <SectionHead
             title="Pipeline comercial"
             href={`${Routes.panel}?tab=clientes`}
@@ -526,13 +632,17 @@ export function CompanyDashboard({
           ) : null}
           <PipelineBars bars={stats.pipelineBars} />
         </section>
-        <section className={cn(panelClass, "lg:col-span-2")}>
+        </DashboardInView>
+        <DashboardInView className="lg:col-span-2" delay={0.05}>
+        <section className={panelClass}>
           <SectionHead title="Altas por semana" />
           <WeeklyBars bars={stats.weeklyBars} />
         </section>
+        </DashboardInView>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <DashboardInView>
         <section className={panelClass}>
           <SectionHead
             title="Agenda de seguimientos"
@@ -610,7 +720,9 @@ export function CompanyDashboard({
             </ul>
           )}
         </section>
+        </DashboardInView>
 
+        <DashboardInView delay={0.05}>
         <section className={panelClass}>
           <SectionHead
             title="Clientes recientes"
@@ -662,9 +774,11 @@ export function CompanyDashboard({
             </ul>
           )}
         </section>
+        </DashboardInView>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <DashboardInView>
         <section className={panelClass}>
           <SectionHead title="Categorías" />
           <ShareBars
@@ -672,6 +786,8 @@ export function CompanyDashboard({
             emptyLabel="Sin categorías todavía."
           />
         </section>
+        </DashboardInView>
+        <DashboardInView delay={0.04}>
         <section className={panelClass}>
           <SectionHead title="Ciudades" />
           <ShareBars
@@ -679,6 +795,8 @@ export function CompanyDashboard({
             emptyLabel="Sin ciudades todavía."
           />
         </section>
+        </DashboardInView>
+        <DashboardInView delay={0.08}>
         <section className={panelClass}>
           <SectionHead title="Origen del lead" />
           <ShareBars
@@ -686,9 +804,11 @@ export function CompanyDashboard({
             emptyLabel="Sin fuentes todavía."
           />
         </section>
+        </DashboardInView>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <DashboardInView>
         <section className={panelClass}>
           <SectionHead
             title="Cotizaciones"
@@ -743,7 +863,9 @@ export function CompanyDashboard({
             </>
           )}
         </section>
+        </DashboardInView>
 
+        <DashboardInView delay={0.05}>
         <section className={panelClass}>
           <SectionHead
             title="Proyectos"
@@ -791,9 +913,11 @@ export function CompanyDashboard({
             </>
           )}
         </section>
+        </DashboardInView>
       </div>
 
       {isAdminCompany && team.length > 0 ? (
+        <DashboardInView>
         <section className={panelClass}>
           <SectionHead
             title="Equipo comercial"
@@ -839,8 +963,10 @@ export function CompanyDashboard({
             </table>
           </div>
         </section>
+        </DashboardInView>
       ) : null}
 
+      <DashboardInView>
       <section className={panelClass}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -866,7 +992,7 @@ export function CompanyDashboard({
           <div className="mt-3 h-2 rounded-full bg-[#f0f0f0] dark:bg-[#2a2a2a] overflow-hidden">
             <div
               className={cn(
-                "h-full rounded-full",
+                "h-full rounded-full dashboard-bar-grow",
                 remainingQuota < 5
                   ? "bg-red-500"
                   : remainingQuota < 20
@@ -880,7 +1006,9 @@ export function CompanyDashboard({
           </div>
         ) : null}
       </section>
+      </DashboardInView>
 
+      <DashboardInView>
       <section className="space-y-3">
         <ReferralLinkSection
           userId={userId}
@@ -899,6 +1027,7 @@ export function CompanyDashboard({
           </Link>
         </div>
       </section>
+      </DashboardInView>
 
       {hasAdminRole ? (
         <div className="pt-1 flex justify-center">

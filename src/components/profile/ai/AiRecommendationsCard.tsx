@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon, SparklesIcon } from "@hugeicons/core-free-icons";
@@ -28,6 +29,11 @@ import {
   type GenerateAiPlaybookResponse,
   type GenerateAiPlaybookVariables,
 } from "./queries";
+import {
+  aiFadeUpVariants,
+  aiMotionTransition,
+  aiStaggerContainer,
+} from "./motion";
 
 type AiRecommendationsCardProps = {
   companyId: string;
@@ -47,6 +53,8 @@ export function AiRecommendationsCard({
   const { remainingQuota, refetch: refetchCredits } =
     useRemainingCredits(companyId);
   const isManaged = billingMode === AI_BILLING_MODE.MANAGED;
+  const reduce = useReducedMotion();
+  const fadeUp = aiFadeUpVariants(reduce);
 
   const settingsQuery = useQuery<
     CompanyAiSettingsResponse,
@@ -176,9 +184,19 @@ export function AiRecommendationsCard({
           Completa el perfil de empresa para ver recomendaciones a tu medida.
         </p>
       ) : (
-        <ol className="space-y-3">
+        <motion.ol
+          className="space-y-3"
+          variants={aiStaggerContainer(reduce, 0.03)}
+          initial="hidden"
+          animate="show"
+        >
           {items.map((item, index) => (
-            <li key={`${item.title}-${index}`} className="flex gap-2.5">
+            <motion.li
+              key={`${item.title}-${index}`}
+              className="flex gap-2.5"
+              variants={fadeUp}
+              transition={aiMotionTransition(reduce)}
+            >
               <span
                 className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-white"
                 style={{
@@ -214,9 +232,9 @@ export function AiRecommendationsCard({
                   </Link>
                 ) : null}
               </span>
-            </li>
+            </motion.li>
           ))}
-        </ol>
+        </motion.ol>
       )}
 
       {isAiLive && !insight ? (

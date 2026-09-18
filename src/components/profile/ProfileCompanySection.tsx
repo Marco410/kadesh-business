@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { InformationCircleIcon, Edit01Icon } from "@hugeicons/core-free-icons";
@@ -28,6 +29,32 @@ const TEXTAREA_CLASS =
 const COMPANY_LOGO_PX = 500;
 const DEFAULT_PRIMARY = "#F7945E";
 const DEFAULT_SECONDARY = "#E07C3A";
+const MOTION_EASE: [number, number, number, number] = [0.2, 0, 0, 1];
+
+function motionTransition(reduce: boolean | null, delay = 0) {
+  if (reduce) return { duration: 0.12, delay: 0 };
+  return { duration: 0.28, ease: MOTION_EASE, delay };
+}
+
+function fadeUpVariants(reduce: boolean | null) {
+  if (reduce) return { hidden: { opacity: 0 }, show: { opacity: 1 } };
+  return {
+    hidden: { opacity: 0, y: 12 },
+    show: { opacity: 1, y: 0 },
+  };
+}
+
+function FieldGroup({ children }: { children: React.ReactNode }) {
+  const reduce = useReducedMotion();
+  return (
+    <motion.div
+      variants={fadeUpVariants(reduce)}
+      transition={motionTransition(reduce)}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 function normalizeHexColor(raw: string): string | null {
   const t = raw.trim().toUpperCase();
@@ -73,23 +100,34 @@ function SaveChangesButton({
   label = "Guardar cambios",
   savingLabel = "Guardando...",
 }: SaveChangesButtonProps) {
-  if (!isDirty) return null;
+  const reduce = useReducedMotion();
   return (
-    <button
-      type="button"
-      onClick={onSave}
-      disabled={saving}
-      className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto"
-    >
-      {saving ? (
-        <>
-          <span className="animate-spin size-4 border-2 border-white border-t-transparent rounded-full" />
-          {savingLabel}
-        </>
-      ) : (
-        label
-      )}
-    </button>
+    <AnimatePresence>
+      {isDirty ? (
+        <motion.button
+          type="button"
+          key="save-company"
+          onClick={onSave}
+          disabled={saving}
+          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+          transition={
+            reduce ? { duration: 0.12 } : { duration: 0.22, ease: MOTION_EASE }
+          }
+          className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto"
+        >
+          {saving ? (
+            <>
+              <span className="animate-spin size-4 border-2 border-white border-t-transparent rounded-full" />
+              {savingLabel}
+            </>
+          ) : (
+            label
+          )}
+        </motion.button>
+      ) : null}
+    </AnimatePresence>
   );
 }
 
@@ -290,19 +328,40 @@ export default function ProfileCompanySection({
 
   const companyLogoDisplayUrl =
     logoPreviewUrl ?? savedCompany?.logo?.url ?? null;
+  const reduce = useReducedMotion();
+  const cardTransition = motionTransition(reduce);
+  const formStagger = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: reduce ? 0 : 0.05,
+        delayChildren: reduce ? 0 : 0.06,
+      },
+    },
+  };
 
   if (loading && !data?.user) {
     return (
-      <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 sm:p-8 border border-[#e0e0e0] dark:border-[#3a3a3a] shadow-md dark:shadow-lg">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2 }}
+        className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 sm:p-8 border border-[#e0e0e0] dark:border-[#3a3a3a] shadow-md dark:shadow-lg"
+      >
         <div className="flex items-center justify-center py-12">
           <span className="animate-spin size-8 border-2 border-orange-500 border-t-transparent rounded-full" />
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 sm:p-8 border border-[#e0e0e0] dark:border-[#3a3a3a] shadow-md dark:shadow-lg">
+    <motion.div
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={cardTransition}
+      className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 sm:p-8 border border-[#e0e0e0] dark:border-[#3a3a3a] shadow-md dark:shadow-lg"
+    >
       <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
         <h2 className="text-2xl font-bold text-[#212121] dark:text-[#ffffff]">
           Información de la empresa
@@ -316,11 +375,16 @@ export default function ProfileCompanySection({
         />
       </div>
 
-      {companySaveError && (
-        <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm font-medium">
+      {companySaveError ? (
+        <motion.div
+          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={motionTransition(reduce)}
+          className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm font-medium"
+        >
           {companySaveError}
-        </div>
-      )}
+        </motion.div>
+      ) : null}
 
       {!savedCompany ? (
         <p className="text-[#616161] dark:text-[#b0b0b0] text-sm">
@@ -335,7 +399,13 @@ export default function ProfileCompanySection({
           .
         </p>
       ) : (
-        <div className="space-y-6">
+        <motion.div
+          className="space-y-6"
+          variants={formStagger}
+          initial="hidden"
+          animate="show"
+        >
+          <FieldGroup>
           <div className="flex flex-col sm:flex-row sm:items-start gap-4 pb-6 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
             <div className="flex flex-col items-start gap-1">
               <input
@@ -346,9 +416,12 @@ export default function ProfileCompanySection({
                 aria-label="Subir logo de la empresa"
                 onChange={handleCompanyLogoPick}
               />
-              <button
+              <motion.button
                 type="button"
                 onClick={() => companyLogoInputRef.current?.click()}
+                whileHover={reduce ? undefined : { scale: 1.02 }}
+                whileTap={reduce ? undefined : { scale: 0.98 }}
+                transition={{ duration: 0.12, ease: MOTION_EASE }}
                 className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-xl border-2 border-dashed border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#2a2a2a] flex items-center justify-center overflow-hidden group cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e]"
               >
                 {companyLogoDisplayUrl ? (
@@ -372,7 +445,7 @@ export default function ProfileCompanySection({
                     className="size-4 text-[#212121] dark:text-white"
                   />
                 </span>
-              </button>
+              </motion.button>
               {companyLogoError && (
                 <p className="text-sm text-red-600 dark:text-red-400 max-w-xs">
                   {companyLogoError}
@@ -384,7 +457,9 @@ export default function ProfileCompanySection({
               Se guarda al pulsar &quot;Guardar empresa&quot;. PNG o JPG recomendado.
             </p>
           </div>
+          </FieldGroup>
 
+          <FieldGroup>
           <div>
             <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
               Nombre de la empresa <span className="text-red-500">*</span>
@@ -401,13 +476,15 @@ export default function ProfileCompanySection({
               Nombre de la compañía u organización.
             </p>
           </div>
+          </FieldGroup>
 
+          <FieldGroup>
           <div>
             <h3 className="text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-3">
               Personalización y contacto (opcional)
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
+              <div className="h-full min-h-0">
                 <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
                   Color primario (hex)
                 </label>
@@ -430,7 +507,7 @@ export default function ProfileCompanySection({
                 </div>
               </div>
 
-              <div>
+              <div className="h-full min-h-0">
                 <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
                   Color secundario (hex)
                 </label>
@@ -453,7 +530,7 @@ export default function ProfileCompanySection({
                 </div>
               </div>
 
-              <div>
+              <div className="h-full min-h-0">
                 <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
                   Email de contacto
                 </label>
@@ -466,7 +543,7 @@ export default function ProfileCompanySection({
                 />
               </div>
 
-              <div>
+              <div className="h-full min-h-0">
                 <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
                   Teléfono de contacto
                 </label>
@@ -483,7 +560,9 @@ export default function ProfileCompanySection({
               Los colores se guardan como hexadecimal en formato #RRGGBB.
             </p>
           </div>
+          </FieldGroup>
 
+          <FieldGroup>
           <div>
             <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2 flex items-center gap-1.5">
               <HugeiconsIcon
@@ -500,7 +579,9 @@ export default function ProfileCompanySection({
               rows={3}
             />
           </div>
+          </FieldGroup>
 
+          <FieldGroup>
           <div>
             {/* Copy de IA: no hablar de “cada llamada”. Ver src/components/profile/ai/README.md */}
             <h3 className="text-lg font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">Información</h3>
@@ -531,7 +612,9 @@ export default function ProfileCompanySection({
               rows={3}
             />
           </div>
+          </FieldGroup>
 
+          <FieldGroup>
           <div>
             <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2 flex items-center gap-1.5">
               <HugeiconsIcon
@@ -548,7 +631,9 @@ export default function ProfileCompanySection({
               rows={3}
             />
           </div>
+          </FieldGroup>
 
+          <FieldGroup>
           <div>
             <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2 flex items-center gap-1.5">
               <HugeiconsIcon
@@ -565,7 +650,9 @@ export default function ProfileCompanySection({
               rows={3}
             />
           </div>
+          </FieldGroup>
 
+          <FieldGroup>
           <div>
             <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2 flex items-center gap-1.5">
               <HugeiconsIcon
@@ -582,7 +669,9 @@ export default function ProfileCompanySection({
               rows={3}
             />
           </div>
+          </FieldGroup>
 
+          <FieldGroup>
           <div className="flex justify-center sm:justify-end pt-2">
             <SaveChangesButton
               isDirty={isCompanyDirty}
@@ -592,8 +681,9 @@ export default function ProfileCompanySection({
               savingLabel="Guardando..."
             />
           </div>
-        </div>
+          </FieldGroup>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }
