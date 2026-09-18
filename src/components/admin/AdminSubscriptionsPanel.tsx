@@ -10,11 +10,14 @@ import {
 import { formatDateShort } from "kadesh/utils/format-date";
 import {
   ADMIN_SUBSCRIPTIONS_QUERY,
+  GRANT_ADMIN_CREDITS_MUTATION,
   UPDATE_ADMIN_SUBSCRIPTION_MUTATION,
   type AdminSubscriptionsResponse,
+  type GrantAdminCreditsResponse,
 } from "./queries";
 import { ADMIN_PAGE_SIZE, SUBSCRIPTION_STATUS_FILTERS } from "./constants";
 import type { AdminSubscriptionRow } from "./types";
+import { getCurrentCreditPeriodParts, getSubscriptionCredits } from "./credits";
 import { useDebouncedValue } from "./hooks/useDebouncedValue";
 import AdminSubscriptionEditor from "./AdminSubscriptionEditor";
 import {
@@ -25,6 +28,7 @@ import {
   AdminPagination,
   AdminSearchInput,
   AdminStatusBadge,
+  formatCredits,
   formatMoney,
   formatPersonName,
   formatPlanFrequency,
@@ -62,6 +66,7 @@ export default function AdminSubscriptionsPanel() {
     where,
     take: ADMIN_PAGE_SIZE,
     skip: (page - 1) * ADMIN_PAGE_SIZE,
+    ...getCurrentCreditPeriodParts(),
   };
 
   const { data, loading, error } = useQuery<AdminSubscriptionsResponse>(
@@ -72,25 +77,67 @@ export default function AdminSubscriptionsPanel() {
     },
   );
 
+  const refetchSubscriptions = {
+    query: ADMIN_SUBSCRIPTIONS_QUERY,
+    variables: queryVariables,
+  };
+
   const [updateSubscription] = useMutation(UPDATE_ADMIN_SUBSCRIPTION_MUTATION, {
-    refetchQueries: [
-      { query: ADMIN_SUBSCRIPTIONS_QUERY, variables: queryVariables },
-    ],
+    refetchQueries: [refetchSubscriptions],
   });
+
+  const [grantCredits] = useMutation<GrantAdminCreditsResponse>(
+    GRANT_ADMIN_CREDITS_MUTATION,
+    {
+      refetchQueries: [refetchSubscriptions],
+    },
+  );
 
   const subscriptions = data?.saasCompanySubscriptions ?? [];
   const totalCount = data?.saasCompanySubscriptionsCount ?? 0;
-  const selected =
-    subscriptions.find((s) => s.id === selectedId) ?? null;
+  const selected = subscriptions.find((s) => s.id === selectedId) ?? null;
 
   async function handleSave(args: {
     subscriptionId: string;
     planFeaturesPayload: Array<{ key: string; included: boolean }>;
     activatedAt?: string | null;
     currentPeriodEnd?: string | null;
+    creditsToAdd?: number;
   }) {
+    const companyId = selected?.company?.id;
+    const creditsToAdd = Math.floor(args.creditsToAdd ?? 0);
+    const willGrantCredits = creditsToAdd >= 1;
+
+    if (willGrantCredits && !companyId) {
+      sileo.error({
+        title: "No se pudieron agregar créditos",
+        description: "Esta suscripción no tiene empresa vinculada.",
+      });
+      return;
+    }
+
     setSavingId(args.subscriptionId);
     try {
+      if (willGrantCredits && companyId) {
+        const grantResult = await grantCredits({
+          variables: {
+            input: {
+              companyId,
+              subscriptionId: args.subscriptionId,
+              amount: creditsToAdd,
+            },
+          },
+        });
+        const grant = grantResult.data?.grantAdminCredits;
+        if (!grant?.success) {
+          sileo.error({
+            title: "No se pudieron agregar créditos",
+            description: grant?.message ?? "Intenta de nuevo.",
+          });
+          return;
+        }
+      }
+
       await updateSubscription({
         variables: {
           where: { id: args.subscriptionId },
@@ -103,11 +150,17 @@ export default function AdminSubscriptionsPanel() {
           },
         },
       });
-      sileo.success({ title: "Plan actualizado" });
+      sileo.success({
+        title: willGrantCredits
+          ? `Plan actualizado · +${formatCredits(creditsToAdd)} créditos`
+          : "Plan actualizado",
+      });
       setSelectedId(null);
     } catch (err) {
       sileo.error({
-        title: "No se pudo guardar el plan",
+        title: willGrantCredits
+          ? "No se pudieron guardar los cambios"
+          : "No se pudo guardar el plan",
         description: err instanceof Error ? err.message : "Intenta de nuevo.",
       });
     } finally {
@@ -166,11 +219,12 @@ export default function AdminSubscriptionsPanel() {
           </div>
 
           <div className={`${surfaceClass} hidden md:block overflow-x-auto`}>
-            <table className="min-w-[920px] w-full text-sm">
+            <table className="min-w-[1080px] w-full text-sm">
               <thead>
                 <tr className="text-left text-xs uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] border-b border-[#e8e8e8] dark:border-[#333]">
                   <th className="px-4 py-3">Empresa</th>
                   <th className="px-4 py-3">Plan</th>
+                  <th className="px-4 py-3">Créditos</th>
                   <th className="px-4 py-3">Estado</th>
                   <th className="px-4 py-3">Periodo</th>
                   <th className="px-4 py-3 text-right">Acción</th>
@@ -179,6 +233,7 @@ export default function AdminSubscriptionsPanel() {
               <tbody>
                 {subscriptions.map((sub) => {
                   const contact = sub.company?.users?.[0];
+                  const credits = getSubscriptionCredits(sub);
                   const statusLabel =
                     SUBSCRIPTION_STATUS_OPTIONS.find(
                       (o) => o.value === sub.status,
@@ -205,7 +260,18 @@ export default function AdminSubscriptionsPanel() {
                           {formatMoney(sub.planCost, sub.planCurrency)}{" "}
                           {formatPlanFrequency(sub.planFrequency)}
                           {sub.planLeadLimit != null
-                            ? ` · ${sub.planLeadLimit} leads`
+                            ? ` · ${formatCredits(sub.planLeadLimit)} del plan`
+                            : ""}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 align-top">
+                        <div className="font-semibold text-[#212121] dark:text-white">
+                          {formatCredits(credits.remaining)}
+                        </div>
+                        <div className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                          este mes
+                          {credits.bonus > 0
+                            ? ` · ${formatCredits(credits.bonus)} extra`
                             : ""}
                         </div>
                       </td>
@@ -258,6 +324,7 @@ function SubscriptionCard({
   onOpen: () => void;
 }) {
   const contact = subscription.company?.users?.[0];
+  const credits = getSubscriptionCredits(subscription);
   const statusLabel =
     SUBSCRIPTION_STATUS_OPTIONS.find((o) => o.value === subscription.status)
       ?.label ?? "Sin estado";
@@ -285,6 +352,10 @@ function SubscriptionCard({
         {subscription.planName ?? "Sin plan"} ·{" "}
         {formatMoney(subscription.planCost, subscription.planCurrency)}{" "}
         {formatPlanFrequency(subscription.planFrequency)}
+      </p>
+      <p className="text-sm text-[#212121] dark:text-white mt-1">
+        {formatCredits(credits.remaining)} créditos este mes
+        {credits.bonus > 0 ? ` · ${formatCredits(credits.bonus)} extra` : ""}
       </p>
       <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1">
         {formatDateShort(subscription.activatedAt, false)} →{" "}

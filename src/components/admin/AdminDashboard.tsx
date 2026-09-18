@@ -17,7 +17,9 @@ import {
 import AdminOverview from "./AdminOverview";
 import AdminUsersPanel from "./AdminUsersPanel";
 import AdminSubscriptionsPanel from "./AdminSubscriptionsPanel";
-import AdminPetPlacesPanel from "./AdminPetPlacesPanel";
+import AdminPetPlacesPanel, {
+  type PetPlacesVista,
+} from "./AdminPetPlacesPanel";
 
 function AdminFallback() {
   return (
@@ -37,7 +39,10 @@ function AdminDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tab = parseAdminTab(searchParams.get("tab"));
+  const vista: PetPlacesVista =
+    searchParams.get("vista") === "servicios" ? "servicios" : "fichas";
   const [reviewPlaceId, setReviewPlaceId] = useState<string | null>(null);
+  const [reviewServiceId, setReviewServiceId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user?.id) {
@@ -46,15 +51,34 @@ function AdminDashboardContent() {
   }, [loading, user, router]);
 
   const setTab = useCallback(
-    (next: AdminTab) => {
+    (next: AdminTab, nextVista?: "servicios") => {
       const params = new URLSearchParams(searchParams.toString());
       if (next === ADMIN_TABS.OVERVIEW) {
         params.delete("tab");
+        params.delete("vista");
       } else {
         params.set("tab", next);
+        if (next === ADMIN_TABS.PET_PLACES && nextVista === "servicios") {
+          params.set("vista", "servicios");
+        } else {
+          params.delete("vista");
+        }
       }
       const qs = params.toString();
       router.replace(qs ? `${Routes.panelAdmin}?${qs}` : Routes.panelAdmin, {
+        scroll: false,
+      });
+    },
+    [router, searchParams],
+  );
+
+  const setPetPlacesVista = useCallback(
+    (next: PetPlacesVista) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("tab", ADMIN_TABS.PET_PLACES);
+      if (next === "servicios") params.set("vista", "servicios");
+      else params.delete("vista");
+      router.replace(`${Routes.panelAdmin}?${params.toString()}`, {
         scroll: false,
       });
     },
@@ -69,8 +93,20 @@ function AdminDashboardContent() {
     [setTab],
   );
 
+  const openServiceReview = useCallback(
+    (serviceId: string) => {
+      setReviewServiceId(serviceId);
+      setTab(ADMIN_TABS.PET_PLACES, "servicios");
+    },
+    [setTab],
+  );
+
   const clearReviewPlace = useCallback(() => {
     setReviewPlaceId(null);
+  }, []);
+
+  const clearReviewService = useCallback(() => {
+    setReviewServiceId(null);
   }, []);
 
   if (loading) return <AdminFallback />;
@@ -127,14 +163,19 @@ function AdminDashboardContent() {
         <AdminOverview
           onOpenTab={setTab}
           onReviewPlace={openPlaceReview}
+          onReviewService={openServiceReview}
         />
       ) : null}
       {tab === ADMIN_TABS.USERS ? <AdminUsersPanel /> : null}
       {tab === ADMIN_TABS.SUBSCRIPTIONS ? <AdminSubscriptionsPanel /> : null}
       {tab === ADMIN_TABS.PET_PLACES ? (
         <AdminPetPlacesPanel
+          vista={vista}
+          onVistaChange={setPetPlacesVista}
           initialPlaceId={reviewPlaceId}
           onConsumedInitialPlace={clearReviewPlace}
+          initialServiceId={reviewServiceId}
+          onConsumedInitialService={clearReviewService}
         />
       ) : null}
     </div>

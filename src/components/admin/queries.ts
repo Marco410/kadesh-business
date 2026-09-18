@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import type {
   AdminOverviewData,
   AdminPetPlaceRow,
+  AdminPetPlaceServiceRow,
   AdminSubscriptionRow,
   AdminUserRow,
 } from "./types";
@@ -33,23 +34,56 @@ const PET_PLACE_FIELDS = gql`
   }
 `;
 
+const PET_PLACE_SERVICE_FIELDS = gql`
+  fragment AdminPetPlaceServiceFields on PetPlaceService {
+    id
+    name
+    description
+    status
+    active
+    createdAt
+    requestedBy {
+      id
+      name
+      lastName
+      email
+    }
+    requestedFor {
+      id
+      name
+      municipality
+      state
+    }
+  }
+`;
+
 export const ADMIN_OVERVIEW_QUERY = gql`
   ${PET_PLACE_FIELDS}
+  ${PET_PLACE_SERVICE_FIELDS}
   query AdminOverview(
     $activeWhere: SaasCompanySubscriptionWhereInput!
     $pendingWhere: PetPlaceWhereInput!
     $verifiedWhere: PetPlaceWhereInput!
+    $pendingServiceWhere: PetPlaceServiceWhereInput!
   ) {
     usersCount
     activeSubscriptions: saasCompanySubscriptionsCount(where: $activeWhere)
     pendingPlaces: petPlacesCount(where: $pendingWhere)
     verifiedPlaces: petPlacesCount(where: $verifiedWhere)
+    pendingServices: petPlaceServicesCount(where: $pendingServiceWhere)
     pendingPetPlaces: petPlaces(
       where: $pendingWhere
       orderBy: [{ claimedAt: desc }]
       take: 6
     ) {
       ...AdminPetPlaceFields
+    }
+    pendingPetPlaceServices: petPlaceServices(
+      where: $pendingServiceWhere
+      orderBy: [{ createdAt: desc }]
+      take: 6
+    ) {
+      ...AdminPetPlaceServiceFields
     }
   }
 `;
@@ -94,6 +128,8 @@ export const ADMIN_SUBSCRIPTIONS_QUERY = gql`
     $where: SaasCompanySubscriptionWhereInput!
     $take: Int
     $skip: Int!
+    $year: Int!
+    $month: Int!
   ) {
     saasCompanySubscriptions(
       where: $where
@@ -117,6 +153,16 @@ export const ADMIN_SUBSCRIPTIONS_QUERY = gql`
       company {
         id
         name
+        purchasedBonusCredits
+        creditPeriods(
+          where: { year: { equals: $year }, month: { equals: $month } }
+          take: 1
+        ) {
+          id
+          planAllowance
+          bonusAllowance
+          used
+        }
         users(take: 4, orderBy: [{ createdAt: asc }]) {
           id
           name
@@ -167,6 +213,28 @@ export type AdminPetPlacesResponse = {
   petPlacesCount: number;
 };
 
+export const GRANT_ADMIN_CREDITS_MUTATION = gql`
+  mutation GrantAdminCredits($input: GrantAdminCreditsInput!) {
+    grantAdminCredits(input: $input) {
+      success
+      message
+      creditsAdded
+      remainingQuota
+      extraCredits
+    }
+  }
+`;
+
+export type GrantAdminCreditsResponse = {
+  grantAdminCredits: {
+    success: boolean;
+    message: string;
+    creditsAdded: number | null;
+    remainingQuota: number | null;
+    extraCredits: number | null;
+  };
+};
+
 export const UPDATE_ADMIN_SUBSCRIPTION_MUTATION = gql`
   mutation UpdateAdminSubscription(
     $where: SaasCompanySubscriptionWhereUniqueInput!
@@ -202,3 +270,71 @@ export const UPDATE_PET_PLACE_MUTATION = gql`
     }
   }
 `;
+
+export const ADMIN_PET_PLACE_SERVICES_QUERY = gql`
+  ${PET_PLACE_SERVICE_FIELDS}
+  query AdminPetPlaceServices(
+    $where: PetPlaceServiceWhereInput!
+    $take: Int
+    $skip: Int!
+  ) {
+    petPlaceServices(
+      where: $where
+      orderBy: [{ createdAt: desc }]
+      take: $take
+      skip: $skip
+    ) {
+      ...AdminPetPlaceServiceFields
+    }
+    petPlaceServicesCount(where: $where)
+  }
+`;
+
+export const ADMIN_PET_PLACE_SERVICE_QUERY = gql`
+  ${PET_PLACE_SERVICE_FIELDS}
+  query AdminPetPlaceService($id: ID!) {
+    petPlaceService(where: { id: $id }) {
+      ...AdminPetPlaceServiceFields
+    }
+  }
+`;
+
+export type AdminPetPlaceServicesResponse = {
+  petPlaceServices: AdminPetPlaceServiceRow[];
+  petPlaceServicesCount: number;
+};
+
+export const UPDATE_PET_PLACE_SERVICE_MUTATION = gql`
+  mutation UpdateAdminPetPlaceService(
+    $where: PetPlaceServiceWhereUniqueInput!
+    $data: PetPlaceServiceUpdateInput!
+  ) {
+    updatePetPlaceService(where: $where, data: $data) {
+      id
+      status
+      active
+      requestedFor {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const ADMIN_PET_PLACE_SEARCH_QUERY = gql`
+  query AdminPetPlaceSearch($where: PetPlaceWhereInput!, $take: Int) {
+    petPlaces(where: $where, orderBy: [{ name: asc }], take: $take) {
+      id
+      name
+      municipality
+      state
+    }
+  }
+`;
+
+export type AdminPetPlaceSearchRow = {
+  id: string;
+  name: string | null;
+  municipality: string | null;
+  state: string | null;
+};

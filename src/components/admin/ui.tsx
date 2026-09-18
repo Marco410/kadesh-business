@@ -229,6 +229,11 @@ export function formatMoney(amount: number | null, currency: string | null) {
   }
 }
 
+export function formatCredits(value: number | null | undefined) {
+  if (value == null) return "—";
+  return new Intl.NumberFormat("es-MX").format(value);
+}
+
 export function formatPlanFrequency(frequency: string | null | undefined) {
   const f = frequency?.toLowerCase();
   if (f === "monthly") return "al mes";

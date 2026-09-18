@@ -12,6 +12,12 @@ import {
 import { formatDateShort } from "kadesh/utils/format-date";
 import type { AdminSubscriptionRow } from "./types";
 import {
+  ADMIN_CREDIT_GRANT_MAX,
+  ADMIN_CREDIT_GRANT_PRESETS,
+} from "./constants";
+import { getSubscriptionCredits } from "./credits";
+import {
+  formatCredits,
   formatMoney,
   formatPersonName,
   formatPlanFrequency,
@@ -62,11 +68,13 @@ export default function AdminSubscriptionEditor({
     planFeaturesPayload: Array<{ key: string; included: boolean }>;
     activatedAt?: string | null;
     currentPeriodEnd?: string | null;
+    creditsToAdd?: number;
   }) => Promise<void>;
 }) {
   const [draft, setDraft] = useState<Record<string, boolean>>({});
   const [activatedAtLocal, setActivatedAtLocal] = useState("");
   const [currentPeriodEndLocal, setCurrentPeriodEndLocal] = useState("");
+  const [creditsToAdd, setCreditsToAdd] = useState("");
   const [hydratedId, setHydratedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -84,10 +92,22 @@ export default function AdminSubscriptionEditor({
     setDraft(next);
     setActivatedAtLocal(toCalendarDay(subscription.activatedAt));
     setCurrentPeriodEndLocal(toCalendarDay(subscription.currentPeriodEnd));
+    setCreditsToAdd("");
     setHydratedId(subscription.id);
   }, [hydratedId, isOpen, subscription]);
 
   const contact = subscription?.company?.users?.[0];
+  const credits = getSubscriptionCredits(subscription);
+  const parsedCreditsToAdd = Math.floor(Number(creditsToAdd));
+  const hasCreditsToAdd =
+    Number.isFinite(parsedCreditsToAdd) && parsedCreditsToAdd >= 1;
+  const creditsToAddError =
+    creditsToAdd.trim() !== "" &&
+    (!Number.isFinite(parsedCreditsToAdd) ||
+      parsedCreditsToAdd < 1 ||
+      parsedCreditsToAdd > ADMIN_CREDIT_GRANT_MAX)
+      ? `Indica entre 1 y ${formatCredits(ADMIN_CREDIT_GRANT_MAX)} créditos.`
+      : null;
   const statusLabel =
     SUBSCRIPTION_STATUS_OPTIONS.find((o) => o.value === subscription?.status)
       ?.label ?? "Sin estado";
@@ -157,14 +177,16 @@ export default function AdminSubscriptionEditor({
                     </p>
                     <span
                       className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-                        SUBSCRIPTION_STATUS_CLASSES[subscription.status ?? ""] ??
-                        "bg-[#e0e0e0] dark:bg-[#3a3a3a] text-[#616161]"
+                        SUBSCRIPTION_STATUS_CLASSES[
+                          subscription.status ?? ""
+                        ] ?? "bg-[#e0e0e0] dark:bg-[#3a3a3a] text-[#616161]"
                       }`}
                     >
                       {statusLabel}
                     </span>
                     <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-2">
-                      Límite: {subscription.planLeadLimit ?? "—"} leads
+                      Del plan: {formatCredits(subscription.planLeadLimit)}{" "}
+                      / mes
                     </p>
                   </div>
                   <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
@@ -175,6 +197,85 @@ export default function AdminSubscriptionEditor({
                       {formatDateShort(subscription.activatedAt, false)} →{" "}
                       {formatDateShort(subscription.currentPeriodEnd, false)}
                     </p>
+                  </div>
+                </section>
+
+                <section>
+                  <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+                    Créditos de este mes
+                  </h4>
+                  <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+                    Los extra se suman ahora y se mantienen cada mes, igual
+                    que una recarga.
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                    <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
+                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                        Disponibles
+                      </p>
+                      <p className="mt-1 text-lg font-semibold text-[#212121] dark:text-white">
+                        {formatCredits(credits.remaining)}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
+                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                        Del plan
+                      </p>
+                      <p className="mt-1 text-lg font-semibold text-[#212121] dark:text-white">
+                        {formatCredits(credits.plan)}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
+                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                        Extra
+                      </p>
+                      <p className="mt-1 text-lg font-semibold text-[#212121] dark:text-white">
+                        {formatCredits(credits.bonus)}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
+                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                        Usados
+                      </p>
+                      <p className="mt-1 text-lg font-semibold text-[#212121] dark:text-white">
+                        {formatCredits(credits.used)}
+                      </p>
+                    </div>
+                  </div>
+                  <label className="block">
+                    <span className="block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1">
+                      Agregar créditos extra
+                    </span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={ADMIN_CREDIT_GRANT_MAX}
+                      step={1}
+                      inputMode="numeric"
+                      value={creditsToAdd}
+                      onChange={(e) => setCreditsToAdd(e.target.value)}
+                      disabled={saving}
+                      placeholder="Ej. 250"
+                      className="h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm"
+                    />
+                  </label>
+                  {creditsToAddError ? (
+                    <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+                      {creditsToAddError}
+                    </p>
+                  ) : null}
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {ADMIN_CREDIT_GRANT_PRESETS.map((amount) => (
+                      <button
+                        key={amount}
+                        type="button"
+                        disabled={saving}
+                        onClick={() => setCreditsToAdd(String(amount))}
+                        className="h-11 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-4 text-sm font-semibold hover:border-orange-300 cursor-pointer disabled:opacity-60"
+                      >
+                        +{formatCredits(amount)}
+                      </button>
+                    ))}
                   </div>
                 </section>
 
@@ -220,7 +321,8 @@ export default function AdminSubscriptionEditor({
                     Qué incluye este plan
                   </h4>
                   <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
-                    Activa o quita módulos. El cambio aplica al instante para esa empresa.
+                    Activa o quita módulos. El cambio aplica al instante para
+                    esa empresa.
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {FEATURE_KEYS.map((key) => {
@@ -269,7 +371,7 @@ export default function AdminSubscriptionEditor({
                   </button>
                   <button
                     type="button"
-                    disabled={saving}
+                    disabled={saving || Boolean(creditsToAddError)}
                     onClick={async () => {
                       await onSave({
                         subscriptionId: subscription.id,
@@ -281,6 +383,9 @@ export default function AdminSubscriptionEditor({
                         currentPeriodEnd: calendarDayOrNull(
                           currentPeriodEndLocal,
                         ),
+                        creditsToAdd: hasCreditsToAdd
+                          ? parsedCreditsToAdd
+                          : undefined,
                       });
                     }}
                     className="h-11 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer"

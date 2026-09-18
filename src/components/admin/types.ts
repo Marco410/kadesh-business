@@ -29,6 +29,13 @@ export type AdminSubscriptionRow = {
   company: {
     id: string;
     name: string | null;
+    purchasedBonusCredits: number | null;
+    creditPeriods: Array<{
+      id: string;
+      planAllowance: number | null;
+      bonusAllowance: number | null;
+      used: number | null;
+    }>;
     users: Array<{
       id: string;
       name: string | null;
@@ -63,10 +70,33 @@ export type AdminPetPlaceRow = {
   } | null;
 };
 
+export type AdminPetPlaceServiceRow = {
+  id: string;
+  name: string | null;
+  description: string | null;
+  status: string | null;
+  active: boolean | null;
+  createdAt: string | null;
+  requestedBy: {
+    id: string;
+    name: string | null;
+    lastName: string | null;
+    email: string | null;
+  } | null;
+  requestedFor: {
+    id: string;
+    name: string | null;
+    municipality: string | null;
+    state: string | null;
+  } | null;
+};
+
 export type AdminOverviewData = {
   usersCount: number;
   activeSubscriptions: number;
   pendingPlaces: number;
   verifiedPlaces: number;
+  pendingServices: number;
   pendingPetPlaces: AdminPetPlaceRow[];
+  pendingPetPlaceServices: AdminPetPlaceServiceRow[];
 };

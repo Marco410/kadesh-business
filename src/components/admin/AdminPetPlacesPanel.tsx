@@ -17,11 +17,13 @@ import {
   PET_PLACE_CLAIM_STATUS_CLASSES,
   PET_PLACE_CLAIM_STATUS_LABELS,
   PET_PLACE_CLAIM_STATUS_OPTIONS,
+  PET_PLACE_SERVICE_STATUS,
   type PetPlaceClaimStatus,
 } from "./constants";
 import type { AdminPetPlaceRow } from "./types";
 import { useDebouncedValue } from "./hooks/useDebouncedValue";
 import AdminPetPlaceReviewModal from "./AdminPetPlaceReviewModal";
+import AdminPetPlaceServicesPanel from "./AdminPetPlaceServicesPanel";
 import {
   AdminEmptyState,
   AdminErrorState,
@@ -34,13 +36,24 @@ import {
   surfaceClass,
 } from "./ui";
 import { SUBSCRIPTION_STATUS } from "kadesh/constants/constans";
+import { cn } from "kadesh/utils/cn";
+
+export type PetPlacesVista = "fichas" | "servicios";
 
 export default function AdminPetPlacesPanel({
   initialPlaceId,
   onConsumedInitialPlace,
+  vista = "fichas",
+  onVistaChange,
+  initialServiceId,
+  onConsumedInitialService,
 }: {
   initialPlaceId?: string | null;
   onConsumedInitialPlace?: () => void;
+  vista?: PetPlacesVista;
+  onVistaChange?: (vista: PetPlacesVista) => void;
+  initialServiceId?: string | null;
+  onConsumedInitialService?: () => void;
 }) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<PetPlaceClaimStatus | "all">("all");
@@ -80,6 +93,7 @@ export default function AdminPetPlacesPanel({
     {
       variables: queryVariables,
       fetchPolicy: "network-only",
+      skip: vista === "servicios",
     },
   );
 
@@ -87,6 +101,9 @@ export default function AdminPetPlacesPanel({
     activeWhere: { status: { equals: SUBSCRIPTION_STATUS.ACTIVE } },
     pendingWhere: { claimStatus: { equals: PET_PLACE_CLAIM_STATUS.PENDING } },
     verifiedWhere: { verified: { equals: true } },
+    pendingServiceWhere: {
+      status: { equals: PET_PLACE_SERVICE_STATUS.PENDING },
+    },
   };
 
   const [verifyPetPlace] = useMutation(VERIFY_PET_PLACE_MUTATION, {
@@ -178,6 +195,39 @@ export default function AdminPetPlacesPanel({
   }
 
   return (
+    <div className="flex flex-col gap-4">
+      <div className="flex gap-2">
+        {(
+          [
+            { id: "fichas" as const, label: "Fichas" },
+            { id: "servicios" as const, label: "Servicios" },
+          ] as const
+        ).map((item) => {
+          const selected = item.id === vista;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => onVistaChange?.(item.id)}
+              className={cn(
+                "h-11 rounded-xl px-4 text-sm font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400",
+                selected
+                  ? "bg-orange-500 text-white"
+                  : "border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] text-[#424242] dark:text-[#e0e0e0]",
+              )}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {vista === "servicios" ? (
+        <AdminPetPlaceServicesPanel
+          initialServiceId={initialServiceId}
+          onConsumedInitialService={onConsumedInitialService}
+        />
+      ) : (
     <div className="flex flex-col gap-4">
       <AdminPetPlaceReviewModal
         isOpen={Boolean(selectedId)}
@@ -339,6 +389,8 @@ export default function AdminPetPlacesPanel({
             onPageChange={setPage}
           />
         </>
+      )}
+    </div>
       )}
     </div>
   );

@@ -103,6 +103,43 @@ export const PET_PLACE_CLAIM_ROLE_LABELS: Record<string, string> = {
   vet: "Veterinario",
 };
 
+export const PET_PLACE_SERVICE_STATUS = {
+  PENDING: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+} as const;
+
+export type PetPlaceServiceStatus =
+  (typeof PET_PLACE_SERVICE_STATUS)[keyof typeof PET_PLACE_SERVICE_STATUS];
+
+export const PET_PLACE_SERVICE_STATUS_OPTIONS: Array<{
+  value: PetPlaceServiceStatus | "all";
+  label: string;
+}> = [
+  { value: PET_PLACE_SERVICE_STATUS.PENDING, label: "Pendientes" },
+  { value: PET_PLACE_SERVICE_STATUS.APPROVED, label: "Aprobados" },
+  { value: PET_PLACE_SERVICE_STATUS.REJECTED, label: "Rechazados" },
+  { value: "all", label: "Todos" },
+];
+
+export const PET_PLACE_SERVICE_STATUS_LABELS: Record<string, string> = {
+  [PET_PLACE_SERVICE_STATUS.PENDING]: "Pendiente",
+  [PET_PLACE_SERVICE_STATUS.APPROVED]: "Aprobado",
+  [PET_PLACE_SERVICE_STATUS.REJECTED]: "Rechazado",
+};
+
+export const PET_PLACE_SERVICE_STATUS_CLASSES: Record<string, string> = {
+  [PET_PLACE_SERVICE_STATUS.PENDING]:
+    "bg-amber-500/15 text-amber-800 dark:text-amber-300 dark:bg-amber-500/20",
+  [PET_PLACE_SERVICE_STATUS.APPROVED]:
+    "bg-green-500/15 text-green-700 dark:text-green-400 dark:bg-green-500/20",
+  [PET_PLACE_SERVICE_STATUS.REJECTED]:
+    "bg-red-500/15 text-red-700 dark:text-red-400 dark:bg-red-500/20",
+};
+
+export const ADMIN_CREDIT_GRANT_PRESETS = [250, 1000, 3000] as const;
+export const ADMIN_CREDIT_GRANT_MAX = 50_000;
+
 export const SUBSCRIPTION_STATUS_FILTERS = [
   { value: "all", label: "Todas" },
   { value: "active", label: "Activas" },

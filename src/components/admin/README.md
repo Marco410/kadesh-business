@@ -4,7 +4,7 @@ Pantalla interna en `/panel/clientes/admin`. No es el panel de un cliente: es de
 
 ## Promesa
 
-Ver y ajustar **usuarios**, **planes** y **fichas de veterinarias** en un solo lugar. El default es Inicio, con recuentos y reclamos pendientes. Las otras vistas viven en `?tab=usuarios`, `?tab=suscripciones` y `?tab=veterinarias`.
+Ver y ajustar **usuarios**, **planes** y **fichas de veterinarias** (reclamos y servicios pedidos) en un solo lugar. El default es Inicio, con recuentos, reclamos y servicios pendientes. Las otras vistas viven en `?tab=usuarios`, `?tab=suscripciones` y `?tab=veterinarias`.
 
 ## Acceso
 
@@ -14,14 +14,22 @@ El enlace **Operaciones** aparece en el menú del avatar y, de forma discreta, a
 
 ## Copy
 
-Decimos **Operaciones**, **planes**, **fichas**, **verificar**. Nunca GraphQL, Keystone, Stripe IDs ni `planFeatures` en la UI.
+Decimos **Operaciones**, **planes**, **fichas**, **servicios**, **verificar**. Nunca GraphQL, Keystone, Stripe IDs ni `planFeatures` en la UI.
 
-En veterinarias:
+## Veterinarias
+
+Dos vistas dentro de `?tab=veterinarias`: **Fichas** (default) y **Servicios** (`&vista=servicios`).
+
+En fichas:
 
 - **Verificar** aprueba el reclamo: el dueño ya puede editar la ficha pública.
 - **Rechazar** suelta al solicitante y la ficha vuelve a poder reclamarse.
 - **Quitar verificación** deja al dueño vinculado pero sin poder editar hasta una nueva aprobación.
 
+En servicios: un dueño pidió algo que no estaba en el catálogo. Default **Pendientes**. Al **Aprobar y asignar**, el servicio entra al catálogo **y** se marca en la clínica elegida (prellenada con la que lo pidió; se puede cambiar). **Rechazar** no lo publica.
+
 ## Planes
 
 La lista son suscripciones de empresa, no “usuarios admin empresa”. Se ajustan fechas del periodo y módulos del plan. El modal de features debe seguir los nombres de `PLAN_FEATURES_MAP`.
+
+En la lista se ve el saldo **de este mes** (disponibles / extra). En **Ajustar plan** se pueden **agregar créditos extra**: se suman ahora y se mantienen cada mes, igual que una recarga. No decimos “bonus”, “ledger” ni “periodo Keystone”. Los montos rápidos (250 / 1 000 / 3 000) coinciden con los paquetes de recarga del panel del cliente.
