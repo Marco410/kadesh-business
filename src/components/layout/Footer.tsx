@@ -9,6 +9,7 @@ const FOOTER_LINKS = {
     { label: "Kadesh AI", href: "/#kadesh-ai" },
     { label: "Conócenos", href: Routes.conocenos },
     { label: "Planes y precios", href: Routes.precios },
+    { label: "Blog", href: Routes.blog.index },
     { label: "Novedades", href: Routes.novedades },
     { label: "Contacto", href: "/contacto" },
     { label: "Iniciar sesión", href: Routes.auth.login },

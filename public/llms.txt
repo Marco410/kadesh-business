@@ -7,6 +7,7 @@
 - [Inicio](https://kadesh.com.mx/): qué es Kadesh, cómo extraer leads de Google Maps y comparativa de costo por lead
 - [Precios](https://kadesh.com.mx/precios): planes Starter 399 MXN, Pro 799 MXN y Agencia 1,999 MXN
 - [Conócenos](https://kadesh.com.mx/conocenos): quién está detrás de Kadesh
+- [Blog](https://kadesh.com.mx/blog): guías de prospección B2B, generación de leads, CRM y ventas en México
 - [Novedades](https://kadesh.com.mx/novedades): changelog del producto
 - [Contacto](https://kadesh.com.mx/contacto): formulario y correo contacto@kadesh.com.mx
 - [Crear cuenta](https://kadesh.com.mx/auth/register): prueba de 7 días con 50 leads

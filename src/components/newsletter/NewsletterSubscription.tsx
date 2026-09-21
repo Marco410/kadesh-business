@@ -20,7 +20,7 @@ interface NewsletterSubscriptionProps {
 export default function NewsletterSubscription({ 
   className = '',
   title = 'Suscríbete a nuestro blog',
-  description = 'Recibe las últimas historias, consejos y noticias sobre bienestar animal directamente en tu correo.',
+  description = 'Recibe guías y consejos de prospección B2B, leads y ventas directamente en tu correo.',
   showTitle = true,
 }: NewsletterSubscriptionProps) {
   const { user } = useUser();
@@ -40,7 +40,11 @@ export default function NewsletterSubscription({
     },
     onError: (error) => {
       console.error('Error al suscribirse:', error);
-      setError('Hubo un error al procesar tu suscripción. Por favor, intenta de nuevo.');
+      setError(
+        error.message.includes('ya está suscrito')
+          ? 'Este correo ya está suscrito a nuestro blog.'
+          : 'Hubo un error al procesar tu suscripción. Por favor, intenta de nuevo.',
+      );
     },
   });
 
@@ -68,6 +72,7 @@ export default function NewsletterSubscription({
         variables: {
           data: {
             email: email.trim(),
+            product: 'saas',
             active: true,
             ...(user?.id && {
               user: {
