@@ -249,6 +249,13 @@ export default function Navigation() {
           </Link>
 
           <Link
+            href={Routes.blog.index}
+            className={`font-semibold text-sm ${navLinkClass}`}
+          >
+            Blog
+          </Link>
+
+          <Link
             href={Routes.contact}
             className={`font-semibold text-sm ${navLinkClass}`}
           >
@@ -565,6 +572,14 @@ export default function Navigation() {
                     className="text-white font-semibold text-lg no-underline opacity-92 hover:opacity-100 py-4 px-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all"
                   >
                     Precios
+                  </Link>
+
+                  <Link
+                    href={Routes.blog.index}
+                    onClick={() => setOpened(false)}
+                    className="text-white font-semibold text-lg no-underline opacity-92 hover:opacity-100 py-4 px-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all"
+                  >
+                    Blog
                   </Link>
 
                   <Link
