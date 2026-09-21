@@ -188,6 +188,7 @@ export default function AdminSubscriptionsPanel() {
           placeholder="Buscar por empresa o nombre de plan"
         />
         <AdminFilterChips
+          label="Estado"
           options={[...SUBSCRIPTION_STATUS_FILTERS]}
           value={status}
           onChange={(value) => {

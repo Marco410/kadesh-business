@@ -83,6 +83,7 @@ export default function AdminUsersPanel() {
           placeholder="Buscar por nombre o correo"
         />
         <AdminFilterChips
+          label="Rol"
           options={ROLE_FILTERS}
           value={role}
           onChange={(value) => {

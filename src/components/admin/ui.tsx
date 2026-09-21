@@ -59,35 +59,127 @@ export function AdminSearchInput({
   );
 }
 
+/** Navegación principal de la pantalla: barra con subrayado, no compite con los filtros. */
+export function AdminTabBar<T extends string>({
+  items,
+  value,
+  onChange,
+  ariaLabel,
+}: {
+  items: Array<{ id: T; label: string }>;
+  value: T;
+  onChange: (value: T) => void;
+  ariaLabel: string;
+}) {
+  return (
+    <nav
+      aria-label={ariaLabel}
+      className="flex gap-1 overflow-x-auto border-b border-[#e0e0e0] dark:border-[#3a3a3a] -mx-4 px-4 sm:mx-0 sm:px-0"
+    >
+      {items.map((item) => {
+        const selected = item.id === value;
+        return (
+          <button
+            key={item.id}
+            type="button"
+            aria-current={selected ? "page" : undefined}
+            onClick={() => onChange(item.id)}
+            className={cn(
+              "relative -mb-px h-12 shrink-0 border-b-2 px-4 text-base font-semibold transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-400",
+              selected
+                ? "border-orange-500 text-[#212121] dark:text-white"
+                : "border-transparent text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-white hover:border-[#d0d0d0] dark:hover:border-[#555]",
+            )}
+          >
+            {item.label}
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+/** Cambio de vista dentro de una sección (p. ej. Fichas / Servicios). */
+export function AdminSegmented<T extends string>({
+  items,
+  value,
+  onChange,
+  ariaLabel,
+}: {
+  items: Array<{ id: T; label: string }>;
+  value: T;
+  onChange: (value: T) => void;
+  ariaLabel: string;
+}) {
+  return (
+    <div
+      role="group"
+      aria-label={ariaLabel}
+      className="inline-flex self-start rounded-xl bg-black/5 dark:bg-white/10 p-1"
+    >
+      {items.map((item) => {
+        const selected = item.id === value;
+        return (
+          <button
+            key={item.id}
+            type="button"
+            aria-pressed={selected}
+            onClick={() => onChange(item.id)}
+            className={cn(
+              "h-10 rounded-lg px-4 text-sm font-semibold transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400",
+              selected
+                ? "bg-white dark:bg-[#3a3a3a] text-[#212121] dark:text-white shadow-sm"
+                : "text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-white",
+            )}
+          >
+            {item.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Filtro de una tabla: chips pequeños y tintados, con etiqueta de qué filtran. */
 export function AdminFilterChips<T extends string>({
   options,
   value,
   onChange,
+  label,
 }: {
   options: Array<{ value: T; label: string }>;
   value: T;
   onChange: (value: T) => void;
+  label?: string;
 }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-      {options.map((option) => {
-        const selected = option.value === value;
-        return (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => onChange(option.value)}
-            className={cn(
-              "h-11 shrink-0 rounded-full px-4 text-sm font-semibold transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400",
-              selected
-                ? "bg-orange-500 text-white"
-                : "border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] text-[#424242] dark:text-[#e0e0e0] hover:border-orange-300 dark:hover:border-orange-500",
-            )}
-          >
-            {option.label}
-          </button>
-        );
-      })}
+    <div className="flex items-center gap-3">
+      {label ? (
+        <span className="shrink-0 text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+          {label}
+        </span>
+      ) : null}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 -mb-1 px-1 -mx-1">
+        {options.map((option) => {
+          const selected = option.value === value;
+          return (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => onChange(option.value)}
+              className={cn(
+                "h-11 sm:h-9 shrink-0 rounded-lg border px-3 text-[13px] font-medium transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400",
+                selected
+                  ? "border-orange-500 bg-orange-500/10 text-orange-700 dark:text-orange-300"
+                  : "border-transparent bg-black/5 dark:bg-white/5 text-[#616161] dark:text-[#b0b0b0] hover:bg-black/10 dark:hover:bg-white/10",
+              )}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
