@@ -501,6 +501,8 @@ export const CREATE_BLOG_SUBSCRIPTION_MUTATION = gql`
 export interface CreateBlogSubscriptionVariables {
   data: {
     email: string;
+    /** Blog al que se suscribe: el backend es compartido con Kadesh Pet. */
+    product: 'pet' | 'saas';
     active?: boolean;
     user?: {
       connect?: {

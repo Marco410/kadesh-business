@@ -57,4 +57,12 @@ export const Routes = {
   conocenos: "/conocenos",
   precios: "/precios",
   novedades: "/novedades",
+
+  // Blog
+  blog: {
+    index: "/blog",
+    post: (url: string): string => `/blog/${url}`,
+    /** Portada estable para compartir (la del CMS es una URL firmada que caduca). */
+    postImage: (url: string): string => `/blog/${url}/og`,
+  },
 } as const;
