@@ -16,6 +16,17 @@ El enlace **Operaciones** aparece en el menú del avatar y, de forma discreta, a
 
 Decimos **Operaciones**, **planes**, **fichas**, **servicios**, **verificar**. Nunca GraphQL, Keystone, Stripe IDs ni `planFeatures` en la UI.
 
+## Usuarios
+
+Al hacer clic en un usuario (fila en escritorio, tarjeta en móvil) se abre su detalle. Ahí se ve empresa, alta y último acceso, y se puede editar nombre, apellidos, teléfono, correo, cuenta verificada y **roles**. Se guarda con **Guardar usuario**.
+
+Debajo va la **suscripción al blog**, con una tarjeta por blog (Pet y SaaS) que se guarda por separado, para no mezclar errores de un bloque con el otro:
+
+- Sin suscripción: **Suscribir** la crea con el correo del usuario (editable).
+- Con suscripción: se cambia el correo o se pausa/reactiva. Pausada = no recibe avisos de nuevos artículos. No se borra desde aquí.
+- Si alguien se suscribió con ese correo antes de tener cuenta, aparece igual y al guardar se liga a la cuenta.
+- Un mismo correo no puede repetirse en el mismo blog; el aviso de error viene del backend.
+
 ## Veterinarias
 
 Dos vistas dentro de `?tab=veterinarias`: **Fichas** (default) y **Servicios** (`&vista=servicios`).

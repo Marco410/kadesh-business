@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { Role } from "kadesh/constants/constans";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { ADMIN_USERS_QUERY, type AdminUsersResponse } from "./queries";
 import { ADMIN_PAGE_SIZE, ROLE_LABELS } from "./constants";
 import { useDebouncedValue } from "./hooks/useDebouncedValue";
+import AdminUserEditor from "./AdminUserEditor";
 import {
   AdminEmptyState,
   AdminErrorState,
@@ -32,6 +33,8 @@ export default function AdminUsersPanel() {
   const [search, setSearch] = useState("");
   const [role, setRole] = useState("all");
   const [page, setPage] = useState(1);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const closeEditor = useCallback(() => setSelectedId(null), []);
   const debouncedSearch = useDebouncedValue(search);
 
   const where = useMemo(() => {
@@ -69,6 +72,7 @@ export default function AdminUsersPanel() {
 
   return (
     <div className="flex flex-col gap-4">
+      <AdminUserEditor userId={selectedId} onClose={closeEditor} />
       <div className="flex flex-col gap-3">
         <AdminSearchInput
           value={search}
@@ -101,7 +105,12 @@ export default function AdminUsersPanel() {
         <>
           <div className="flex flex-col gap-3 md:hidden">
             {users.map((user) => (
-              <article key={user.id} className={`${surfaceClass} p-4`}>
+              <article key={user.id} className={surfaceClass}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedId(user.id)}
+                  className="w-full p-4 text-left cursor-pointer rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                >
                 <p className="font-semibold text-[#212121] dark:text-white">
                   {formatPersonName(user.name, user.lastName, user.secondLastName)}
                 </p>
@@ -126,6 +135,7 @@ export default function AdminUsersPanel() {
                     ? ` · Último acceso ${formatDateShort(user.lastLoginAt, false)}`
                     : ""}
                 </p>
+                </button>
               </article>
             ))}
           </div>
@@ -145,16 +155,24 @@ export default function AdminUsersPanel() {
                 {users.map((user) => (
                   <tr
                     key={user.id}
-                    className="border-b border-[#f0f0f0] dark:border-[#2a2a2a] last:border-0"
+                    onClick={() => setSelectedId(user.id)}
+                    className="border-b border-[#f0f0f0] dark:border-[#2a2a2a] last:border-0 cursor-pointer hover:bg-black/[0.03] dark:hover:bg-white/5"
                   >
                     <td className="px-4 py-3 align-top">
-                      <div className="font-semibold text-[#212121] dark:text-white">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedId(user.id);
+                        }}
+                        className="text-left font-semibold text-[#212121] dark:text-white hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 rounded"
+                      >
                         {formatPersonName(
                           user.name,
                           user.lastName,
                           user.secondLastName,
                         )}
-                      </div>
+                      </button>
                       <div className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
                         {user.email ?? "—"}
                       </div>
