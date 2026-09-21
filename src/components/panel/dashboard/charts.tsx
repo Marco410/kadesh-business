@@ -3,6 +3,7 @@
 import { cn } from "kadesh/utils/cn";
 import { PIPELINE_BAR_COLORS } from "./constants";
 import type { NamedCount, PipelineBar, WeeklyBar } from "./aggregate";
+import { barGrowDelay } from "./motion";
 
 export function PipelineBars({ bars }: { bars: PipelineBar[] }) {
   const max = Math.max(...bars.map((bar) => bar.count), 1);
@@ -19,7 +20,7 @@ export function PipelineBars({ bars }: { bars: PipelineBar[] }) {
 
   return (
     <ul className="space-y-2" aria-label="Clientes por etapa del pipeline">
-      {bars.map((bar) => {
+      {bars.map((bar, index) => {
         const width = Math.max((bar.count / max) * 100, 2);
         const color = PIPELINE_BAR_COLORS[bar.status] ?? "#737373";
         const share = total > 0 ? Math.round((bar.count / total) * 100) : 0;
@@ -34,7 +35,11 @@ export function PipelineBars({ bars }: { bars: PipelineBar[] }) {
             <div className="h-3 rounded-full bg-[#f0f0f0] dark:bg-[#2a2a2a] overflow-hidden">
               <div
                 className="h-full rounded-full dashboard-bar-grow"
-                style={{ width: `${width}%`, backgroundColor: color }}
+                style={{
+                  width: `${width}%`,
+                  backgroundColor: color,
+                  animationDelay: barGrowDelay(index, false),
+                }}
               />
             </div>
             <span className="text-right text-sm tabular-nums text-[#616161] dark:text-[#b0b0b0]">
@@ -54,11 +59,11 @@ export function WeeklyBars({ bars }: { bars: WeeklyBar[] }) {
 
   return (
     <div
-      className="flex items-end gap-1.5 h-32"
+      className="flex items-end gap-1.5 h-32 min-h-32"
       role="img"
       aria-label="Clientes nuevos por semana"
     >
-      {bars.map((bar) => {
+      {bars.map((bar, index) => {
         const height = hasData
           ? Math.max((bar.count / max) * 100, bar.count > 0 ? 8 : 2)
           : 2;
@@ -67,7 +72,7 @@ export function WeeklyBars({ bars }: { bars: WeeklyBar[] }) {
             key={bar.weekStart}
             className="flex-1 flex flex-col items-center gap-1.5 min-w-0 h-full"
           >
-            <div className="flex-1 w-full flex items-end">
+            <div className="flex-1 w-full flex items-end min-h-0 overflow-hidden">
               <div
                 className={cn(
                   "w-full rounded-t-md dashboard-bar-grow-y",
@@ -75,7 +80,10 @@ export function WeeklyBars({ bars }: { bars: WeeklyBar[] }) {
                     ? "bg-orange-500/85 dark:bg-orange-400/80"
                     : "bg-[#e8e8e8] dark:bg-[#2a2a2a]",
                 )}
-                style={{ height: `${height}%` }}
+                style={{
+                  height: `${height}%`,
+                  animationDelay: barGrowDelay(index, false),
+                }}
                 title={`${bar.label}: ${bar.count}`}
               />
             </div>
@@ -108,7 +116,7 @@ export function ShareBars({
 
   return (
     <ul className="space-y-2">
-      {items.map((item) => (
+      {items.map((item, index) => (
         <li key={item.key}>
           <div className="flex items-baseline justify-between gap-3 mb-1">
             <span className="text-sm text-[#212121] dark:text-white truncate">
@@ -120,8 +128,11 @@ export function ShareBars({
           </div>
           <div className="h-2 rounded-full bg-[#f0f0f0] dark:bg-[#2a2a2a] overflow-hidden">
             <div
-              className="h-full rounded-full bg-[#212121] dark:bg-white/80"
-              style={{ width: `${Math.max((item.count / max) * 100, 4)}%` }}
+              className="h-full rounded-full bg-[#212121] dark:bg-white/80 dashboard-bar-grow"
+              style={{
+                width: `${Math.max((item.count / max) * 100, 4)}%`,
+                animationDelay: barGrowDelay(index, false),
+              }}
             />
           </div>
         </li>

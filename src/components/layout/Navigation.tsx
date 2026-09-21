@@ -9,6 +9,7 @@ import Logo from "../shared/Logo";
 import Link from "next/link";
 import { Routes } from "kadesh/core/routes";
 import { useUser } from "kadesh/utils/UserContext";
+import { isPlatformAdminUser } from "kadesh/utils/user-roles";
 import { NICHE_TARGET_MAPPING } from "kadesh/constants/constans";
 import FontSizeSlider from "./FontSizeSlider";
 
@@ -355,6 +356,15 @@ export default function Navigation() {
                     >
                       Mi perfil
                     </Link>
+                    {isPlatformAdminUser(user) ? (
+                      <Link
+                        href={Routes.panelAdmin}
+                        onClick={() => setAvatarDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-[#212121] dark:text-[#ffffff] hover:bg-orange-500/10 dark:hover:bg-white/10 transition-colors"
+                      >
+                        Operaciones
+                      </Link>
+                    ) : null}
                     <Link
                       href={Routes.novedades}
                       onClick={() => setAvatarDropdownOpen(false)}
@@ -664,6 +674,15 @@ export default function Navigation() {
                       >
                         Mi perfil
                       </Link>
+                      {isPlatformAdminUser(user) ? (
+                        <Link
+                          href={Routes.panelAdmin}
+                          onClick={() => setOpened(false)}
+                          className="block text-white font-semibold text-lg opacity-92 hover:opacity-100 py-4 px-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all mb-2"
+                        >
+                          Operaciones
+                        </Link>
+                      ) : null}
                       <button
                         onClick={() => {
                           handleLogout();

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -25,6 +26,11 @@ import {
   type CompanyAiSettingsVariables,
 } from "./queries";
 import { useRefreshCompanyAiBrief } from "./useRefreshCompanyAiBrief";
+import {
+  aiFadeUpVariants,
+  aiMotionTransition,
+  aiStaggerContainer,
+} from "./motion";
 
 const TEXTAREA_CLASS =
   "w-full min-h-[120px] px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed resize-y";
@@ -140,15 +146,66 @@ export function AiCompanyInfoTab({
 
   if (loading && !saved) {
     return (
-      <div className="flex items-center justify-center rounded-2xl border border-[#e0e0e0] bg-white py-16 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2 }}
+        className="flex items-center justify-center rounded-2xl border border-[#e0e0e0] bg-white py-16 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+      >
         <span className="size-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
-      </div>
+      </motion.div>
     );
   }
 
   return (
+    <AiCompanyInfoForm
+      values={values}
+      setValues={setValues}
+      setJustSaved={setJustSaved}
+      isDirty={isDirty}
+      justSaved={justSaved}
+      formError={formError}
+      saving={saving}
+      onSave={handleSave}
+      onOpenDashboard={onOpenDashboard}
+    />
+  );
+}
+
+function AiCompanyInfoForm({
+  values,
+  setValues,
+  setJustSaved,
+  isDirty,
+  justSaved,
+  formError,
+  saving,
+  onSave,
+  onOpenDashboard,
+}: {
+  values: Record<OnboardingContextKey, string>;
+  setValues: React.Dispatch<
+    React.SetStateAction<Record<OnboardingContextKey, string>>
+  >;
+  setJustSaved: (value: boolean) => void;
+  isDirty: boolean;
+  justSaved: boolean;
+  formError: string;
+  saving: boolean;
+  onSave: () => void;
+  onOpenDashboard: () => void;
+}) {
+  const reduce = useReducedMotion();
+  const fadeUp = aiFadeUpVariants(reduce);
+
+  return (
     <div className="space-y-4 pb-24">
-      <div className="rounded-2xl border border-[#e0e0e0] bg-white p-6 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-8">
+      <motion.div
+        initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={aiMotionTransition(reduce)}
+        className="rounded-2xl border border-[#e0e0e0] bg-white p-6 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-8"
+      >
         <h3 className="text-lg font-semibold text-[#212121] dark:text-white">
           Edita el perfil de tu negocio
         </h3>
@@ -158,8 +215,8 @@ export function AiCompanyInfoTab({
           empresa y qué le falta por conocer.
         </p>
 
-        <ol className="mt-5 grid gap-3 sm:grid-cols-3">
-          <li className="rounded-xl bg-[#f7f7f7] px-3 py-3 text-sm dark:bg-[#2a2a2a]">
+        <ol className="mt-5 grid gap-3 sm:grid-cols-3 items-stretch">
+          <li className="h-full rounded-xl bg-[#f7f7f7] px-3 py-3 text-sm dark:bg-[#2a2a2a]">
             <span className="font-semibold text-[#212121] dark:text-white">
               1. Edita
             </span>
@@ -167,7 +224,7 @@ export function AiCompanyInfoTab({
               Haz clic en un recuadro y cambia el texto.
             </span>
           </li>
-          <li className="rounded-xl bg-[#f7f7f7] px-3 py-3 text-sm dark:bg-[#2a2a2a]">
+          <li className="h-full rounded-xl bg-[#f7f7f7] px-3 py-3 text-sm dark:bg-[#2a2a2a]">
             <span className="font-semibold text-[#212121] dark:text-white">
               2. Guarda
             </span>
@@ -175,7 +232,7 @@ export function AiCompanyInfoTab({
               Sin guardar, Dashboard sigue con la versión anterior.
             </span>
           </li>
-          <li className="rounded-xl bg-[#f7f7f7] px-3 py-3 text-sm dark:bg-[#2a2a2a]">
+          <li className="h-full rounded-xl bg-[#f7f7f7] px-3 py-3 text-sm dark:bg-[#2a2a2a]">
             <span className="font-semibold text-[#212121] dark:text-white">
               3. Revisa
             </span>
@@ -185,8 +242,15 @@ export function AiCompanyInfoTab({
           </li>
         </ol>
 
-        {justSaved && !isDirty ? (
-          <div className="mt-5 flex flex-col gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-emerald-900/60 dark:bg-emerald-950/30">
+        <AnimatePresence>
+          {justSaved && !isDirty ? (
+            <motion.div
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={aiMotionTransition(reduce)}
+              className="mt-5 flex flex-col gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-emerald-900/60 dark:bg-emerald-950/30"
+            >
             <p className="inline-flex items-start gap-2 text-sm font-medium text-emerald-800 dark:text-emerald-300">
               <HugeiconsIcon
                 icon={CheckmarkCircle02Icon}
@@ -204,18 +268,36 @@ export function AiCompanyInfoTab({
               Ver en Dashboard
               <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
             </button>
-          </div>
-        ) : null}
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
 
+        <AnimatePresence>
         {formError ? (
-          <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-300">
+          <motion.div
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={aiMotionTransition(reduce)}
+            className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-300"
+          >
             {formError}
-          </div>
+          </motion.div>
         ) : null}
+        </AnimatePresence>
 
-        <div className="mt-8 space-y-6">
+        <motion.div
+          className="mt-8 space-y-6"
+          variants={aiStaggerContainer(reduce, 0.05)}
+          initial="hidden"
+          animate="show"
+        >
           {ONBOARDING_CONTEXT_FIELDS.map((field) => (
-            <div key={field.key}>
+            <motion.div
+              key={field.key}
+              variants={fadeUp}
+              transition={aiMotionTransition(reduce)}
+            >
               <label
                 htmlFor={field.key}
                 className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-[#212121] dark:text-white"
@@ -244,34 +326,42 @@ export function AiCompanyInfoTab({
                 rows={4}
                 disabled={saving}
               />
-            </div>
+            </motion.div>
           ))}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      {isDirty ? (
-        <div className="sticky bottom-3 z-10 rounded-xl border border-orange-200 bg-white p-3 shadow-lg dark:border-orange-900/50 dark:bg-[#1e1e1e] sm:flex sm:items-center sm:justify-between sm:gap-4">
-          <p className="px-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
-            Tienes cambios sin guardar. Dashboard todavía muestra la versión
-            anterior.
-          </p>
-          <button
-            type="button"
-            onClick={() => void handleSave()}
-            disabled={saving}
-            className="mt-3 flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-orange-500 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70 sm:mt-0 sm:w-auto"
+      <AnimatePresence>
+        {isDirty ? (
+          <motion.div
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
+            transition={aiMotionTransition(reduce)}
+            className="sticky bottom-3 z-10 rounded-xl border border-orange-200 bg-white p-3 shadow-lg dark:border-orange-900/50 dark:bg-[#1e1e1e] sm:flex sm:items-center sm:justify-between sm:gap-4"
           >
-            {saving ? (
-              <>
-                <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                Guardando…
-              </>
-            ) : (
-              "Guardar cambios"
-            )}
-          </button>
-        </div>
-      ) : null}
+            <p className="px-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+              Tienes cambios sin guardar. Dashboard todavía muestra la versión
+              anterior.
+            </p>
+            <button
+              type="button"
+              onClick={() => void onSave()}
+              disabled={saving}
+              className="mt-3 flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-orange-500 px-5 py-2.5 font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70 sm:mt-0 sm:w-auto"
+            >
+              {saving ? (
+                <>
+                  <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Guardando…
+                </>
+              ) : (
+                "Guardar cambios"
+              )}
+            </button>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }
