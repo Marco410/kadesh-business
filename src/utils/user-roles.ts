@@ -8,6 +8,11 @@ export function userHasRole(
   return user?.roles?.some((r) => r.name === roleName) ?? false;
 }
 
+/** Admin de plataforma (rol `admin`). No confundir con admin de empresa. */
+export function isPlatformAdminUser(user: User | undefined): boolean {
+  return userHasRole(user, Role.ADMIN);
+}
+
 /** Usuario con rol administrador de empresa (saas). */
 export function isAdminCompanyUser(user: User | undefined): boolean {
   return userHasRole(user, Role.ADMIN_COMPANY);

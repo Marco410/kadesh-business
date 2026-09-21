@@ -64,7 +64,7 @@ Subscription plans gate CRM functionality via `PLAN_FEATURE_KEYS`/`PLAN_FEATURES
 
 - **Server vs Client**: default to React Server Components; add `"use client"` only when the component needs hooks/browser APIs/event handlers. Keep the client boundary as low as possible.
 - **Icons**: `@hugeicons/react` only — do not introduce lucide, heroicons, or other icon libraries.
-- **Styling**: Tailwind CSS, mobile-first, dark mode via `dark:` classes (the app supports light/dark throughout, see `ThemeProvider`).
+- **Styling**: Tailwind CSS, **mobile-first** (`.cursor/rules/mobile-first.mdc`), dark mode via `dark:` classes (the app supports light/dark throughout, see `ThemeProvider`). Unprefixed classes are the phone layout; `sm:` / `md:` / `lg:` only enhance. Do not design desktop-first and patch with `max-*`.
 - **GraphQL**: keep queries/mutations colocated in the feature that uses them (`queries.ts`/`mutations.ts` next to the components), using the shared Apollo client — don't create new client instances.
 - **Naming**: PascalCase for component files (`AnimalCard.tsx`), camelCase for hooks/utils (`useLogin.ts`, `format-date.tsx`), lowercase-with-dashes for directories.
 - **Validation**: Zod for schema validation where applicable.

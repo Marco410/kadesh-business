@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon, SparklesIcon } from "@hugeicons/core-free-icons";
@@ -21,6 +22,11 @@ import {
   type CompanyAiSettingsVariables,
   type DailyDigestQueryVariables,
 } from "./queries";
+import {
+  aiFadeUpVariants,
+  aiMotionTransition,
+  aiStaggerContainer,
+} from "./motion";
 
 type AiCompanyKnowledgeCardProps = {
   companyId: string;
@@ -82,6 +88,8 @@ export function AiCompanyKnowledgeCard({
     })),
   );
   const hasProfile = companyHasOnboardingText(company);
+  const reduce = useReducedMotion();
+  const fadeUp = aiFadeUpVariants(reduce);
 
   useEffect(() => {
     if (autoRequested.current) return;
@@ -133,22 +141,32 @@ export function AiCompanyKnowledgeCard({
         </div>
       ) : (
         <>
-          <ul className="divide-y divide-[#ececec] dark:divide-[#2a2a2a]">
+          <motion.ul
+            className="divide-y divide-[#ececec] dark:divide-[#2a2a2a]"
+            variants={aiStaggerContainer(reduce, 0.03)}
+            initial="hidden"
+            animate="show"
+          >
             {pillars.map((pillar) => {
               const heading = PILLAR_HEADING[pillar.key] ?? pillar.title;
 
               return (
-                <li key={pillar.key} className="px-4 py-3">
+                <motion.li
+                  key={pillar.key}
+                  className="px-4 py-3"
+                  variants={fadeUp}
+                  transition={aiMotionTransition(reduce)}
+                >
                   <p className="text-sm font-semibold text-[#212121] dark:text-white">
                     {heading}
                   </p>
                   <div className="mt-1">
                     <ExpandableCopy text={pillar.summary} />
                   </div>
-                </li>
+                </motion.li>
               );
             })}
-          </ul>
+          </motion.ul>
           {missing.length > 0 ? (
             <div className="border-t border-[#ececec] bg-[#fafafa] px-4 py-3 dark:border-[#2a2a2a] dark:bg-[#252525]">
               <p className="text-sm font-semibold text-[#212121] dark:text-white">

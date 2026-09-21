@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -46,6 +47,11 @@ import {
   type UpdateCompanyAiSettingsResponse,
   type UpdateCompanyAiSettingsVariables,
 } from "./queries";
+import {
+  aiFadeUpVariants,
+  aiMotionTransition,
+  aiStaggerContainer,
+} from "./motion";
 
 const INPUT_CLASS =
   "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
@@ -178,6 +184,8 @@ export function AiSettingsSection({
     defaultModelForProvider(provider) || "Modelo default del proveedor";
   const creditPeriod = formatCreditPeriod(year, month);
   const busy = saving || testing;
+  const reduce = useReducedMotion();
+  const fadeUp = aiFadeUpVariants(reduce);
 
   const persistSettings = async (overrides?: {
     apiKey?: string;
@@ -329,8 +337,11 @@ export function AiSettingsSection({
           nueva.
         </p>
       )}
-      {testResult && (
-        <div
+      {testResult ? (
+        <motion.div
+          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={aiMotionTransition(reduce)}
           className={`mt-5 rounded-xl border p-4 text-sm ${
             testResult.success
               ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
@@ -345,27 +356,39 @@ export function AiSettingsSection({
             />
             {testResult.message}
           </p>
-        </div>
-      )}
+        </motion.div>
+      ) : null}
     </>
   );
 
   if (loading && !saved) {
     return (
-      <div className="flex items-center justify-center rounded-2xl border border-[#e0e0e0] bg-white py-16 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2 }}
+        className="flex items-center justify-center rounded-2xl border border-[#e0e0e0] bg-white py-16 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+      >
         <div className="text-center">
           <span className="mx-auto block size-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
           <p className="mt-3 text-sm text-[#616161] dark:text-[#b0b0b0]">
             Cargando {KADESH_URIM_AI_NAME}...
           </p>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div
+    <motion.div
+      className="space-y-6"
+      variants={aiStaggerContainer(reduce, 0.04)}
+      initial="hidden"
+      animate="show"
+    >
+      <motion.div
+        variants={fadeUp}
+        transition={aiMotionTransition(reduce)}
         className={`rounded-2xl border p-5 sm:p-6 ${
           contextComplete
             ? "border-[#e0e0e0] bg-white dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
@@ -405,14 +428,26 @@ export function AiSettingsSection({
             <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
           </Link>
         )}
-      </div>
+      </motion.div>
 
-      <div className="rounded-2xl border border-[#e0e0e0] bg-white p-6 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-8">
-        {formError && (
-          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-300">
-            {formError}
-          </div>
-        )}
+      <motion.div
+        variants={fadeUp}
+        transition={aiMotionTransition(reduce, 0.04)}
+        className="h-full min-h-0 rounded-2xl border border-[#e0e0e0] bg-white p-6 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-8"
+      >
+        <AnimatePresence>
+          {formError ? (
+            <motion.div
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={aiMotionTransition(reduce)}
+              className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-300"
+            >
+              {formError}
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
 
         <fieldset className="min-w-0">
           <legend className="text-sm font-semibold text-[#212121] dark:text-white">
@@ -421,7 +456,7 @@ export function AiSettingsSection({
           <div
             role="radiogroup"
             aria-label="Modalidad de pago de IA"
-            className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2"
+            className="mt-3 grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2"
           >
             {AI_BILLING_MODE_OPTIONS.map((option) => {
               const selected = billingMode === option.value;
@@ -433,7 +468,7 @@ export function AiSettingsSection({
                   aria-checked={selected}
                   disabled={busy}
                   onClick={() => setBillingMode(option.value)}
-                  className={`rounded-xl border p-4 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] ${
+                  className={`h-full min-h-0 rounded-xl border p-4 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] ${
                     selected
                       ? "border-orange-500 bg-orange-500/10 dark:bg-orange-500/15"
                       : "border-[#e0e0e0] bg-white hover:border-orange-300 dark:border-[#3a3a3a] dark:bg-[#161616] dark:hover:border-orange-500/50"
@@ -680,7 +715,7 @@ export function AiSettingsSection({
             />
           </div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

@@ -102,16 +102,10 @@ function LoginPageContent() {
       );
       params.set(META_REGISTER_SUCCESS_QUERY_KEY, "1");
       params.delete("tab");
-
-      if (redirectPath) {
-        setSuccessMessage("Registro exitoso. Iniciando sesión...");
-      } else {
-        setSelectedTab("login");
-        setSuccessMessage(
-          "Registro exitoso, ya puedes iniciar sesión con tus credenciales",
-        );
-      }
-
+      setSelectedTab("login");
+      setSuccessMessage(
+        "Registro exitoso, ya puedes iniciar sesión con tus credenciales",
+      );
       router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     },
     redirectTo: redirectPath,

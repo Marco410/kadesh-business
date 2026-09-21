@@ -35,6 +35,16 @@ Misma regla en `ProfileCompanySection` (bloque Información del perfil) y en la 
 
 La sección `#kadesh-ai` (`KadeshAiSection` en home, después de la vitrina de plataforma) explica el mismo flujo: perfil → pipeline → 3 pasos de hoy. El mock del resumen es **ejemplo**, no datos reales. Misma marca y mismas prohibiciones de copy. CTA a registro.
 
+## Motion
+
+Corporate, igual que dashboard, perfil y CRM: 280 ms, `cubic-bezier(0.2, 0, 0, 1)`, subida de 12 px. Tokens en `motion.ts`.
+
+- Encabezado y tablist entran en fade-up. La tab activa usa `layoutId` con el degradado `ai-urim-fill`; el contenido de cada tab entra/sale con `AnimatePresence` (wait).
+- Dashboard anima las **dos columnas** (digest+recs vs conocimiento), no cada tarjeta suelta. Las listas de recomendaciones y pilares entran en cascada corta.
+- Información: la tarjeta y los cuatro recuadros en cascada. Los 3 pasos se animan juntos (`items-stretch` + `h-full`) para que queden a la misma altura. Guardar y los avisos de éxito/error aparecen con fade.
+- Configuración: contexto y formulario en cascada. Las dos modalidades de pago se animan como **un grupo** (`h-full` en cada radio). BYOK: las tres guías de proveedor en cascada.
+- Respeta `prefers-reduced-motion`: solo opacity, sin y ni layoutId.
+
 ## Lo que sabe de la empresa (columna derecha)
 
 Por cada pilar (Qué, Quién, Cuánto, Cómo): un **resumen** de lo que ya quedó escrito y **puntos exactos** que aún no mencionó.

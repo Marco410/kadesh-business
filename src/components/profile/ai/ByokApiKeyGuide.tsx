@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowUpRight01Icon,
@@ -12,6 +13,11 @@ import {
   AI_PROVIDER_KEY_GUIDES,
   type AiProviderKey,
 } from "./constants";
+import {
+  aiFadeUpVariants,
+  aiMotionTransition,
+  aiStaggerContainer,
+} from "./motion";
 
 const PROVIDER_ORDER: AiProviderKey[] = [
   AI_PROVIDER.ANTHROPIC,
@@ -35,6 +41,9 @@ export function ByokApiKeyGuide({
   disabled = false,
   className,
 }: ByokApiKeyGuideProps) {
+  const reduce = useReducedMotion();
+  const fadeUp = aiFadeUpVariants(reduce);
+
   return (
     <div
       className={cn(
@@ -57,13 +66,20 @@ export function ByokApiKeyGuide({
         </div>
       </div>
 
-      <ul className="mt-4 grid grid-cols-1 gap-3">
+      <motion.ul
+        className="mt-4 grid grid-cols-1 gap-3"
+        variants={aiStaggerContainer(reduce, 0.04)}
+        initial="hidden"
+        animate="show"
+      >
         {PROVIDER_ORDER.map((key) => {
           const guide = AI_PROVIDER_KEY_GUIDES[key];
           const selected = provider === key;
           return (
-            <li
+            <motion.li
               key={key}
+              variants={fadeUp}
+              transition={aiMotionTransition(reduce)}
               className={cn(
                 "relative rounded-xl border bg-white p-4 dark:bg-[#1e1e1e]",
                 selected
@@ -112,10 +128,10 @@ export function ByokApiKeyGuide({
                 {guide.consoleLabel}
                 <HugeiconsIcon icon={ArrowUpRight01Icon} size={14} />
               </a>
-            </li>
+            </motion.li>
           );
         })}
-      </ul>
+      </motion.ul>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import "./globals.css";
 import { Inter, Poppins } from "next/font/google";
 import ClientProviders from "./ClientProviders";
-import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import {
   FONT_SCALE_DEFAULT,
@@ -144,12 +143,6 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        <link
-          rel="preconnect"
-          href="https://connect.facebook.net"
-          crossOrigin=""
-        />
-        <link rel="dns-prefetch" href="https://connect.facebook.net" />
         <script
           id="kadesh-geo-core-jsonld"
           type="application/ld+json"
@@ -161,35 +154,6 @@ export default function RootLayout({
             __html: `(function(){try{var n=parseFloat(localStorage.getItem("${FONT_SCALE_STORAGE_KEY}")||"");if(isNaN(n))n=${FONT_SCALE_DEFAULT};if(n<${FONT_SCALE_MIN})n=${FONT_SCALE_MIN};if(n>${FONT_SCALE_MAX})n=${FONT_SCALE_MAX};document.documentElement.style.setProperty("--kadesh-font-scale",String(n));}catch(e){}})();`,
           }}
         />
-        {/* Meta Pixel Code */}
-        <Script
-          id="facebook-pixel"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1093441746302298');
-fbq('track', 'PageView');
-            `,
-          }}
-        />
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=1093441746302298&ev=PageView&noscript=1"
-            alt=""
-          />
-        </noscript>
-        {/* End Meta Pixel Code */}
       </head>
       <body
         className={`${poppins.variable} ${inter.variable} font-sans bg-[#ffffff] dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] transition-colors duration-200`}

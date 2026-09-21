@@ -8,6 +8,11 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
 import { UserProvider } from "kadesh/utils/UserContext";
 import { WorkspaceProvider } from "kadesh/components/profile/sales/workspaces";
+import {
+  CookieConsentProvider,
+  CookieConsentBanner,
+  MetaPixelLoader,
+} from "kadesh/components/consent";
 import { HeroUIProvider } from "@heroui/system";
 import { Toaster } from "sileo";
 import { useTheme } from "next-themes";
@@ -37,19 +42,23 @@ export default function ClientProviders({
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider>
-      <HeroUIProvider locale="es-MX">
-        <ApolloProviderWrapper>
-          <UserProvider>
-            <WorkspaceProvider>
-            {children}
-            </WorkspaceProvider>
-            <ThemedToaster />
-            <SpeedInsights />
-            <Analytics />
-          </UserProvider>
-        </ApolloProviderWrapper>
-      </HeroUIProvider>
-    </ThemeProvider>
+    <CookieConsentProvider>
+      <ThemeProvider>
+        <HeroUIProvider locale="es-MX">
+          <ApolloProviderWrapper>
+            <UserProvider>
+              <WorkspaceProvider>
+              {children}
+              </WorkspaceProvider>
+              <ThemedToaster />
+              <SpeedInsights />
+              <Analytics />
+            </UserProvider>
+          </ApolloProviderWrapper>
+        </HeroUIProvider>
+      </ThemeProvider>
+      <CookieConsentBanner />
+      <MetaPixelLoader />
+    </CookieConsentProvider>
   );
 }

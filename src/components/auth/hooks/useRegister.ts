@@ -12,6 +12,7 @@ import {
   type AuthenticateUserResponse,
 } from 'kadesh/utils/queries';
 import { useUser } from 'kadesh/utils/UserContext';
+import type { AuthenticatedItem } from 'kadesh/utils/types';
 import {
   setRegisterSuccessUrl,
   trackCompleteRegistration,
@@ -20,6 +21,15 @@ import {
 import { Routes } from 'kadesh/core/routes';
 import { sileo } from 'sileo';
 import { useTouchUserLastLogin } from './useTouchUserLastLogin';
+
+function persistSessionToken(sessionToken: string) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem('keystonejs-session-token', sessionToken);
+  const expires = new Date();
+  expires.setTime(expires.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const isSecure = window.location.protocol === 'https:';
+  document.cookie = `keystonejs-session=${sessionToken}; expires=${expires.toUTCString()}; path=/; SameSite=Lax${isSecure ? '; Secure' : ''}`;
+}
 
 /** Texto crudo de error (GraphQL + mensaje) para detectar patrones sin filtrar al usuario. */
 function collectRegisterErrorText(err: unknown): string {
@@ -67,7 +77,7 @@ interface UseRegisterOptions {
 export function useRegister(options?: UseRegisterOptions) {
   const router = useRouter();
   const touchUserLastLoginAt = useTouchUserLastLogin();
-  const { refreshUser } = useUser();
+  const { refreshUser, setUser } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -87,77 +97,55 @@ export function useRegister(options?: UseRegisterOptions) {
   const [registerUser, { loading }] = useMutation<
     RegisterUserResponse,
     RegisterUserVariables
-  >(REGISTER_USER_MUTATION, {
-    onCompleted: async () => {
-      setRegisterSuccessUrl(router);
-      trackCompleteRegistration();
-      // Save credentials before clearing form
-      const savedEmail = email;
-      const savedPassword = password;
-      
-      // If redirectTo is provided, automatically login after registration
-       if (options?.redirectTo) {
-        try {
-          // Auto-login with the credentials
-          const { data } = await authenticateUser({
-            variables: {
-              email: savedEmail,
-              password: savedPassword,
-            },
-          });
+  >(REGISTER_USER_MUTATION);
 
-          if (data?.authenticateUserWithPassword?.__typename === 'UserAuthenticationWithPasswordSuccess') {
-            const sessionToken = data.authenticateUserWithPassword.sessionToken;
-            const loggedInUser = data.authenticateUserWithPassword.item;
-            if (sessionToken && typeof window !== 'undefined') {
-              localStorage.setItem('keystonejs-session-token', sessionToken);
-              const expires = new Date();
-              expires.setTime(expires.getTime() + 30 * 24 * 60 * 60 * 1000);
-              const isSecure = window.location.protocol === 'https:';
-              document.cookie = `keystonejs-session=${sessionToken}; expires=${expires.toUTCString()}; path=/; SameSite=Lax${isSecure ? '; Secure' : ''}`;
-            }
-            if (loggedInUser?.id) {
-              await touchUserLastLoginAt(loggedInUser.id);
-            }
-            await refreshUser();
-            // Breve pausa para que Meta capture la URL antes de navegar al panel
-            await new Promise((resolve) => setTimeout(resolve, 400));
-            router.push(withRegisterSuccessUrl(Routes.panel));
-            
-            // Clear form after successful redirect
-            setName('');
-            setLastName('');
-            setCompanyName('');
-            setEmail('');
-            setPhone('');
-            setPassword('');
-            setConfirmPassword('');
-            setError('');
-            return;
-          }
-        } catch (error) {
-          console.error('Error auto-logging in:', error);
-          // If auto-login fails, just show success message
-        }
-      } 
-      
-      // Clear form
-      setName('');
-      setLastName('');
-      setCompanyName('');
-      setEmail('');
-      setPhone('');
-      setPassword('');
-      setConfirmPassword('');
-      setError('');
-      setReferralCode('');
-      
-      // Call success callback if provided
-      if (options?.onSuccess) {
-        options.onSuccess();
-      }
-    },
-  });
+  const clearForm = () => {
+    setName('');
+    setLastName('');
+    setCompanyName('');
+    setEmail('');
+    setPhone('');
+    setPassword('');
+    setConfirmPassword('');
+    setError('');
+    setReferralCode('');
+  };
+
+  const loginAfterRegister = async (loginEmail: string, loginPassword: string) => {
+    const { data } = await authenticateUser({
+      variables: {
+        email: loginEmail,
+        password: loginPassword,
+      },
+    });
+
+    const auth = data?.authenticateUserWithPassword;
+    if (auth?.__typename !== 'UserAuthenticationWithPasswordSuccess') {
+      return false;
+    }
+
+    if (auth.sessionToken) {
+      persistSessionToken(auth.sessionToken);
+    }
+
+    const loggedInUser = auth.item;
+    if (loggedInUser?.id) {
+      await touchUserLastLoginAt(loggedInUser.id);
+      const userFromLogin: AuthenticatedItem = {
+        ...loggedInUser,
+        roles: loggedInUser.roles ?? null,
+        birthday: (loggedInUser as { birthday?: string | null }).birthday ?? null,
+        age: (loggedInUser as { age?: string | null }).age ?? null,
+        createdAt:
+          (loggedInUser as { createdAt?: string }).createdAt ??
+          new Date().toISOString(),
+      };
+      setUser(userFromLogin);
+    }
+
+    await refreshUser();
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,6 +182,25 @@ export function useRegister(options?: UseRegisterOptions) {
           companyName: companyName.trim(),
         },
       });
+
+      setRegisterSuccessUrl(router);
+      trackCompleteRegistration();
+
+      try {
+        const didLogin = await loginAfterRegister(email, password);
+        if (didLogin) {
+          clearForm();
+          // Meta captura ?registro-exitoso=1 en la URL actual antes de ir al panel
+          await new Promise((resolve) => setTimeout(resolve, 400));
+          router.push(withRegisterSuccessUrl(options?.redirectTo || Routes.panel));
+          return;
+        }
+      } catch (autoLoginErr) {
+        console.error('Error al iniciar sesión tras el registro:', autoLoginErr);
+      }
+
+      clearForm();
+      options?.onSuccess?.();
     } catch (regErr) {
       // No UserAuthLog: el backend ya registra intentos/resultado de registerUser
       const friendly = mapRegisterErrorToUserMessage(regErr);
