@@ -208,6 +208,7 @@ export default function AdminPetPlaceServicesPanel({
           placeholder="Buscar por servicio o clínica"
         />
         <AdminFilterChips
+          label="Estado"
           options={PET_PLACE_SERVICE_STATUS_OPTIONS}
           value={status}
           onChange={(value) => {

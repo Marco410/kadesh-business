@@ -28,6 +28,7 @@ import {
   AdminEmptyState,
   AdminErrorState,
   AdminFilterChips,
+  AdminSegmented,
   AdminLoadingRows,
   AdminPagination,
   AdminSearchInput,
@@ -36,7 +37,6 @@ import {
   surfaceClass,
 } from "./ui";
 import { SUBSCRIPTION_STATUS } from "kadesh/constants/constans";
-import { cn } from "kadesh/utils/cn";
 
 export type PetPlacesVista = "fichas" | "servicios";
 
@@ -196,31 +196,15 @@ export default function AdminPetPlacesPanel({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2">
-        {(
-          [
-            { id: "fichas" as const, label: "Fichas" },
-            { id: "servicios" as const, label: "Servicios" },
-          ] as const
-        ).map((item) => {
-          const selected = item.id === vista;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onVistaChange?.(item.id)}
-              className={cn(
-                "h-11 rounded-xl px-4 text-sm font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400",
-                selected
-                  ? "bg-orange-500 text-white"
-                  : "border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] text-[#424242] dark:text-[#e0e0e0]",
-              )}
-            >
-              {item.label}
-            </button>
-          );
-        })}
-      </div>
+      <AdminSegmented
+        ariaLabel="Vista de veterinarias"
+        items={[
+          { id: "fichas" as const, label: "Fichas" },
+          { id: "servicios" as const, label: "Servicios" },
+        ]}
+        value={vista}
+        onChange={(next) => onVistaChange?.(next)}
+      />
 
       {vista === "servicios" ? (
         <AdminPetPlaceServicesPanel
@@ -249,6 +233,7 @@ export default function AdminPetPlacesPanel({
           placeholder="Buscar por nombre o municipio"
         />
         <AdminFilterChips
+          label="Estado"
           options={PET_PLACE_CLAIM_STATUS_OPTIONS}
           value={status}
           onChange={(value) => {

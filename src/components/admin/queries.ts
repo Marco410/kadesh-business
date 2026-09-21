@@ -1,9 +1,12 @@
 import { gql } from "@apollo/client";
 import type {
+  AdminBlogSubscriptionRow,
   AdminOverviewData,
   AdminPetPlaceRow,
   AdminPetPlaceServiceRow,
+  AdminRoleOption,
   AdminSubscriptionRow,
+  AdminUserDetail,
   AdminUserRow,
 } from "./types";
 
@@ -122,6 +125,85 @@ export type AdminUsersResponse = {
   users: AdminUserRow[];
   usersCount: number;
 };
+
+export const ADMIN_USER_DETAIL_QUERY = gql`
+  query AdminUserDetail($id: ID!) {
+    user(where: { id: $id }) {
+      id
+      name
+      lastName
+      secondLastName
+      email
+      phone
+      createdAt
+      lastLoginAt
+      verified
+      roles {
+        id
+        name
+      }
+      company {
+        id
+        name
+      }
+    }
+    roles {
+      id
+      name
+    }
+  }
+`;
+
+export type AdminUserDetailResponse = {
+  user: AdminUserDetail | null;
+  roles: AdminRoleOption[];
+};
+
+export const ADMIN_USER_BLOG_SUBSCRIPTIONS_QUERY = gql`
+  query AdminUserBlogSubscriptions($where: BlogSubscriptionWhereInput!) {
+    blogSubscriptions(where: $where, orderBy: [{ createdAt: desc }]) {
+      id
+      email
+      product
+      active
+      createdAt
+      user {
+        id
+      }
+    }
+  }
+`;
+
+export type AdminUserBlogSubscriptionsResponse = {
+  blogSubscriptions: AdminBlogSubscriptionRow[];
+};
+
+export const UPDATE_ADMIN_USER_MUTATION = gql`
+  mutation UpdateAdminUser($where: UserWhereUniqueInput!, $data: UserUpdateInput!) {
+    updateUser(where: $where, data: $data) {
+      id
+    }
+  }
+`;
+
+export const CREATE_BLOG_SUBSCRIPTION_MUTATION = gql`
+  mutation CreateAdminBlogSubscription($data: BlogSubscriptionCreateInput!) {
+    createBlogSubscription(data: $data) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_BLOG_SUBSCRIPTION_MUTATION = gql`
+  mutation UpdateAdminBlogSubscription(
+    $where: BlogSubscriptionWhereUniqueInput!
+    $data: BlogSubscriptionUpdateInput!
+  ) {
+    updateBlogSubscription(where: $where, data: $data) {
+      id
+    }
+  }
+`;
 
 export const ADMIN_SUBSCRIPTIONS_QUERY = gql`
   query AdminSubscriptions(
