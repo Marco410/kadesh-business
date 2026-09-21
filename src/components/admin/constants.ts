@@ -58,6 +58,15 @@ export const ROLE_LABELS: Record<string, string> = {
   [Role.USER_COMPANY]: "Usuario empresa",
 };
 
+export const BLOG_PRODUCT_OPTIONS: Array<{
+  value: string;
+  label: string;
+  description: string;
+}> = [
+  { value: "pet", label: "Blog de Pet", description: "Veterinarias y mascotas" },
+  { value: "saas", label: "Blog de SaaS", description: "Ventas y prospección" },
+];
+
 export const PET_PLACE_CLAIM_STATUS = {
   UNCLAIMED: "unclaimed",
   PENDING: "pending",

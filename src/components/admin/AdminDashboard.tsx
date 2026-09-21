@@ -7,7 +7,6 @@ import RoleAccessDeniedSection from "kadesh/components/profile/sales/RoleAccessD
 import { Routes } from "kadesh/core/routes";
 import { useUser } from "kadesh/utils/UserContext";
 import { isPlatformAdminUser } from "kadesh/utils/user-roles";
-import { cn } from "kadesh/utils/cn";
 import {
   ADMIN_TAB_ITEMS,
   ADMIN_TABS,
@@ -15,6 +14,7 @@ import {
   type AdminTab,
 } from "./constants";
 import AdminOverview from "./AdminOverview";
+import { AdminTabBar } from "./ui";
 import AdminUsersPanel from "./AdminUsersPanel";
 import AdminSubscriptionsPanel from "./AdminSubscriptionsPanel";
 import AdminPetPlacesPanel, {
@@ -135,29 +135,12 @@ function AdminDashboardContent() {
         </p>
       </header>
 
-      <nav
-        aria-label="Secciones de operaciones"
-        className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1"
-      >
-        {ADMIN_TAB_ITEMS.map((item) => {
-          const selected = item.id === tab;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setTab(item.id)}
-              className={cn(
-                "h-11 shrink-0 rounded-full px-4 text-sm font-semibold transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400",
-                selected
-                  ? "bg-[#212121] text-white dark:bg-white dark:text-[#121212]"
-                  : "border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] text-[#424242] dark:text-[#e0e0e0] hover:border-orange-300",
-              )}
-            >
-              {item.label}
-            </button>
-          );
-        })}
-      </nav>
+      <AdminTabBar
+        ariaLabel="Secciones de operaciones"
+        items={ADMIN_TAB_ITEMS}
+        value={tab}
+        onChange={setTab}
+      />
 
       {tab === ADMIN_TABS.OVERVIEW ? (
         <AdminOverview

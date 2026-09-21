@@ -12,6 +12,24 @@ export type AdminUserRow = {
   company: { id: string; name: string | null } | null;
 };
 
+export type AdminRoleOption = {
+  id: string;
+  name: string;
+};
+
+export type AdminBlogSubscriptionRow = {
+  id: string;
+  email: string | null;
+  product: string | null;
+  active: boolean | null;
+  createdAt: string | null;
+  user: { id: string } | null;
+};
+
+export type AdminUserDetail = Omit<AdminUserRow, "roles"> & {
+  roles: AdminRoleOption[];
+};
+
 export type AdminSubscriptionRow = {
   id: string;
   planName: string | null;
