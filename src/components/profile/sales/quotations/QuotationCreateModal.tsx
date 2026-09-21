@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation } from "@apollo/client";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
 import {
   CREATE_SAAS_QUOTATION_MUTATION,
@@ -12,10 +14,12 @@ import {
 import { ClientLeadAutocomplete } from "kadesh/components/shared";
 import { useRouter } from "next/navigation";
 import { Routes } from "kadesh/core/routes";
+import { quotationMotionTransition } from "./motion";
 
 const inputClassName =
-  "w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
-const labelClassName = "block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5";
+  "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-[#212121] dark:text-white text-sm placeholder-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
+const labelClassName =
+  "block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5";
 
 export interface QuotationCreateModalProps {
   isOpen: boolean;
@@ -36,6 +40,8 @@ export default function QuotationCreateModal({
   const [validUntil, setValidUntil] = useState("");
   const [notes, setNotes] = useState("");
   const router = useRouter();
+  const reduce = useReducedMotion();
+  const transition = quotationMotionTransition(reduce);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -58,7 +64,10 @@ export default function QuotationCreateModal({
         onClose();
         return;
       }
-      sileo.success({ title: "Cotización creada.", description: "Redirigiendo a la cotización..." });
+      sileo.success({
+        title: "Cotización creada.",
+        description: "Redirigiendo a la cotización...",
+      });
       router.push(Routes.panelQuotation(id));
       onSuccess?.();
       onClose();
@@ -70,6 +79,7 @@ export default function QuotationCreateModal({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!leadId.trim() || loading) return;
     createQuotation({
       variables: {
         data: {
@@ -85,113 +95,118 @@ export default function QuotationCreateModal({
     });
   }
 
-  if (!isOpen) return null;
-
   return (
     <AnimatePresence>
-      <motion.div
-        key="qc-backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 z-[95] flex items-center justify-center p-4"
-        onClick={onClose}
-      />
-      <motion.div
-        key="qc-content"
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none"
-      >
-        <div
-          className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-hidden pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a] flex flex-col"
-          onClick={(e) => e.stopPropagation()}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="quotation-create-modal-title"
-        >
-          <div className="flex justify-between items-center p-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a]">
-            <h4
-              id="quotation-create-modal-title"
-              className="text-lg font-bold text-[#212121] dark:text-[#ffffff]"
-            >
-              Nueva cotización
-            </h4>
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-2xl font-bold text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#ffffff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#e5e5e5] dark:hover:bg-[#333]"
-              aria-label="Cerrar"
-            >
-              ×
-            </button>
-          </div>
-
-          <form
-            onSubmit={handleSubmit}
-            className="p-4 overflow-y-auto space-y-4 flex-1"
+      {isOpen ? (
+        <>
+          <motion.div
+            key="qc-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={transition}
+            className="fixed inset-0 z-[95] bg-black/50"
+            onClick={onClose}
+          />
+          <motion.div
+            key="qc-content"
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+            transition={transition}
+            className="pointer-events-none fixed inset-0 z-[100] flex items-center justify-center p-4"
           >
+            <div
+              className="pointer-events-auto flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white shadow-2xl dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="quotation-create-modal-title"
+            >
+              <div className="flex items-start justify-between gap-3 border-b border-[#e0e0e0] bg-[#f5f5f5] px-5 py-4 dark:border-[#3a3a3a] dark:bg-[#2a2a2a]">
+                <div className="min-w-0">
+                  <h4
+                    id="quotation-create-modal-title"
+                    className="text-lg font-bold text-[#212121] dark:text-white"
+                  >
+                    Nueva cotización
+                  </h4>
+                  <p className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    Elige el cliente. Fecha y notas son opcionales.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#616161] hover:bg-[#e5e5e5] hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:bg-[#333] dark:hover:text-white"
+                  aria-label="Cerrar"
+                >
+                  <HugeiconsIcon icon={Cancel01Icon} size={18} />
+                </button>
+              </div>
 
-            <div>
-              <label htmlFor="qc-valid-until" className={labelClassName}>
-                Válida hasta
-              </label>
-              <input
-                id="qc-valid-until"
-                type="date"
-                value={validUntil}
-                onChange={(e) => setValidUntil(e.target.value)}
-                className={inputClassName}
-              />
-            </div>
-
-            <div>
-              <ClientLeadAutocomplete
-                id="qc-lead"
-                userId={userId}
-                enabled={isOpen}
-                selectedLeadId={leadId || null}
-                onSelectedLeadIdChange={(id) => setLeadId(id ?? "")}
-                placeholder="Buscar cliente por nombre"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="qc-notes" className={labelClassName}>
-                Notas
-              </label>
-              <textarea
-                id="qc-notes"
-                rows={3}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Notas internas o para el cliente"
-                className={inputClassName}
-              />
-            </div>
-
-            <div className="flex gap-2 justify-end pt-2 border-t border-[#e0e0e0] dark:border-[#3a3a3a]">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-[#ffffff] text-sm font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#333]"
+              <form
+                onSubmit={handleSubmit}
+                className="flex-1 space-y-4 overflow-y-auto p-5"
               >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium hover:bg-orange-600 disabled:opacity-50 disabled:pointer-events-none"
-              >
-                {loading ? "Creando…" : "Crear cotización"}
-              </button>
+                <ClientLeadAutocomplete
+                  id="qc-lead"
+                  userId={userId}
+                  enabled={isOpen}
+                  selectedLeadId={leadId || null}
+                  onSelectedLeadIdChange={(id) => setLeadId(id ?? "")}
+                  placeholder="Buscar cliente por nombre"
+                  required
+                />
+
+                <div>
+                  <label htmlFor="qc-valid-until" className={labelClassName}>
+                    Válida hasta
+                  </label>
+                  <input
+                    id="qc-valid-until"
+                    type="date"
+                    value={validUntil}
+                    onChange={(e) => setValidUntil(e.target.value)}
+                    className={inputClassName}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="qc-notes" className={labelClassName}>
+                    Notas
+                  </label>
+                  <textarea
+                    id="qc-notes"
+                    rows={3}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Notas internas o para el cliente"
+                    className={inputClassName}
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 border-t border-[#e0e0e0] pt-4 dark:border-[#3a3a3a]">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="inline-flex min-h-11 items-center rounded-xl border border-[#e0e0e0] px-4 text-sm font-medium text-[#212121] hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-white dark:hover:bg-[#333]"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading || !leadId.trim()}
+                    className="inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-4 text-sm font-semibold text-white hover:bg-orange-600 disabled:pointer-events-none disabled:opacity-50"
+                  >
+                    {loading ? "Creando…" : "Crear cotización"}
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
-        </div>
-      </motion.div>
+          </motion.div>
+        </>
+      ) : null}
     </AnimatePresence>
   );
 }

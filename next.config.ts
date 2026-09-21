@@ -46,6 +46,12 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
+      // Keystone signed uploads (private R2 bucket via S3 API).
+      {
+        protocol: "https",
+        hostname: "*.r2.cloudflarestorage.com",
+        pathname: "/**",
+      },
     ],
   },
   async rewrites() {
