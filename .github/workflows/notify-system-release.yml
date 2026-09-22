@@ -1,0 +1,59 @@
+name: Avisar novedades a kadesh-back
+
+# En cada push a main, este workflow manda el mensaje del commit a kadesh-back para armar (o
+# seguir editando) un borrador de "novedades" (SystemRelease, producto SaaS). Ese borrador NO se
+# publica solo: un admin lo revisa, le pone versión y lo publica manualmente desde el admin de
+# Keystone (models/SystemRelease). Mientras no se publique, cada push nuevo se sigue agregando
+# al mismo borrador en vez de crear uno distinto.
+#
+# El mensaje del commit se usa tal cual como línea de la novedad — escríbelo en lenguaje
+# natural y sin tecnicismos (qué se arregló / mejoró / agregó), no como mensaje técnico de git.
+#
+# Requiere estos secrets del repo (Settings → Secrets and variables → Actions):
+#   KADESH_API_URL          — endpoint GraphQL del backend, ej. https://<dominio>/api/graphql
+#   SYSTEM_RELEASE_SECRET   — mismo valor que SYSTEM_RELEASE_SECRET en las env vars del backend
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  notify-system-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Avisar a kadesh-back del nuevo cambio
+        env:
+          KADESH_API_URL: ${{ secrets.KADESH_API_URL }}
+          SYSTEM_RELEASE_SECRET: ${{ secrets.SYSTEM_RELEASE_SECRET }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${KADESH_API_URL:-}" ] || [ -z "${SYSTEM_RELEASE_SECRET:-}" ]; then
+            echo "::error::Faltan los secrets KADESH_API_URL y/o SYSTEM_RELEASE_SECRET en este repo."
+            exit 1
+          fi
+
+          entry=$(printf '%s' "$COMMIT_MESSAGE" | head -n 1)
+
+          if [ -z "$entry" ]; then
+            echo "Commit sin mensaje, no hay nada que avisar."
+            exit 0
+          fi
+
+          payload=$(jq -n \
+            --arg secret "$SYSTEM_RELEASE_SECRET" \
+            --arg product "saas" \
+            --arg entry "$entry" \
+            '{
+              query: "mutation UpsertDraftSystemRelease($secret: String!, $product: String!, $entry: String!) { upsertDraftSystemRelease(secret: $secret, product: $product, entry: $entry) { success message releaseId } }",
+              variables: { secret: $secret, product: $product, entry: $entry }
+            }')
+
+          response=$(curl -sS -f -X POST "$KADESH_API_URL" \
+            -H "Content-Type: application/json" \
+            -d "$payload")
+
+          echo "$response" | jq .
+
+          echo "$response" | jq -e '.data.upsertDraftSystemRelease.success == true' > /dev/null
