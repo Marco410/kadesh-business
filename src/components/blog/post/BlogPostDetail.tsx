@@ -137,7 +137,7 @@ export default function BlogPostDetailComponent({ post }: BlogPostDetailProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="prose prose-lg dark:prose-invert max-w-none mb-8"
+          className="mb-8 text-lg"
         >
           <DocumentRenderer document={post.content?.document ?? []} renderers={renderers} />
         </motion.div>
