@@ -7,6 +7,11 @@ const SITEMAP_MAX_POSTS = 2000;
 
 const PUBLISHED_EQUALS = { equals: true };
 
+/** Un post programado (`publishedAt` a futuro) no debe aparecer en el sitio hasta esa fecha. */
+function duePublishedAtFilter(): { lte: string } {
+  return { lte: new Date().toISOString() };
+}
+
 const POST_CARD_FIELDS = `
   id
   title
@@ -43,11 +48,12 @@ const POST_CARD_FIELDS = `
 `;
 
 const POST_BY_URL_QUERY = `
-  query GetPublishedPostByUrl($url: String!) {
+  query GetPublishedPostByUrl($url: String!, $now: DateTime!) {
     posts(
       where: {
         url: { equals: $url }
         published: { equals: true }
+        publishedAt: { lte: $now }
         product: { in: ["saas", "all"] }
       }
       take: 1
@@ -168,9 +174,13 @@ export async function fetchPublishedPostByUrl(
     return null;
   }
 
-  const data = await queryGraphql<PostByUrlData>(POST_BY_URL_QUERY, { url });
+  const data = await queryGraphql<PostByUrlData>(POST_BY_URL_QUERY, {
+    url,
+    now: new Date().toISOString(),
+  });
   const post = data?.posts?.[0];
-  if (!post?.url || post.published === false) {
+  const isScheduledForLater = post?.publishedAt ? new Date(post.publishedAt) > new Date() : false;
+  if (!post?.url || post.published === false || isScheduledForLater) {
     return null;
   }
 
@@ -184,6 +194,7 @@ export async function fetchPublishedPosts(options?: {
 }): Promise<{ posts: BlogPost[]; postsCount: number }> {
   const where: Record<string, unknown> = {
     published: PUBLISHED_EQUALS,
+    publishedAt: duePublishedAtFilter(),
     product: BLOG_PRODUCT_FILTER,
   };
 
@@ -207,7 +218,11 @@ export async function fetchPublishedPosts(options?: {
 }
 
 export async function fetchPublishedPostsForSitemap(): Promise<SitemapPost[]> {
-  const where = { published: PUBLISHED_EQUALS, product: BLOG_PRODUCT_FILTER };
+  const where = {
+    published: PUBLISHED_EQUALS,
+    publishedAt: duePublishedAtFilter(),
+    product: BLOG_PRODUCT_FILTER,
+  };
   const orderBy = [{ publishedAt: 'desc' as const }];
   const posts: SitemapPost[] = [];
   let skip = 0;
