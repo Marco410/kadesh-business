@@ -19,6 +19,7 @@ import {
   WorkIcon,
   FlashIcon,
   SparklesIcon,
+  WhatsappIcon,
 } from "@hugeicons/core-free-icons";
 import ProfileData from "kadesh/components/profile/ProfileData";
 import { AiSection } from "kadesh/components/profile/ai/AiSection";
@@ -50,6 +51,7 @@ import CreateWorkspaceModal from "kadesh/components/profile/sales/workspaces/Cre
 import { NovedadesPage } from "../changelog";
 import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
 import { useCompanyAiLive } from "kadesh/components/profile/ai/useCompanyAiLive";
+import { WhatsAppSettingsSection } from "kadesh/components/profile/whatsapp/WhatsAppSettingsSection";
 import { cn } from "kadesh/utils/cn";
 
 const VALID_TABS = [
@@ -63,6 +65,7 @@ const VALID_TABS = [
   "cotizaciones",
   "calendar",
   "workspaces",
+  "whatsapp",
   "referidos",
   "novedades",
 ] as const;
@@ -131,6 +134,12 @@ const navItems = [
     key: "workspaces" as const,
     label: "Espacios de trabajo",
     icon: WorkIcon,
+  },
+  {
+    key: "whatsapp" as const,
+    label: "WhatsApp Business",
+    icon: WhatsappIcon,
+    requireAdminCompany: true,
   },
 ];
 
@@ -344,6 +353,10 @@ function PanelControlSectionContent({
     subscription?.planFeatures ?? null,
     PLAN_FEATURE_KEYS.WORKSPACES,
   );
+  const hasWhatsappFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.WHATSAPP,
+  );
   const selectedTab = getValidTab(
     tabFromUrl,
     hasVendedorRole,
@@ -553,6 +566,13 @@ function PanelControlSectionContent({
                   </div>
                 ) : (
                   <FeatureLockedSection sectionName="Espacios de trabajo" />
+                ))}
+
+              {selectedTab === "whatsapp" &&
+                (isAdminCompany && hasWhatsappFeature ? (
+                  <WhatsAppSettingsSection companyId={companyId} />
+                ) : (
+                  <FeatureLockedSection sectionName="WhatsApp Business" />
                 ))}
 
               {selectedTab === "referidos" && (

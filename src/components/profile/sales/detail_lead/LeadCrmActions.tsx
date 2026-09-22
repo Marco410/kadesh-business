@@ -8,10 +8,17 @@ import {
   Calendar02Icon,
   FileAttachmentIcon,
   MessageEditIcon,
+  WhatsappIcon,
 } from "@hugeicons/core-free-icons";
 import RegisterActivityModal from "./RegisterActivityModal";
 import RegisterProposalModal from "./RegisterProposalModal";
 import RegisterFollowUpModal from "./RegisterFollowUpModal";
+import WhatsAppChatModal from "kadesh/components/profile/whatsapp/WhatsAppChatModal";
+import { WHATSAPP_MESSAGES_COUNT_QUERY } from "kadesh/components/profile/whatsapp/queries";
+import type {
+  WhatsAppMessagesCountResponse,
+  WhatsAppMessagesCountVariables,
+} from "kadesh/components/profile/whatsapp/queries";
 import {
   TECH_SALES_ACTIVITIES_COUNT_QUERY,
   TECH_PROPOSALS_COUNT_QUERY,
@@ -32,6 +39,7 @@ import { useSubscription } from "../SubscriptionContext";
 export interface LeadCrmActionsProps {
   leadId: string;
   userId: string;
+  leadName?: string;
 }
 
 const ACTION_CARDS = [
@@ -62,16 +70,27 @@ const ACTION_CARDS = [
     tone:
       "border-emerald-200/80 dark:border-emerald-500/25 from-emerald-500/12 dark:from-emerald-500/15 ring-emerald-500/10 dark:ring-emerald-400/10 text-emerald-600 dark:text-emerald-400",
   },
+  {
+    key: "whatsapp" as const,
+    label: "WhatsApp",
+    cta: "Abrir chat",
+    feature: PLAN_FEATURE_KEYS.WHATSAPP,
+    icon: WhatsappIcon,
+    tone:
+      "border-[#25D366]/40 dark:border-[#25D366]/30 from-[#25D366]/12 dark:from-[#25D366]/15 ring-[#25D366]/10 dark:ring-[#25D366]/10 text-[#1ebe57] dark:text-[#25D366]",
+  },
 ] as const;
 
 export default function LeadCrmActions({
   leadId,
   userId,
+  leadName,
 }: LeadCrmActionsProps) {
   const { currentWorkspaceId } = useWorkspaceContext();
   const [activityModalOpen, setActivityModalOpen] = useState(false);
   const [proposalModalOpen, setProposalModalOpen] = useState(false);
   const [followUpModalOpen, setFollowUpModalOpen] = useState(false);
+  const [whatsappModalOpen, setWhatsappModalOpen] = useState(false);
   const { subscription } = useSubscription();
 
   const activitiesWhere: TechSalesActivitiesVariables["where"] =
@@ -139,16 +158,27 @@ export default function LeadCrmActions({
     fetchPolicy: "network-only",
   });
 
+  const { data: whatsappCountData } = useQuery<
+    WhatsAppMessagesCountResponse,
+    WhatsAppMessagesCountVariables
+  >(WHATSAPP_MESSAGES_COUNT_QUERY, {
+    variables: { businessLeadId: leadId },
+    skip: !leadId,
+    fetchPolicy: "network-only",
+  });
+
   const counts = {
     activity: countData?.techSalesActivitiesCount ?? 0,
     proposal: proposalsCountData?.techProposalsCount ?? 0,
     followup: followUpCountData?.techFollowUpTasksCount ?? 0,
+    whatsapp: whatsappCountData?.techWhatsAppMessagesCount ?? 0,
   };
 
   const openModal = (key: (typeof ACTION_CARDS)[number]["key"]) => {
     if (key === "activity") setActivityModalOpen(true);
     if (key === "proposal") setProposalModalOpen(true);
     if (key === "followup") setFollowUpModalOpen(true);
+    if (key === "whatsapp") setWhatsappModalOpen(true);
   };
 
   return (
@@ -222,6 +252,12 @@ export default function LeadCrmActions({
         onClose={() => setFollowUpModalOpen(false)}
         leadId={leadId}
         userId={userId}
+      />
+      <WhatsAppChatModal
+        isOpen={whatsappModalOpen}
+        onClose={() => setWhatsappModalOpen(false)}
+        leadId={leadId}
+        leadName={leadName}
       />
     </div>
   );
