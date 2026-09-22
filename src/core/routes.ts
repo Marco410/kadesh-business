@@ -64,5 +64,6 @@ export const Routes = {
     post: (url: string): string => `/blog/${url}`,
     /** Portada estable para compartir (la del CMS es una URL firmada que caduca). */
     postImage: (url: string): string => `/blog/${url}/og`,
+    unsubscribe: "/blog/desuscribirse",
   },
 } as const;
