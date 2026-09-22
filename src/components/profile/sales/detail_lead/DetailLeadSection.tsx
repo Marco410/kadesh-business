@@ -634,7 +634,11 @@ export default function DetailLeadSection() {
                 Añadir
               </span>
             </button>
-            <LeadCrmActions leadId={id} userId={user?.id ?? ""} />
+            <LeadCrmActions
+              leadId={id}
+              userId={user?.id ?? ""}
+              leadName={lead.businessName ?? undefined}
+            />
           </div>
         </div>
       </div>

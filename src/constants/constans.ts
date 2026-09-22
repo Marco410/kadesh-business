@@ -1082,6 +1082,7 @@ export const PLAN_FEATURE_KEYS = {
   EXPORT_EXCEL: "export_excel",
   QUOTATIONS: "quotations",
   WORKSPACES: "workspaces",
+  WHATSAPP: "whatsapp",
 } as const;
 
 export type PlanFeatureKey =
@@ -1156,6 +1157,10 @@ export const PLAN_FEATURES_MAP: Record<
   [PLAN_FEATURE_KEYS.WORKSPACES]: {
     name: "Espacios de trabajo",
     description: "Crear y gestionar espacios de trabajo",
+  },
+  [PLAN_FEATURE_KEYS.WHATSAPP]: {
+    name: "WhatsApp Business",
+    description: "Mandar y recibir WhatsApp con tus leads desde el CRM",
   },
 };
 
