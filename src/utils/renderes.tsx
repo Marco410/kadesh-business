@@ -9,21 +9,28 @@ const renderers: DocumentRendererProps['renderers'] = {
   },
   block: {
     paragraph: ({ children, textAlign }) => {
-      return <p style={{ textAlign }}>{children}</p>;
+      return (
+        <p
+          className="mb-4 leading-relaxed text-[#424242] dark:text-[#e0e0e0] last:mb-0"
+          style={{ textAlign }}
+        >
+          {children}
+        </p>
+      );
     },
     heading: ({ children, textAlign, level }) => {
       const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
       const headingClasses = {
-        1: 'text-4xl font-bold mb-6 mt-8',
-        2: 'text-3xl font-bold mb-5 mt-7',
-        3: 'text-2xl font-bold mb-4 mt-6',
-        4: 'text-xl font-bold mb-3 mt-5',
-        5: 'text-lg font-bold mb-3 mt-4',
-        6: 'text-base font-bold mb-2 mt-3',
-      }[level] || 'text-lg font-bold mb-3';
+        1: 'text-4xl font-bold mb-6 mt-10',
+        2: 'text-3xl font-bold mb-5 mt-9',
+        3: 'text-2xl font-bold mb-4 mt-8',
+        4: 'text-xl font-bold mb-3 mt-6',
+        5: 'text-lg font-bold mb-3 mt-5',
+        6: 'text-base font-bold mb-2 mt-4',
+      }[level] || 'text-lg font-bold mb-3 mt-5';
       return (
         <HeadingTag
-          className={`${headingClasses} text-[#212121] dark:text-[#ffffff]`}
+          className={`${headingClasses} text-[#212121] dark:text-[#ffffff] first:mt-0`}
           style={{ textAlign }}
         >
           {children}
@@ -31,14 +38,19 @@ const renderers: DocumentRendererProps['renderers'] = {
       );
     },
     list: ({ children, type }) => {
+      const items = children.map((child, index) => (
+        <li key={index} className="leading-relaxed text-[#424242] dark:text-[#e0e0e0]">
+          {child}
+        </li>
+      ));
       return type === 'unordered' ? (
-        <ul style={{listStyleType:'disc', marginLeft:20}}>{children.map((child, index) => <li key={index}>{child}</li>)}</ul>
+        <ul className="mb-4 ml-5 list-disc space-y-2 last:mb-0">{items}</ul>
       ) : (
-        <ol style={{listStyleType:'decimal', marginLeft:20}}>{children.map((child, index) => <li key={index}>{child}</li>)}</ol>
+        <ol className="mb-4 ml-5 list-decimal space-y-2 last:mb-0">{items}</ol>
       );
     },
     divider: () => {
-      return <hr style={{ marginTop: "2rem" }} />;
+      return <hr className="my-8 border-[#e0e0e0] dark:border-[#3a3a3a]" />;
     },
   },
 };
