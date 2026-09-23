@@ -55,7 +55,7 @@ export default function WhatsAppChatModal({
                 </div>
 
                 <WhatsAppChatPanel
-                  leadId={leadId}
+                  target={{ kind: "lead", id: leadId }}
                   active={isOpen}
                   className="min-h-0 flex-1"
                 />
