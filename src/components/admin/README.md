@@ -12,6 +12,16 @@ Solo el rol `admin` de plataforma. Un admin de empresa no entra. Si no hay sesi�
 
 El enlace **Operaciones** aparece en el menú del avatar y, de forma discreta, al final del dashboard de inicio.
 
+## Navegación en tres niveles
+
+Antes las tabs, la vista Fichas/Servicios y los filtros eran la misma píldora y no se distinguían. Ahora cada nivel tiene su propio componente en `ui.tsx`:
+
+1. **Secciones** (Inicio, Usuarios, Planes, Veterinarias) — `AdminTabBar`: texto con subrayado naranja en la activa, no píldoras.
+2. **Vista dentro de una sección** (Fichas / Servicios) — `AdminSegmented`: control segmentado, opción activa como pastilla blanca.
+3. **Filtros de una tabla** (rol, estado) — `AdminFilterChips`: chips pequeños, activo con tinte naranja (no relleno sólido), con etiqueta (**Rol**, **Estado**) para que se lea qué filtran.
+
+Una pantalla nueva usa el componente de su nivel. No vuelvas a poner píldoras sólidas en las tabs: compiten con el filtro y con los botones de acción, que son los únicos naranja sólido.
+
 ## Copy
 
 Decimos **Operaciones**, **planes**, **fichas**, **servicios**, **verificar**. Nunca GraphQL, Keystone, Stripe IDs ni `planFeatures` en la UI.
