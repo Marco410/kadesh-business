@@ -136,7 +136,9 @@ export function WhatsAppChatImportSection() {
       </h3>
       <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
         Sube el .txt que exporta WhatsApp por conversación (en el chat, menú → Más → Exportar
-        chat). Elige a qué lead pertenece cada archivo antes de importar.
+        chat). Elige a qué lead pertenece cada archivo antes de importar. Si todavía no
+        conectaste tu número arriba, exporta tus chats ahora — después de conectarlo a la Cloud
+        API ya no vas a poder sacarlos desde la app de WhatsApp.
       </p>
 
       <label className="mt-4 flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#e0e0e0] px-4 py-2.5 text-sm font-medium text-[#616161] transition-colors hover:border-orange-400 hover:text-orange-600 dark:border-[#3a3a3a] dark:text-[#b0b0b0] dark:hover:text-orange-400">
