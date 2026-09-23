@@ -110,6 +110,9 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
     success: boolean;
     message: string;
   } | null>(null);
+  // Motivo real (de Meta) de que no se creó la plantilla. Solo llega en la respuesta de la
+  // prueba de conexión (no se guarda en el back), así que vive aquí hasta la siguiente prueba.
+  const [templateError, setTemplateError] = useState<string | null>(null);
 
   useEffect(() => {
     setPhoneNumberId(saved?.whatsappPhoneNumberId ?? "");
@@ -207,6 +210,7 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
   const handleTestConnection = async () => {
     if (!companyId || isDirty) return;
     setTestResult(null);
+    setTemplateError(null);
     try {
       const result = await testConnection({ variables: { companyId } });
       const payload = result.data?.testCompanyWhatsappConnection;
@@ -215,6 +219,7 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
         ? `Conexión OK: ${payload?.displayPhoneNumber || "número verificado"}`
         : payload?.message || "No se pudo probar la conexión.";
       setTestResult({ success, message });
+      setTemplateError(payload?.templateError ?? null);
       success ? sileo.success({ title: message }) : sileo.error({ title: message });
       if (success) await refetch();
     } catch (err) {
@@ -302,6 +307,14 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
               <>
                 No se pudo crear la plantilla para iniciar conversaciones. Vuelve a darle{" "}
                 <strong>&quot;Probar conexión&quot;</strong> para reintentarlo.
+                {templateError ? (
+                  <>
+                    {" "}
+                    <span className="mt-1 block">
+                      Meta respondió: <em>{templateError}</em>
+                    </span>
+                  </>
+                ) : null}
               </>
             )}
           </p>
@@ -385,8 +398,8 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
           </div>
           <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
             Configuración de la empresa → Usuarios del sistema → genera uno permanente con
-            permiso <code>whatsapp_business_messaging</code>. Déjalo vacío para conservar el
-            actual.
+            los permisos <code>whatsapp_business_messaging</code> y{" "}
+            <code>whatsapp_business_management</code>. Déjalo vacío para conservar el actual.
           </p>
         </div>
 
@@ -520,8 +533,10 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
           <li>
             En <strong>Configuración de la empresa → Usuarios del sistema</strong>, crea un
             usuario de tipo Admin, asígnale esta App y genera un{" "}
-            <strong>token permanente</strong> (sin fecha de expiración) con el permiso{" "}
-            <code>whatsapp_business_messaging</code>.
+            <strong>token permanente</strong> (sin fecha de expiración) con los permisos{" "}
+            <code>whatsapp_business_messaging</code> y{" "}
+            <code>whatsapp_business_management</code> (este segundo es el que deja crear la
+            plantilla para iniciar conversaciones).
           </li>
           <li>
             En <strong>Configuración de la app → Básica</strong>, dale &quot;Mostrar&quot; a la{" "}
