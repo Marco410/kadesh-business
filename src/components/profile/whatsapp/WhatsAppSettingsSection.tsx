@@ -54,7 +54,7 @@ export function WhatsAppSettingsSection({
       </div>
 
       {tab === "chats" ? (
-        <WhatsAppChatsTab />
+        <WhatsAppChatsTab companyId={companyId} />
       ) : (
         <WhatsAppConfigTab companyId={companyId} />
       )}
