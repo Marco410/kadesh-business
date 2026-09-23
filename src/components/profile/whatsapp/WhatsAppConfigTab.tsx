@@ -18,10 +18,13 @@ import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
 import {
   COMPANY_WHATSAPP_SETTINGS_QUERY,
+  COMPANY_WHATSAPP_WEBHOOK_INFO_QUERY,
   TEST_COMPANY_WHATSAPP_CONNECTION_MUTATION,
   UPDATE_COMPANY_WHATSAPP_SETTINGS_MUTATION,
   type CompanyWhatsappSettingsResponse,
   type CompanyWhatsappSettingsVariables,
+  type CompanyWhatsappWebhookInfoResponse,
+  type CompanyWhatsappWebhookInfoVariables,
   type TestCompanyWhatsappConnectionResponse,
   type TestCompanyWhatsappConnectionVariables,
   type UpdateCompanyWhatsappSettingsResponse,
@@ -31,20 +34,6 @@ import { WhatsAppChatImportSection } from "./WhatsAppChatImportSection";
 
 const INPUT_CLASS =
   "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
-
-// Dominio del backend en Railway (donde vive /webhooks/whatsapp, registrado en
-// kadesh-back/keystone.ts), no el de este front: la empresa que lee esta instrucción siempre
-// debe apuntar su webhook de Meta a este dominio, sin importar desde qué entorno se vea esta
-// página.
-const WHATSAPP_WEBHOOK_URL =
-  "https://kadesh-back-production.up.railway.app/webhooks/whatsapp";
-
-// Mismo Verify Token para todas las empresas (WHATSAPP_WEBHOOK_VERIFY_TOKEN en el backend):
-// no es secreto de alto riesgo, la seguridad real la da la firma X-Hub-Signature-256 con el
-// App Secret de cada empresa (ver kadesh-back/config/.env.template). Se muestra oculto por
-// default para no dejarlo pegado en pantalla sin querer.
-const WHATSAPP_WEBHOOK_VERIFY_TOKEN =
-  "0ef084dc658e6ec7310959186e1ea445cec2a009d4045637c8eda0fe388f7639";
 
 export interface WhatsAppConfigTabProps {
   companyId: string | null;
@@ -90,9 +79,24 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
   >(COMPANY_WHATSAPP_SETTINGS_QUERY, {
     variables: { id: companyId ?? "" },
     skip: !companyId,
+    // Mientras se espera que Meta apruebe la plantilla de inicio de conversación (creada sola
+    // al probar la conexión), refresca sin que el usuario tenga que recargar la página.
+    pollInterval: 20000,
   });
 
   const saved = data?.saasCompany ?? null;
+
+  // Callback URL + Verify Token del webhook: nunca hardcodeados aquí, se piden autenticados
+  // (ver COMPANY_WHATSAPP_WEBHOOK_INFO_QUERY) y solo se resuelven para quien ya puede
+  // administrar el WhatsApp de esta empresa (canManageCompanyWhatsapp en el backend).
+  const { data: webhookInfoData } = useQuery<
+    CompanyWhatsappWebhookInfoResponse,
+    CompanyWhatsappWebhookInfoVariables
+  >(COMPANY_WHATSAPP_WEBHOOK_INFO_QUERY, {
+    variables: { companyId: companyId ?? "" },
+    skip: !companyId,
+  });
+  const webhookInfo = webhookInfoData?.companyWhatsappWebhookInfo ?? null;
 
   const [phoneNumberId, setPhoneNumberId] = useState("");
   const [businessAccountId, setBusinessAccountId] = useState("");
@@ -139,6 +143,7 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
   >(TEST_COMPANY_WHATSAPP_CONNECTION_MUTATION);
 
   const isConnected = Boolean(saved?.whatsappConnectedAt);
+  const templateStatus = saved?.whatsappTemplateStatus ?? "none";
   const busy = saving || testing;
 
   const isDirty = Boolean(
@@ -266,6 +271,40 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
               ? ` (actualizado ${formatDateShort(saved.whatsappConnectedAt)})`
               : ""}
           </span>
+        </div>
+      )}
+
+      {isConnected && templateStatus !== "approved" && (
+        <div
+          className={`mt-3 flex items-start gap-2 rounded-xl border p-4 text-sm ${
+            templateStatus === "rejected"
+              ? "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-300"
+              : "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300"
+          }`}
+        >
+          <HugeiconsIcon icon={Alert02Icon} size={18} className="mt-0.5 shrink-0" />
+          <p className="leading-relaxed">
+            {templateStatus === "rejected" ? (
+              <>
+                La plantilla para iniciar conversaciones con leads nuevos fue{" "}
+                <strong>rechazada por Meta</strong>. Contacta a soporte de Kadesh para
+                resolverlo — mientras tanto solo podrás contestar a leads que ya te
+                escribieron.
+              </>
+            ) : templateStatus === "pending" ? (
+              <>
+                La plantilla para iniciar conversaciones con leads nuevos está{" "}
+                <strong>pendiente de aprobación de Meta</strong> (puede tardar de minutos a un
+                par de días). Mientras tanto solo podrás contestar a leads que ya te
+                escribieron.
+              </>
+            ) : (
+              <>
+                No se pudo crear la plantilla para iniciar conversaciones. Vuelve a darle{" "}
+                <strong>&quot;Probar conexión&quot;</strong> para reintentarlo.
+              </>
+            )}
+          </p>
         </div>
       )}
 
@@ -489,32 +528,40 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
             <strong>Clave secreta de la aplicación</strong> (App Secret) y cópiala.
           </li>
           <li>
-            En <strong>WhatsApp → Configuración → Webhook</strong>, edita la Callback URL a{" "}
-            <span className="inline-flex items-center gap-1.5 align-middle">
-              <code className="select-all">{WHATSAPP_WEBHOOK_URL}</code>
-              <CopyButton value={WHATSAPP_WEBHOOK_URL} label="URL del webhook" />
-            </span>{" "}
-            y pon este mismo <strong>Verify Token</strong>:{" "}
-            <span className="inline-flex items-center gap-1.5 align-middle">
-              <code className="select-all">
-                {showWebhookToken
-                  ? WHATSAPP_WEBHOOK_VERIFY_TOKEN
-                  : "•".repeat(24)}
-              </code>
-              <button
-                type="button"
-                onClick={() => setShowWebhookToken((prev) => !prev)}
-                className="inline-flex shrink-0 items-center rounded-md p-1 text-[#616161] transition-colors hover:bg-black/5 hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:bg-white/10 dark:hover:text-white"
-                aria-label={showWebhookToken ? "Ocultar Verify Token" : "Mostrar Verify Token"}
-              >
-                <HugeiconsIcon
-                  icon={showWebhookToken ? ViewOffIcon : EyeIcon}
-                  className="size-3.5"
-                />
-              </button>
-              <CopyButton value={WHATSAPP_WEBHOOK_VERIFY_TOKEN} label="Verify Token" />
-            </span>
-            . Verifica y guarda, luego suscríbete al campo <code>messages</code> — sin eso no
+            En <strong>WhatsApp → Configuración → Webhook</strong>, edita la Callback URL y el{" "}
+            <strong>Verify Token</strong> con estos datos:
+            {webhookInfo?.success && webhookInfo.webhookUrl && webhookInfo.verifyToken ? (
+              <>
+                {" "}
+                <span className="inline-flex items-center gap-1.5 align-middle">
+                  <code className="select-all">{webhookInfo.webhookUrl}</code>
+                  <CopyButton value={webhookInfo.webhookUrl} label="URL del webhook" />
+                </span>{" "}
+                y{" "}
+                <span className="inline-flex items-center gap-1.5 align-middle">
+                  <code className="select-all">
+                    {showWebhookToken
+                      ? webhookInfo.verifyToken
+                      : "•".repeat(24)}
+                  </code>
+                  <button
+                    type="button"
+                    onClick={() => setShowWebhookToken((prev) => !prev)}
+                    className="inline-flex shrink-0 items-center rounded-md p-1 text-[#616161] transition-colors hover:bg-black/5 hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:bg-white/10 dark:hover:text-white"
+                    aria-label={showWebhookToken ? "Ocultar Verify Token" : "Mostrar Verify Token"}
+                  >
+                    <HugeiconsIcon
+                      icon={showWebhookToken ? ViewOffIcon : EyeIcon}
+                      className="size-3.5"
+                    />
+                  </button>
+                  <CopyButton value={webhookInfo.verifyToken} label="Verify Token" />
+                </span>
+              </>
+            ) : (
+              <span className="italic"> pídeselos a tu contacto en Kadesh.</span>
+            )}{" "}
+            Verifica y guarda, luego suscríbete al campo <code>messages</code> — sin eso no
             llegan los mensajes entrantes.
           </li>
           <li>Pega los 4 datos aquí arriba y guarda.</li>

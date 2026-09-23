@@ -9,6 +9,7 @@ export const COMPANY_WHATSAPP_SETTINGS_QUERY = gql`
       whatsappDisplayPhoneNumber
       whatsappTokenPreview
       whatsappConnectedAt
+      whatsappTemplateStatus
     }
   }
 `;
@@ -20,6 +21,7 @@ export interface CompanyWhatsappSettings {
   whatsappDisplayPhoneNumber: string | null;
   whatsappTokenPreview: string | null;
   whatsappConnectedAt: string | null;
+  whatsappTemplateStatus: "none" | "pending" | "approved" | "rejected" | null;
 }
 
 export interface CompanyWhatsappSettingsResponse {
@@ -28,6 +30,73 @@ export interface CompanyWhatsappSettingsResponse {
 
 export interface CompanyWhatsappSettingsVariables {
   id: string;
+}
+
+// Callback URL + Verify Token del webhook de Meta: nunca hardcodeados en el front (el
+// Verify Token es un secreto del backend), se piden autenticados vía esta query, gateada por
+// canManageCompanyWhatsapp en el backend (graphql/customs/queries/whatsapp/).
+export const COMPANY_WHATSAPP_WEBHOOK_INFO_QUERY = gql`
+  query CompanyWhatsappWebhookInfo($companyId: ID!) {
+    companyWhatsappWebhookInfo(companyId: $companyId) {
+      success
+      message
+      webhookUrl
+      verifyToken
+    }
+  }
+`;
+
+export interface CompanyWhatsappWebhookInfoResult {
+  success: boolean;
+  message: string;
+  webhookUrl: string | null;
+  verifyToken: string | null;
+}
+
+export interface CompanyWhatsappWebhookInfoResponse {
+  companyWhatsappWebhookInfo: CompanyWhatsappWebhookInfoResult;
+}
+
+export interface CompanyWhatsappWebhookInfoVariables {
+  companyId: string;
+}
+
+export const WHATSAPP_CONVERSATIONS_QUERY = gql`
+  query WhatsAppConversations($companyId: ID!) {
+    whatsappConversations(companyId: $companyId) {
+      success
+      message
+      conversations {
+        leadId
+        leadName
+        lastMessageBody
+        lastMessageAt
+        lastMessageDirection
+      }
+    }
+  }
+`;
+
+export interface WhatsAppConversationSummary {
+  leadId: string;
+  leadName: string;
+  lastMessageBody: string;
+  lastMessageAt: string;
+  lastMessageDirection: "inbound" | "outbound" | "unknown";
+}
+
+export interface WhatsAppConversationsResult {
+  success: boolean;
+  message: string;
+  conversations: WhatsAppConversationSummary[];
+}
+
+export interface WhatsAppConversationsResponse {
+  whatsappConversations: WhatsAppConversationsResult;
+}
+
+export interface WhatsAppConversationsVariables {
+  companyId: string;
 }
 
 export const UPDATE_COMPANY_WHATSAPP_SETTINGS_MUTATION = gql`
@@ -136,9 +205,13 @@ export const WHATSAPP_MESSAGES_QUERY = gql`
       direction
       source
       senderLabel
+      messageKind
       body
       status
       errorMessage
+      mediaUrl
+      mediaType
+      mediaFileName
       createdAt
     }
   }
@@ -149,9 +222,13 @@ export interface WhatsAppMessageItem {
   direction: "inbound" | "outbound" | "unknown";
   source: "api" | "imported";
   senderLabel: string | null;
+  messageKind: "text" | "template";
   body: string;
   status: "sent" | "received" | "failed";
   errorMessage: string | null;
+  mediaUrl: string | null;
+  mediaType: "image" | "document" | null;
+  mediaFileName: string | null;
   createdAt: string;
 }
 
@@ -242,4 +319,80 @@ export interface ImportWhatsAppChatExportVariables {
   fileName?: string | null;
   content: string;
   leadSenderName?: string | null;
+}
+
+/** Estado para decidir si mostrar el composer normal o el botón "Iniciar conversación". */
+export const BUSINESS_LEAD_WHATSAPP_STATUS_QUERY = gql`
+  query BusinessLeadWhatsappStatus($businessLeadId: ID!) {
+    businessLeadWhatsappStatus(businessLeadId: $businessLeadId) {
+      success
+      message
+      canReplyFreely
+      templateStatus
+    }
+  }
+`;
+
+export interface BusinessLeadWhatsappStatusResult {
+  success: boolean;
+  message: string;
+  canReplyFreely: boolean;
+  templateStatus: "none" | "pending" | "approved" | "rejected" | null;
+}
+
+export interface BusinessLeadWhatsappStatusResponse {
+  businessLeadWhatsappStatus: BusinessLeadWhatsappStatusResult;
+}
+
+export interface BusinessLeadWhatsappStatusVariables {
+  businessLeadId: string;
+}
+
+/** Manda la plantilla aprobada para iniciarle conversación a un lead que nunca ha escrito. */
+export const START_WHATSAPP_CONVERSATION_MUTATION = gql`
+  mutation StartWhatsAppConversation($businessLeadId: ID!) {
+    startWhatsAppConversation(businessLeadId: $businessLeadId) {
+      success
+      message
+    }
+  }
+`;
+
+export interface StartWhatsAppConversationResult {
+  success: boolean;
+  message: string;
+}
+
+export interface StartWhatsAppConversationResponse {
+  startWhatsAppConversation: StartWhatsAppConversationResult;
+}
+
+export interface StartWhatsAppConversationVariables {
+  businessLeadId: string;
+}
+
+export const SEND_WHATSAPP_MEDIA_MESSAGE_MUTATION = gql`
+  mutation SendWhatsAppMediaMessage($businessLeadId: ID!, $media: Upload!, $caption: String) {
+    sendWhatsAppMediaMessage(businessLeadId: $businessLeadId, media: $media, caption: $caption) {
+      success
+      message
+      messageId
+    }
+  }
+`;
+
+export interface SendWhatsAppMediaMessageResult {
+  success: boolean;
+  message: string;
+  messageId: string | null;
+}
+
+export interface SendWhatsAppMediaMessageResponse {
+  sendWhatsAppMediaMessage: SendWhatsAppMediaMessageResult;
+}
+
+export interface SendWhatsAppMediaMessageVariables {
+  businessLeadId: string;
+  media: File;
+  caption?: string | null;
 }
