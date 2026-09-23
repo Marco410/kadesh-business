@@ -23,3 +23,10 @@ Enter en un input avanza de paso. En notas (textarea) sí inserta salto de líne
 ## Acceso
 
 La feature de plan `add_own_leads`. Si no está, `FeatureLockedSection`. Sin empresa asociada, la página muestra `EmptyCompanySection` antes de montar este formulario.
+
+## Alta rápida desde WhatsApp
+
+La bandeja de WhatsApp (`profile/whatsapp`) crea clientes con **solo nombre y teléfono** usando el mismo `addOwnLead`, con fuente `WhatsApp`. No pasa por este formulario ni pide categoría: es para empezar a escribir ya. Por eso el barrel (`index.ts`) exporta también `ADD_OWN_LEAD_MUTATION` y sus tipos: se importa desde ahí, no desde `queries.ts`.
+
+- `WhatsApp` es un texto libre, **no** una de las pastillas de **Fuente** de este formulario. Si algún día se lista o filtra por fuente, hay que agregarlo en los dos sitios.
+- La alta rápida no oculta el botón según el plan; la feature `add_own_leads` la valida el backend y el aviso de error llega al usuario.

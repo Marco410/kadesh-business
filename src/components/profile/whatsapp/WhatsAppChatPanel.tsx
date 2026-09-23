@@ -12,6 +12,7 @@ import {
   SEND_WHATSAPP_MESSAGE_MUTATION,
   START_WHATSAPP_CONVERSATION_MUTATION,
   WHATSAPP_MESSAGES_QUERY,
+  whatsappConversationWhere,
   type BusinessLeadWhatsappStatusResponse,
   type BusinessLeadWhatsappStatusVariables,
   type SendWhatsAppMediaMessageResponse,
@@ -29,8 +30,11 @@ const POLL_INTERVAL_MS = 5000;
 const STATUS_POLL_MS = 15000;
 const MEDIA_ACCEPT = "image/*,.pdf,.doc,.docx,.xls,.xlsx";
 
+/** Con quién es la conversación: un cliente del CRM o alguien del propio equipo. */
+export type WhatsAppChatTarget = { kind: "lead" | "team"; id: string };
+
 export interface WhatsAppChatPanelProps {
-  leadId: string;
+  target: WhatsAppChatTarget;
   /** false pausa el polling (p. ej. modal cerrado o tab no visible). */
   active?: boolean;
   className?: string;
@@ -46,7 +50,7 @@ function templateStatusMessage(templateStatus: string | null): string {
   if (templateStatus === "approved") {
     return "";
   }
-  return "Conecta WhatsApp en \"Configuración\" para poder escribirle primero a este lead.";
+  return "Conecta WhatsApp en \"Configuración\" para poder escribirle primero.";
 }
 
 /**
@@ -58,10 +62,14 @@ function templateStatusMessage(templateStatus: string | null): string {
  * plataforma). En ese caso se muestra "Iniciar conversación" en vez del composer.
  */
 export default function WhatsAppChatPanel({
-  leadId,
+  target,
   active = true,
   className = "",
 }: WhatsAppChatPanelProps) {
+  const leadId = target.kind === "lead" ? target.id : null;
+  const teamMemberId = target.kind === "team" ? target.id : null;
+  const targetVariables = { businessLeadId: leadId, teamMemberId };
+  const messagesWhere = whatsappConversationWhere(target);
   const [draft, setDraft] = useState("");
   const [justStarted, setJustStarted] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -71,16 +79,16 @@ export default function WhatsAppChatPanel({
     WhatsAppMessagesResponse,
     WhatsAppMessagesVariables
   >(WHATSAPP_MESSAGES_QUERY, {
-    variables: { businessLeadId: leadId },
-    skip: !active || !leadId,
+    variables: { where: messagesWhere },
+    skip: !active || !target.id,
     fetchPolicy: "cache-and-network",
   });
 
   useEffect(() => {
-    if (!active || !leadId) return;
+    if (!active || !target.id) return;
     startPolling(POLL_INTERVAL_MS);
     return () => stopPolling();
-  }, [active, leadId, startPolling, stopPolling]);
+  }, [active, target.id, startPolling, stopPolling]);
 
   const {
     data: statusData,
@@ -89,8 +97,8 @@ export default function WhatsAppChatPanel({
   } = useQuery<BusinessLeadWhatsappStatusResponse, BusinessLeadWhatsappStatusVariables>(
     BUSINESS_LEAD_WHATSAPP_STATUS_QUERY,
     {
-      variables: { businessLeadId: leadId },
-      skip: !active || !leadId,
+      variables: targetVariables,
+      skip: !active || !target.id,
       fetchPolicy: "cache-and-network",
       pollInterval: active ? STATUS_POLL_MS : 0,
     },
@@ -107,11 +115,11 @@ export default function WhatsAppChatPanel({
 
   const messagesQueryOptions = {
     query: WHATSAPP_MESSAGES_QUERY,
-    variables: { businessLeadId: leadId },
+    variables: { where: messagesWhere },
   };
   const statusQueryOptions = {
     query: BUSINESS_LEAD_WHATSAPP_STATUS_QUERY,
-    variables: { businessLeadId: leadId },
+    variables: targetVariables,
   };
 
   const [sendMessage, { loading: sending }] = useMutation<
@@ -137,7 +145,7 @@ export default function WhatsAppChatPanel({
     const body = draft.trim();
     if (!body || busy) return;
     try {
-      const result = await sendMessage({ variables: { businessLeadId: leadId, body } });
+      const result = await sendMessage({ variables: { ...targetVariables, body } });
       const payload = result.data?.sendWhatsAppMessage;
       if (!payload?.success) {
         sileo.error({ title: payload?.message || "No se pudo enviar el mensaje" });
@@ -155,7 +163,7 @@ export default function WhatsAppChatPanel({
     if (!file || busy) return;
     try {
       const result = await sendMedia({
-        variables: { businessLeadId: leadId, media: file, caption: draft.trim() || null },
+        variables: { ...targetVariables, media: file, caption: draft.trim() || null },
       });
       const payload = result.data?.sendWhatsAppMediaMessage;
       if (!payload?.success) {
@@ -172,7 +180,7 @@ export default function WhatsAppChatPanel({
 
   const handleStartConversation = async () => {
     try {
-      const result = await startConversation({ variables: { businessLeadId: leadId } });
+      const result = await startConversation({ variables: targetVariables });
       const payload = result.data?.startWhatsAppConversation;
       if (!payload?.success) {
         sileo.error({ title: payload?.message || "No se pudo iniciar la conversación" });

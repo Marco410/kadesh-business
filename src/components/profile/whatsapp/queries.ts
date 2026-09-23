@@ -68,7 +68,11 @@ export const WHATSAPP_CONVERSATIONS_QUERY = gql`
       message
       conversations {
         leadId
-        leadName
+        teamMemberId
+        kind
+        name
+        assignedToId
+        assignedToName
         lastMessageBody
         lastMessageAt
         lastMessageDirection
@@ -77,9 +81,18 @@ export const WHATSAPP_CONVERSATIONS_QUERY = gql`
   }
 `;
 
+export type WhatsAppConversationKind = "lead" | "team";
+
 export interface WhatsAppConversationSummary {
-  leadId: string;
-  leadName: string;
+  /** Presente solo en conversaciones con un cliente. */
+  leadId: string | null;
+  /** Presente solo en conversaciones internas con alguien del equipo. */
+  teamMemberId: string | null;
+  kind: WhatsAppConversationKind;
+  name: string;
+  /** Vendedor dueño del chat (= salesPerson del lead). Vacío = solo lo ven los admins. */
+  assignedToId: string | null;
+  assignedToName: string | null;
   lastMessageBody: string;
   lastMessageAt: string;
   lastMessageDirection: "inbound" | "outbound" | "unknown";
@@ -170,8 +183,8 @@ export interface TestCompanyWhatsappConnectionVariables {
 }
 
 export const SEND_WHATSAPP_MESSAGE_MUTATION = gql`
-  mutation SendWhatsAppMessage($businessLeadId: ID!, $body: String!) {
-    sendWhatsAppMessage(businessLeadId: $businessLeadId, body: $body) {
+  mutation SendWhatsAppMessage($businessLeadId: ID, $teamMemberId: ID, $body: String!) {
+    sendWhatsAppMessage(businessLeadId: $businessLeadId, teamMemberId: $teamMemberId, body: $body) {
       success
       message
       messageId
@@ -190,14 +203,15 @@ export interface SendWhatsAppMessageResponse {
 }
 
 export interface SendWhatsAppMessageVariables {
-  businessLeadId: string;
+  businessLeadId?: string | null;
+  teamMemberId?: string | null;
   body: string;
 }
 
 export const WHATSAPP_MESSAGES_QUERY = gql`
-  query WhatsAppMessages($businessLeadId: ID!) {
+  query WhatsAppMessages($where: TechWhatsAppMessageWhereInput!) {
     techWhatsAppMessages(
-      where: { businessLead: { id: { equals: $businessLeadId } } }
+      where: $where
       orderBy: [{ createdAt: asc }]
       take: 200
     ) {
@@ -237,7 +251,17 @@ export interface WhatsAppMessagesResponse {
 }
 
 export interface WhatsAppMessagesVariables {
-  businessLeadId: string;
+  where: Record<string, unknown>;
+}
+
+/** Filtro de la conversación: con un cliente (lead) o interna (compañero de equipo). */
+export function whatsappConversationWhere(target: {
+  kind: "lead" | "team";
+  id: string;
+}): Record<string, unknown> {
+  return target.kind === "lead"
+    ? { businessLead: { id: { equals: target.id } } }
+    : { teamMember: { id: { equals: target.id } } };
 }
 
 export const WHATSAPP_MESSAGES_COUNT_QUERY = gql`
@@ -323,8 +347,8 @@ export interface ImportWhatsAppChatExportVariables {
 
 /** Estado para decidir si mostrar el composer normal o el botón "Iniciar conversación". */
 export const BUSINESS_LEAD_WHATSAPP_STATUS_QUERY = gql`
-  query BusinessLeadWhatsappStatus($businessLeadId: ID!) {
-    businessLeadWhatsappStatus(businessLeadId: $businessLeadId) {
+  query BusinessLeadWhatsappStatus($businessLeadId: ID, $teamMemberId: ID) {
+    businessLeadWhatsappStatus(businessLeadId: $businessLeadId, teamMemberId: $teamMemberId) {
       success
       message
       canReplyFreely
@@ -345,13 +369,14 @@ export interface BusinessLeadWhatsappStatusResponse {
 }
 
 export interface BusinessLeadWhatsappStatusVariables {
-  businessLeadId: string;
+  businessLeadId?: string | null;
+  teamMemberId?: string | null;
 }
 
 /** Manda la plantilla aprobada para iniciarle conversación a un lead que nunca ha escrito. */
 export const START_WHATSAPP_CONVERSATION_MUTATION = gql`
-  mutation StartWhatsAppConversation($businessLeadId: ID!) {
-    startWhatsAppConversation(businessLeadId: $businessLeadId) {
+  mutation StartWhatsAppConversation($businessLeadId: ID, $teamMemberId: ID) {
+    startWhatsAppConversation(businessLeadId: $businessLeadId, teamMemberId: $teamMemberId) {
       success
       message
     }
@@ -368,12 +393,13 @@ export interface StartWhatsAppConversationResponse {
 }
 
 export interface StartWhatsAppConversationVariables {
-  businessLeadId: string;
+  businessLeadId?: string | null;
+  teamMemberId?: string | null;
 }
 
 export const SEND_WHATSAPP_MEDIA_MESSAGE_MUTATION = gql`
-  mutation SendWhatsAppMediaMessage($businessLeadId: ID!, $media: Upload!, $caption: String) {
-    sendWhatsAppMediaMessage(businessLeadId: $businessLeadId, media: $media, caption: $caption) {
+  mutation SendWhatsAppMediaMessage($businessLeadId: ID, $teamMemberId: ID, $media: Upload!, $caption: String) {
+    sendWhatsAppMediaMessage(businessLeadId: $businessLeadId, teamMemberId: $teamMemberId, media: $media, caption: $caption) {
       success
       message
       messageId
@@ -392,7 +418,65 @@ export interface SendWhatsAppMediaMessageResponse {
 }
 
 export interface SendWhatsAppMediaMessageVariables {
-  businessLeadId: string;
+  businessLeadId?: string | null;
+  teamMemberId?: string | null;
   media: File;
   caption?: string | null;
+}
+
+/** Compañeros de la empresa a los que se les puede escribir (o asignarles un chat). */
+export const COMPANY_WHATSAPP_TEAM_QUERY = gql`
+  query CompanyWhatsappTeam($companyId: ID!) {
+    companyWhatsappTeam(companyId: $companyId) {
+      success
+      message
+      members {
+        id
+        name
+        phone
+        canReceiveWhatsapp
+      }
+    }
+  }
+`;
+
+export interface WhatsAppTeamMember {
+  id: string;
+  name: string;
+  phone: string | null;
+  canReceiveWhatsapp: boolean;
+}
+
+export interface CompanyWhatsappTeamResponse {
+  companyWhatsappTeam: {
+    success: boolean;
+    message: string;
+    members: WhatsAppTeamMember[];
+  };
+}
+
+export interface CompanyWhatsappTeamVariables {
+  companyId: string;
+}
+
+/** Asignar el chat = asignarle el lead a ese vendedor (una sola fuente de verdad). */
+export const ASSIGN_WHATSAPP_CONVERSATION_MUTATION = gql`
+  mutation AssignWhatsAppConversation($businessLeadId: ID!, $salesPersonId: ID) {
+    assignWhatsAppConversation(
+      businessLeadId: $businessLeadId
+      salesPersonId: $salesPersonId
+    ) {
+      success
+      message
+    }
+  }
+`;
+
+export interface AssignWhatsAppConversationResponse {
+  assignWhatsAppConversation: { success: boolean; message: string };
+}
+
+export interface AssignWhatsAppConversationVariables {
+  businessLeadId: string;
+  salesPersonId?: string | null;
 }

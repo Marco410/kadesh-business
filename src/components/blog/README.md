@@ -16,6 +16,14 @@ El módulo se portó de Pet: los cambios de estructura conviene hacerlos en los 
 - Likes, favoritos, comentarios y vistas requieren sesión para escribir (misma cuenta `User` que el panel); anónimos solo leen.
 - **Newsletter**: `NewsletterSubscription` guarda `product: 'saas'`. El mismo correo puede estar suscrito a Pet y al SaaS; repetir el mismo producto muestra "ya está suscrito".
 
+## Cuerpo del artículo
+
+El cuerpo lo pinta `src/utils/renderes.tsx` (renderer del campo de contenido del CMS) y **ahí** vive el espaciado: margen y color por bloque (párrafo, lista, título, divisor). No está instalado `@tailwindcss/typography`, así que las clases `prose` **no hacen nada**: no las reintroduzcas esperando que separen los párrafos (eso fue lo que dejó el texto "amontonado" aunque el editor sí tenía los espacios). El contenedor solo fija el tamaño de lectura (`text-lg`).
+
+`kadesh-landing/src/utils/renderes.tsx` debe quedar igual.
+
+La miga de pan lleva `pt-24` porque el `Navigation` es `fixed`; sin ese margen se encima con el menú.
+
 ## Categorías
 
 Los valores (`prospecting`, `crm_sales`, `lead_gen`, `case_studies`, `product_updates`, más `news`, `tips`, `other`) salen de `POST_CATEGORIES` del backend. `POST_CATEGORIES_MAP` y `CATEGORY_COLORS` en `constants.ts` deben quedar alineados con esa lista; un valor desconocido se muestra tal cual.
