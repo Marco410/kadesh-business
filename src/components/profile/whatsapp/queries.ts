@@ -163,6 +163,7 @@ export const TEST_COMPANY_WHATSAPP_CONNECTION_MUTATION = gql`
       message
       displayPhoneNumber
       verifiedName
+      templateError
     }
   }
 `;
@@ -172,6 +173,8 @@ export interface TestCompanyWhatsappConnectionResult {
   message: string;
   displayPhoneNumber: string | null;
   verifiedName: string | null;
+  /** Motivo (de Meta) por el que no se pudo crear la plantilla de inicio; null si salió bien. */
+  templateError: string | null;
 }
 
 export interface TestCompanyWhatsappConnectionResponse {
