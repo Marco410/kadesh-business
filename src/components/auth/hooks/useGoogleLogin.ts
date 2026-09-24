@@ -180,6 +180,7 @@ export function useGoogleLogin(options?: UseGoogleLoginOptions) {
         variables: {
           idToken: response.credential,
           referrerCode: options?.referralCode ?? null,
+          product: "saas",
         },
       });
     },

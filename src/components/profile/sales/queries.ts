@@ -1803,6 +1803,7 @@ export interface CreateSalesPersonVariables {
     birthday?: string | null;
     salesComission?: number | null;
     salesPersonVerified?: boolean | null;
+    product?: "pet" | "saas";
     roles?: { connect: Array<{ id: string }> };
     company?: { connect: { id: string } };
   };
