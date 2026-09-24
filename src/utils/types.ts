@@ -20,5 +20,9 @@ export interface User {
   birthday?: string | null;
   age?: string | null;
   createdAt: string;
+  onboardingState?: Record<
+    string,
+    { status: "completed" | "skipped"; at: string; version: number }
+  > | null;
   salesComission?: number | null;
 }

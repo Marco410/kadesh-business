@@ -1042,6 +1042,7 @@ export default function ObtenerClientesSection({
                     type="button"
                     onClick={() => void runSync()}
                     disabled={isLoading}
+                    data-tour="extraccion-buscar-leads"
                     whileHover={reduceMotion ? undefined : { scale: 1.03 }}
                     whileTap={reduceMotion ? undefined : { scale: 0.97 }}
                     className={`inline-flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-150 hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70 sm:flex-none ${FOCUS_RING}`}

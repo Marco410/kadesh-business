@@ -25,6 +25,7 @@ import {
   type AutocompleteOption,
 } from "kadesh/components/shared";
 import LocationPicker from "kadesh/components/shared/LocationPicker";
+import { TourHelpButton } from "kadesh/components/onboarding";
 import { Routes } from "kadesh/core/routes";
 import {
   ADD_OWN_LEAD_MUTATION,
@@ -272,13 +273,16 @@ export default function AddLeadSection() {
       </div>
 
       <div className="rounded-xl border border-orange-200/60 dark:border-orange-900/40 bg-white dark:bg-[#1e1e1e] shadow-sm">
-        <div className="px-6 py-5 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/[0.07] to-transparent dark:from-orange-500/10">
-          <h1 className="text-xl font-bold text-[#212121] dark:text-white">
-            Agregar cliente
-          </h1>
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1">
-            Paso {step} de 3. Con nombre y categoría ya puedes guardar.
-          </p>
+        <div className="flex items-start justify-between gap-3 px-6 py-5 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/[0.07] to-transparent dark:from-orange-500/10">
+          <div>
+            <h1 className="text-xl font-bold text-[#212121] dark:text-white">
+              Agregar cliente
+            </h1>
+            <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1">
+              Paso {step} de 3. Con nombre y categoría ya puedes guardar.
+            </p>
+          </div>
+          <TourHelpButton tourId="agregar-cliente" />
         </div>
 
         <nav
