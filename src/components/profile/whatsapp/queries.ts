@@ -71,6 +71,7 @@ export const WHATSAPP_CONVERSATIONS_QUERY = gql`
         teamMemberId
         kind
         name
+        phone
         assignedToId
         assignedToName
         lastMessageBody
@@ -90,6 +91,7 @@ export interface WhatsAppConversationSummary {
   teamMemberId: string | null;
   kind: WhatsAppConversationKind;
   name: string;
+  phone: string | null;
   /** Vendedor dueño del chat (= salesPerson del lead). Vacío = solo lo ven los admins. */
   assignedToId: string | null;
   assignedToName: string | null;
@@ -211,12 +213,26 @@ export interface SendWhatsAppMessageVariables {
   body: string;
 }
 
+/** Cuántos mensajes trae cada página del chat (los últimos al abrir; otros tantos al subir). */
+export const WHATSAPP_MESSAGES_PAGE_SIZE = 30;
+
+/** Paginada por cursor (id), no por `skip`: mientras alguien escribe llegan mensajes nuevos y un
+ * `skip` fijo se correría y repetiría o se comería mensajes. `id` va como desempate porque los
+ * mensajes importados comparten minuto y sin él el orden entre ellos no es estable. */
 export const WHATSAPP_MESSAGES_QUERY = gql`
-  query WhatsAppMessages($where: TechWhatsAppMessageWhereInput!) {
+  query WhatsAppMessages(
+    $where: TechWhatsAppMessageWhereInput!
+    $orderBy: [TechWhatsAppMessageOrderByInput!]!
+    $take: Int!
+    $skip: Int! = 0
+    $cursor: TechWhatsAppMessageWhereUniqueInput
+  ) {
     techWhatsAppMessages(
       where: $where
-      orderBy: [{ createdAt: asc }]
-      take: 200
+      orderBy: $orderBy
+      take: $take
+      skip: $skip
+      cursor: $cursor
     ) {
       id
       direction
@@ -253,8 +269,17 @@ export interface WhatsAppMessagesResponse {
   techWhatsAppMessages: WhatsAppMessageItem[];
 }
 
+type MessageOrderBy = Array<{ createdAt: "asc" | "desc" } | { id: "asc" | "desc" }>;
+
+export const WHATSAPP_NEWEST_FIRST: MessageOrderBy = [{ createdAt: "desc" }, { id: "desc" }];
+export const WHATSAPP_OLDEST_FIRST: MessageOrderBy = [{ createdAt: "asc" }, { id: "asc" }];
+
 export interface WhatsAppMessagesVariables {
   where: Record<string, unknown>;
+  orderBy: MessageOrderBy;
+  take: number;
+  skip?: number;
+  cursor?: { id: string } | null;
 }
 
 /** Filtro de la conversación: con un cliente (lead) o interna (compañero de equipo). */

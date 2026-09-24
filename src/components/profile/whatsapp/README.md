@@ -17,6 +17,8 @@ Hoy el tab lo ve **solo el admin de empresa** con la feature de plan `WHATSAPP` 
 Bandeja estilo WhatsApp: conversaciones a la izquierda, chat abierto a la derecha. En móvil se ve una cosa a la vez (lista o chat, con flecha para volver).
 
 - La lista trae **solo conversaciones que ya tienen mensajes**, la más reciente arriba. Excepción: un chat que abriste en esta sesión y aún no tiene mensajes aparece como **Nuevo** para poder escribirle. Eso vive solo en el navegador: al recargar desaparece hasta que haya un mensaje (el cliente sí queda guardado en Clientes).
+- **Al abrir un chat se ven los últimos mensajes, ya posicionado abajo y sin animación.** Se traen de a 30; al subir con el scroll (o con **Ver mensajes anteriores**) se cargan los anteriores sin mover lo que estás leyendo. Un mensaje nuevo baja solo únicamente si ya estabas abajo (o si lo mandaste tú): si subiste a leer historial, no te jala de regreso. Es paginado por cursor, no por `skip`, a propósito: mientras se conversa llegan mensajes y un `skip` fijo repetiría o se comería alguno. No vuelvas a traer "los primeros N": eso era lo que mostraba el arranque de la conversación en vez de lo reciente.
+- **Encabezado del chat**: el nombre de un cliente es un enlace a su ficha (`Routes.panelLead`) y al lado va su teléfono. En un chat interno el nombre no enlaza (no hay ficha de cliente), pero sí muestra el teléfono.
 - **Nueva** abre dos pestañas:
   - **Cliente** — alta rápida con solo nombre y teléfono (`addOwnLead`, fuente `WhatsApp`). No pedimos categoría ni ubicación a propósito: es para escribir ya. El formulario completo sigue en `sales/lead`.
   - **Mi equipo** — no crea nada; usa el teléfono del perfil de la persona. Sin teléfono aparece deshabilitado.

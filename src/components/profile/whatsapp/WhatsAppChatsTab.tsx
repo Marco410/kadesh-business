@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -10,6 +11,7 @@ import {
   WhatsappIcon,
 } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
+import { Routes } from "kadesh/core/routes";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { useUser } from "kadesh/utils/UserContext";
 import { isAdminCompanyUser, isPlatformAdminUser } from "kadesh/utils/user-roles";
@@ -35,6 +37,8 @@ type ConversationRow = WhatsAppConversationSummary & { isNew?: boolean };
 type SelectedConversation = {
   target: WhatsAppChatTarget;
   name: string;
+  /** Teléfono conocido al abrir (p. ej. recién agregado); la lista lo trae del back. */
+  phone?: string | null;
 };
 
 /** Tab "Chats": bandeja estilo WhatsApp — conversaciones a la izquierda (clientes y equipo), el
@@ -97,6 +101,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
         teamMemberId: chat.target.kind === "team" ? chat.target.id : null,
         kind: chat.target.kind,
         name: chat.name,
+        phone: chat.phone ?? null,
         assignedToId: null,
         assignedToName: null,
         lastMessageBody: "",
@@ -123,6 +128,9 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
           (c.leadId ?? c.teamMemberId) === selected.target.id,
       ) ?? null
     : null;
+
+  // El teléfono de la lista (dato vivo del back) gana; el de al abrir cubre chats recién creados.
+  const chatPhone = selectedRow?.phone ?? selected?.phone ?? null;
 
   const handleAssign = async (salesPersonId: string | null) => {
     if (!selected || selected.target.kind !== "lead") return;
@@ -218,7 +226,11 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
                     <button
                       type="button"
                       onClick={() =>
-                        setSelected({ target: { kind: c.kind, id }, name: c.name })
+                        setSelected({
+                          target: { kind: c.kind, id },
+                          name: c.name,
+                          phone: c.phone,
+                        })
                       }
                       className={`flex w-full flex-col gap-0.5 border-b border-[#f0f0f0] px-4 py-3 text-left transition-colors dark:border-[#2a2a2a] ${
                         isSelected
@@ -288,9 +300,26 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
               >
                 <HugeiconsIcon icon={ArrowLeft01Icon} size={18} />
               </button>
-              <h3 className="truncate text-sm font-semibold text-[#212121] dark:text-white">
-                {selected.name}
-              </h3>
+              <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
+                {selected.target.kind === "lead" ? (
+                  <Link
+                    href={Routes.panelLead(selected.target.id)}
+                    title="Ver detalles del cliente"
+                    className="truncate text-sm font-semibold text-[#212121] hover:text-orange-500 hover:underline dark:text-white dark:hover:text-orange-400"
+                  >
+                    {selected.name}
+                  </Link>
+                ) : (
+                  <h3 className="truncate text-sm font-semibold text-[#212121] dark:text-white">
+                    {selected.name}
+                  </h3>
+                )}
+                {chatPhone ? (
+                  <span className="shrink-0 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    {chatPhone}
+                  </span>
+                ) : null}
+              </div>
               {selected.target.kind === "team" ? (
                 <span className="rounded-full bg-black/5 px-2 py-0.5 text-[11px] font-medium text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]">
                   Chat interno
