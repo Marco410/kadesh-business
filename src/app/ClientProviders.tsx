@@ -13,6 +13,7 @@ import {
   CookieConsentBanner,
   MetaPixelLoader,
 } from "kadesh/components/consent";
+import { OnboardingProvider } from "kadesh/components/onboarding";
 import { HeroUIProvider } from "@heroui/system";
 import { Toaster } from "sileo";
 import { useTheme } from "next-themes";
@@ -48,7 +49,7 @@ export default function ClientProviders({
           <ApolloProviderWrapper>
             <UserProvider>
               <WorkspaceProvider>
-              {children}
+                <OnboardingProvider>{children}</OnboardingProvider>
               </WorkspaceProvider>
               <ThemedToaster />
               <SpeedInsights />

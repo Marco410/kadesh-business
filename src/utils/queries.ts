@@ -23,6 +23,7 @@ export const AUTHENTICATED_ITEM_QUERY = gql(`
         birthday
         age
         createdAt
+        onboardingState
       }
     }
   }

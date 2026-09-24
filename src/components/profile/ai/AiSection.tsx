@@ -100,7 +100,7 @@ export function AiSection({
         <span className="ai-urim-fill mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl shadow-[0_6px_14px_rgba(139,92,246,0.28)]">
           <HugeiconsIcon icon={SparklesIcon} size={22} />
         </span>
-        <div>
+        <div data-tour="ai-header">
           <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
             {KADESH_URIM_AI_NAME}
           </h2>
@@ -113,6 +113,7 @@ export function AiSection({
       <motion.div
         className="flex w-full gap-1 rounded-xl border border-[#e0e0e0] bg-white p-1 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
         role="tablist"
+        data-tour="ai-tabs"
         aria-label={`${KADESH_URIM_AI_NAME} secciones`}
         variants={fadeUp}
         initial="hidden"
@@ -124,6 +125,7 @@ export function AiSection({
             key={item.key}
             type="button"
             role="tab"
+            data-tour={`ai-tab-${item.key}`}
             aria-selected={tab === item.key}
             onClick={() => setTab(item.key)}
             className={cn(

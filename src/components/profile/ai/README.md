@@ -23,6 +23,10 @@ No reexportes componentes React desde `index.ts` (rompe el language service). Im
 
 No cambies de tab después de guardar. `configured` ≠ `isAiLive`: live exige además un `connection_test` exitoso. El digest, el playbook y el brief de empresa se piden al modelo solo si `isAiLive`.
 
+## Tutorial guiado
+
+El tour `ai` (`onboarding/registry.ts`) recorre encabezado y las tres tabs con anclas `data-tour="ai-header"`, `ai-tabs` y `ai-tab-<key>`; abre desde el botón "Tutorial" del panel. Solo resalta elementos siempre visibles: no cambia de tab. Mismo tono y prohibiciones de copy que esta pantalla (sin proveedor, modelo ni jerga). Si agregas una tab, agrégala al tour.
+
 ## Copy: la IA ya conoce el negocio
 
 Al usuario: Kadesh **ya sabe** de su empresa por lo que van capturando (perfil / Información) y por cómo usan el SaaS.

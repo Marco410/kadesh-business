@@ -1,0 +1,14 @@
+---
+description: Mantener el tutorial guiado sincronizado cuando se agrega o cambia UI del panel.
+alwaysApply: true
+---
+
+# Tutorial guiado (onboarding)
+
+Cuando agregues o cambies una sección, tab, botón principal o flujo del panel:
+
+1. Ponle `data-tour="<seccion>-<elemento>"` (o usa un `#id` estable).
+2. Registra su paso en `src/components/onboarding/registry.ts` (tour de la sección y, si es clave, en `welcome`).
+3. Si el flujo de un tour cambió, sube su `version`.
+4. Corre `pnpm check:tours`. Falla si un target no existe o si una sección del sidebar no tiene paso ni está exenta.
+5. Actualiza `src/components/onboarding/README.md` si cambia una decisión de producto o copy.
