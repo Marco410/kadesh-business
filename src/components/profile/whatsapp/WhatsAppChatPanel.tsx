@@ -34,8 +34,9 @@ const NEAR_EDGE_PX = 120;
 const STATUS_POLL_MS = 15000;
 const MEDIA_ACCEPT = "image/*,.pdf,.doc,.docx,.xls,.xlsx";
 
-/** Con quién es la conversación: un cliente del CRM o alguien del propio equipo. */
-export type WhatsAppChatTarget = { kind: "lead" | "team"; id: string };
+/** Con quién es la conversación: un cliente del CRM, alguien del equipo, o un número que aún
+ * no es cliente (`id` = últimos 10 dígitos; solo lo ven los admins). */
+export type WhatsAppChatTarget = { kind: "lead" | "team" | "phone"; id: string };
 
 export interface WhatsAppChatPanelProps {
   target: WhatsAppChatTarget;
@@ -85,7 +86,8 @@ export default function WhatsAppChatPanel({
   const { kind, id: targetId } = target;
   const leadId = kind === "lead" ? targetId : null;
   const teamMemberId = kind === "team" ? targetId : null;
-  const targetVariables = { businessLeadId: leadId, teamMemberId };
+  const phone = kind === "phone" ? targetId : null;
+  const targetVariables = { businessLeadId: leadId, teamMemberId, phone };
   const client = useApolloClient();
 
   const [draft, setDraft] = useState("");

@@ -29,10 +29,16 @@ import {
 } from "./queries";
 import WhatsAppChatPanel, { type WhatsAppChatTarget } from "./WhatsAppChatPanel";
 import WhatsAppNewConversationModal from "./WhatsAppNewConversationModal";
+import WhatsAppSaveContactModal from "./WhatsAppSaveContactModal";
 
 const CONVERSATIONS_POLL_MS = 8000;
 
 type ConversationRow = WhatsAppConversationSummary & { isNew?: boolean };
+
+/** Id con el que se abre el chat: el del cliente, el del compañero, o los últimos 10 dígitos. */
+function conversationId(c: WhatsAppConversationSummary): string {
+  return (c.leadId ?? c.teamMemberId ?? c.phoneKey) as string;
+}
 
 type SelectedConversation = {
   target: WhatsAppChatTarget;
@@ -50,6 +56,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
   const [selected, setSelected] = useState<SelectedConversation | null>(null);
   const [manualChats, setManualChats] = useState<SelectedConversation[]>([]);
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
+  const [isSaveContactOpen, setIsSaveContactOpen] = useState(false);
 
   const conversationsQueryOptions = {
     query: WHATSAPP_CONVERSATIONS_QUERY,
@@ -88,7 +95,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
     const keyOf = (kind: string, id: string) => `${kind}:${id}`;
 
     for (const c of fetched) {
-      const id = c.leadId ?? c.teamMemberId;
+      const id = conversationId(c);
       if (id) byKey.set(keyOf(c.kind, id), c);
     }
     // Chats abiertos en esta sesión que todavía no tienen ningún mensaje: se muestran igual
@@ -99,6 +106,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
       byKey.set(key, {
         leadId: chat.target.kind === "lead" ? chat.target.id : null,
         teamMemberId: chat.target.kind === "team" ? chat.target.id : null,
+        phoneKey: chat.target.kind === "phone" ? chat.target.id : null,
         kind: chat.target.kind,
         name: chat.name,
         phone: chat.phone ?? null,
@@ -124,8 +132,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
   const selectedRow = selected
     ? conversations.find(
         (c) =>
-          c.kind === selected.target.kind &&
-          (c.leadId ?? c.teamMemberId) === selected.target.id,
+          c.kind === selected.target.kind && conversationId(c) === selected.target.id,
       ) ?? null
     : null;
 
@@ -173,6 +180,26 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
         }}
       />
 
+      {selected?.target.kind === "phone" ? (
+        <WhatsAppSaveContactModal
+          key={selected.target.id}
+          isOpen={isSaveContactOpen}
+          onClose={() => setIsSaveContactOpen(false)}
+          phone={chatPhone ?? `+${selected.target.id}`}
+          phoneKey={selected.target.id}
+          // Sin nombre de perfil el nombre de la fila es el teléfono: no sirve de sugerencia.
+          suggestedName={
+            selectedRow && selectedRow.name !== selectedRow.phone ? selectedRow.name : ""
+          }
+          onSaved={(client) => {
+            const saved = { target: { kind: "lead" as const, id: client.id }, name: client.name, phone: chatPhone };
+            setManualChats((prev) => [saved, ...prev.filter((c) => c.target.id !== client.id)]);
+            setSelected(saved);
+            setIsSaveContactOpen(false);
+          }}
+        />
+      ) : null}
+
       <aside
         className={`w-full shrink-0 flex-col border-r border-[#e0e0e0] dark:border-[#3a3a3a] sm:flex sm:w-80 ${
           selected ? "hidden" : "flex"
@@ -213,7 +240,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
           ) : (
             <ul>
               {conversations.map((c) => {
-                const id = (c.leadId ?? c.teamMemberId) as string;
+                const id = conversationId(c);
                 const isSelected =
                   selected?.target.kind === c.kind && selected?.target.id === id;
                 const preview = c.isNew
@@ -267,6 +294,10 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
                       {c.kind === "team" ? (
                         <span className="text-[11px] font-medium text-[#616161] dark:text-[#b0b0b0]">
                           Chat interno
+                        </span>
+                      ) : c.kind === "phone" ? (
+                        <span className="text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                          Número nuevo · aún no es cliente
                         </span>
                       ) : c.assignedToName ? (
                         <span className="truncate text-[11px] text-[#616161] dark:text-[#b0b0b0]">
@@ -324,6 +355,16 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
                 <span className="rounded-full bg-black/5 px-2 py-0.5 text-[11px] font-medium text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]">
                   Chat interno
                 </span>
+              ) : selected.target.kind === "phone" ? (
+                canAssign ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsSaveContactOpen(true)}
+                    className="ml-auto h-9 rounded-lg bg-orange-500 px-3 text-xs font-semibold text-white hover:bg-orange-600"
+                  >
+                    Guardar como cliente
+                  </button>
+                ) : null
               ) : canAssign ? (
                 <label className="ml-auto flex items-center gap-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
                   <span className="hidden sm:inline">Asignado a</span>

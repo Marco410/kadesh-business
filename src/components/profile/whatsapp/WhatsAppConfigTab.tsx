@@ -579,6 +579,13 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
             Verifica y guarda, luego suscríbete al campo <code>messages</code> — sin eso no
             llegan los mensajes entrantes.
           </li>
+          <li>
+            <strong>Publica tu App</strong> (arriba en el panel de la App, cambia el modo de{" "}
+            <em>Desarrollo</em> a <strong>Publicada / Live</strong>). Mientras esté en desarrollo
+            Meta <strong>no manda al webhook los mensajes reales</strong> — ni siquiera los de
+            administradores o testers — y aquí nunca aparecerán. Meta te pedirá al menos la URL
+            de una política de privacidad (Configuración de la app → Básica).
+          </li>
           <li>Pega los 4 datos aquí arriba y guarda.</li>
         </ol>
       </div>
