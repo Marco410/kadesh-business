@@ -10,6 +10,9 @@ export const COMPANY_WHATSAPP_SETTINGS_QUERY = gql`
       whatsappTokenPreview
       whatsappConnectedAt
       whatsappTemplateStatus
+      whatsappAppId
+      whatsappWebhookConfiguredAt
+      whatsappLastWebhookAt
     }
   }
 `;
@@ -22,6 +25,11 @@ export interface CompanyWhatsappSettings {
   whatsappTokenPreview: string | null;
   whatsappConnectedAt: string | null;
   whatsappTemplateStatus: "none" | "pending" | "approved" | "rejected" | null;
+  whatsappAppId: string | null;
+  /** Kadesh dejó el webhook configurado por API (no implica que la App esté publicada). */
+  whatsappWebhookConfiguredAt: string | null;
+  /** Último mensaje REAL recibido por el webhook; null = nunca ha llegado uno. */
+  whatsappLastWebhookAt: string | null;
 }
 
 export interface CompanyWhatsappSettingsResponse {
@@ -189,6 +197,62 @@ export interface TestCompanyWhatsappConnectionResponse {
 
 export interface TestCompanyWhatsappConnectionVariables {
   companyId: string;
+}
+
+export const DISCOVER_WHATSAPP_ACCOUNT_MUTATION = gql`
+  mutation DiscoverWhatsappAccount($input: DiscoverWhatsappAccountInput!) {
+    discoverWhatsappAccount(input: $input) {
+      success
+      message
+      detail
+      needsSelection
+      phoneOptions {
+        id
+        displayPhoneNumber
+        verifiedName
+        wabaId
+      }
+      displayPhoneNumber
+      verifiedName
+      webhookConfigured
+      webhookError
+      templateError
+    }
+  }
+`;
+
+export interface WhatsappPhoneOption {
+  id: string;
+  displayPhoneNumber: string;
+  verifiedName: string;
+  wabaId: string;
+}
+
+export interface DiscoverWhatsappAccountResult {
+  success: boolean;
+  message: string;
+  detail: string | null;
+  needsSelection: boolean;
+  phoneOptions: WhatsappPhoneOption[];
+  displayPhoneNumber: string | null;
+  verifiedName: string | null;
+  webhookConfigured: boolean;
+  webhookError: string | null;
+  templateError: string | null;
+}
+
+export interface DiscoverWhatsappAccountResponse {
+  discoverWhatsappAccount: DiscoverWhatsappAccountResult;
+}
+
+export interface DiscoverWhatsappAccountVariables {
+  input: {
+    companyId: string;
+    appId: string;
+    appSecret: string;
+    accessToken: string;
+    phoneNumberId?: string;
+  };
 }
 
 export const SEND_WHATSAPP_MESSAGE_MUTATION = gql`

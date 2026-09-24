@@ -31,6 +31,7 @@ import {
   type UpdateCompanyWhatsappSettingsVariables,
 } from "./queries";
 import { WhatsAppChatImportSection } from "./WhatsAppChatImportSection";
+import { WhatsAppConnectWizard } from "./WhatsAppConnectWizard";
 
 const INPUT_CLASS =
   "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
@@ -65,6 +66,22 @@ function CopyButton({ value, label }: { value: string; label: string }) {
         className="size-3.5"
       />
     </button>
+  );
+}
+
+function HealthRow({ ok, label, hint }: { ok: boolean; label: string; hint?: string }) {
+  return (
+    <li className="flex items-start gap-2">
+      <HugeiconsIcon
+        icon={ok ? CheckmarkCircle02Icon : Alert02Icon}
+        size={16}
+        className={`mt-0.5 shrink-0 ${ok ? "text-emerald-600" : "text-amber-600"}`}
+      />
+      <span>
+        {label}
+        {hint ? <span className="block text-xs opacity-80">{hint}</span> : null}
+      </span>
+    </li>
   );
 }
 
@@ -327,6 +344,96 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
         </div>
       )}
 
+
+      {isConnected && (
+        <div className="mt-3 rounded-xl border border-[#e0e0e0] p-4 text-sm dark:border-[#3a3a3a]">
+          <p className="font-semibold text-[#212121] dark:text-white">Estado de la conexión</p>
+          <ul className="mt-2 space-y-1.5 text-[#616161] dark:text-[#b0b0b0]">
+            <HealthRow ok label="Conexión" />
+            <HealthRow
+              ok={Boolean(saved?.whatsappWebhookConfiguredAt)}
+              label="Webhook configurado"
+              hint={saved?.whatsappWebhookConfiguredAt ? undefined : "Configúralo a mano (ver Configuración manual)."}
+            />
+            <HealthRow
+              ok={Boolean(saved?.whatsappLastWebhookAt)}
+              label="Mensajes reales recibidos"
+              hint={
+                saved?.whatsappLastWebhookAt
+                  ? `Último: ${formatDateShort(saved.whatsappLastWebhookAt)}`
+                  : saved?.whatsappWebhookConfiguredAt
+                    ? "Aún no llega ninguno. ¿Publicaste la App en modo Live? (paso 5)"
+                    : undefined
+              }
+            />
+            <HealthRow
+              ok={templateStatus === "approved"}
+              label={`Plantilla de inicio: ${
+                templateStatus === "approved"
+                  ? "aprobada"
+                  : templateStatus === "pending"
+                    ? "pendiente de Meta"
+                    : templateStatus === "rejected"
+                      ? "rechazada"
+                      : "no creada"
+              }`}
+              hint={templateStatus === "none" && templateError ? templateError : undefined}
+            />
+          </ul>
+          <p className="mt-3 text-xs text-[#616161] dark:text-[#b0b0b0]">
+            Meta pide un método de pago en tu cuenta de WhatsApp Business para las plantillas de
+            inicio de conversación; el cobro es directo de Meta a tu tarjeta.
+          </p>
+        </div>
+      )}
+
+      {companyId && (
+        <WhatsAppConnectWizard
+          companyId={companyId}
+          saved={saved}
+          onConnected={async () => {
+            await refetch();
+          }}
+        />
+      )}
+
+      {isConnected && (
+        <div className="mt-6 text-right">
+            {confirmClear ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm text-[#616161] dark:text-[#b0b0b0]">¿Quitar la conexión?</span>
+                <button
+                  type="button"
+                  onClick={() => void handleClear()}
+                  disabled={busy}
+                  className="rounded-lg bg-red-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
+                >
+                  Sí, quitar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmClear(false)}
+                  disabled={busy}
+                  className="rounded-lg border border-[#e0e0e0] px-3 py-1.5 text-sm font-medium text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmClear(true)}
+                disabled={busy}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
+              >
+                <HugeiconsIcon icon={Delete02Icon} size={16} />
+                Quitar conexión
+              </button>
+            )}
+        </div>
+      )}
+      <details className="mt-8 rounded-xl border border-[#e0e0e0] p-4 dark:border-[#3a3a3a]">
+        <summary className="cursor-pointer text-sm font-semibold text-[#212121] dark:text-white">Configuración manual (avanzado)</summary>
       <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="wa-phone-number-id" className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]">
@@ -463,41 +570,6 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
             </>
           )}
         </button>
-        {isConnected && (
-          <div className="sm:ml-auto">
-            {confirmClear ? (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm text-[#616161] dark:text-[#b0b0b0]">¿Quitar la conexión?</span>
-                <button
-                  type="button"
-                  onClick={() => void handleClear()}
-                  disabled={busy}
-                  className="rounded-lg bg-red-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-60"
-                >
-                  Sí, quitar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfirmClear(false)}
-                  disabled={busy}
-                  className="rounded-lg border border-[#e0e0e0] px-3 py-1.5 text-sm font-medium text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
-                >
-                  Cancelar
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setConfirmClear(true)}
-                disabled={busy}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700 disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
-              >
-                <HugeiconsIcon icon={Delete02Icon} size={16} />
-                Quitar conexión
-              </button>
-            )}
-          </div>
-        )}
       </div>
       {isDirty && (
         <p className="mt-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
@@ -516,79 +588,38 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
         </div>
       )}
 
-      <div className="mt-8 rounded-xl border border-[#e0e0e0] bg-[#fafafa] p-5 text-sm leading-relaxed text-[#616161] dark:border-[#3a3a3a] dark:bg-[#252525] dark:text-[#b0b0b0]">
-        <p className="font-semibold text-[#212121] dark:text-white">Cómo conectar tu WhatsApp Business</p>
-        <ol className="mt-2 list-decimal space-y-2 pl-5">
-          <li>
-            En <code>developers.facebook.com/apps</code>, crea una App de tipo &quot;Empresa&quot;
-            y agrégale el producto <strong>WhatsApp</strong>.
-          </li>
-          <li>
-            Ve a <strong>WhatsApp → Configuración de la API</strong>: ahí están el{" "}
-            <strong>Phone Number ID</strong> y el <strong>WhatsApp Business Account ID</strong>.
-            Si vas a conectar tu número real en vez del de prueba,{" "}
-            <strong>exporta antes tus chats importantes</strong> desde la app de WhatsApp — una
-            vez conectado a la Cloud API ya no vas a poder sacarlos desde ahí.
-          </li>
-          <li>
-            En <strong>Configuración de la empresa → Usuarios del sistema</strong>, crea un
-            usuario de tipo Admin, asígnale esta App y genera un{" "}
-            <strong>token permanente</strong> (sin fecha de expiración) con los permisos{" "}
-            <code>whatsapp_business_messaging</code> y{" "}
-            <code>whatsapp_business_management</code> (este segundo es el que deja crear la
-            plantilla para iniciar conversaciones).
-          </li>
-          <li>
-            En <strong>Configuración de la app → Básica</strong>, dale &quot;Mostrar&quot; a la{" "}
-            <strong>Clave secreta de la aplicación</strong> (App Secret) y cópiala.
-          </li>
-          <li>
-            En <strong>WhatsApp → Configuración → Webhook</strong>, edita la Callback URL y el{" "}
-            <strong>Verify Token</strong> con estos datos:
-            {webhookInfo?.success && webhookInfo.webhookUrl && webhookInfo.verifyToken ? (
-              <>
-                {" "}
-                <span className="inline-flex items-center gap-1.5 align-middle">
-                  <code className="select-all">{webhookInfo.webhookUrl}</code>
-                  <CopyButton value={webhookInfo.webhookUrl} label="URL del webhook" />
-                </span>{" "}
-                y{" "}
-                <span className="inline-flex items-center gap-1.5 align-middle">
-                  <code className="select-all">
-                    {showWebhookToken
-                      ? webhookInfo.verifyToken
-                      : "•".repeat(24)}
-                  </code>
-                  <button
-                    type="button"
-                    onClick={() => setShowWebhookToken((prev) => !prev)}
-                    className="inline-flex shrink-0 items-center rounded-md p-1 text-[#616161] transition-colors hover:bg-black/5 hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:bg-white/10 dark:hover:text-white"
-                    aria-label={showWebhookToken ? "Ocultar Verify Token" : "Mostrar Verify Token"}
-                  >
-                    <HugeiconsIcon
-                      icon={showWebhookToken ? ViewOffIcon : EyeIcon}
-                      className="size-3.5"
-                    />
-                  </button>
-                  <CopyButton value={webhookInfo.verifyToken} label="Verify Token" />
-                </span>
-              </>
-            ) : (
-              <span className="italic"> pídeselos a tu contacto en Kadesh.</span>
-            )}{" "}
-            Verifica y guarda, luego suscríbete al campo <code>messages</code> — sin eso no
-            llegan los mensajes entrantes.
-          </li>
-          <li>
-            <strong>Publica tu App</strong> (arriba en el panel de la App, cambia el modo de{" "}
-            <em>Desarrollo</em> a <strong>Publicada / Live</strong>). Mientras esté en desarrollo
-            Meta <strong>no manda al webhook los mensajes reales</strong> — ni siquiera los de
-            administradores o testers — y aquí nunca aparecerán. Meta te pedirá al menos la URL
-            de una política de privacidad (Configuración de la app → Básica).
-          </li>
-          <li>Pega los 4 datos aquí arriba y guarda.</li>
-        </ol>
+      <div className="mt-6 rounded-xl border border-[#e0e0e0] bg-[#fafafa] p-4 text-sm leading-relaxed text-[#616161] dark:border-[#3a3a3a] dark:bg-[#252525] dark:text-[#b0b0b0]">
+        <p className="font-semibold text-[#212121] dark:text-white">Webhook (solo si Kadesh no pudo configurarlo)</p>
+        <p className="mt-1">
+          En <strong>WhatsApp → Configuración → Webhook</strong> de tu App, usa esta Callback URL y
+          Verify Token, guarda y suscríbete al campo <code>messages</code>.
+        </p>
+        {webhookInfo?.success && webhookInfo.webhookUrl && webhookInfo.verifyToken ? (
+          <div className="mt-2 space-y-1.5">
+            <span className="flex items-center gap-1.5">
+              <code className="select-all break-all">{webhookInfo.webhookUrl}</code>
+              <CopyButton value={webhookInfo.webhookUrl} label="URL del webhook" />
+            </span>
+            <span className="flex items-center gap-1.5">
+              <code className="select-all break-all">
+                {showWebhookToken ? webhookInfo.verifyToken : "\u2022".repeat(24)}
+              </code>
+              <button
+                type="button"
+                onClick={() => setShowWebhookToken((prev) => !prev)}
+                className="inline-flex shrink-0 items-center rounded-md p-1 text-[#616161] transition-colors hover:bg-black/5 hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:bg-white/10 dark:hover:text-white"
+                aria-label={showWebhookToken ? "Ocultar Verify Token" : "Mostrar Verify Token"}
+              >
+                <HugeiconsIcon icon={showWebhookToken ? ViewOffIcon : EyeIcon} className="size-3.5" />
+              </button>
+              <CopyButton value={webhookInfo.verifyToken} label="Verify Token" />
+            </span>
+          </div>
+        ) : (
+          <p className="mt-2 italic">Pídeselos a tu contacto en Kadesh.</p>
+        )}
       </div>
+      </details>
 
       <WhatsAppChatImportSection />
     </div>
