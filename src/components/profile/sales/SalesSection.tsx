@@ -782,6 +782,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
               {hasAddOwnLeadsFeature && (
                 <button
                   type="button"
+                  data-tour="clientes-add-lead"
                   onClick={() => router.push(Routes.panelAddLead)}
                   className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-green-500 hover:bg-green-600 active:bg-green-700 hover:-translate-y-px active:scale-[0.98] shadow-sm shadow-green-500/20 hover:shadow-md hover:shadow-green-500/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-[transform,box-shadow,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)]"
                 >

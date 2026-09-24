@@ -16,6 +16,7 @@ import {
   type UserCompanyCategoriesResponse,
   type UserCompanyCategoriesVariables,
 } from "kadesh/components/profile/sales/queries";
+import { TourHelpButton } from "kadesh/components/onboarding";
 import { Routes } from "kadesh/core/routes";
 import { cn } from "kadesh/utils/cn";
 import { useUser } from "kadesh/utils/UserContext";
@@ -69,6 +70,7 @@ function PanelCreditsButton({
   return (
     <Link
       href={Routes.panelCredits}
+      data-tour="panel-credits"
       className={cn(
         "inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-white transition-all duration-200 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2",
         getCreditsButtonClasses(remainingQuota),
@@ -202,6 +204,7 @@ function PanelPageSectionContent() {
                     }}
                     type="button"
                     role="tab"
+                    data-tour={`main-tab-${tab.key}`}
                     aria-selected={isActive}
                     onClick={() => handleMainTabChange(tab.key)}
                     className={`relative z-10 flex items-center justify-center gap-2 rounded-full px-2 py-1.5 text-xs font-semibold transition-colors duration-300 motion-reduce:transition-none sm:px-6 sm:py-2.5 min-w-0 ${
@@ -226,7 +229,8 @@ function PanelPageSectionContent() {
                 );
               })}
             </div>
-            <div className="flex items-center justify-end">
+            <div className="flex items-center justify-end gap-2">
+              <TourHelpButton />
               <PanelCreditsButton
                 remainingQuota={remainingQuota}
                 loading={creditsLoading}
