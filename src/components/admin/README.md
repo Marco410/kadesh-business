@@ -46,6 +46,8 @@ En fichas:
 - **Verificar** aprueba el reclamo: el dueño ya puede editar la ficha pública.
 - **Rechazar** suelta al solicitante y la ficha vuelve a poder reclamarse.
 - **Quitar verificación** deja al dueño vinculado pero sin poder editar hasta una nueva aprobación.
+- **Pipeline** (`pipelineStatus`): estatus comercial interno, el mismo de los leads del CRM (`PIPELINE_STATUS`). Se cambia con el selector de cada fila y guarda al instante. Es independiente del estado de reclamo y el dueño no lo ve. Default: `01 - Detectado`.
+- **Filtros**: nombre/municipio (buscador), ciudad, pipeline y estado de reclamo (chips). Se combinan entre sí.
 
 En servicios: un dueño pidió algo que no estaba en el catálogo. Default **Pendientes**. Al **Aprobar y asignar**, el servicio entra al catálogo **y** se marca en la clínica elegida (prellenada con la que lo pidió; se puede cambiar). **Rechazar** no lo publica.
 
