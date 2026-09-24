@@ -210,6 +210,7 @@ export default function AddCompanyUserForm({
               password: password || undefined,
               phone: phone.trim() || undefined,
               birthday: birthday.trim() ? birthday.trim().slice(0, 10) : undefined,
+              product: "saas",
               roles: { connect: roleIds },
               company: { connect: { id: companyId } },
             },
