@@ -10,6 +10,9 @@ export const COMPANY_WHATSAPP_SETTINGS_QUERY = gql`
       whatsappTokenPreview
       whatsappConnectedAt
       whatsappTemplateStatus
+      whatsappAppId
+      whatsappWebhookConfiguredAt
+      whatsappLastWebhookAt
     }
   }
 `;
@@ -22,6 +25,11 @@ export interface CompanyWhatsappSettings {
   whatsappTokenPreview: string | null;
   whatsappConnectedAt: string | null;
   whatsappTemplateStatus: "none" | "pending" | "approved" | "rejected" | null;
+  whatsappAppId: string | null;
+  /** Kadesh dejó el webhook configurado por API (no implica que la App esté publicada). */
+  whatsappWebhookConfiguredAt: string | null;
+  /** Último mensaje REAL recibido por el webhook; null = nunca ha llegado uno. */
+  whatsappLastWebhookAt: string | null;
 }
 
 export interface CompanyWhatsappSettingsResponse {
@@ -69,8 +77,10 @@ export const WHATSAPP_CONVERSATIONS_QUERY = gql`
       conversations {
         leadId
         teamMemberId
+        phoneKey
         kind
         name
+        phone
         assignedToId
         assignedToName
         lastMessageBody
@@ -81,15 +91,19 @@ export const WHATSAPP_CONVERSATIONS_QUERY = gql`
   }
 `;
 
-export type WhatsAppConversationKind = "lead" | "team";
+/** `phone` = un número que escribió sin ser cliente todavía (solo lo ven los admins). */
+export type WhatsAppConversationKind = "lead" | "team" | "phone";
 
 export interface WhatsAppConversationSummary {
   /** Presente solo en conversaciones con un cliente. */
   leadId: string | null;
   /** Presente solo en conversaciones internas con alguien del equipo. */
   teamMemberId: string | null;
+  /** Últimos 10 dígitos; presente solo en conversaciones con un número que aún no es cliente. */
+  phoneKey: string | null;
   kind: WhatsAppConversationKind;
   name: string;
+  phone: string | null;
   /** Vendedor dueño del chat (= salesPerson del lead). Vacío = solo lo ven los admins. */
   assignedToId: string | null;
   assignedToName: string | null;
@@ -185,9 +199,65 @@ export interface TestCompanyWhatsappConnectionVariables {
   companyId: string;
 }
 
+export const DISCOVER_WHATSAPP_ACCOUNT_MUTATION = gql`
+  mutation DiscoverWhatsappAccount($input: DiscoverWhatsappAccountInput!) {
+    discoverWhatsappAccount(input: $input) {
+      success
+      message
+      detail
+      needsSelection
+      phoneOptions {
+        id
+        displayPhoneNumber
+        verifiedName
+        wabaId
+      }
+      displayPhoneNumber
+      verifiedName
+      webhookConfigured
+      webhookError
+      templateError
+    }
+  }
+`;
+
+export interface WhatsappPhoneOption {
+  id: string;
+  displayPhoneNumber: string;
+  verifiedName: string;
+  wabaId: string;
+}
+
+export interface DiscoverWhatsappAccountResult {
+  success: boolean;
+  message: string;
+  detail: string | null;
+  needsSelection: boolean;
+  phoneOptions: WhatsappPhoneOption[];
+  displayPhoneNumber: string | null;
+  verifiedName: string | null;
+  webhookConfigured: boolean;
+  webhookError: string | null;
+  templateError: string | null;
+}
+
+export interface DiscoverWhatsappAccountResponse {
+  discoverWhatsappAccount: DiscoverWhatsappAccountResult;
+}
+
+export interface DiscoverWhatsappAccountVariables {
+  input: {
+    companyId: string;
+    appId: string;
+    appSecret: string;
+    accessToken: string;
+    phoneNumberId?: string;
+  };
+}
+
 export const SEND_WHATSAPP_MESSAGE_MUTATION = gql`
-  mutation SendWhatsAppMessage($businessLeadId: ID, $teamMemberId: ID, $body: String!) {
-    sendWhatsAppMessage(businessLeadId: $businessLeadId, teamMemberId: $teamMemberId, body: $body) {
+  mutation SendWhatsAppMessage($businessLeadId: ID, $teamMemberId: ID, $phone: String, $body: String!) {
+    sendWhatsAppMessage(businessLeadId: $businessLeadId, teamMemberId: $teamMemberId, phone: $phone, body: $body) {
       success
       message
       messageId
@@ -208,15 +278,30 @@ export interface SendWhatsAppMessageResponse {
 export interface SendWhatsAppMessageVariables {
   businessLeadId?: string | null;
   teamMemberId?: string | null;
+  phone?: string | null;
   body: string;
 }
 
+/** Cuántos mensajes trae cada página del chat (los últimos al abrir; otros tantos al subir). */
+export const WHATSAPP_MESSAGES_PAGE_SIZE = 30;
+
+/** Paginada por cursor (id), no por `skip`: mientras alguien escribe llegan mensajes nuevos y un
+ * `skip` fijo se correría y repetiría o se comería mensajes. `id` va como desempate porque los
+ * mensajes importados comparten minuto y sin él el orden entre ellos no es estable. */
 export const WHATSAPP_MESSAGES_QUERY = gql`
-  query WhatsAppMessages($where: TechWhatsAppMessageWhereInput!) {
+  query WhatsAppMessages(
+    $where: TechWhatsAppMessageWhereInput!
+    $orderBy: [TechWhatsAppMessageOrderByInput!]!
+    $take: Int!
+    $skip: Int! = 0
+    $cursor: TechWhatsAppMessageWhereUniqueInput
+  ) {
     techWhatsAppMessages(
       where: $where
-      orderBy: [{ createdAt: asc }]
-      take: 200
+      orderBy: $orderBy
+      take: $take
+      skip: $skip
+      cursor: $cursor
     ) {
       id
       direction
@@ -253,18 +338,30 @@ export interface WhatsAppMessagesResponse {
   techWhatsAppMessages: WhatsAppMessageItem[];
 }
 
+type MessageOrderBy = Array<{ createdAt: "asc" | "desc" } | { id: "asc" | "desc" }>;
+
+export const WHATSAPP_NEWEST_FIRST: MessageOrderBy = [{ createdAt: "desc" }, { id: "desc" }];
+export const WHATSAPP_OLDEST_FIRST: MessageOrderBy = [{ createdAt: "asc" }, { id: "asc" }];
+
 export interface WhatsAppMessagesVariables {
   where: Record<string, unknown>;
+  orderBy: MessageOrderBy;
+  take: number;
+  skip?: number;
+  cursor?: { id: string } | null;
 }
 
-/** Filtro de la conversación: con un cliente (lead) o interna (compañero de equipo). */
+/** Filtro de la conversación: con un cliente (lead), interna (compañero de equipo) o con un
+ * número que aún no es cliente (`id` = últimos 10 dígitos; se busca en quien lo mandó o recibió). */
 export function whatsappConversationWhere(target: {
-  kind: "lead" | "team";
+  kind: "lead" | "team" | "phone";
   id: string;
 }): Record<string, unknown> {
-  return target.kind === "lead"
-    ? { businessLead: { id: { equals: target.id } } }
-    : { teamMember: { id: { equals: target.id } } };
+  if (target.kind === "lead") return { businessLead: { id: { equals: target.id } } };
+  if (target.kind === "team") return { teamMember: { id: { equals: target.id } } };
+  return {
+    OR: [{ fromPhone: { endsWith: target.id } }, { toPhone: { endsWith: target.id } }],
+  };
 }
 
 export const WHATSAPP_MESSAGES_COUNT_QUERY = gql`
@@ -350,8 +447,8 @@ export interface ImportWhatsAppChatExportVariables {
 
 /** Estado para decidir si mostrar el composer normal o el botón "Iniciar conversación". */
 export const BUSINESS_LEAD_WHATSAPP_STATUS_QUERY = gql`
-  query BusinessLeadWhatsappStatus($businessLeadId: ID, $teamMemberId: ID) {
-    businessLeadWhatsappStatus(businessLeadId: $businessLeadId, teamMemberId: $teamMemberId) {
+  query BusinessLeadWhatsappStatus($businessLeadId: ID, $teamMemberId: ID, $phone: String) {
+    businessLeadWhatsappStatus(businessLeadId: $businessLeadId, teamMemberId: $teamMemberId, phone: $phone) {
       success
       message
       canReplyFreely
@@ -374,12 +471,13 @@ export interface BusinessLeadWhatsappStatusResponse {
 export interface BusinessLeadWhatsappStatusVariables {
   businessLeadId?: string | null;
   teamMemberId?: string | null;
+  phone?: string | null;
 }
 
 /** Manda la plantilla aprobada para iniciarle conversación a un lead que nunca ha escrito. */
 export const START_WHATSAPP_CONVERSATION_MUTATION = gql`
-  mutation StartWhatsAppConversation($businessLeadId: ID, $teamMemberId: ID) {
-    startWhatsAppConversation(businessLeadId: $businessLeadId, teamMemberId: $teamMemberId) {
+  mutation StartWhatsAppConversation($businessLeadId: ID, $teamMemberId: ID, $phone: String) {
+    startWhatsAppConversation(businessLeadId: $businessLeadId, teamMemberId: $teamMemberId, phone: $phone) {
       success
       message
     }
@@ -398,11 +496,12 @@ export interface StartWhatsAppConversationResponse {
 export interface StartWhatsAppConversationVariables {
   businessLeadId?: string | null;
   teamMemberId?: string | null;
+  phone?: string | null;
 }
 
 export const SEND_WHATSAPP_MEDIA_MESSAGE_MUTATION = gql`
-  mutation SendWhatsAppMediaMessage($businessLeadId: ID, $teamMemberId: ID, $media: Upload!, $caption: String) {
-    sendWhatsAppMediaMessage(businessLeadId: $businessLeadId, teamMemberId: $teamMemberId, media: $media, caption: $caption) {
+  mutation SendWhatsAppMediaMessage($businessLeadId: ID, $teamMemberId: ID, $phone: String, $media: Upload!, $caption: String) {
+    sendWhatsAppMediaMessage(businessLeadId: $businessLeadId, teamMemberId: $teamMemberId, phone: $phone, media: $media, caption: $caption) {
       success
       message
       messageId
@@ -423,6 +522,7 @@ export interface SendWhatsAppMediaMessageResponse {
 export interface SendWhatsAppMediaMessageVariables {
   businessLeadId?: string | null;
   teamMemberId?: string | null;
+  phone?: string | null;
   media: File;
   caption?: string | null;
 }
@@ -482,4 +582,24 @@ export interface AssignWhatsAppConversationResponse {
 export interface AssignWhatsAppConversationVariables {
   businessLeadId: string;
   salesPersonId?: string | null;
+}
+
+/** Al guardar como cliente un número que escribió solo: enlaza el historial que ya tenía. */
+export const LINK_WHATSAPP_CONTACT_TO_LEAD_MUTATION = gql`
+  mutation LinkWhatsAppContactToLead($businessLeadId: ID!, $phone: String!) {
+    linkWhatsAppContactToLead(businessLeadId: $businessLeadId, phone: $phone) {
+      success
+      message
+      linked
+    }
+  }
+`;
+
+export interface LinkWhatsAppContactToLeadResponse {
+  linkWhatsAppContactToLead: { success: boolean; message: string; linked: number };
+}
+
+export interface LinkWhatsAppContactToLeadVariables {
+  businessLeadId: string;
+  phone: string;
 }

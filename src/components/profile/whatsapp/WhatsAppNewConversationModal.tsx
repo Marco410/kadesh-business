@@ -26,7 +26,11 @@ export interface WhatsAppNewConversationModalProps {
   onClose: () => void;
   companyId: string | null;
   /** Abre el chat recién creado (cliente nuevo) o elegido (compañero de equipo). */
-  onCreated: (conversation: { target: WhatsAppChatTarget; name: string }) => void;
+  onCreated: (conversation: {
+    target: WhatsAppChatTarget;
+    name: string;
+    phone: string | null;
+  }) => void;
 }
 
 /**
@@ -89,6 +93,7 @@ export default function WhatsAppNewConversationModal({
       onCreated({
         target: { kind: "lead", id: payload.leadId },
         name: name.trim(),
+        phone: phone.trim(),
       });
       setName("");
       setPhone("");
@@ -240,6 +245,7 @@ export default function WhatsAppNewConversationModal({
                                 onCreated({
                                   target: { kind: "team", id: member.id },
                                   name: member.name,
+                                  phone: member.phone,
                                 })
                               }
                               className="flex w-full flex-col items-start gap-0.5 border-b border-[#f0f0f0] px-4 py-3 text-left transition-colors last:border-0 hover:bg-black/[0.03] disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#2a2a2a] dark:hover:bg-white/5"

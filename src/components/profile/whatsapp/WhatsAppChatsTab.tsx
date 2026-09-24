@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -10,6 +11,7 @@ import {
   WhatsappIcon,
 } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
+import { Routes } from "kadesh/core/routes";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { useUser } from "kadesh/utils/UserContext";
 import { isAdminCompanyUser, isPlatformAdminUser } from "kadesh/utils/user-roles";
@@ -27,14 +29,22 @@ import {
 } from "./queries";
 import WhatsAppChatPanel, { type WhatsAppChatTarget } from "./WhatsAppChatPanel";
 import WhatsAppNewConversationModal from "./WhatsAppNewConversationModal";
+import WhatsAppSaveContactModal from "./WhatsAppSaveContactModal";
 
 const CONVERSATIONS_POLL_MS = 8000;
 
 type ConversationRow = WhatsAppConversationSummary & { isNew?: boolean };
 
+/** Id con el que se abre el chat: el del cliente, el del compañero, o los últimos 10 dígitos. */
+function conversationId(c: WhatsAppConversationSummary): string {
+  return (c.leadId ?? c.teamMemberId ?? c.phoneKey) as string;
+}
+
 type SelectedConversation = {
   target: WhatsAppChatTarget;
   name: string;
+  /** Teléfono conocido al abrir (p. ej. recién agregado); la lista lo trae del back. */
+  phone?: string | null;
 };
 
 /** Tab "Chats": bandeja estilo WhatsApp — conversaciones a la izquierda (clientes y equipo), el
@@ -46,6 +56,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
   const [selected, setSelected] = useState<SelectedConversation | null>(null);
   const [manualChats, setManualChats] = useState<SelectedConversation[]>([]);
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
+  const [isSaveContactOpen, setIsSaveContactOpen] = useState(false);
 
   const conversationsQueryOptions = {
     query: WHATSAPP_CONVERSATIONS_QUERY,
@@ -84,7 +95,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
     const keyOf = (kind: string, id: string) => `${kind}:${id}`;
 
     for (const c of fetched) {
-      const id = c.leadId ?? c.teamMemberId;
+      const id = conversationId(c);
       if (id) byKey.set(keyOf(c.kind, id), c);
     }
     // Chats abiertos en esta sesión que todavía no tienen ningún mensaje: se muestran igual
@@ -95,8 +106,10 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
       byKey.set(key, {
         leadId: chat.target.kind === "lead" ? chat.target.id : null,
         teamMemberId: chat.target.kind === "team" ? chat.target.id : null,
+        phoneKey: chat.target.kind === "phone" ? chat.target.id : null,
         kind: chat.target.kind,
         name: chat.name,
+        phone: chat.phone ?? null,
         assignedToId: null,
         assignedToName: null,
         lastMessageBody: "",
@@ -119,10 +132,12 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
   const selectedRow = selected
     ? conversations.find(
         (c) =>
-          c.kind === selected.target.kind &&
-          (c.leadId ?? c.teamMemberId) === selected.target.id,
+          c.kind === selected.target.kind && conversationId(c) === selected.target.id,
       ) ?? null
     : null;
+
+  // El teléfono de la lista (dato vivo del back) gana; el de al abrir cubre chats recién creados.
+  const chatPhone = selectedRow?.phone ?? selected?.phone ?? null;
 
   const handleAssign = async (salesPersonId: string | null) => {
     if (!selected || selected.target.kind !== "lead") return;
@@ -165,6 +180,26 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
         }}
       />
 
+      {selected?.target.kind === "phone" ? (
+        <WhatsAppSaveContactModal
+          key={selected.target.id}
+          isOpen={isSaveContactOpen}
+          onClose={() => setIsSaveContactOpen(false)}
+          phone={chatPhone ?? `+${selected.target.id}`}
+          phoneKey={selected.target.id}
+          // Sin nombre de perfil el nombre de la fila es el teléfono: no sirve de sugerencia.
+          suggestedName={
+            selectedRow && selectedRow.name !== selectedRow.phone ? selectedRow.name : ""
+          }
+          onSaved={(client) => {
+            const saved = { target: { kind: "lead" as const, id: client.id }, name: client.name, phone: chatPhone };
+            setManualChats((prev) => [saved, ...prev.filter((c) => c.target.id !== client.id)]);
+            setSelected(saved);
+            setIsSaveContactOpen(false);
+          }}
+        />
+      ) : null}
+
       <aside
         className={`w-full shrink-0 flex-col border-r border-[#e0e0e0] dark:border-[#3a3a3a] sm:flex sm:w-80 ${
           selected ? "hidden" : "flex"
@@ -205,7 +240,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
           ) : (
             <ul>
               {conversations.map((c) => {
-                const id = (c.leadId ?? c.teamMemberId) as string;
+                const id = conversationId(c);
                 const isSelected =
                   selected?.target.kind === c.kind && selected?.target.id === id;
                 const preview = c.isNew
@@ -218,7 +253,11 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
                     <button
                       type="button"
                       onClick={() =>
-                        setSelected({ target: { kind: c.kind, id }, name: c.name })
+                        setSelected({
+                          target: { kind: c.kind, id },
+                          name: c.name,
+                          phone: c.phone,
+                        })
                       }
                       className={`flex w-full flex-col gap-0.5 border-b border-[#f0f0f0] px-4 py-3 text-left transition-colors dark:border-[#2a2a2a] ${
                         isSelected
@@ -256,6 +295,10 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
                         <span className="text-[11px] font-medium text-[#616161] dark:text-[#b0b0b0]">
                           Chat interno
                         </span>
+                      ) : c.kind === "phone" ? (
+                        <span className="text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                          Número nuevo · aún no es cliente
+                        </span>
                       ) : c.assignedToName ? (
                         <span className="truncate text-[11px] text-[#616161] dark:text-[#b0b0b0]">
                           Asignado a {c.assignedToName}
@@ -288,13 +331,40 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
               >
                 <HugeiconsIcon icon={ArrowLeft01Icon} size={18} />
               </button>
-              <h3 className="truncate text-sm font-semibold text-[#212121] dark:text-white">
-                {selected.name}
-              </h3>
+              <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
+                {selected.target.kind === "lead" ? (
+                  <Link
+                    href={Routes.panelLead(selected.target.id)}
+                    title="Ver detalles del cliente"
+                    className="truncate text-sm font-semibold text-[#212121] hover:text-orange-500 hover:underline dark:text-white dark:hover:text-orange-400"
+                  >
+                    {selected.name}
+                  </Link>
+                ) : (
+                  <h3 className="truncate text-sm font-semibold text-[#212121] dark:text-white">
+                    {selected.name}
+                  </h3>
+                )}
+                {chatPhone ? (
+                  <span className="shrink-0 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    {chatPhone}
+                  </span>
+                ) : null}
+              </div>
               {selected.target.kind === "team" ? (
                 <span className="rounded-full bg-black/5 px-2 py-0.5 text-[11px] font-medium text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]">
                   Chat interno
                 </span>
+              ) : selected.target.kind === "phone" ? (
+                canAssign ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsSaveContactOpen(true)}
+                    className="ml-auto h-9 rounded-lg bg-orange-500 px-3 text-xs font-semibold text-white hover:bg-orange-600"
+                  >
+                    Guardar como cliente
+                  </button>
+                ) : null
               ) : canAssign ? (
                 <label className="ml-auto flex items-center gap-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
                   <span className="hidden sm:inline">Asignado a</span>

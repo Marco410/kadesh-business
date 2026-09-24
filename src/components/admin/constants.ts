@@ -1,4 +1,4 @@
-import { Role } from "kadesh/constants/constans";
+import { PIPELINE_STATUS, Role } from "kadesh/constants/constans";
 
 export const ADMIN_TABS = {
   OVERVIEW: "inicio",
@@ -105,6 +105,15 @@ export const PET_PLACE_CLAIM_STATUS_CLASSES: Record<string, string> = {
   [PET_PLACE_CLAIM_STATUS.REJECTED]:
     "bg-red-500/15 text-red-700 dark:text-red-400 dark:bg-red-500/20",
 };
+
+/** Pipeline comercial interno (mismo que los leads del CRM). Solo lo ve y edita el admin. */
+export const PET_PLACE_PIPELINE_OPTIONS: Array<{
+  value: string;
+  label: string;
+}> = [
+  { value: "all", label: "Todos" },
+  ...Object.values(PIPELINE_STATUS).map((value) => ({ value, label: value })),
+];
 
 export const PET_PLACE_CLAIM_ROLE_LABELS: Record<string, string> = {
   owner: "Propietario",

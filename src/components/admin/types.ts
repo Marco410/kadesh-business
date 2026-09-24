@@ -74,6 +74,7 @@ export type AdminPetPlaceRow = {
   verified: boolean | null;
   verifiedAt: string | null;
   claimStatus: string | null;
+  pipelineStatus: string | null;
   claimRole: string | null;
   claimPhone: string | null;
   claimNotes: string | null;

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Attachment01Icon, FileAttachmentIcon, SentIcon } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
@@ -11,7 +11,10 @@ import {
   SEND_WHATSAPP_MEDIA_MESSAGE_MUTATION,
   SEND_WHATSAPP_MESSAGE_MUTATION,
   START_WHATSAPP_CONVERSATION_MUTATION,
+  WHATSAPP_MESSAGES_PAGE_SIZE,
   WHATSAPP_MESSAGES_QUERY,
+  WHATSAPP_NEWEST_FIRST,
+  WHATSAPP_OLDEST_FIRST,
   whatsappConversationWhere,
   type BusinessLeadWhatsappStatusResponse,
   type BusinessLeadWhatsappStatusVariables,
@@ -27,11 +30,13 @@ import {
 } from "./queries";
 
 const POLL_INTERVAL_MS = 5000;
+const NEAR_EDGE_PX = 120;
 const STATUS_POLL_MS = 15000;
 const MEDIA_ACCEPT = "image/*,.pdf,.doc,.docx,.xls,.xlsx";
 
-/** Con quién es la conversación: un cliente del CRM o alguien del propio equipo. */
-export type WhatsAppChatTarget = { kind: "lead" | "team"; id: string };
+/** Con quién es la conversación: un cliente del CRM, alguien del equipo, o un número que aún
+ * no es cliente (`id` = últimos 10 dígitos; solo lo ven los admins). */
+export type WhatsAppChatTarget = { kind: "lead" | "team" | "phone"; id: string };
 
 export interface WhatsAppChatPanelProps {
   target: WhatsAppChatTarget;
@@ -61,34 +66,167 @@ function templateStatusMessage(templateStatus: string | null): string {
  * libre — solo una plantilla aprobada por Meta puede iniciar la conversación (regla de la
  * plataforma). En ese caso se muestra "Iniciar conversación" en vez del composer.
  */
+/** Junta lotes de mensajes sin repetir ninguno (por id), en orden cronológico. */
+function mergeMessages(
+  current: WhatsAppMessageItem[],
+  incoming: WhatsAppMessageItem[],
+  position: "start" | "end",
+): WhatsAppMessageItem[] {
+  const known = new Set(current.map((m) => m.id));
+  const fresh = incoming.filter((m) => !known.has(m.id));
+  if (fresh.length === 0) return current;
+  return position === "start" ? [...fresh, ...current] : [...current, ...fresh];
+}
+
 export default function WhatsAppChatPanel({
   target,
   active = true,
   className = "",
 }: WhatsAppChatPanelProps) {
-  const leadId = target.kind === "lead" ? target.id : null;
-  const teamMemberId = target.kind === "team" ? target.id : null;
-  const targetVariables = { businessLeadId: leadId, teamMemberId };
-  const messagesWhere = whatsappConversationWhere(target);
+  const { kind, id: targetId } = target;
+  const leadId = kind === "lead" ? targetId : null;
+  const teamMemberId = kind === "team" ? targetId : null;
+  const phone = kind === "phone" ? targetId : null;
+  const targetVariables = { businessLeadId: leadId, teamMemberId, phone };
+  const client = useApolloClient();
+
   const [draft, setDraft] = useState("");
   const [justStarted, setJustStarted] = useState(false);
-  const bottomRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { data, loading, startPolling, stopPolling } = useQuery<
-    WhatsAppMessagesResponse,
-    WhatsAppMessagesVariables
-  >(WHATSAPP_MESSAGES_QUERY, {
-    variables: { where: messagesWhere },
-    skip: !active || !target.id,
-    fetchPolicy: "cache-and-network",
-  });
+  // Los mensajes se traen de a páginas: al abrir, solo los ÚLTIMOS; los anteriores se piden al
+  // subir con el scroll. Antes se traían los 200 más viejos y se bajaba con animación hasta el
+  // final, así que se veía el arranque de la conversación y no lo reciente.
+  const [messages, setMessages] = useState<WhatsAppMessageItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const olderInFlight = useRef(false);
+  // Qué hacer con el scroll cuando cambie la lista (se decide justo antes de cambiarla).
+  const scrollIntent = useRef<"bottom" | "bottom-smooth" | "keep-position" | null>(null);
+  const heightBeforePrepend = useRef(0);
+
+  const fetchMessages = useCallback(
+    async (variables: Omit<WhatsAppMessagesVariables, "where">) => {
+      const result = await client.query<WhatsAppMessagesResponse, WhatsAppMessagesVariables>({
+        query: WHATSAPP_MESSAGES_QUERY,
+        variables: { where: whatsappConversationWhere({ kind, id: targetId }), ...variables },
+        fetchPolicy: "network-only",
+      });
+      return [...result.data.techWhatsAppMessages];
+    },
+    [client, kind, targetId],
+  );
+
+  // Primera página: los últimos mensajes, ya posicionados abajo (sin animación).
+  useEffect(() => {
+    if (!active || !targetId) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const page = await fetchMessages({
+          orderBy: WHATSAPP_NEWEST_FIRST,
+          take: WHATSAPP_MESSAGES_PAGE_SIZE,
+        });
+        if (cancelled) return;
+        scrollIntent.current = "bottom";
+        setMessages(page.reverse());
+        setHasMore(page.length === WHATSAPP_MESSAGES_PAGE_SIZE);
+      } catch {
+        // sin red: se queda vacío y el polling lo reintenta al siguiente ciclo
+      } finally {
+        if (!cancelled) setLoaded(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [active, targetId, fetchMessages]);
+
+  const newestId = messages[messages.length - 1]?.id ?? null;
+
+  const isNearBottom = () => {
+    const el = scrollRef.current;
+    return !el || el.scrollHeight - el.scrollTop - el.clientHeight < NEAR_EDGE_PX;
+  };
+
+  /** Trae lo que llegó después del último mensaje que tenemos. `forceScroll` = lo mandé yo. */
+  const syncNewer = useCallback(
+    async (forceScroll: boolean) => {
+      try {
+        const fresh = newestId
+          ? await fetchMessages({
+              orderBy: WHATSAPP_OLDEST_FIRST,
+              take: 100,
+              skip: 1,
+              cursor: { id: newestId },
+            })
+          : await fetchMessages({
+              orderBy: WHATSAPP_NEWEST_FIRST,
+              take: WHATSAPP_MESSAGES_PAGE_SIZE,
+            }).then((page) => page.reverse());
+        if (fresh.length === 0) return;
+        // Solo baja solo si ya estabas abajo (o si lo mandaste tú): si subiste a leer el
+        // historial, un mensaje nuevo no te jala de regreso.
+        scrollIntent.current = forceScroll || isNearBottom() ? "bottom-smooth" : null;
+        setMessages((prev) => mergeMessages(prev, fresh, "end"));
+      } catch {
+        // el siguiente ciclo lo reintenta
+      }
+    },
+    [fetchMessages, newestId],
+  );
 
   useEffect(() => {
-    if (!active || !target.id) return;
-    startPolling(POLL_INTERVAL_MS);
-    return () => stopPolling();
-  }, [active, target.id, startPolling, stopPolling]);
+    if (!active || !targetId || !loaded) return;
+    const timer = setInterval(() => void syncNewer(false), POLL_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [active, targetId, loaded, syncNewer]);
+
+  /** Trae la página anterior a la más vieja que tenemos, sin mover lo que estás leyendo. */
+  const loadOlder = async () => {
+    const oldestId = messages[0]?.id;
+    if (!oldestId || olderInFlight.current || !hasMore) return;
+    olderInFlight.current = true;
+    setLoadingOlder(true);
+    try {
+      const page = await fetchMessages({
+        orderBy: WHATSAPP_NEWEST_FIRST,
+        take: WHATSAPP_MESSAGES_PAGE_SIZE,
+        skip: 1,
+        cursor: { id: oldestId },
+      });
+      heightBeforePrepend.current = scrollRef.current?.scrollHeight ?? 0;
+      scrollIntent.current = "keep-position";
+      setMessages((prev) => mergeMessages(prev, page.reverse(), "start"));
+      setHasMore(page.length === WHATSAPP_MESSAGES_PAGE_SIZE);
+    } catch {
+      // se puede volver a intentar subiendo otra vez
+    } finally {
+      olderInFlight.current = false;
+      setLoadingOlder(false);
+    }
+  };
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (el && el.scrollTop < NEAR_EDGE_PX) void loadOlder();
+  };
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    const intent = scrollIntent.current;
+    scrollIntent.current = null;
+    if (!el || !intent) return;
+    if (intent === "bottom") {
+      el.scrollTop = el.scrollHeight;
+    } else if (intent === "bottom-smooth") {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    } else {
+      el.scrollTop += el.scrollHeight - heightBeforePrepend.current;
+    }
+  }, [messages]);
 
   const {
     data: statusData,
@@ -98,7 +236,7 @@ export default function WhatsAppChatPanel({
     BUSINESS_LEAD_WHATSAPP_STATUS_QUERY,
     {
       variables: targetVariables,
-      skip: !active || !target.id,
+      skip: !active || !targetId,
       fetchPolicy: "cache-and-network",
       pollInterval: active ? STATUS_POLL_MS : 0,
     },
@@ -107,36 +245,23 @@ export default function WhatsAppChatPanel({
   const canReplyFreely = status?.canReplyFreely ?? false;
   const templateStatus = status?.templateStatus ?? "none";
 
-  const messages = data?.techWhatsAppMessages ?? [];
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length]);
-
-  const messagesQueryOptions = {
-    query: WHATSAPP_MESSAGES_QUERY,
-    variables: { where: messagesWhere },
-  };
-  const statusQueryOptions = {
-    query: BUSINESS_LEAD_WHATSAPP_STATUS_QUERY,
-    variables: targetVariables,
-  };
-
   const [sendMessage, { loading: sending }] = useMutation<
     SendWhatsAppMessageResponse,
     SendWhatsAppMessageVariables
-  >(SEND_WHATSAPP_MESSAGE_MUTATION, { refetchQueries: [messagesQueryOptions] });
+  >(SEND_WHATSAPP_MESSAGE_MUTATION);
 
   const [sendMedia, { loading: sendingMedia }] = useMutation<
     SendWhatsAppMediaMessageResponse,
     SendWhatsAppMediaMessageVariables
-  >(SEND_WHATSAPP_MEDIA_MESSAGE_MUTATION, { refetchQueries: [messagesQueryOptions] });
+  >(SEND_WHATSAPP_MEDIA_MESSAGE_MUTATION);
 
   const [startConversation, { loading: starting }] = useMutation<
     StartWhatsAppConversationResponse,
     StartWhatsAppConversationVariables
   >(START_WHATSAPP_CONVERSATION_MUTATION, {
-    refetchQueries: [messagesQueryOptions, statusQueryOptions],
+    refetchQueries: [
+      { query: BUSINESS_LEAD_WHATSAPP_STATUS_QUERY, variables: targetVariables },
+    ],
   });
 
   const busy = sending || sendingMedia;
@@ -149,9 +274,12 @@ export default function WhatsAppChatPanel({
       const payload = result.data?.sendWhatsAppMessage;
       if (!payload?.success) {
         sileo.error({ title: payload?.message || "No se pudo enviar el mensaje" });
+        // aun si falló se guarda como "no enviado": se muestra en el chat
+        await syncNewer(true);
         return;
       }
       setDraft("");
+      await syncNewer(true);
     } catch (err) {
       sileo.error({
         title: err instanceof Error ? err.message : "No se pudo enviar el mensaje",
@@ -168,9 +296,11 @@ export default function WhatsAppChatPanel({
       const payload = result.data?.sendWhatsAppMediaMessage;
       if (!payload?.success) {
         sileo.error({ title: payload?.message || "No se pudo enviar el archivo" });
+        await syncNewer(true);
         return;
       }
       setDraft("");
+      await syncNewer(true);
     } catch (err) {
       sileo.error({
         title: err instanceof Error ? err.message : "No se pudo enviar el archivo",
@@ -193,7 +323,7 @@ export default function WhatsAppChatPanel({
       // (o el lag de hasta 5s del polling de mensajes) puede mandar el saludo dos veces.
       setJustStarted(true);
       setTimeout(() => setJustStarted(false), 8000);
-      await refetchStatus();
+      await Promise.all([refetchStatus(), syncNewer(true)]);
     } catch (err) {
       sileo.error({
         title: err instanceof Error ? err.message : "No se pudo iniciar la conversación",
@@ -207,14 +337,33 @@ export default function WhatsAppChatPanel({
 
   return (
     <div className={`flex flex-col ${className}`}>
-      <div className="flex-1 overflow-y-auto min-h-0 px-4 py-4 space-y-3 bg-[#f5f5f5] dark:bg-[#161616]">
-        {loading && messages.length === 0 ? (
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto min-h-0 px-4 py-4 space-y-3 bg-[#f5f5f5] dark:bg-[#161616]"
+      >
+        {hasMore && messages.length > 0 ? (
+          <div className="flex justify-center pb-1">
+            {loadingOlder ? (
+              <span className="size-5 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
+            ) : (
+              <button
+                type="button"
+                onClick={() => void loadOlder()}
+                className="rounded-full bg-black/5 px-3 py-1 text-xs font-medium text-[#616161] hover:bg-black/10 dark:bg-white/10 dark:text-[#b0b0b0] dark:hover:bg-white/15"
+              >
+                Ver mensajes anteriores
+              </button>
+            )}
+          </div>
+        ) : null}
+        {!loaded ? (
           <div className="flex justify-center py-6">
             <span className="animate-spin size-8 border-2 border-orange-500 border-t-transparent rounded-full" />
           </div>
         ) : messages.length === 0 ? (
           <p className="text-sm text-[#616161] dark:text-[#b0b0b0] py-4 text-center">
-            Todavía no hay mensajes con este lead.
+            Todavía no hay mensajes en esta conversación.
           </p>
         ) : (
           messages.map((msg: WhatsAppMessageItem) => {
@@ -294,7 +443,6 @@ export default function WhatsAppChatPanel({
             );
           })
         )}
-        <div ref={bottomRef} />
       </div>
 
       {statusLoading && !statusData ? (

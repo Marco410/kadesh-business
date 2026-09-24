@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useCookieConsent } from "./CookieConsentContext";
 
-const META_PIXEL_ID = "1093441746302298";
+const META_PIXEL_ID = "1085575667194114";
 
 let metaPixelInjected = false;
 

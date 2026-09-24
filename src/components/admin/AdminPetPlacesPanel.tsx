@@ -17,6 +17,7 @@ import {
   PET_PLACE_CLAIM_STATUS_CLASSES,
   PET_PLACE_CLAIM_STATUS_LABELS,
   PET_PLACE_CLAIM_STATUS_OPTIONS,
+  PET_PLACE_PIPELINE_OPTIONS,
   PET_PLACE_SERVICE_STATUS,
   type PetPlaceClaimStatus,
 } from "./constants";
@@ -36,7 +37,45 @@ import {
   formatPersonName,
   surfaceClass,
 } from "./ui";
-import { SUBSCRIPTION_STATUS } from "kadesh/constants/constans";
+import {
+  PIPELINE_STATUS,
+  PIPELINE_STATUS_COLORS,
+  SUBSCRIPTION_STATUS,
+} from "kadesh/constants/constans";
+
+const fieldClass =
+  "h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
+
+function PipelineSelect({
+  place,
+  disabled,
+  onChange,
+  className = "",
+}: {
+  place: AdminPetPlaceRow;
+  disabled: boolean;
+  onChange: (place: AdminPetPlaceRow, value: string) => void;
+  className?: string;
+}) {
+  const value = place.pipelineStatus ?? PIPELINE_STATUS.DETECTADO;
+  return (
+    <select
+      aria-label={`Pipeline de ${place.name}`}
+      value={value}
+      disabled={disabled}
+      onChange={(e) => onChange(place, e.target.value)}
+      className={`h-11 sm:h-9 rounded-lg border-0 px-2 text-xs font-medium cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:opacity-60 ${
+        PIPELINE_STATUS_COLORS[value] ?? ""
+      } ${className}`}
+    >
+      {Object.values(PIPELINE_STATUS).map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
+  );
+}
 
 export type PetPlacesVista = "fichas" | "servicios";
 
@@ -57,10 +96,13 @@ export default function AdminPetPlacesPanel({
 }) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<PetPlaceClaimStatus | "all">("all");
+  const [city, setCity] = useState("");
+  const [pipeline, setPipeline] = useState("all");
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const debouncedSearch = useDebouncedValue(search);
+  const debouncedCity = useDebouncedValue(city);
 
   const where = useMemo(() => {
     const filters: Record<string, unknown>[] = [];
@@ -74,13 +116,22 @@ export default function AdminPetPlacesPanel({
         ],
       });
     }
+    const cityQuery = debouncedCity.trim();
+    if (cityQuery) {
+      filters.push({
+        municipality: { contains: cityQuery, mode: "insensitive" },
+      });
+    }
     if (status !== "all") {
       filters.push({ claimStatus: { equals: status } });
+    }
+    if (pipeline !== "all") {
+      filters.push({ pipelineStatus: { equals: pipeline } });
     }
     if (filters.length === 0) return {};
     if (filters.length === 1) return filters[0];
     return { AND: filters };
-  }, [debouncedSearch, status]);
+  }, [debouncedSearch, debouncedCity, status, pipeline]);
 
   const queryVariables = {
     where,
@@ -168,6 +219,28 @@ export default function AdminPetPlacesPanel({
     }
   }
 
+  async function changePipeline(place: AdminPetPlaceRow, value: string) {
+    if (value === place.pipelineStatus) return;
+    setBusyId(place.id);
+    try {
+      await updatePetPlace({
+        variables: {
+          where: { id: place.id },
+          data: { pipelineStatus: value },
+        },
+      });
+      sileo.success({ title: "Pipeline actualizado" });
+      await refetch();
+    } catch (err) {
+      sileo.error({
+        title: "No se pudo cambiar el pipeline",
+        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+      });
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   async function runUnverify(place: AdminPetPlaceRow) {
     const confirmed = window.confirm(
       "¿Quitar la verificación? El dueño dejará de poder editar la ficha hasta que la apruebes otra vez.",
@@ -232,6 +305,40 @@ export default function AdminPetPlacesPanel({
           }}
           placeholder="Buscar por nombre o municipio"
         />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <label className="block">
+            <span className="sr-only">Filtrar por ciudad</span>
+            <input
+              type="search"
+              value={city}
+              onChange={(e) => {
+                setCity(e.target.value);
+                setPage(1);
+              }}
+              placeholder="Ciudad o municipio"
+              className={fieldClass}
+            />
+          </label>
+          <label className="block">
+            <span className="sr-only">Filtrar por pipeline</span>
+            <select
+              value={pipeline}
+              onChange={(e) => {
+                setPipeline(e.target.value);
+                setPage(1);
+              }}
+              className={`${fieldClass} cursor-pointer`}
+            >
+              {PET_PLACE_PIPELINE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.value === "all"
+                    ? "Pipeline: todos"
+                    : option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
         <AdminFilterChips
           label="Estado"
           options={PET_PLACE_CLAIM_STATUS_OPTIONS}
@@ -250,7 +357,7 @@ export default function AdminPetPlacesPanel({
       ) : places.length === 0 ? (
         <AdminEmptyState
           title="No hay fichas con ese filtro"
-          description="Cambia el estado o busca por el nombre de la clínica."
+          description="Cambia el estado, el pipeline o busca por nombre o ciudad."
         />
       ) : (
         <>
@@ -283,6 +390,12 @@ export default function AdminPetPlacesPanel({
                     ? formatPersonName(place.user.name, place.user.lastName)
                     : "Sin solicitante"}
                 </p>
+                <PipelineSelect
+                  place={place}
+                  disabled={busyId === place.id}
+                  onChange={changePipeline}
+                  className="mt-3 w-full"
+                />
                 <button
                   type="button"
                   onClick={() => setSelectedId(place.id)}
@@ -295,12 +408,13 @@ export default function AdminPetPlacesPanel({
           </div>
 
           <div className={`${surfaceClass} hidden md:block overflow-x-auto`}>
-            <table className="min-w-[920px] w-full text-sm">
+            <table className="min-w-[1080px] w-full text-sm">
               <thead>
                 <tr className="text-left text-xs uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] border-b border-[#e8e8e8] dark:border-[#333]">
                   <th className="px-4 py-3">Clínica</th>
                   <th className="px-4 py-3">Solicitante</th>
                   <th className="px-4 py-3">Estado</th>
+                  <th className="px-4 py-3">Pipeline</th>
                   <th className="px-4 py-3">Verificada</th>
                   <th className="px-4 py-3 text-right">Acción</th>
                 </tr>
@@ -347,6 +461,13 @@ export default function AdminPetPlacesPanel({
                         className={
                           PET_PLACE_CLAIM_STATUS_CLASSES[place.claimStatus ?? ""]
                         }
+                      />
+                    </td>
+                    <td className="px-4 py-3 align-top">
+                      <PipelineSelect
+                        place={place}
+                        disabled={busyId === place.id}
+                        onChange={changePipeline}
                       />
                     </td>
                     <td className="px-4 py-3 align-top text-sm text-[#212121] dark:text-white">

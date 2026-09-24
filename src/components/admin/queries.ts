@@ -22,6 +22,7 @@ const PET_PLACE_FIELDS = gql`
     verified
     verifiedAt
     claimStatus
+    pipelineStatus
     claimRole
     claimPhone
     claimNotes
@@ -348,6 +349,7 @@ export const UPDATE_PET_PLACE_MUTATION = gql`
       id
       verified
       claimStatus
+      pipelineStatus
       verifiedAt
     }
   }
