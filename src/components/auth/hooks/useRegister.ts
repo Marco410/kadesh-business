@@ -177,6 +177,7 @@ export function useRegister(options?: UseRegisterOptions) {
             email,
             password,
             phone: phone || undefined,
+            product: 'saas',
           },
           referrerCode: referralCode || null,
           companyName: companyName.trim(),
