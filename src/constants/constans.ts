@@ -1025,12 +1025,20 @@ export const EVENT_COLORS = {
   activity: "bg-orange-500",
   proposal: "bg-blue-500",
   followup: "bg-emerald-500",
+  task: "bg-amber-500",
+  /** Evento creado directamente en el calendario de Kadesh. */
+  native: "bg-violet-500",
+  /** Evento que vive solo en un calendario de Google conectado. */
+  google: "bg-sky-500",
 } as const;
 
 export const EVENT_LABELS = {
   activity: "Actividad",
   proposal: "Propuesta",
   followup: "Seguimiento",
+  task: "Tarea",
+  native: "Evento",
+  google: "Google",
 } as const;
 
 /** Subscription status (aligned with Stripe subscription status) */

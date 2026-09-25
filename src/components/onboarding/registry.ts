@@ -182,6 +182,39 @@ export const TOURS: TourDefinition[] = [
     ],
   },
   {
+    id: "calendar",
+    title: "Mi Calendario",
+    version: 3,
+    match: (pathname, tab) => pathname === Routes.panel && tab === "calendar",
+    steps: [
+      {
+        target: '[data-tour="nav-calendar"]',
+        title: "Tu calendario",
+        description:
+          "Aquí ves tus actividades, seguimientos y propuestas, y los eventos que crees.",
+        side: "right",
+      },
+      {
+        target: '[data-tour="calendar-new-event"]',
+        title: "Crea un evento",
+        description:
+          "Agrega reuniones o recordatorios. Se envían a los calendarios de Google que tengas seleccionados.",
+      },
+      {
+        target: '[data-tour="calendar-google-toggle"]',
+        title: "Conecta Google Calendar",
+        description:
+          "Conecta tu cuenta, elige qué calendarios ver y mantén todo sincronizado. Si eres administrador, también puedes conectar una cuenta compartida para todo el equipo.",
+      },
+      {
+        target: '[data-tour="calendar-filters"]',
+        title: "Elige qué ver",
+        description:
+          "Marca o desmarca actividades, propuestas, seguimientos, eventos y cada calendario de Google. Cada uno conserva su color.",
+      },
+    ],
+  },
+  {
     id: "agregar-cliente",
     title: "Agregar cliente",
     version: 1,

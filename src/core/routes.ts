@@ -35,6 +35,9 @@ export const Routes = {
   panel: "/panel",
   panelProfile: "/panel?tab=profile",
   panelAi: "/panel?tab=ai",
+  panelCalendar: "/panel?tab=calendar",
+  /** Redirect URI de OAuth de Google Calendar (debe coincidir con GOOGLE_CALENDAR_REDIRECT_URI del backend). */
+  panelGoogleCalendarCallback: "/panel/google-calendar/callback",
   panelLead: (id: string): string => `/panel/clientes/lead/${id}`,
   panelProject: (id: string): string => `/panel/clientes/proyecto/${id}`,
   panelQuotation: (id: string): string => `/panel/cotizacion/${id}`,
