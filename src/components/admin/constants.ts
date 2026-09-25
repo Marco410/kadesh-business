@@ -47,6 +47,14 @@ export const USERS_VISTAS = {
 
 export type UsersVista = (typeof USERS_VISTAS)[keyof typeof USERS_VISTAS];
 
+/** Vistas dentro de la sección Planes. */
+export const PLANS_VISTAS = {
+  CATALOG: "catalogo",
+  MODULES: "modulos",
+} as const;
+
+export type PlansVista = (typeof PLANS_VISTAS)[keyof typeof PLANS_VISTAS];
+
 export function parseAdminTab(value: string | null): AdminTab {
   if (value === LEGACY_SUBSCRIPTIONS_TAB) return ADMIN_TABS.USERS;
   if (
@@ -68,6 +76,12 @@ export function parseUsersVista(
   return vista === USERS_VISTAS.SUBSCRIPTIONS
     ? USERS_VISTAS.SUBSCRIPTIONS
     : USERS_VISTAS.ACCOUNTS;
+}
+
+export function parsePlansVista(vista: string | null): PlansVista {
+  return vista === PLANS_VISTAS.MODULES
+    ? PLANS_VISTAS.MODULES
+    : PLANS_VISTAS.CATALOG;
 }
 
 export const ADMIN_PAGE_SIZE = 25;

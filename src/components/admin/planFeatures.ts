@@ -55,16 +55,40 @@ export function mergePlanFeatures(value: unknown): PlanFeatureEntry[] {
   return [...stored, ...missing];
 }
 
-/** Payload para `planFeatures`: conserva nombre y descripción publicados. */
+/**
+ * Catálogo compartido de nombre/descripción: unión de keys conocidas + lo
+ * guardado en los planes. El `included` aquí no importa (siempre false).
+ */
+export function deriveSharedFeatureCatalog(
+  plans: Array<{ planFeatures: unknown }>,
+): PlanFeatureEntry[] {
+  const byKey = new Map<string, PlanFeatureEntry>();
+  for (const base of mergePlanFeatures([])) {
+    byKey.set(base.key, { ...base, included: false });
+  }
+  for (const plan of plans) {
+    for (const f of readPlanFeatures(plan.planFeatures)) {
+      const existing = byKey.get(f.key);
+      if (!existing) {
+        byKey.set(f.key, { ...f, included: false });
+        continue;
+      }
+      if (f.name.trim()) existing.name = f.name;
+      if (f.description.trim()) existing.description = f.description;
+    }
+  }
+  return [...byKey.values()];
+}
+
+/** Payload para `planFeatures` de un plan: limpia y guarda included + copy. */
 export function toPlanFeaturesPayload(
   entries: PlanFeatureEntry[],
-  included: Record<string, boolean>,
 ): PlanFeatureEntry[] {
   return entries.map((f) => ({
     key: f.key,
-    name: f.name,
-    description: f.description,
-    included: Boolean(included[f.key]),
+    name: f.name.trim() || prettyKey(f.key),
+    description: f.description.trim(),
+    included: Boolean(f.included),
   }));
 }
 
@@ -74,4 +98,24 @@ export function countIncluded(value: unknown): { included: number; total: number
     included: entries.filter((f) => f.included).length,
     total: entries.length,
   };
+}
+
+/**
+ * Nombres de plan (únicos) donde la feature está incluida.
+ * Agrupa mensual/anual del mismo nombre en una sola etiqueta.
+ */
+export function planNamesIncludingFeature(
+  plans: Array<{ name: string | null; planFeatures: unknown }>,
+  featureKey: string,
+): string[] {
+  const names = new Set<string>();
+  for (const plan of plans) {
+    const hit = readPlanFeatures(plan.planFeatures).find(
+      (f) => f.key === featureKey && f.included,
+    );
+    if (!hit) continue;
+    const label = (plan.name ?? "").trim() || "Sin nombre";
+    names.add(label);
+  }
+  return [...names].sort((a, b) => a.localeCompare(b, "es"));
 }

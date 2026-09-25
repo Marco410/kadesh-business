@@ -37,8 +37,6 @@ function inputToNumber(value: string): number | null {
 }
 
 function buildDraft(plan: AdminPlanRow, features: PlanFeatureEntry[]): AdminPlanDraft {
-  const included: Record<string, boolean> = {};
-  for (const f of features) included[f.key] = f.included;
   return {
     name: plan.name ?? "",
     cost: numberToInput(plan.cost),
@@ -56,7 +54,7 @@ function buildDraft(plan: AdminPlanRow, features: PlanFeatureEntry[]): AdminPlan
     ),
     stripePriceId: plan.stripePriceId ?? "",
     stripeProductId: plan.stripeProductId ?? "",
-    features: included,
+    features: features.map((f) => ({ ...f })),
   };
 }
 
@@ -105,9 +103,8 @@ function AdminPlanEditorForm({
   onClose: () => void;
   onSave: (payload: AdminPlanSavePayload) => Promise<void>;
 }) {
-  const features = mergePlanFeatures(plan.planFeatures);
   const [draft, setDraft] = useState<AdminPlanDraft>(() =>
-    buildDraft(plan, features),
+    buildDraft(plan, mergePlanFeatures(plan.planFeatures)),
   );
   /** "check" = solo consultar; "save" = verificar y luego guardar. */
   const [checkIntent, setCheckIntent] = useState<"check" | "save" | null>(null);
@@ -122,6 +119,18 @@ function AdminPlanEditorForm({
     value: AdminPlanDraft[K],
   ) => setDraft((prev) => ({ ...prev, [key]: value }));
 
+  function patchFeature(
+    featureKey: string,
+    patch: Partial<Pick<PlanFeatureEntry, "name" | "description" | "included">>,
+  ) {
+    setDraft((prev) => ({
+      ...prev,
+      features: prev.features.map((f) =>
+        f.key === featureKey ? { ...f, ...patch } : f,
+      ),
+    }));
+  }
+
   const costNumber = inputToNumber(draft.cost);
   const billingChanged =
     costNumber !== (plan.cost ?? null) ||
@@ -135,6 +144,7 @@ function AdminPlanEditorForm({
     draft.cost.trim() !== "" && (costNumber == null || costNumber < 0)
       ? "El monto tiene que ser un número de 0 o más."
       : null;
+  const includedCount = draft.features.filter((f) => f.included).length;
   const invalid = Boolean(nameError || costError);
 
   function checkVariables() {
@@ -174,13 +184,11 @@ function AdminPlanEditorForm({
         ),
         stripePriceId: draft.stripePriceId.trim() || null,
         stripeProductId: draft.stripeProductId.trim() || null,
-        planFeatures: toPlanFeaturesPayload(features, draft.features),
+        planFeatures: toPlanFeaturesPayload(draft.features),
       },
     });
     setCheckIntent(null);
   }
-
-  const includedCount = features.filter((f) => draft.features[f.key]).length;
 
   return (
     <>
@@ -486,28 +494,22 @@ function AdminPlanEditorForm({
                   Qué incluye este plan
                 </h4>
                 <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
-                  {includedCount} de {features.length} módulos. Aplica a quien
-                  contrate de aquí en adelante; las empresas ya suscritas se
-                  ajustan desde Usuarios → Suscripciones.
+                  {includedCount} de {draft.features.length} módulos incluidos.
+                  El nombre y la descripción se editan una sola vez para todos
+                  los planes, en Planes → Módulos.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {features.map((f) => (
+                  {draft.features.map((f) => (
                     <label
                       key={f.key}
                       className="flex items-start gap-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-3 py-3 cursor-pointer min-h-11"
                     >
                       <input
                         type="checkbox"
-                        checked={Boolean(draft.features[f.key])}
+                        checked={f.included}
                         disabled={saving}
                         onChange={(e) =>
-                          setDraft((prev) => ({
-                            ...prev,
-                            features: {
-                              ...prev.features,
-                              [f.key]: e.target.checked,
-                            },
-                          }))
+                          patchFeature(f.key, { included: e.target.checked })
                         }
                         className="mt-1 h-4 w-4 accent-orange-500"
                       />
