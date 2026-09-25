@@ -9,15 +9,17 @@ import {
   UPDATE_ADMIN_PLAN_MUTATION,
   type AdminPlansResponse,
 } from "./queries";
-import { PLAN_FILTERS } from "./constants";
+import { PLAN_FILTERS, PLANS_VISTAS, type PlansVista } from "./constants";
 import type { AdminPlanRow } from "./types";
 import { countIncluded } from "./planFeatures";
 import AdminPlanEditor, { type AdminPlanSavePayload } from "./AdminPlanEditor";
+import AdminPlanModulesPanel from "./AdminPlanModulesPanel";
 import {
   AdminEmptyState,
   AdminErrorState,
   AdminFilterChips,
   AdminLoadingRows,
+  AdminSegmented,
   AdminStatusBadge,
   formatCredits,
   formatMoney,
@@ -27,7 +29,34 @@ import {
 
 type PlanFilter = (typeof PLAN_FILTERS)[number]["value"];
 
-export default function AdminPlansPanel() {
+export default function AdminPlansPanel({
+  vista = PLANS_VISTAS.CATALOG,
+  onVistaChange,
+}: {
+  vista?: PlansVista;
+  onVistaChange?: (vista: PlansVista) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-4">
+      <AdminSegmented
+        ariaLabel="Vista de planes"
+        items={[
+          { id: PLANS_VISTAS.CATALOG, label: "Catálogo" },
+          { id: PLANS_VISTAS.MODULES, label: "Módulos" },
+        ]}
+        value={vista}
+        onChange={(next) => onVistaChange?.(next)}
+      />
+      {vista === PLANS_VISTAS.MODULES ? (
+        <AdminPlanModulesPanel />
+      ) : (
+        <AdminPlansCatalog />
+      )}
+    </div>
+  );
+}
+
+function AdminPlansCatalog() {
   const [filter, setFilter] = useState<PlanFilter>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -80,8 +109,8 @@ export default function AdminPlansPanel() {
 
       <div className="flex flex-col gap-2">
         <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
-          El catálogo que se ve en precios y al contratar. Los cambios de precio
-          se verifican contra Stripe antes de guardar.
+          Precio, créditos e inclusión de módulos por plan. El texto de cada
+          módulo (nombre y descripción) se edita en la vista Módulos.
         </p>
         <AdminFilterChips
           label="Planes"

@@ -11,9 +11,12 @@ import {
   ADMIN_TAB_ITEMS,
   ADMIN_TABS,
   parseAdminTab,
+  parsePlansVista,
   parseUsersVista,
+  PLANS_VISTAS,
   USERS_VISTAS,
   type AdminTab,
+  type PlansVista,
   type UsersVista,
 } from "./constants";
 import AdminOverview from "./AdminOverview";
@@ -48,6 +51,7 @@ function AdminDashboardContent() {
     searchParams.get("tab"),
     searchParams.get("vista"),
   );
+  const plansVista = parsePlansVista(searchParams.get("vista"));
   const [reviewPlaceId, setReviewPlaceId] = useState<string | null>(null);
   const [reviewServiceId, setReviewServiceId] = useState<string | null>(null);
 
@@ -57,7 +61,7 @@ function AdminDashboardContent() {
     }
   }, [loading, user, router]);
 
-  /** `vista` solo vive en las tabs que la usan (Usuarios y Veterinarias). */
+  /** `vista` solo vive en las tabs que la usan (Usuarios, Planes y Veterinarias). */
   const setTab = useCallback(
     (next: AdminTab, nextVista?: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -67,7 +71,9 @@ function AdminDashboardContent() {
       } else {
         params.set("tab", next);
         const supportsVista =
-          next === ADMIN_TABS.PET_PLACES || next === ADMIN_TABS.USERS;
+          next === ADMIN_TABS.PET_PLACES ||
+          next === ADMIN_TABS.USERS ||
+          next === ADMIN_TABS.PLANS;
         if (supportsVista && nextVista) params.set("vista", nextVista);
       }
       const qs = params.toString();
@@ -90,6 +96,16 @@ function AdminDashboardContent() {
       setTab(
         ADMIN_TABS.USERS,
         next === USERS_VISTAS.SUBSCRIPTIONS ? next : undefined,
+      );
+    },
+    [setTab],
+  );
+
+  const setPlansVista = useCallback(
+    (next: PlansVista) => {
+      setTab(
+        ADMIN_TABS.PLANS,
+        next === PLANS_VISTAS.MODULES ? next : undefined,
       );
     },
     [setTab],
@@ -162,7 +178,9 @@ function AdminDashboardContent() {
       {tab === ADMIN_TABS.USERS ? (
         <AdminUsersSection vista={usersVista} onVistaChange={setUsersVista} />
       ) : null}
-      {tab === ADMIN_TABS.PLANS ? <AdminPlansPanel /> : null}
+      {tab === ADMIN_TABS.PLANS ? (
+        <AdminPlansPanel vista={plansVista} onVistaChange={setPlansVista} />
+      ) : null}
       {tab === ADMIN_TABS.PET_PLACES ? (
         <AdminPetPlacesPanel
           vista={vista}

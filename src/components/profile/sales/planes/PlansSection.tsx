@@ -471,8 +471,6 @@ function PairedPlanCard({
     monthly?.bestSeller === true || annual?.bestSeller === true;
 
   const persona = getPlanPersonaForTier(baseKey, displayName);
-  const includedSource = annual ?? monthly;
-  const includedFeatures = includedPlanFeatures(includedSource?.planFeatures);
 
   const planToSubscribe: SaasPlanItem | null =
     billingPeriod === "annual" ? annual : monthly;
@@ -480,6 +478,10 @@ function PairedPlanCard({
     planToSubscribe != null &&
     planToSubscribe.active &&
     planToSubscribe.cost > 0;
+
+  /** Features del periodo visible (antes siempre prefería annual y el mensual no se veía). */
+  const includedSource = planToSubscribe ?? monthly ?? annual;
+  const includedFeatures = includedPlanFeatures(includedSource?.planFeatures);
 
   const savings = annualSavingsVsMonthly(monthly, annual);
 
