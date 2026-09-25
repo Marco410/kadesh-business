@@ -15,7 +15,6 @@ const EXEMPT_NAV_KEYS = new Set([
   "vendedores",
   "archivos",
   "proyectos",
-  "calendar",
   "whatsapp",
   "referidos",
   "novedades",
