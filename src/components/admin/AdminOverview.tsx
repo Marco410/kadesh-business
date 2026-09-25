@@ -19,6 +19,7 @@ import {
   PET_PLACE_SERVICE_STATUS,
   PET_PLACE_SERVICE_STATUS_CLASSES,
   PET_PLACE_SERVICE_STATUS_LABELS,
+  USERS_VISTAS,
   type AdminTab,
 } from "./constants";
 import {
@@ -35,7 +36,7 @@ export default function AdminOverview({
   onReviewPlace,
   onReviewService,
 }: {
-  onOpenTab: (tab: AdminTab, vista?: "servicios") => void;
+  onOpenTab: (tab: AdminTab, vista?: string) => void;
   onReviewPlace: (placeId: string) => void;
   onReviewService: (serviceId: string) => void;
 }) {
@@ -71,11 +72,12 @@ export default function AdminOverview({
       icon: UserIcon,
     },
     {
-      tab: ADMIN_TABS.SUBSCRIPTIONS,
-      label: "Planes activos",
+      tab: ADMIN_TABS.USERS,
+      label: "Suscripciones activas",
       value: data?.activeSubscriptions ?? 0,
-      hint: "Suscripciones vigentes",
+      hint: "Empresas con plan vigente",
       icon: CheckmarkCircle02Icon,
+      vista: USERS_VISTAS.SUBSCRIPTIONS as string,
     },
     {
       tab: ADMIN_TABS.PET_PLACES,
@@ -92,7 +94,7 @@ export default function AdminOverview({
       hint: "Por aprobar y asignar",
       icon: CheckmarkCircle02Icon,
       emphasize: (data?.pendingServices ?? 0) > 0,
-      vista: "servicios" as const,
+      vista: "servicios" as string,
     },
   ];
 

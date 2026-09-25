@@ -63,6 +63,65 @@ export type AdminSubscriptionRow = {
   } | null;
 };
 
+export type AdminPlanRow = {
+  id: string;
+  name: string | null;
+  cost: number | null;
+  costOld: number | null;
+  currency: string | null;
+  frequency: string | null;
+  leadLimit: number | null;
+  planFeatures: unknown;
+  active: boolean | null;
+  bestSeller: boolean | null;
+  referralUpfrontCommissionPct: number | null;
+  referralRecurringCommissionPct: number | null;
+  stripePriceId: string | null;
+  stripeProductId: string | null;
+  updatedAt: string | null;
+  subscriptionsCount: number | null;
+};
+
+/** Borrador editable de un plan. Todo string: viene de inputs. */
+export type AdminPlanDraft = {
+  name: string;
+  cost: string;
+  costOld: string;
+  currency: string;
+  frequency: string;
+  leadLimit: string;
+  active: boolean;
+  bestSeller: boolean;
+  referralUpfrontCommissionPct: string;
+  referralRecurringCommissionPct: string;
+  stripePriceId: string;
+  stripeProductId: string;
+  features: Record<string, boolean>;
+};
+
+export type StripePlanCheckField = {
+  field: string;
+  label: string;
+  local: string | null;
+  stripe: string | null;
+  match: boolean;
+};
+
+export type StripePlanCheckResult = {
+  success: boolean;
+  message: string;
+  allMatch: boolean;
+  checkedAt: string | null;
+  priceId: string | null;
+  priceActive: boolean | null;
+  productId: string | null;
+  productName: string | null;
+  productActive: boolean | null;
+  livemode: boolean | null;
+  subscriptionsCount: number | null;
+  fields: StripePlanCheckField[];
+};
+
 export type AdminPetPlaceRow = {
   id: string;
   name: string;
