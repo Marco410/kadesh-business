@@ -29,4 +29,4 @@ Los pasos se omiten solos si el elemento no existe (rol, plan o feature sin acce
 5. Corre `pnpm check:tours`.
 
 ## Pendiente
-Secciones del sidebar sin tour propio (ver `EXEMPT_NAV_KEYS` en `scripts/check-tours.mjs`): perfil, vendedores, archivos, proyectos, calendario, WhatsApp, referidos, novedades. Ir retirándolas de esa lista al agregar su tour.
+Secciones del sidebar sin tour propio (ver `EXEMPT_NAV_KEYS` en `scripts/check-tours.mjs`): perfil, vendedores, archivos, proyectos, WhatsApp, referidos, novedades. Ir retirándolas de esa lista al agregar su tour.

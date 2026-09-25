@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { EVENT_COLORS } from "kadesh/constants/constans";
+import TaskDetailModal from "kadesh/components/profile/sales/detail_lead/TaskDetailModal";
 import ActivityDetailModal from "kadesh/components/profile/sales/detail_lead/ActivityDetailModal";
 import ProposalDetailModal from "kadesh/components/profile/sales/detail_lead/ProposalDetailModal";
 import FollowUpDetailModal from "kadesh/components/profile/sales/detail_lead/FollowUpDetailModal";
@@ -12,17 +13,36 @@ const MONTHS = [
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
 ];
 
+/** Tipos con modal de detalle propio (registros del CRM). */
+type CrmEventType = "activity" | "proposal" | "followup" | "task";
+
 export type CalendarEvent = {
   id: string;
   recordId: string;
-  type: "activity" | "proposal" | "followup";
+  /**
+   * `activity`/`proposal`/`followup` vienen del CRM; `native` es un evento creado a mano en
+   * Kadesh; `google` vive solo en un calendario de Google conectado.
+   */
+  type: CrmEventType | "native" | "google";
   typeLabel: string;
   dateKey: string;
   timeLabel: string | null;
   businessName: string;
   sellerName: string;
   extra?: string;
+  /** Solo `google`: enlace al evento en Google Calendar. */
+  href?: string | null;
+  /** Solo `google`: color hex del calendario en Google (`#rrggbb`). */
+  color?: string | null;
 };
+
+const LEGEND: { type: CalendarEvent["type"]; label: string; title: string }[] = [
+  { type: "activity", label: "Actividades", title: "Actividad" },
+  { type: "proposal", label: "Propuestas", title: "Propuesta" },
+  { type: "followup", label: "Seguimientos", title: "Seguimiento" },
+  { type: "task", label: "Tareas", title: "Tarea" },
+  { type: "native", label: "Eventos", title: "Evento" },
+];
 
 function EventListItem({
   event,
@@ -44,11 +64,15 @@ function EventListItem({
           onOpen(event);
         }
       }}
+      style={event.color ? { borderLeft: `4px solid ${event.color}` } : undefined}
       className="flex flex-col gap-1 p-3 rounded-lg bg-white dark:bg-[#1e1e1e] border border-[#e8e8e8] dark:border-[#333] cursor-pointer hover:border-orange-500/50 hover:ring-1 hover:ring-orange-500/30 transition-colors"
     >
       <div className="flex items-center gap-2 flex-wrap">
         <span
-          className={`inline-flex px-2 py-0.5 rounded text-xs font-medium text-white ${EVENT_COLORS[event.type]}`}
+          style={event.color ? { backgroundColor: event.color } : undefined}
+          className={`inline-flex px-2 py-0.5 rounded text-xs font-medium text-white ${
+            event.color ? "" : EVENT_COLORS[event.type]
+          }`}
         >
           {event.typeLabel}
         </span>
@@ -84,6 +108,12 @@ export interface SalesCalendarViewProps {
   className?: string;
   /** `compact` para la ficha del cliente; `full` para el calendario del panel. */
   variant?: "full" | "compact";
+  /** Se llama con el mes visible (día 1) al montar y cada vez que cambia. */
+  onVisibleMonthChange?: (month: Date) => void;
+  /** Clic en un evento `native` o `google` (los del CRM abren su propio modal). */
+  onOpenExternalEvent?: (event: CalendarEvent) => void;
+  /** Oculta la leyenda de colores cuando otro control (capas) ya cumple ese papel. */
+  hideLegend?: boolean;
 }
 
 function todayKey(): string {
@@ -96,6 +126,9 @@ export default function SalesCalendarView({
   title = "Calendario",
   className = "",
   variant = "full",
+  onVisibleMonthChange,
+  onOpenExternalEvent,
+  hideLegend = false,
 }: SalesCalendarViewProps) {
   const isCompact = variant === "compact";
   const [currentMonth, setCurrentMonth] = useState(() => {
@@ -106,9 +139,22 @@ export default function SalesCalendarView({
     isCompact ? todayKey() : null
   );
   const [openedEvent, setOpenedEvent] = useState<{
-    type: CalendarEvent["type"];
+    type: CrmEventType;
     recordId: string;
   } | null>(null);
+
+  useEffect(() => {
+    onVisibleMonthChange?.(currentMonth);
+  }, [currentMonth, onVisibleMonthChange]);
+
+  const handleOpen = (item: CalendarEvent) => {
+    if (item.type === "native" || item.type === "google") {
+      if (onOpenExternalEvent) onOpenExternalEvent(item);
+      else if (item.href) window.open(item.href, "_blank", "noopener,noreferrer");
+      return;
+    }
+    setOpenedEvent({ type: item.type, recordId: item.recordId });
+  };
 
   const calendarGrid = useMemo(() => {
     const year = currentMonth.getFullYear();
@@ -155,12 +201,28 @@ export default function SalesCalendarView({
       })
     : [];
 
-  const hasActivity = (dateKey: string) =>
-    (eventsByDate.get(dateKey) ?? []).some((e) => e.type === "activity");
-  const hasProposal = (dateKey: string) =>
-    (eventsByDate.get(dateKey) ?? []).some((e) => e.type === "proposal");
-  const hasFollowup = (dateKey: string) =>
-    (eventsByDate.get(dateKey) ?? []).some((e) => e.type === "followup");
+  // Un punto por tipo; los de Google se distinguen por el color de su calendario.
+  const dotsFor = (dateKey: string) => {
+    const dots = new Map<string, { key: string; className?: string; color?: string; title: string }>();
+    (eventsByDate.get(dateKey) ?? []).forEach((e) => {
+      const key = e.color ? `color-${e.color}` : e.type;
+      if (dots.has(key)) return;
+      dots.set(key, {
+        key,
+        className: e.color ? undefined : EVENT_COLORS[e.type],
+        color: e.color ?? undefined,
+        title: e.type === "google" ? (e.extra ?? "Google") : e.typeLabel,
+      });
+    });
+    return [...dots.values()].slice(0, 6);
+  };
+
+  // En la ficha compacta, "Eventos" solo sale en la leyenda si hay eventos nativos.
+  const legendItems = useMemo(() => {
+    if (!isCompact) return LEGEND;
+    const hasNative = [...eventsByDate.values()].some((list) => list.some((e) => e.type === "native"));
+    return LEGEND.filter((item) => item.type !== "native" || hasNative);
+  }, [eventsByDate, isCompact]);
 
   const todayDateKey = todayKey();
 
@@ -217,20 +279,16 @@ export default function SalesCalendarView({
             Hoy
           </button>
         </div>
-        <div className="flex items-center gap-4 text-xs text-[#616161] dark:text-[#b0b0b0]">
-          <span className="flex items-center gap-1.5">
-            <span className={`w-3 h-3 rounded-full ${EVENT_COLORS.activity}`} />
-            Actividades
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className={`w-3 h-3 rounded-full ${EVENT_COLORS.proposal}`} />
-            Propuestas
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className={`w-3 h-3 rounded-full ${EVENT_COLORS.followup}`} />
-            Seguimientos
-          </span>
+        {hideLegend ? null : (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+          {legendItems.map((item) => (
+            <span key={item.type} className="flex items-center gap-1.5">
+              <span className={`w-3 h-3 rounded-full ${EVENT_COLORS[item.type]}`} />
+              {item.label}
+            </span>
+          ))}
         </div>
+        )}
       </div>
 
       <div className={`p-4 flex flex-col lg:flex-row gap-4 ${isCompact ? "" : "min-h-[500px]"}`}>
@@ -272,24 +330,14 @@ export default function SalesCalendarView({
                     </span>
                     {cell.dateKey && (
                       <div className="flex flex-wrap gap-0.5 justify-center mt-1">
-                        {hasActivity(cell.dateKey) && (
+                        {dotsFor(cell.dateKey).map((dot) => (
                           <span
-                            className={`w-2.5 h-2.5 rounded-full ${EVENT_COLORS.activity}`}
-                            title="Actividad"
+                            key={dot.key}
+                            style={dot.color ? { backgroundColor: dot.color } : undefined}
+                            className={`w-2.5 h-2.5 rounded-full ${dot.className ?? ""}`}
+                            title={dot.title}
                           />
-                        )}
-                        {hasProposal(cell.dateKey) && (
-                          <span
-                            className={`w-2.5 h-2.5 rounded-full ${EVENT_COLORS.proposal}`}
-                            title="Propuesta"
-                          />
-                        )}
-                        {hasFollowup(cell.dateKey) && (
-                          <span
-                            className={`w-2.5 h-2.5 rounded-full ${EVENT_COLORS.followup}`}
-                            title="Seguimiento"
-                          />
-                        )}
+                        ))}
                       </div>
                     )}
                   </>
@@ -335,9 +383,7 @@ export default function SalesCalendarView({
                       key={e.id}
                       event={e}
                       hideSeller={isCompact}
-                      onOpen={(item) =>
-                        setOpenedEvent({ type: item.type, recordId: item.recordId })
-                      }
+                      onOpen={handleOpen}
                     />
                   ))}
                 </ul>
@@ -355,9 +401,7 @@ export default function SalesCalendarView({
                         key={`up-${e.id}`}
                         event={e}
                         hideSeller
-                        onOpen={(item) =>
-                          setOpenedEvent({ type: item.type, recordId: item.recordId })
-                        }
+                        onOpen={handleOpen}
                       />
                     ))}
                   </ul>
@@ -384,9 +428,7 @@ export default function SalesCalendarView({
                       key={`up-${e.id}`}
                       event={e}
                       hideSeller
-                      onOpen={(item) =>
-                        setOpenedEvent({ type: item.type, recordId: item.recordId })
-                      }
+                      onOpen={handleOpen}
                     />
                   ))}
                 </ul>
@@ -410,6 +452,11 @@ export default function SalesCalendarView({
       <ProposalDetailModal
         proposalId={openedEvent?.type === "proposal" ? openedEvent.recordId : null}
         isOpen={openedEvent !== null && openedEvent.type === "proposal"}
+        onClose={() => setOpenedEvent(null)}
+      />
+      <TaskDetailModal
+        taskId={openedEvent?.type === "task" ? openedEvent.recordId : null}
+        isOpen={openedEvent !== null && openedEvent.type === "task"}
         onClose={() => setOpenedEvent(null)}
       />
       <FollowUpDetailModal
