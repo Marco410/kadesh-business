@@ -4,10 +4,12 @@ import type {
   AdminOverviewData,
   AdminPetPlaceRow,
   AdminPetPlaceServiceRow,
+  AdminPlanRow,
   AdminRoleOption,
   AdminSubscriptionRow,
   AdminUserDetail,
   AdminUserRow,
+  StripePlanCheckResult,
 } from "./types";
 
 const PET_PLACE_FIELDS = gql`
@@ -261,6 +263,73 @@ export const ADMIN_SUBSCRIPTIONS_QUERY = gql`
 export type AdminSubscriptionsResponse = {
   saasCompanySubscriptions: AdminSubscriptionRow[];
   saasCompanySubscriptionsCount: number;
+};
+
+export const ADMIN_PLANS_QUERY = gql`
+  query AdminPlans($where: SaasPlanWhereInput!) {
+    saasPlans(where: $where, orderBy: [{ cost: asc }]) {
+      id
+      name
+      cost
+      costOld
+      currency
+      frequency
+      leadLimit
+      planFeatures
+      active
+      bestSeller
+      referralUpfrontCommissionPct
+      referralRecurringCommissionPct
+      stripePriceId
+      stripeProductId
+      updatedAt
+      subscriptionsCount
+    }
+  }
+`;
+
+export type AdminPlansResponse = {
+  saasPlans: AdminPlanRow[];
+};
+
+export const UPDATE_ADMIN_PLAN_MUTATION = gql`
+  mutation UpdateAdminPlan(
+    $where: SaasPlanWhereUniqueInput!
+    $data: SaasPlanUpdateInput!
+  ) {
+    updateSaasPlan(where: $where, data: $data) {
+      id
+    }
+  }
+`;
+
+export const STRIPE_PLAN_CHECK_QUERY = gql`
+  query StripePlanCheck($input: StripePlanCheckInput!) {
+    stripePlanCheck(input: $input) {
+      success
+      message
+      allMatch
+      checkedAt
+      priceId
+      priceActive
+      productId
+      productName
+      productActive
+      livemode
+      subscriptionsCount
+      fields {
+        field
+        label
+        local
+        stripe
+        match
+      }
+    }
+  }
+`;
+
+export type StripePlanCheckResponse = {
+  stripePlanCheck: StripePlanCheckResult;
 };
 
 export const ADMIN_PET_PLACES_QUERY = gql`

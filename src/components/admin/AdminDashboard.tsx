@@ -11,12 +11,15 @@ import {
   ADMIN_TAB_ITEMS,
   ADMIN_TABS,
   parseAdminTab,
+  parseUsersVista,
+  USERS_VISTAS,
   type AdminTab,
+  type UsersVista,
 } from "./constants";
 import AdminOverview from "./AdminOverview";
 import { AdminTabBar } from "./ui";
-import AdminUsersPanel from "./AdminUsersPanel";
-import AdminSubscriptionsPanel from "./AdminSubscriptionsPanel";
+import AdminUsersSection from "./AdminUsersSection";
+import AdminPlansPanel from "./AdminPlansPanel";
 import AdminPetPlacesPanel, {
   type PetPlacesVista,
 } from "./AdminPetPlacesPanel";
@@ -41,6 +44,10 @@ function AdminDashboardContent() {
   const tab = parseAdminTab(searchParams.get("tab"));
   const vista: PetPlacesVista =
     searchParams.get("vista") === "servicios" ? "servicios" : "fichas";
+  const usersVista = parseUsersVista(
+    searchParams.get("tab"),
+    searchParams.get("vista"),
+  );
   const [reviewPlaceId, setReviewPlaceId] = useState<string | null>(null);
   const [reviewServiceId, setReviewServiceId] = useState<string | null>(null);
 
@@ -50,19 +57,18 @@ function AdminDashboardContent() {
     }
   }, [loading, user, router]);
 
+  /** `vista` solo vive en las tabs que la usan (Usuarios y Veterinarias). */
   const setTab = useCallback(
-    (next: AdminTab, nextVista?: "servicios") => {
+    (next: AdminTab, nextVista?: string) => {
       const params = new URLSearchParams(searchParams.toString());
+      params.delete("vista");
       if (next === ADMIN_TABS.OVERVIEW) {
         params.delete("tab");
-        params.delete("vista");
       } else {
         params.set("tab", next);
-        if (next === ADMIN_TABS.PET_PLACES && nextVista === "servicios") {
-          params.set("vista", "servicios");
-        } else {
-          params.delete("vista");
-        }
+        const supportsVista =
+          next === ADMIN_TABS.PET_PLACES || next === ADMIN_TABS.USERS;
+        if (supportsVista && nextVista) params.set("vista", nextVista);
       }
       const qs = params.toString();
       router.replace(qs ? `${Routes.panelAdmin}?${qs}` : Routes.panelAdmin, {
@@ -74,15 +80,19 @@ function AdminDashboardContent() {
 
   const setPetPlacesVista = useCallback(
     (next: PetPlacesVista) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("tab", ADMIN_TABS.PET_PLACES);
-      if (next === "servicios") params.set("vista", "servicios");
-      else params.delete("vista");
-      router.replace(`${Routes.panelAdmin}?${params.toString()}`, {
-        scroll: false,
-      });
+      setTab(ADMIN_TABS.PET_PLACES, next === "servicios" ? next : undefined);
     },
-    [router, searchParams],
+    [setTab],
+  );
+
+  const setUsersVista = useCallback(
+    (next: UsersVista) => {
+      setTab(
+        ADMIN_TABS.USERS,
+        next === USERS_VISTAS.SUBSCRIPTIONS ? next : undefined,
+      );
+    },
+    [setTab],
   );
 
   const openPlaceReview = useCallback(
@@ -149,8 +159,10 @@ function AdminDashboardContent() {
           onReviewService={openServiceReview}
         />
       ) : null}
-      {tab === ADMIN_TABS.USERS ? <AdminUsersPanel /> : null}
-      {tab === ADMIN_TABS.SUBSCRIPTIONS ? <AdminSubscriptionsPanel /> : null}
+      {tab === ADMIN_TABS.USERS ? (
+        <AdminUsersSection vista={usersVista} onVistaChange={setUsersVista} />
+      ) : null}
+      {tab === ADMIN_TABS.PLANS ? <AdminPlansPanel /> : null}
       {tab === ADMIN_TABS.PET_PLACES ? (
         <AdminPetPlacesPanel
           vista={vista}
