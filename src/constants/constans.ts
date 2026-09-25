@@ -1128,7 +1128,7 @@ export const PLAN_FEATURES_MAP: Record<
   [PLAN_FEATURE_KEYS.CALENDAR_CRM]: {
     name: "Gestión de calendario",
     description:
-      "Gestión de propuestas, actividades de ventas y tareas de seguimiento",
+      "Calendario con tus actividades, seguimientos, tareas y propuestas, sincronizado con Google Calendar (personal o compartido con tu equipo)",
   },
   [PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT]: {
     name: "Gestión de vendedores",

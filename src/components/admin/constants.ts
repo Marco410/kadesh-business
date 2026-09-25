@@ -3,11 +3,14 @@ import { PIPELINE_STATUS, Role } from "kadesh/constants/constans";
 export const ADMIN_TABS = {
   OVERVIEW: "inicio",
   USERS: "usuarios",
-  SUBSCRIPTIONS: "suscripciones",
+  PLANS: "planes",
   PET_PLACES: "veterinarias",
 } as const;
 
 export type AdminTab = (typeof ADMIN_TABS)[keyof typeof ADMIN_TABS];
+
+/** Valor viejo de la tab de suscripciones; ahora es una vista dentro de Usuarios. */
+const LEGACY_SUBSCRIPTIONS_TAB = "suscripciones";
 
 export const ADMIN_TAB_ITEMS: Array<{
   id: AdminTab;
@@ -22,12 +25,12 @@ export const ADMIN_TAB_ITEMS: Array<{
   {
     id: ADMIN_TABS.USERS,
     label: "Usuarios",
-    description: "Cuentas de la plataforma",
+    description: "Cuentas y suscripciones",
   },
   {
-    id: ADMIN_TABS.SUBSCRIPTIONS,
+    id: ADMIN_TABS.PLANS,
     label: "Planes",
-    description: "Suscripciones y features",
+    description: "Catálogo, precios y módulos",
   },
   {
     id: ADMIN_TABS.PET_PLACES,
@@ -36,15 +39,35 @@ export const ADMIN_TAB_ITEMS: Array<{
   },
 ];
 
+/** Vistas dentro de la sección Usuarios. */
+export const USERS_VISTAS = {
+  ACCOUNTS: "cuentas",
+  SUBSCRIPTIONS: "suscripciones",
+} as const;
+
+export type UsersVista = (typeof USERS_VISTAS)[keyof typeof USERS_VISTAS];
+
 export function parseAdminTab(value: string | null): AdminTab {
+  if (value === LEGACY_SUBSCRIPTIONS_TAB) return ADMIN_TABS.USERS;
   if (
     value === ADMIN_TABS.USERS ||
-    value === ADMIN_TABS.SUBSCRIPTIONS ||
+    value === ADMIN_TABS.PLANS ||
     value === ADMIN_TABS.PET_PLACES
   ) {
     return value;
   }
   return ADMIN_TABS.OVERVIEW;
+}
+
+/** `?tab=suscripciones` (enlace viejo) entra directo a la vista de suscripciones. */
+export function parseUsersVista(
+  tab: string | null,
+  vista: string | null,
+): UsersVista {
+  if (tab === LEGACY_SUBSCRIPTIONS_TAB) return USERS_VISTAS.SUBSCRIPTIONS;
+  return vista === USERS_VISTAS.SUBSCRIPTIONS
+    ? USERS_VISTAS.SUBSCRIPTIONS
+    : USERS_VISTAS.ACCOUNTS;
 }
 
 export const ADMIN_PAGE_SIZE = 25;
@@ -157,6 +180,31 @@ export const PET_PLACE_SERVICE_STATUS_CLASSES: Record<string, string> = {
 
 export const ADMIN_CREDIT_GRANT_PRESETS = [250, 1000, 3000] as const;
 export const ADMIN_CREDIT_GRANT_MAX = 50_000;
+
+/** Frecuencias de cobro de un plan (mismos valores que PLAN_FREQUENCY del backend). */
+export const PLAN_FREQUENCY_OPTIONS: Array<{
+  value: string;
+  label: string;
+}> = [
+  { value: "monthly", label: "Mensual" },
+  { value: "annual", label: "Anual" },
+  { value: "weekly", label: "Semanal" },
+  { value: "once", label: "Pago único" },
+];
+
+/** Campos que cambian lo que se le cobra a la gente: exigen verificar con Stripe. */
+export const PLAN_BILLING_FIELDS = [
+  "cost",
+  "currency",
+  "frequency",
+  "stripePriceId",
+] as const;
+
+export const PLAN_FILTERS = [
+  { value: "all", label: "Todos" },
+  { value: "active", label: "Activos" },
+  { value: "inactive", label: "Apagados" },
+] as const;
 
 export const SUBSCRIPTION_STATUS_FILTERS = [
   { value: "all", label: "Todas" },
