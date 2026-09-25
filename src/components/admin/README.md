@@ -49,9 +49,12 @@ En la lista se ve el saldo **de este mes** (disponibles / extra). En **Ajustar p
 
 ## Planes (catálogo)
 
-`?tab=planes` edita el catálogo `SaasPlan` (Free, Starter, Pro, Agencia…): nombre, precio, frecuencia, créditos, visibilidad, más vendido, comisiones de referidos, IDs de Stripe y módulos.
+`?tab=planes` tiene dos vistas:
 
-- Cambiar el catálogo **no** reescribe las suscripciones ya contratadas (son un snapshot). Esas se ajustan en Usuarios → Suscripciones.
+- **Catálogo** (default): edita cada `SaasPlan` (precio, créditos, visibilidad, Stripe, **qué módulos incluye**).
+- **Módulos** (`&vista=modulos`): lista + editor (no una tarjeta por módulo). Buscas, eliges uno, editas nombre/descripción y guardas cuando hay cambios. Punto naranja = sin guardar. Mutación `updatePlanFeatureCatalog`.
+
+- Cambiar el catálogo **no** reescribe el `included` de empresas ya contratadas. El copy (nombre/descripción) sí se propaga a suscripciones al guardar Módulos.
 - Si cambias monto, moneda, frecuencia o el ID del precio, el botón pasa a **Verificar y guardar**: se abre un diálogo que compara el borrador con Stripe (`stripePlanCheck`). Kadesh **nunca escribe** en Stripe; si no coincide, el admin crea un Price nuevo allá, pega el ID y confirma.
 - Se puede **Verificar con Stripe** sin guardar, solo para consultar.
 
@@ -74,3 +77,7 @@ En servicios: un dueño pidió algo que no estaba en el catálogo. Default **Pen
 ### 2026-09-25 — Tab Planes = catálogo; suscripciones bajo Usuarios
 
 La tab que se llamaba Planes listaba suscripciones de empresa. Eso confundía el catálogo (precios/módulos públicos) con el ajuste por cliente. Ahora Planes edita `SaasPlan` y las suscripciones viven en Usuarios → Suscripciones. Al cambiar precio se exige verificar contra Stripe (solo lectura); no se sincroniza ni se crea Price desde Kadesh.
+
+### 2026-09-25 — Nombre y descripción globales; included por plan
+
+En Planes → **Módulos** se edita el copy una vez (`updatePlanFeatureCatalog` sincroniza todos los planes y suscripciones). En el editor de cada plan solo se marca qué módulos van incluidos. La página de precios muestra los features del periodo visible (mensual/anual), no siempre el anual.

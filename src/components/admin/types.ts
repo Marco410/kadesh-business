@@ -82,7 +82,7 @@ export type AdminPlanRow = {
   subscriptionsCount: number | null;
 };
 
-/** Borrador editable de un plan. Todo string: viene de inputs. */
+/** Borrador editable de un plan. Montos y textos vienen de inputs. */
 export type AdminPlanDraft = {
   name: string;
   cost: string;
@@ -96,7 +96,13 @@ export type AdminPlanDraft = {
   referralRecurringCommissionPct: string;
   stripePriceId: string;
   stripeProductId: string;
-  features: Record<string, boolean>;
+  /** Módulos con nombre/descripción editables (lo que se publica en precios). */
+  features: Array<{
+    key: string;
+    name: string;
+    description: string;
+    included: boolean;
+  }>;
 };
 
 export type StripePlanCheckField = {

@@ -303,6 +303,26 @@ export const UPDATE_ADMIN_PLAN_MUTATION = gql`
   }
 `;
 
+export const UPDATE_PLAN_FEATURE_CATALOG_MUTATION = gql`
+  mutation UpdatePlanFeatureCatalog($input: UpdatePlanFeatureCatalogInput!) {
+    updatePlanFeatureCatalog(input: $input) {
+      success
+      message
+      plansUpdated
+      subscriptionsUpdated
+    }
+  }
+`;
+
+export type UpdatePlanFeatureCatalogResponse = {
+  updatePlanFeatureCatalog: {
+    success: boolean;
+    message: string;
+    plansUpdated: number | null;
+    subscriptionsUpdated: number | null;
+  };
+};
+
 export const STRIPE_PLAN_CHECK_QUERY = gql`
   query StripePlanCheck($input: StripePlanCheckInput!) {
     stripePlanCheck(input: $input) {
