@@ -319,6 +319,10 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
                 <strong>pendiente de aprobación de Meta</strong> (puede tardar de minutos a un
                 par de días). Mientras tanto solo podrás contestar a leads que ya te
                 escribieron.
+                <span className="mt-1 block">
+                  Si en WhatsApp Manager ya te aparece aprobada, dale a{" "}
+                  <strong>&quot;Probar conexión&quot;</strong> para actualizar el estado aquí.
+                </span>
               </>
             ) : (
               <>
