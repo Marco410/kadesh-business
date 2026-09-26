@@ -28,6 +28,7 @@ import {
   type WhatsAppMessagesResponse,
   type WhatsAppMessagesVariables,
 } from "./queries";
+import WhatsAppStartTemplateModal from "./WhatsAppStartTemplateModal";
 
 const POLL_INTERVAL_MS = 5000;
 const NEAR_EDGE_PX = 120;
@@ -92,6 +93,7 @@ export default function WhatsAppChatPanel({
 
   const [draft, setDraft] = useState("");
   const [justStarted, setJustStarted] = useState(false);
+  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Los mensajes se traen de a páginas: al abrir, solo los ÚLTIMOS; los anteriores se piden al
@@ -308,14 +310,21 @@ export default function WhatsAppChatPanel({
     }
   };
 
-  const handleStartConversation = async () => {
+  const handleStartConversation = async (template: {
+    templateName: string;
+    templateLanguage: string;
+    templateParams: string[];
+  }) => {
     try {
-      const result = await startConversation({ variables: targetVariables });
+      const result = await startConversation({
+        variables: { ...targetVariables, ...template },
+      });
       const payload = result.data?.startWhatsAppConversation;
       if (!payload?.success) {
         sileo.error({ title: payload?.message || "No se pudo iniciar la conversación" });
         return;
       }
+      setTemplatePickerOpen(false);
       sileo.success({ title: payload.message || "Conversación iniciada" });
       // El mensaje ya se mandó, pero canReplyFreely sigue en false (mandar una plantilla no
       // abre la ventana libre, solo la respuesta del lead la abre) — sin este flag el botón se
@@ -504,20 +513,20 @@ export default function WhatsAppChatPanel({
             <>
               <button
                 type="button"
-                onClick={() => void handleStartConversation()}
+                onClick={() => setTemplatePickerOpen(true)}
                 disabled={starting || justStarted}
                 className="w-full rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {starting
                   ? "Enviando..."
                   : alreadySentFirstMessage
-                    ? "Reenviar mensaje de inicio"
+                    ? "Mandar otro mensaje de inicio"
                     : "Iniciar conversación"}
               </button>
               <p className="mt-2 text-xs text-[#9e9e9e] dark:text-[#888]">
                 {alreadySentFirstMessage
-                  ? "Ya le mandaste el mensaje de inicio. Podrás escribir libre en cuanto te conteste; si no contesta, puedes reenviarlo."
-                  : "WhatsApp exige este mensaje fijo para iniciar la plática con un lead nuevo."}
+                  ? "Ya le mandaste un mensaje de inicio. Podrás escribir libre en cuanto te conteste; si no contesta, puedes mandarle otro."
+                  : "WhatsApp exige una plantilla aprobada para iniciar la plática; eliges cuál al dar clic."}
               </p>
             </>
           ) : (
@@ -527,6 +536,14 @@ export default function WhatsAppChatPanel({
           )}
         </div>
       )}
+
+      <WhatsAppStartTemplateModal
+        isOpen={templatePickerOpen}
+        onClose={() => setTemplatePickerOpen(false)}
+        targetVariables={targetVariables}
+        sending={starting}
+        onSend={handleStartConversation}
+      />
     </div>
   );
 }
