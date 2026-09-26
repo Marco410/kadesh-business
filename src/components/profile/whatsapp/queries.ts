@@ -474,10 +474,72 @@ export interface BusinessLeadWhatsappStatusVariables {
   phone?: string | null;
 }
 
+/** Plantillas aprobadas de la empresa, leídas en vivo de Meta, para elegir cuál mandar. */
+export const COMPANY_WHATSAPP_TEMPLATES_QUERY = gql`
+  query CompanyWhatsappTemplates($companyId: ID, $businessLeadId: ID, $teamMemberId: ID, $phone: String) {
+    companyWhatsappTemplates(
+      companyId: $companyId
+      businessLeadId: $businessLeadId
+      teamMemberId: $teamMemberId
+      phone: $phone
+    ) {
+      success
+      message
+      recipientName
+      companyName
+      templates {
+        name
+        language
+        category
+        headerText
+        bodyText
+        footerText
+        variableCount
+      }
+    }
+  }
+`;
+
+export interface WhatsappTemplateOption {
+  name: string;
+  language: string;
+  category: string;
+  headerText: string | null;
+  bodyText: string;
+  footerText: string | null;
+  variableCount: number;
+}
+
+export interface CompanyWhatsappTemplatesResponse {
+  companyWhatsappTemplates: {
+    success: boolean;
+    message: string;
+    /** Valores propuestos para `{{1}}` y `{{2}}`; el usuario puede cambiarlos. */
+    recipientName: string | null;
+    companyName: string | null;
+    templates: WhatsappTemplateOption[];
+  };
+}
+
+export interface CompanyWhatsappTemplatesVariables {
+  /** Sin `companyId`, el backend resuelve la empresa a partir del destinatario. */
+  companyId?: string | null;
+  businessLeadId?: string | null;
+  teamMemberId?: string | null;
+  phone?: string | null;
+}
+
 /** Manda la plantilla aprobada para iniciarle conversación a un lead que nunca ha escrito. */
 export const START_WHATSAPP_CONVERSATION_MUTATION = gql`
-  mutation StartWhatsAppConversation($businessLeadId: ID, $teamMemberId: ID, $phone: String) {
-    startWhatsAppConversation(businessLeadId: $businessLeadId, teamMemberId: $teamMemberId, phone: $phone) {
+  mutation StartWhatsAppConversation($businessLeadId: ID, $teamMemberId: ID, $phone: String, $templateName: String, $templateLanguage: String, $templateParams: [String!]) {
+    startWhatsAppConversation(
+      businessLeadId: $businessLeadId
+      teamMemberId: $teamMemberId
+      phone: $phone
+      templateName: $templateName
+      templateLanguage: $templateLanguage
+      templateParams: $templateParams
+    ) {
       success
       message
     }
@@ -497,6 +559,10 @@ export interface StartWhatsAppConversationVariables {
   businessLeadId?: string | null;
   teamMemberId?: string | null;
   phone?: string | null;
+  /** Sin nombre, el backend manda la plantilla que Kadesh creó para la empresa. */
+  templateName?: string | null;
+  templateLanguage?: string | null;
+  templateParams?: string[] | null;
 }
 
 export const SEND_WHATSAPP_MEDIA_MESSAGE_MUTATION = gql`
