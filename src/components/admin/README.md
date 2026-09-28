@@ -64,7 +64,7 @@ En la lista se ve el saldo **de este mes** (disponibles / extra). En **Ajustar p
 
 ### Artículos
 
-Se publican en Pet, en SaaS o en ambos. La categoría tiene que ser del mismo blog (o de ambos). La portada es la imagen del artículo. El cuerpo se escribe en el cuadro de texto: línea en blanco entre párrafos, `#` título, `-` lista, `**negrita**`, enlace `[texto](https://…)`.
+Se publican en Pet, en SaaS o en ambos. La categoría tiene que ser del mismo blog (o de ambos). La portada es la imagen del artículo. El cuerpo usa la misma barra que el editor del blog: títulos, negrita, cursiva, listas, separador, enlace, cita y bloque de código. También valen los atajos al inicio de una línea (`# `, `- `, `1. `, `> `, `---`).
 
 Publicar ahora avisa a quienes siguen ese blog y lo comparte en Facebook. Una fecha futura lo deja oculto hasta ese día. Volver a guardar un artículo que ya estaba publicado no repite el aviso. Un borrador no se ve en el sitio.
 

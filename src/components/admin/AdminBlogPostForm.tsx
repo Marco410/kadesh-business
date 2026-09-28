@@ -7,7 +7,8 @@ import { sileo } from "sileo";
 import { getCategoryLabel } from "kadesh/components/blog/constants";
 import { useUser } from "kadesh/utils/UserContext";
 import { imageFileError } from "./blog-image";
-import { documentToText, textToDocument } from "./blog-document";
+import { emptyBlogDocument, normalizeBlogDocument, type BlogDocument } from "./blog-document";
+import AdminBlogEditor from "./AdminBlogEditor";
 import { adminErrorText } from "./errors";
 import {
   ADMIN_BLOG_CATEGORIES_QUERY,
@@ -163,8 +164,7 @@ function PostFormBody({
           initialProduct={post?.product ?? POST_PRODUCT.SAAS}
           initialPublished={Boolean(post?.published)}
           initialPublishedAt={toDatetimeLocal(post?.publishedAt)}
-          initialContent={documentToText(post?.content?.document)}
-          originalDocument={post?.content?.document ?? null}
+          initialDocument={normalizeBlogDocument(post?.content?.document)}
           initialCategoryId={post?.category?.id ?? ""}
           initialTagIds={(post?.tags ?? []).map((tag) => tag.id)}
           initialImageUrl={post?.image?.url ?? null}
@@ -186,8 +186,7 @@ function PostFormFields({
   initialProduct,
   initialPublished,
   initialPublishedAt,
-  initialContent,
-  originalDocument,
+  initialDocument,
   initialCategoryId,
   initialTagIds,
   initialImageUrl,
@@ -203,8 +202,7 @@ function PostFormFields({
   initialProduct: string;
   initialPublished: boolean;
   initialPublishedAt: string;
-  initialContent: string;
-  originalDocument: unknown;
+  initialDocument: BlogDocument;
   initialCategoryId: string;
   initialTagIds: string[];
   initialImageUrl: string | null;
@@ -218,7 +216,7 @@ function PostFormFields({
   const [product, setProduct] = useState(initialProduct);
   const [published, setPublished] = useState(initialPublished);
   const [publishedAt, setPublishedAt] = useState(initialPublishedAt);
-  const [content, setContent] = useState(initialContent);
+  const [body, setBody] = useState<BlogDocument>(initialDocument);
   const [categoryId, setCategoryId] = useState(initialCategoryId);
   const [tagIds, setTagIds] = useState<string[]>(initialTagIds);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -314,11 +312,7 @@ function PostFormFields({
           : undefined,
     };
 
-    if (!postId || content !== initialContent) {
-      payload.content = textToDocument(content);
-    } else if (originalDocument) {
-      payload.content = originalDocument;
-    }
+    payload.content = body;
 
     if (publishedAt !== initialPublishedAt) {
       payload.publishedAt = publishedAt
@@ -463,20 +457,13 @@ function PostFormFields({
           />
         </label>
 
-        <label className="block">
+        <div>
           <span className={labelClass}>Artículo</span>
-          <textarea
-            value={content}
-            onChange={(event) => setContent(event.target.value)}
-            rows={12}
-            className={`${fieldClass} h-auto min-h-48 py-3 leading-relaxed`}
-            placeholder={"Primer párrafo.\n\n## Un subtítulo\n\n- Una idea\n- Otra idea"}
+          <AdminBlogEditor
+            value={body.length > 0 ? body : emptyBlogDocument()}
+            onChange={setBody}
           />
-          <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
-            Deja una línea en blanco entre párrafos. # título, ## subtítulo, - lista,
-            **negrita**, *cursiva*, [texto](https://…) y --- para separar.
-          </p>
-        </label>
+        </div>
 
         <div>
           <span className={labelClass}>Portada</span>
