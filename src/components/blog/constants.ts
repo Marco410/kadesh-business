@@ -4,6 +4,11 @@ export const BLOG_PRODUCT_FILTER = { in: ['saas', 'all'] } as const;
 // Mapeo de valores de categorías a sus etiquetas.
 // Deben coincidir con `POST_CATEGORIES` del backend (models/Blog/Category).
 export const POST_CATEGORIES_MAP: Record<string, string> = {
+  'care_health': 'Cuidado y salud',
+  'nutrition': 'Alimentación',
+  'training': 'Entrenamiento',
+  'breeds': 'Razas',
+  'adoption': 'Adopción',
   'prospecting': 'Prospección B2B',
   'crm_sales': 'CRM y ventas',
   'lead_gen': 'Generación de leads',
@@ -24,6 +29,11 @@ export const CATEGORY_COLORS: Record<string, { border: string; text: string; bg:
   'news': { border: 'border-2 border-yellow-600', text: 'text-yellow-700', bg: 'bg-yellow-50' },
   'tips': { border: 'border-2 border-pink-600', text: 'text-pink-700', bg: 'bg-pink-50' },
   'other': { border: 'border-2 border-gray-600', text: 'text-gray-700', bg: 'bg-gray-50' },
+  'care_health': { border: 'border-2 border-teal-600', text: 'text-teal-700', bg: 'bg-teal-50' },
+  'nutrition': { border: 'border-2 border-lime-600', text: 'text-lime-700', bg: 'bg-lime-50' },
+  'training': { border: 'border-2 border-cyan-600', text: 'text-cyan-700', bg: 'bg-cyan-50' },
+  'breeds': { border: 'border-2 border-amber-600', text: 'text-amber-700', bg: 'bg-amber-50' },
+  'adoption': { border: 'border-2 border-rose-600', text: 'text-rose-700', bg: 'bg-rose-50' },
 };
 
 // Función helper para obtener el label de una categoría

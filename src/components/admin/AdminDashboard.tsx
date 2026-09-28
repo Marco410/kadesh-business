@@ -10,12 +10,15 @@ import { isPlatformAdminUser } from "kadesh/utils/user-roles";
 import {
   ADMIN_TAB_ITEMS,
   ADMIN_TABS,
+  BLOG_VISTAS,
   parseAdminTab,
+  parseBlogVista,
   parsePlansVista,
   parseUsersVista,
   PLANS_VISTAS,
   USERS_VISTAS,
   type AdminTab,
+  type BlogVista,
   type PlansVista,
   type UsersVista,
 } from "./constants";
@@ -23,6 +26,7 @@ import AdminOverview from "./AdminOverview";
 import { AdminTabBar } from "./ui";
 import AdminUsersSection from "./AdminUsersSection";
 import AdminPlansPanel from "./AdminPlansPanel";
+import AdminBlogPanel from "./AdminBlogPanel";
 import AdminPetPlacesPanel, {
   type PetPlacesVista,
 } from "./AdminPetPlacesPanel";
@@ -52,6 +56,7 @@ function AdminDashboardContent() {
     searchParams.get("vista"),
   );
   const plansVista = parsePlansVista(searchParams.get("vista"));
+  const blogVista = parseBlogVista(searchParams.get("vista"));
   const [reviewPlaceId, setReviewPlaceId] = useState<string | null>(null);
   const [reviewServiceId, setReviewServiceId] = useState<string | null>(null);
 
@@ -61,7 +66,7 @@ function AdminDashboardContent() {
     }
   }, [loading, user, router]);
 
-  /** `vista` solo vive en las tabs que la usan (Usuarios, Planes y Veterinarias). */
+  /** `vista` solo vive en las tabs que la usan (Usuarios, Planes, Veterinarias y Blog). */
   const setTab = useCallback(
     (next: AdminTab, nextVista?: string) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -73,7 +78,8 @@ function AdminDashboardContent() {
         const supportsVista =
           next === ADMIN_TABS.PET_PLACES ||
           next === ADMIN_TABS.USERS ||
-          next === ADMIN_TABS.PLANS;
+          next === ADMIN_TABS.PLANS ||
+          next === ADMIN_TABS.BLOG;
         if (supportsVista && nextVista) params.set("vista", nextVista);
       }
       const qs = params.toString();
@@ -111,6 +117,16 @@ function AdminDashboardContent() {
     [setTab],
   );
 
+  const setBlogVista = useCallback(
+    (next: BlogVista) => {
+      setTab(
+        ADMIN_TABS.BLOG,
+        next === BLOG_VISTAS.ARTICLES ? undefined : next,
+      );
+    },
+    [setTab],
+  );
+
   const openPlaceReview = useCallback(
     (placeId: string) => {
       setReviewPlaceId(placeId);
@@ -142,7 +158,7 @@ function AdminDashboardContent() {
     return (
       <RoleAccessDeniedSection
         title="Solo para administradores de Kadesh"
-        description="Esta pantalla controla usuarios, planes y el directorio de veterinarias. Si necesitas acceso, habla con el equipo de plataforma."
+        description="Esta pantalla controla usuarios, planes, el blog y el directorio de veterinarias. Si necesitas acceso, habla con el equipo de plataforma."
         backHref={Routes.panel}
         backLabel="Volver al panel"
       />
@@ -156,8 +172,8 @@ function AdminDashboardContent() {
           Operaciones
         </h1>
         <p className="text-[#616161] dark:text-[#b0b0b0] mt-1 max-w-2xl">
-          Usuarios, planes y fichas del directorio. Lo que cambies aquí aplica
-          de inmediato.
+          Usuarios, planes, el blog y fichas del directorio. Lo que cambies aquí
+          aplica de inmediato.
         </p>
       </header>
 
@@ -180,6 +196,9 @@ function AdminDashboardContent() {
       ) : null}
       {tab === ADMIN_TABS.PLANS ? (
         <AdminPlansPanel vista={plansVista} onVistaChange={setPlansVista} />
+      ) : null}
+      {tab === ADMIN_TABS.BLOG ? (
+        <AdminBlogPanel vista={blogVista} onVistaChange={setBlogVista} />
       ) : null}
       {tab === ADMIN_TABS.PET_PLACES ? (
         <AdminPetPlacesPanel

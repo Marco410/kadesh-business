@@ -4,7 +4,7 @@ Pantalla interna en `/panel/clientes/admin`. No es el panel de un cliente: es de
 
 ## Promesa
 
-Ver y ajustar **usuarios**, **catálogo de planes** y **fichas de veterinarias** (reclamos y servicios pedidos) en un solo lugar. El default es Inicio, con recuentos, reclamos y servicios pendientes. Las otras vistas viven en `?tab=usuarios`, `?tab=planes` y `?tab=veterinarias`.
+Ver y ajustar **usuarios**, **catálogo de planes**, **el blog** y **fichas de veterinarias** (reclamos y servicios pedidos) en un solo lugar. El default es Inicio, con recuentos, reclamos y servicios pendientes. Las otras vistas viven en `?tab=usuarios`, `?tab=planes`, `?tab=blog` y `?tab=veterinarias`.
 
 ## Acceso
 
@@ -16,7 +16,7 @@ El enlace **Operaciones** aparece en el menú del avatar y, de forma discreta, a
 
 Antes las tabs, la vista Fichas/Servicios y los filtros eran la misma píldora y no se distinguían. Ahora cada nivel tiene su propio componente en `ui.tsx`:
 
-1. **Secciones** (Inicio, Usuarios, Planes, Veterinarias) — `AdminTabBar`: texto con subrayado naranja en la activa, no píldoras.
+1. **Secciones** (Inicio, Usuarios, Planes, Veterinarias, Blog) — `AdminTabBar`: texto con subrayado naranja en la activa, no píldoras.
 2. **Vista dentro de una sección** (Cuentas / Suscripciones, Fichas / Servicios) — `AdminSegmented`: control segmentado, opción activa como pastilla blanca.
 3. **Filtros de una tabla** (rol, estado) — `AdminFilterChips`: chips pequeños, activo con tinte naranja (no relleno sólido), con etiqueta (**Rol**, **Estado**) para que se lea qué filtran.
 
@@ -58,6 +58,24 @@ En la lista se ve el saldo **de este mes** (disponibles / extra). En **Ajustar p
 - Si cambias monto, moneda, frecuencia o el ID del precio, el botón pasa a **Verificar y guardar**: se abre un diálogo que compara el borrador con Stripe (`stripePlanCheck`). Kadesh **nunca escribe** en Stripe; si no coincide, el admin crea un Price nuevo allá, pega el ID y confirma.
 - Se puede **Verificar con Stripe** sin guardar, solo para consultar.
 
+## Blog
+
+`?tab=blog` tiene tres vistas: **Artículos** (default), **Categorías** (`&vista=categorias`) y **Etiquetas** (`&vista=etiquetas`).
+
+### Artículos
+
+Se publican en Pet, en SaaS o en ambos. La categoría tiene que ser del mismo blog (o de ambos). La portada es la imagen del artículo. El cuerpo usa la misma barra que el editor del blog: títulos, negrita, cursiva, listas, separador, enlace, cita y bloque de código. También valen los atajos al inicio de una línea (`# `, `- `, `1. `, `> `, `---`).
+
+Publicar ahora avisa a quienes siguen ese blog y lo comparte en Facebook. Una fecha futura lo deja oculto hasta ese día. Volver a guardar un artículo que ya estaba publicado no repite el aviso. Un borrador no se ve en el sitio.
+
+### Categorías
+
+Nombre libre, blog (Pet, SaaS o ambos) e imagen. El nombre es el que ve la gente y arma la dirección. Si la categoría ya tiene artículos, el nombre no se edita para no cambiar esa dirección. No se borra desde aquí.
+
+### Etiquetas
+
+Un nombre, compartido por los dos blogs. No se renombran ni se borran desde aquí. Un mismo nombre no se puede repetir.
+
 ## Veterinarias
 
 Dos vistas dentro de `?tab=veterinarias`: **Fichas** (default) y **Servicios** (`&vista=servicios`).
@@ -81,3 +99,7 @@ La tab que se llamaba Planes listaba suscripciones de empresa. Eso confundía el
 ### 2026-09-25 — Nombre y descripción globales; included por plan
 
 En Planes → **Módulos** se edita el copy una vez (`updatePlanFeatureCatalog` sincroniza todos los planes y suscripciones). En el editor de cada plan solo se marca qué módulos van incluidos. La página de precios muestra los features del periodo visible (mensual/anual), no siempre el anual.
+
+### 2026-09-28 — Blog en Operaciones
+
+Artículos, categorías y etiquetas viven en Blog, no en una ruta nueva. El nombre de la categoría es texto libre (antes era una lista cerrada en el backend): así se pueden crear las que hagan falta. Los nombres viejos (`prospecting`, `care_health`, …) siguen mostrándose con su etiqueta. Publicar avisa a los suscriptores y comparte en Facebook; un guardado posterior no repite el aviso.
