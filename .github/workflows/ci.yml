@@ -1,0 +1,53 @@
+name: CI
+
+# Corre en cada PR hacia dev o main, y en pushes a esas ramas.
+# Si falla aquí, no merges: es la señal de que "todo está ok".
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Lint, tours y build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.6.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Check onboarding tours
+        run: pnpm check:tours
+
+      - name: Build
+        env:
+          # Placeholders: el build no necesita secretos reales; solo que las vars existan.
+          NEXT_PUBLIC_API_URL: https://ci.example.com/api/graphql
+          NEXT_PUBLIC_IMAGE_DOMAIN: ci.example.com
+          NEXT_PUBLIC_GOOGLE_CLIENT_ID: ci-placeholder.apps.googleusercontent.com
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_ci_placeholder
+        run: pnpm build
