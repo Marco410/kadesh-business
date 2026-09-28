@@ -278,7 +278,7 @@ function LoginPageContent() {
                     )}
                   </button>
 
-                  {/* <div className="relative my-6">
+                  <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
                       <div className="w-full border-t border-[#e0e0e0] dark:border-[#3a3a3a]"></div>
                     </div>
@@ -298,7 +298,8 @@ function LoginPageContent() {
                     <p className="text-center text-sm text-[#616161] dark:text-[#b0b0b0]">
                       Conectando con Google...
                     </p>
-                  )} */}
+                  )}
+                  {/* googleError ya se muestra arriba del formulario. */}
                 </form>
               </Tab>
 
@@ -600,18 +601,18 @@ function LoginPageContent() {
                     </div>
                   </div>
 
-                 {/* <div className="relative my-6">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-[#e0e0e0] dark:border-[#3a3a3a]"></div>
+                  <div className="relative my-6">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-[#e0e0e0] dark:border-[#3a3a3a]"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-3  text-[#616161] dark:text-[#b0b0b0] font-medium">
+                        O continúa con
+                      </span>
+                    </div>
                   </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-3  text-[#616161] dark:text-[#b0b0b0] font-medium">
-                      O continúa con
-                    </span>
-                  </div>
-                </div>
 
-                <div
+                  <div
                     ref={googleButtonRef}
                     className="w-full min-h-[48px] flex items-center justify-center rounded-xl overflow-hidden [&>div]:!w-full [&>div]:!justify-center [&>div]:!min-h-[48px]"
                     aria-label="Continuar con Google"
@@ -625,7 +626,7 @@ function LoginPageContent() {
                     <div className="p-4 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm font-medium">
                       {googleError}
                     </div>
-                  )} */}
+                  )}
                 </form>
               </Tab>
             </Tabs>

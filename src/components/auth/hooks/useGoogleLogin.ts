@@ -2,26 +2,18 @@
 
 import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation, useApolloClient } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
   AUTHENTICATE_USER_WITH_GOOGLE_MUTATION,
-  UPDATE_USER_MUTATION,
   type AuthenticateUserWithGoogleResponse,
   type AuthenticateUserWithGoogleVariables,
-  type UpdateUserVariables,
-  type UpdateUserResponse,
 } from "kadesh/utils/queries";
-import {
-  ROLES_BY_NAMES_QUERY,
-  type RolesByNamesResponse,
-  type RolesByNamesVariables,
-} from "kadesh/components/profile/sales/queries";
-import { Role } from "kadesh/constants/constans";
 import { useUser } from "kadesh/utils/UserContext";
 import { Routes } from "kadesh/core/routes";
 import type { AuthenticatedItem } from "kadesh/utils/types";
 import { loadGoogleGsiScript } from "kadesh/utils/load-google-gsi";
 import { trackCompleteRegistration } from "kadesh/utils/facebook-pixel";
+import { persistSessionToken } from "./session";
 
 declare global {
   interface Window {
@@ -53,43 +45,8 @@ interface UseGoogleLoginOptions {
   referralCode?: string | null;
 }
 
-/** Asigna roles Vendedor y Admin Company al usuario si no los tiene (p. ej. tras login con Google). */
-async function ensureSalesRoles(
-  client: ReturnType<typeof useApolloClient>,
-  userId: string,
-  currentRoleNames: string[]
-): Promise<void> {
-  const hasVendedor = currentRoleNames.some(
-    (name) => name.toLowerCase() === Role.VENDEDOR.toLowerCase()
-  );
-  if (hasVendedor) return;
-
-  const { data: rolesData } = await client.query<
-    RolesByNamesResponse,
-    RolesByNamesVariables
-  >({
-    query: ROLES_BY_NAMES_QUERY,
-    variables: { where: { name: { in: [Role.VENDEDOR] } } },
-  });
-
-  const vendedorRoleId = rolesData?.roles?.find((r) => r.name === Role.VENDEDOR)?.id;
-  const roleIds = [vendedorRoleId].filter(
-    (id): id is string => Boolean(id)
-  );
-  if (roleIds.length === 0) return;
-
-  await client.mutate<UpdateUserResponse, UpdateUserVariables>({
-    mutation: UPDATE_USER_MUTATION,
-    variables: {
-      where: { id: userId },
-      data: { roles: { connect: roleIds.map((id) => ({ id })) } },
-    },
-  });
-}
-
 export function useGoogleLogin(options?: UseGoogleLoginOptions) {
   const router = useRouter();
-  const client = useApolloClient();
   const { refreshUser, setUser } = useUser();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -111,31 +68,21 @@ export function useGoogleLogin(options?: UseGoogleLoginOptions) {
       }
 
       if (result.__typename === "UserAuthenticationWithGoogleSuccess") {
-        trackCompleteRegistration();
-        const { item, sessionToken } = result;
-        // En Google login NO guardamos el `sessionToken` custom en localStorage/cookie,
-        // porque Keystone autentica `authenticatedItem` con su propia sesión (cookie)
-        // iniciada en el backend. Guardar un token distinto rompe la sesión.
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("keystonejs-session-token");
+        const { item, sessionToken, isNewUser } = result;
+        // Solo el alta es una conversión: antes se mandaba el evento también
+        // en cada inicio de sesión de una cuenta ya existente.
+        if (isNewUser) {
+          trackCompleteRegistration();
         }
+        // Mismo token sellado que devuelve el login con contraseña: se guarda
+        // igual. Los roles y la empresa los asigna el backend en el alta.
         if (sessionToken) {
-          localStorage.setItem("keystonejs-session-token", sessionToken);
-          const expires = new Date();
-          expires.setTime(expires.getTime() + 30 * 24 * 60 * 60 * 1000);
-          const isSecure = window.location.protocol === "https:";
-          document.cookie = `keystonejs-session=${sessionToken}; expires=${expires.toUTCString()}; path=/; SameSite=Lax${isSecure ? "; Secure" : ""}`;
+          persistSessionToken(sessionToken);
         }
         const u = item as AuthenticatedItem & {
           roles?: Array<{ name: string; __typename?: string }>;
           __typename?: string;
         };
-        const roleNames = Array.isArray(u.roles) ? u.roles.map((r) => r.name) : [];
-        try {
-          await ensureSalesRoles(client, u.id, roleNames);
-        } catch {
-          // No bloquear el login si falla la asignación de roles
-        }
         const userFromLogin: AuthenticatedItem = {
           id: u.id,
           name: u.name ?? "",
