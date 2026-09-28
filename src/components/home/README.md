@@ -4,6 +4,13 @@ La home en `src/app/page.tsx` es la promesa pública: extraer leads B2B de Googl
 
 En copy: **INEGI**, nunca DENUE, SCIAN ni tokens. Rating y reseñas son de Google Maps; INEGI trae nombre, teléfono, dirección y categoría en México. Google Maps sigue siendo la fuente mundial.
 
+## Rendimiento y accesibilidad
+
+- El hero es **Server Component** sin GSAP: el copy debe ser visible en el primer paint (nada de fades que parten en opacity 0; retrasan LCP).
+- `ProductDemoCard` en el hero va con `animated={false}` para no meter framer-motion en el LCP.
+- Secciones below-the-fold se cargan con `next/dynamic` desde `page.tsx`. Onboarding (driver.js) y HeroUI solo montan en `/panel`, `/admin` y `/auth`.
+- Contraste: texto blanco sobre naranja usa `orange-800` (el `orange-500` de marca `#f7945e` no pasa WCAG AA con blanco). Chips/labels naranja sobre fondo claro → `text-orange-800` / `text-orange-900`.
+
 ## Kadesh AI (`#kadesh-ai`)
 
 Va **después** de la vitrina de plataforma. Ahí ya vieron pipeline, cotizaciones y seguimientos; entonces tiene sentido el resumen del día.

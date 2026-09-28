@@ -50,6 +50,12 @@
     "slate-history": "^0.113.1",
     "slate-react": "^0.127.1"
   },
+  "browserslist": [
+    "chrome >= 111",
+    "edge >= 111",
+    "firefox >= 111",
+    "safari >= 16.4"
+  ],
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^20",

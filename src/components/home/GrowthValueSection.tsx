@@ -130,7 +130,7 @@ export default function GrowthValueSection() {
         >
           <Link
             href={Routes.auth.register}
-            className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
+            className="inline-flex items-center justify-center px-8 py-4 bg-orange-800 hover:bg-orange-900 text-white font-bold text-lg rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
           >
             Comenzar a generar leads
           </Link>

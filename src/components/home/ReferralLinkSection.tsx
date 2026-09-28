@@ -155,7 +155,7 @@ export default function ReferralLinkSection({
   return (
     <div className="w-full rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] shadow-sm overflow-hidden">
       <header className="flex items-start gap-4 px-5 sm:px-6 py-5 border-b border-[#f0f0f0] dark:border-[#2a2a2a]">
-        <div className="shrink-0 flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400">
+        <div className="shrink-0 flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/10 dark:bg-orange-500/20 text-orange-800 dark:text-orange-400">
           <HugeiconsIcon icon={UserAdd01Icon} size={24} />
         </div>
         <div className="min-w-0 flex-1 text-left">
@@ -229,7 +229,7 @@ export default function ReferralLinkSection({
                   <button
                     type="submit"
                     disabled={saving}
-                    className="inline-flex min-w-[8rem] items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-60 transition-colors"
+                    className="inline-flex min-w-[8rem] items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold bg-orange-800 text-white hover:bg-orange-900 disabled:opacity-60 transition-colors"
                   >
                     {saving ? "Guardando…" : "Guardar"}
                   </button>
@@ -255,7 +255,7 @@ export default function ReferralLinkSection({
                   Tu código
                 </span>
                 <div className="inline-flex w-fit max-w-full items-center gap-2 rounded-full border border-orange-200/80 dark:border-orange-500/25 bg-orange-50 dark:bg-orange-500/10 px-4 py-2">
-                  <HugeiconsIcon icon={Link01Icon} size={16} className="text-orange-600 dark:text-orange-400 shrink-0" />
+                  <HugeiconsIcon icon={Link01Icon} size={16} className="text-orange-800 dark:text-orange-400 shrink-0" />
                   <span className="text-base font-mono font-bold tracking-widest text-orange-700 dark:text-orange-300 truncate">
                     {referralCode || "—"}
                   </span>
@@ -280,7 +280,7 @@ export default function ReferralLinkSection({
                     className={`shrink-0 inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-40 ${
                       copied
                         ? "bg-emerald-600 text-white"
-                        : "bg-orange-500 text-white hover:bg-orange-600"
+                        : "bg-orange-800 text-white hover:bg-orange-900"
                     }`}
                   >
                     <HugeiconsIcon icon={copied ? CheckmarkCircle01Icon : Copy01Icon} size={16} />
@@ -297,7 +297,7 @@ export default function ReferralLinkSection({
                   <button
                     type="button"
                     onClick={handleStartEdit}
-                    className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold text-orange-600 dark:text-orange-400 hover:bg-orange-500/10 transition-colors"
+                    className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold text-orange-800 dark:text-orange-400 hover:bg-orange-500/10 transition-colors"
                   >
                     <HugeiconsIcon icon={Edit02Icon} size={14} />
                     Editar

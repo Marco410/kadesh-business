@@ -75,7 +75,7 @@ export default function ScheduleDemoSection() {
           className="text-center mb-10"
         >
           <span className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-orange-500/15 dark:bg-orange-500/20 mb-4">
-            <HugeiconsIcon icon={Calendar03Icon} size={28} className="text-orange-600 dark:text-orange-400" />
+            <HugeiconsIcon icon={Calendar03Icon} size={28} className="text-orange-800 dark:text-orange-400" />
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold text-[#212121] dark:text-white mb-3">
             Agenda una demo en vivo (15 min)
@@ -107,7 +107,7 @@ export default function ScheduleDemoSection() {
                   onClick={() => setDayKey(d.key)}
                   className={`min-w-[3.25rem] px-3.5 py-2 rounded-full text-sm font-semibold transition-all border ${
                     isActive
-                      ? "bg-orange-500 text-white border-orange-500 shadow-md"
+                      ? "bg-orange-800 text-white border-orange-800 shadow-md"
                       : "bg-white dark:bg-[#1a1a1a] text-[#374151] dark:text-[#e5e5e5] border-[#e0e0e0] dark:border-[#333] hover:border-orange-400/60 dark:hover:border-orange-500/50"
                   }`}
                 >
@@ -130,7 +130,7 @@ export default function ScheduleDemoSection() {
                   onClick={() => setTimeId(slot.id)}
                   className={`px-3.5 py-2 rounded-full text-sm font-semibold transition-all border ${
                     isActive
-                      ? "bg-orange-500 text-white border-orange-500 shadow-md"
+                      ? "bg-orange-800 text-white border-orange-800 shadow-md"
                       : "bg-white dark:bg-[#1a1a1a] text-[#374151] dark:text-[#e5e5e5] border-[#e0e0e0] dark:border-[#333] hover:border-orange-400/60 dark:hover:border-orange-500/50"
                   }`}
                 >

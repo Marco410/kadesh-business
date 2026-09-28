@@ -98,7 +98,7 @@ export default function Footer() {
             <p className="text-gray-400 text-sm text-center md:text-left">
               © {new Date().getFullYear()} KADESH. Todos los derechos reservados.
             </p>
-            <p className="text-gray-500 text-sm text-center md:text-right">
+            <p className="text-gray-400 text-sm text-center md:text-right">
               Hecho con ❤️ para equipos de ventas B2B
             </p>
           </div>

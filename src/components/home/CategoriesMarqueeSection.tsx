@@ -1,6 +1,3 @@
-"use client";
-
-import { motion, useReducedMotion } from "framer-motion";
 import { GOOGLE_PLACE_CATEGORIES } from "kadesh/constants/constans";
 import { INEGI_DENUE_CATEGORIES } from "kadesh/constants/inegiDenueCategories";
 
@@ -33,9 +30,12 @@ const categoriesRowB = [
   ...baseCategories,
 ];
 
-export default function CategoriesMarqueeSection() {
-  const prefersReducedMotion = useReducedMotion();
+const chipClassA =
+  "inline-flex items-center px-3 py-1.5 rounded-full border border-orange-800/40 dark:border-orange-500/40 bg-orange-500/15 dark:bg-orange-500/10 text-xs sm:text-sm text-orange-900 dark:text-orange-100";
+const chipClassB =
+  "inline-flex items-center px-3 py-1.5 rounded-full border border-orange-800/35 dark:border-orange-500/35 bg-orange-500/10 dark:bg-orange-500/5 text-xs sm:text-sm text-orange-900 dark:text-orange-100";
 
+export default function CategoriesMarqueeSection() {
   return (
     <section className="py-5 sm:py-10 bg-[#f5f5f5] dark:bg-[#050505] border-y border-[#e5e5e5] dark:border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -53,34 +53,20 @@ export default function CategoriesMarqueeSection() {
           </div>
 
           <div className="relative w-full overflow-hidden space-y-2">
-            <motion.div
-              className="flex gap-2 sm:gap-3 whitespace-nowrap"
-              animate={prefersReducedMotion ? undefined : { x: ["0%", "-50%"] }}
-              transition={{ duration: 26, repeat: Infinity, ease: "linear" }}
-            >
+            <div className="flex w-max gap-2 sm:gap-3 whitespace-nowrap animate-marquee-slow motion-reduce:animate-none">
               {categoriesRowA.map((cat, index) => (
-                <span
-                  key={`rowA-${cat.id}-${index}`}
-                  className="inline-flex items-center px-3 py-1.5 rounded-full border border-orange-600/50 dark:border-orange-500/40 bg-orange-500/15 dark:bg-orange-500/10 text-xs sm:text-sm text-orange-900 dark:text-orange-100 hover:bg-orange-500/25 dark:hover:bg-orange-500/20 transition-colors"
-                >
+                <span key={`rowA-${cat.id}-${index}`} className={chipClassA}>
                   {cat.label}
                 </span>
               ))}
-            </motion.div>
-            <motion.div
-              className="flex gap-3 sm:gap-4 whitespace-nowrap"
-              animate={prefersReducedMotion ? undefined : { x: ["-25%", "-75%"] }}
-              transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
-            >
+            </div>
+            <div className="flex w-max gap-3 sm:gap-4 whitespace-nowrap animate-marquee-fast motion-reduce:animate-none">
               {categoriesRowB.map((cat, index) => (
-                <span
-                  key={`rowB-${cat.id}-${index}`}
-                  className="inline-flex items-center px-3 py-1.5 rounded-full border border-orange-600/45 dark:border-orange-500/35 bg-orange-500/10 dark:bg-orange-500/5 text-xs sm:text-sm text-orange-800 dark:text-orange-100/90 hover:bg-orange-500/20 dark:hover:bg-orange-500/15 transition-colors"
-                >
+                <span key={`rowB-${cat.id}-${index}`} className={chipClassB}>
                   {cat.label}
                 </span>
               ))}
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>
