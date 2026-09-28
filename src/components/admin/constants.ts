@@ -5,6 +5,7 @@ export const ADMIN_TABS = {
   USERS: "usuarios",
   PLANS: "planes",
   PET_PLACES: "veterinarias",
+  BLOG: "blog",
 } as const;
 
 export type AdminTab = (typeof ADMIN_TABS)[keyof typeof ADMIN_TABS];
@@ -37,6 +38,11 @@ export const ADMIN_TAB_ITEMS: Array<{
     label: "Veterinarias",
     description: "Reclamos y verificación",
   },
+  {
+    id: ADMIN_TABS.BLOG,
+    label: "Blog",
+    description: "Artículos, categorías y etiquetas",
+  },
 ];
 
 /** Vistas dentro de la sección Usuarios. */
@@ -55,12 +61,55 @@ export const PLANS_VISTAS = {
 
 export type PlansVista = (typeof PLANS_VISTAS)[keyof typeof PLANS_VISTAS];
 
+/** Vistas dentro de la sección Blog. */
+export const BLOG_VISTAS = {
+  ARTICLES: "articulos",
+  CATEGORIES: "categorias",
+  TAGS: "etiquetas",
+} as const;
+
+export type BlogVista = (typeof BLOG_VISTAS)[keyof typeof BLOG_VISTAS];
+
+export const POST_PRODUCT = {
+  PET: "pet",
+  SAAS: "saas",
+  ALL: "all",
+} as const;
+
+export const POST_PRODUCT_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: POST_PRODUCT.PET, label: "Pet" },
+  { value: POST_PRODUCT.SAAS, label: "SaaS" },
+  { value: POST_PRODUCT.ALL, label: "Ambos" },
+];
+
+export const POST_PRODUCT_LABELS: Record<string, string> = {
+  [POST_PRODUCT.PET]: "Pet",
+  [POST_PRODUCT.SAAS]: "SaaS",
+  [POST_PRODUCT.ALL]: "Ambos",
+};
+
+export const POST_PRODUCT_BADGE: Record<string, string> = {
+  [POST_PRODUCT.PET]:
+    "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 dark:bg-emerald-500/20",
+  [POST_PRODUCT.SAAS]:
+    "bg-orange-500/15 text-orange-800 dark:text-orange-300 dark:bg-orange-500/20",
+  [POST_PRODUCT.ALL]:
+    "bg-black/5 dark:bg-white/10 text-[#424242] dark:text-[#e0e0e0]",
+};
+
+export const POST_STATUS_FILTERS = [
+  { value: "all", label: "Todos" },
+  { value: "published", label: "Publicados" },
+  { value: "draft", label: "Borradores" },
+] as const;
+
 export function parseAdminTab(value: string | null): AdminTab {
   if (value === LEGACY_SUBSCRIPTIONS_TAB) return ADMIN_TABS.USERS;
   if (
     value === ADMIN_TABS.USERS ||
     value === ADMIN_TABS.PLANS ||
-    value === ADMIN_TABS.PET_PLACES
+    value === ADMIN_TABS.PET_PLACES ||
+    value === ADMIN_TABS.BLOG
   ) {
     return value;
   }
@@ -82,6 +131,12 @@ export function parsePlansVista(vista: string | null): PlansVista {
   return vista === PLANS_VISTAS.MODULES
     ? PLANS_VISTAS.MODULES
     : PLANS_VISTAS.CATALOG;
+}
+
+export function parseBlogVista(vista: string | null): BlogVista {
+  if (vista === BLOG_VISTAS.CATEGORIES) return BLOG_VISTAS.CATEGORIES;
+  if (vista === BLOG_VISTAS.TAGS) return BLOG_VISTAS.TAGS;
+  return BLOG_VISTAS.ARTICLES;
 }
 
 export const ADMIN_PAGE_SIZE = 25;

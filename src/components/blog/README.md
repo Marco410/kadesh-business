@@ -26,7 +26,7 @@ La miga de pan lleva `pt-24` porque el `Navigation` es `fixed`; sin ese margen s
 
 ## Categorías
 
-Los valores (`prospecting`, `crm_sales`, `lead_gen`, `case_studies`, `product_updates`, más `news`, `tips`, `other`) salen de `POST_CATEGORIES` del backend. `POST_CATEGORIES_MAP` y `CATEGORY_COLORS` en `constants.ts` deben quedar alineados con esa lista; un valor desconocido se muestra tal cual.
+Los nombres históricos (`prospecting`, `crm_sales`, `care_health`, …) siguen en `POST_CATEGORIES_MAP` y `CATEGORY_COLORS`. Operaciones puede crear categorías con el nombre que se lee en el blog; si ese texto no está en el mapa, se muestra tal cual. El mapa y los colores deben seguir cubriendo los valores viejos.
 
 ## SEO y descubrimiento
 
