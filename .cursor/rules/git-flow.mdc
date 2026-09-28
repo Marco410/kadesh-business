@@ -1,0 +1,28 @@
+---
+description: Flujo de ramas y PRs — features a dev, release a main
+alwaysApply: true
+---
+
+# Git flow (Kadesh)
+
+## Ramas
+
+| Rama | Rol |
+|------|-----|
+| `main` | Producción. Solo recibe merges desde `dev` (PR de release). |
+| `dev` | Integración / staging. Destino por defecto de todo feature/fix. |
+| `feat/*`, `fix/*`, `chore/*` | Trabajo diario. Salen de `dev` y abren PR **hacia `dev`**. |
+
+## Al crear un PR (regla dura)
+
+1. Base = **`dev`**, nunca `main`, salvo que el usuario pida explícitamente un hotfix a producción.
+2. Comando típico: `gh pr create --base dev ...`
+3. Hotfix urgente a `main`: solo si el usuario lo pide; luego cherry-pick o merge de vuelta a `dev`.
+
+## Release a producción
+
+No abras un PR feature → `main`. El workflow `Promote dev → main` abre (o actualiza) el PR `dev` → `main`. El humano mergea ese PR cuando el CI está verde y validó en `dev`.
+
+## Commits que llegan a `main`
+
+El push a `main` dispara el aviso de SystemRelease. Escribe el mensaje de merge del release en lenguaje de producto (qué se arregló / mejoró / agregó), no tecnicismos de git.
