@@ -99,7 +99,7 @@ export default function AgencyTestimonialsSection() {
               <p className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
                 Tiempo ahorrado:
               </p>
-              <p className="text-sm font-medium text-orange-600 dark:text-orange-400">
+              <p className="text-sm font-medium text-orange-800 dark:text-orange-400">
                 {item.timeSaved}
               </p>
             </motion.article>

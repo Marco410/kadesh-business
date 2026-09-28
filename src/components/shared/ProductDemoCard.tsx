@@ -163,12 +163,12 @@ export default function ProductDemoCard({
                   animate: { scale: 1 },
                   transition: { duration: 0.35 },
                 })}
-                className="rounded-full bg-orange-500/15 px-2 py-0.5 text-[10px] font-semibold text-orange-600 dark:bg-orange-500/20 dark:text-orange-400"
+                className="rounded-full bg-orange-800/15 px-2 py-0.5 text-[10px] font-semibold text-orange-900 dark:bg-orange-500/20 dark:text-orange-300"
               >
                 {PRODUCT_DEMO_LEADS.length} leads
               </motion.span>
             ) : (
-              <span className="rounded-full bg-orange-500/15 px-2 py-0.5 text-[10px] font-semibold text-orange-600 dark:bg-orange-500/20 dark:text-orange-400">
+              <span className="rounded-full bg-orange-800/15 px-2 py-0.5 text-[10px] font-semibold text-orange-900 dark:bg-orange-500/20 dark:text-orange-300">
                 {PRODUCT_DEMO_LEADS.length} leads
               </span>
             )}
@@ -207,13 +207,13 @@ export default function ProductDemoCard({
               animate: { scale: 1 },
               transition: { duration: 0.4 },
             })}
-            className="absolute -top-2.5 right-3 flex items-center gap-1.5 rounded-full border border-green-400/30 bg-green-500 px-2.5 py-1 text-[10px] font-semibold text-white shadow-lg sm:right-4 sm:text-xs"
+            className="absolute -top-2.5 right-3 flex items-center gap-1.5 rounded-full border border-green-700/30 bg-green-700 px-2.5 py-1 text-[10px] font-semibold text-white shadow-lg sm:right-4 sm:text-xs"
           >
             <LiveDot />
             Datos en tiempo real
           </motion.div>
         ) : (
-          <div className="absolute -top-2.5 right-3 flex items-center gap-1.5 rounded-full border border-green-400/30 bg-green-500 px-2.5 py-1 text-[10px] font-semibold text-white shadow-lg sm:right-4 sm:text-xs">
+          <div className="absolute -top-2.5 right-3 flex items-center gap-1.5 rounded-full border border-green-700/30 bg-green-700 px-2.5 py-1 text-[10px] font-semibold text-white shadow-lg sm:right-4 sm:text-xs">
             <LiveDot />
             Datos en tiempo real
           </div>
@@ -258,16 +258,16 @@ function PinMarker() {
 function SearchBar() {
   return (
     <div className="flex items-center gap-1.5 rounded-xl border border-[#e8e8e8] bg-white/95 p-1.5 shadow-lg">
-      <span className="shrink-0 rounded-lg bg-orange-500 px-2 py-1 text-[9px] font-semibold text-white sm:text-[10px]">
+      <span className="shrink-0 rounded-lg bg-orange-800 px-2 py-1 text-[9px] font-semibold text-white sm:text-[10px]">
         Categoría
       </span>
-      <span className="min-w-0 flex-1 truncate px-1 text-[10px] text-[#616161] sm:text-xs">
+      <span className="min-w-0 flex-1 truncate px-1 text-[10px] text-[#424242] sm:text-xs">
         Restaurantes
       </span>
-      <span className="hidden shrink-0 rounded-md border border-[#e0e0e0] px-1.5 py-0.5 text-[9px] text-[#616161] sm:inline">
+      <span className="hidden shrink-0 rounded-md border border-[#e0e0e0] px-1.5 py-0.5 text-[9px] text-[#424242] sm:inline">
         2 km
       </span>
-      <span className="inline-flex shrink-0 items-center gap-0.5 rounded-lg bg-orange-500 px-2 py-1 text-[9px] font-semibold text-white sm:text-[10px]">
+      <span className="inline-flex shrink-0 items-center gap-0.5 rounded-lg bg-orange-800 px-2 py-1 text-[9px] font-semibold text-white sm:text-[10px]">
         <HugeiconsIcon icon={Search01Icon} size={11} />
         Buscar
       </span>
@@ -287,7 +287,7 @@ function LeadRow({ lead }: { lead: (typeof PRODUCT_DEMO_LEADS)[number] }) {
           {lead.phone}
         </p>
       </div>
-      <span className="flex shrink-0 items-center gap-0.5 text-amber-500 dark:text-amber-400">
+      <span className="flex shrink-0 items-center gap-0.5 text-amber-800 dark:text-amber-400">
         <HugeiconsIcon icon={StarIcon} size={12} />
         <span className="text-xs font-semibold">{lead.rating}</span>
       </span>

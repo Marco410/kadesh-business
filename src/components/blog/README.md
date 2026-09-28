@@ -33,8 +33,19 @@ Los nombres históricos (`prospecting`, `crm_sales`, `care_health`, …) siguen 
 - El sitemap (`src/app/sitemap.ts`) incluye `/blog` y cada post **publicado**, con `lastmod` de `updatedAt` o `publishedAt`. No se listan borradores.
 - El HTML del post (título, fechas, cuerpo) sale del servidor. Likes, comentarios y vistas son islas de cliente.
 - Schema: `Blog` + `ItemList` en el índice; `BlogPosting` + `BreadcrumbList` en el detalle. El publisher apunta a la Organization de `src/app/layout.tsx` (`/#organization`).
-- Canonical del índice: `/blog` (también con `?category=`). Canonical del post: `/blog/<url>` en `kadesh.com.mx` (`core/site.ts`).
+- Canonical del índice: `/blog` (también con `?category=`). Canonical del post: `/blog/<url>` en `kadesh.com.mx` (`core/site.ts`). **Nunca** `www.kadesh.com.mx`.
 - Open Graph tipo `article`. La portada del CMS es una URL firmada que caduca: el share usa `/blog/<url>/og`, que entrega la portada vigente, y cae a `/og-image.png` si no hay.
+- `public/llms.txt` enlaza el índice del blog en apex (descubrimiento LLM/GEO; Google Search no lo usa para ranking).
+
+### Host canónico (bloqueante para indexación / GEO)
+
+Google indexa y luego puede citar en AI Overviews. Si el host del HTML no coincide con el del sitemap/canonical, los posts no entran al índice.
+
+1. En **Vercel → Project → Settings → Domains**: primario = `kadesh.com.mx`. `www.kadesh.com.mx` debe redirigir **301** al apex (no al revés).
+2. Tras el cambio: `pnpm check:canonical-host` debe salir OK (`www` → apex, apex sin redirigir a www).
+3. En **Google Search Console** (propiedad de dominio `kadesh.com.mx` o URL-prefix apex): `pnpm check:gsc-checklist` lista las URLs; enviar `https://kadesh.com.mx/sitemap.xml`, inspeccionar 2–3 posts y solicitar indexación.
+
+No pongas middleware www→apex en la app mientras Vercel siga haciendo apex→www: crea un bucle. El primary de Vercel es el único remate del conflicto.
 
 ## Copy
 

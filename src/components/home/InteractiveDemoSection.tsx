@@ -30,7 +30,7 @@ export default function InteractiveDemoSection() {
               key={item.step}
               className="rounded-xl border border-[#e0e0e0] dark:border-[#2a2a2a] bg-white dark:bg-[#1e1e1e] px-4 py-3 text-center"
             >
-              <span className="block text-xs font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-1">
+              <span className="block text-xs font-bold uppercase tracking-wider text-orange-800 dark:text-orange-400 mb-1">
                 Paso {item.step}
               </span>
               <span className="text-sm font-medium text-[#212121] dark:text-white">

@@ -9,6 +9,8 @@
     "start": "next start",
     "lint": "eslint .",
     "check:tours": "node scripts/check-tours.mjs",
+    "check:canonical-host": "node scripts/verify-canonical-host.mjs",
+    "check:gsc-checklist": "node scripts/print-gsc-indexing-checklist.mjs",
     "ci": "pnpm lint && pnpm check:tours && pnpm build"
   },
   "dependencies": {
@@ -48,6 +50,12 @@
     "slate-history": "^0.113.1",
     "slate-react": "^0.127.1"
   },
+  "browserslist": [
+    "chrome >= 111",
+    "edge >= 111",
+    "firefox >= 111",
+    "safari >= 16.4"
+  ],
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^20",

@@ -112,7 +112,7 @@ export default function ReferralSection() {
           sigan activos.
         </p>
         {loading && (
-          <p className="text-xs text-[#757575] dark:text-white/60 mb-6">
+          <p className="text-xs text-[#616161] dark:text-white/70 mb-6">
             Calculando comisiones con los precios actuales de los planes...
           </p>
         )}
@@ -199,7 +199,7 @@ export default function ReferralSection() {
                     Anual: {formatCurrency(pro.annual.cost, proCurrency)} / año (pago único)
                   </span>
                 )}
-                <span className="inline-flex items-center rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                <span className="inline-flex items-center rounded-full bg-amber-800 px-2 py-0.5 text-[10px] font-bold text-white">
                   Más vendido
                 </span>
               </span>
@@ -428,7 +428,7 @@ export default function ReferralSection() {
               </strong>{" "}
               solo en comisiones recurrentes, además de las comisiones por nuevas ventas.
             </p>
-            <p className="text-xs text-[#757575] dark:text-white/60">
+            <p className="text-xs text-[#616161] dark:text-white/70">
               Las comisiones se calculan sobre el precio listado del plan y se pagan
               mientras la suscripción del cliente se mantenga activa y al corriente
               (hasta {MONTHS_RECURRING} meses por cliente).

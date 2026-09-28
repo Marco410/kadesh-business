@@ -1,3 +1,7 @@
+import { SITE_URL } from "kadesh/core/site";
+
+const SITE_HOST = SITE_URL.replace(/^https?:\/\//, "");
+
 export default function PrivacidadPage() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -21,10 +25,10 @@ export default function PrivacidadPage() {
             domicilio en la ciudad de Morelia, Michoacán, México, y con
             presencia digital en el sitio web{" "}
             <a
-              href="https://www.kadesh.com.mx"
+              href={SITE_URL}
               className="text-orange-600 dark:text-orange-400 underline"
             >
-              www.kadesh.com.mx
+              {SITE_HOST}
             </a>
             , es el responsable del tratamiento de sus datos personales.
           </p>
@@ -362,10 +366,10 @@ export default function PrivacidadPage() {
             de Privacidad en cualquier momento. Cualquier cambio será notificado
             a través del sitio web{" "}
             <a
-              href="https://www.kadesh.com.mx"
+              href={SITE_URL}
               className="text-orange-600 dark:text-orange-400 underline"
             >
-              www.kadesh.com.mx
+              {SITE_HOST}
             </a>{" "}
             o mediante correo electrónico a los usuarios registrados. Si el
             cambio afecta el uso de datos de usuario de Google, se le pedirá

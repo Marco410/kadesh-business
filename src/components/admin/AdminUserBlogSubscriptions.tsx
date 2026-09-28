@@ -24,10 +24,16 @@ export default function AdminUserBlogSubscriptions({
   userEmail: string | null;
 }) {
   // También trae las registradas solo con su correo (p. ej. desde el blog antes de crear cuenta).
+  // Match case-insensitive: duplicados históricos con distinto casing deben verse aquí.
   const where = useMemo(() => {
     const byUser = { user: { id: { equals: userId } } };
     if (!userEmail) return byUser;
-    return { OR: [byUser, { email: { equals: userEmail } }] };
+    return {
+      OR: [
+        byUser,
+        { email: { equals: userEmail, mode: "insensitive" } },
+      ],
+    };
   }, [userId, userEmail]);
 
   const { data, error, refetch } = useQuery<AdminUserBlogSubscriptionsResponse>(

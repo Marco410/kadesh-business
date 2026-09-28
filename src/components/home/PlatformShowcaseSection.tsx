@@ -126,7 +126,7 @@ export default function PlatformShowcaseSection() {
           transition={{ duration: 0.5 }}
           className="text-center mb-10"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-600 dark:text-orange-400 mb-3">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-800 dark:text-orange-400 mb-3">
             Todo en un solo sistema
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
@@ -148,7 +148,7 @@ export default function PlatformShowcaseSection() {
                 onClick={() => setActiveId(feature.id)}
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all border ${
                   isActive
-                    ? "bg-orange-500 text-white border-orange-500 shadow-md"
+                    ? "bg-orange-800 text-white border-orange-800 shadow-md"
                     : "bg-white dark:bg-[#1a1a1a] text-[#374151] dark:text-[#e5e5e5] border-[#e0e0e0] dark:border-[#333] hover:border-orange-400/60"
                 }`}
               >

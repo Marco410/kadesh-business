@@ -8,6 +8,8 @@
  * 3. Navega/registra en el sitio; los eventos aparecerán como prueba
  */
 
+import { SITE_URL } from 'kadesh/core/site';
+
 declare global {
   interface Window {
     fbq?: (action: string, eventName: string, params?: Record<string, unknown>) => void;
@@ -54,7 +56,7 @@ export function setRegisterSuccessUrl(router?: NextRouterLike): void {
 /** Ruta con el identificador de registro exitoso (p. ej. `/panel?registro-exitoso=1`). */
 export function withRegisterSuccessUrl(path: string): string {
   const base =
-    typeof window !== 'undefined' ? window.location.origin : 'https://www.kadesh.com.mx';
+    typeof window !== 'undefined' ? window.location.origin : SITE_URL;
   const url = new URL(path, base);
   url.searchParams.set(META_REGISTER_SUCCESS_QUERY_KEY, '1');
   return `${url.pathname}${url.search}`;

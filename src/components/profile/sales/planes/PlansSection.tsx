@@ -175,7 +175,7 @@ function PlanPriceLine({
       className={cn("flex flex-col gap-1", alignClass)}
     >
       {showOldPrice && (
-        <span className="text-lg font-medium tabular-nums text-[#9a9a9a] line-through decoration-1 dark:text-[#6a6a6a]">
+        <span className="text-lg font-medium tabular-nums text-[#757575] line-through decoration-1 dark:text-[#9e9e9e]">
           {formatPrice(oldPrice, currency, "monthly")}
         </span>
       )}
@@ -275,7 +275,7 @@ function FeatureChip({ feature }: { feature: PlanFeatureItem }) {
           className={
             isAi
               ? "shrink-0 text-white"
-              : "shrink-0 text-orange-600 dark:text-orange-400"
+              : "shrink-0 text-orange-800 dark:text-orange-400"
           }
           aria-hidden
         />
@@ -409,7 +409,7 @@ function BillingToggle({
     cn(
       "rounded-full px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#121212]",
       active
-        ? "bg-orange-500 text-white shadow-sm"
+        ? "bg-orange-800 text-white shadow-sm"
         : "text-[#616161] hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:text-white",
     );
 
@@ -440,7 +440,7 @@ function BillingToggle({
         </span>
       </div>
       {value === "annual" && (
-        <span className="inline-flex items-center rounded-full bg-orange-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+        <span className="inline-flex items-center rounded-full bg-orange-800 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
           Ahorra 2 meses 🎁
         </span>
       )}
@@ -560,7 +560,7 @@ function PairedPlanCard({
       )}
     >
       {bestSeller && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-orange-500 px-4 py-1 text-xs font-bold text-white">
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-orange-800 px-4 py-1 text-xs font-bold text-white">
           MÁS VENDIDO
         </div>
       )}
@@ -654,7 +654,7 @@ function PairedPlanCard({
           className={cn(
             "mt-8 w-full rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-60",
             highlighted
-              ? "bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
+              ? "bg-orange-800 text-white hover:bg-orange-900 dark:bg-orange-800 dark:hover:bg-orange-900"
               : "border-2 border-orange-600 text-orange-700 hover:bg-orange-500/10 dark:border-orange-500 dark:text-orange-400 dark:hover:bg-orange-500/20",
             isCurrentPlan && "hover:bg-orange-500 dark:hover:bg-orange-500",
           )}
@@ -709,7 +709,7 @@ function FreePlanLayout({
         </div>
 
         <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-          <p className="inline-flex w-fit rounded-full bg-green-500 px-4 py-1 text-sm font-bold text-white">
+          <p className="inline-flex w-fit rounded-full bg-green-700 px-4 py-1 text-sm font-bold text-white">
             Prueba gratuita de 7 días
           </p>
           {plan.leadLimit != null && (
@@ -829,7 +829,7 @@ function PlanCard({
             className={cn(
               "mt-8 w-full rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-60",
               highlighted
-                ? "bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
+                ? "bg-orange-800 text-white hover:bg-orange-900 dark:bg-orange-800 dark:hover:bg-orange-900"
                 : "border-2 border-orange-600 text-orange-700 hover:bg-orange-500/10 dark:border-orange-500 dark:text-orange-400 dark:hover:bg-orange-500/20",
               isCurrentPlan && "hover:bg-orange-500 dark:hover:bg-orange-500",
             )}
@@ -850,7 +850,7 @@ function PlanCard({
       )}
     >
       {plan.bestSeller === true && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-orange-500 px-4 py-1 text-xs font-bold text-white">
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-orange-800 px-4 py-1 text-xs font-bold text-white">
           MÁS VENDIDO
         </div>
       )}
@@ -914,7 +914,7 @@ function PlanCard({
               )} */}
               {plan.cost === 0 && (
                 <div className="mt-2 flex flex-col gap-2">
-                  <p className="inline-block rounded-full bg-green-500 px-4 py-1 text-sm font-bold text-white">
+                  <p className="inline-block rounded-full bg-green-700 px-4 py-1 text-sm font-bold text-white">
                     Prueba gratuita de 7 días
                   </p>
                   {plan.leadLimit != null && (
@@ -938,7 +938,7 @@ function PlanCard({
                 className={cn(
                   "mt-6 w-full rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto",
                   highlighted
-                    ? "bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
+                    ? "bg-orange-800 text-white hover:bg-orange-900 dark:bg-orange-800 dark:hover:bg-orange-900"
                     : "border-2 border-orange-600 text-orange-700 hover:bg-orange-500/10 dark:border-orange-500 dark:text-orange-400 dark:hover:bg-orange-500/20",
                   isCurrentPlan &&
                     "hover:bg-orange-500 dark:hover:bg-orange-500",
