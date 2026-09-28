@@ -9,6 +9,8 @@
     "start": "next start",
     "lint": "eslint .",
     "check:tours": "node scripts/check-tours.mjs",
+    "check:canonical-host": "node scripts/verify-canonical-host.mjs",
+    "check:gsc-checklist": "node scripts/print-gsc-indexing-checklist.mjs",
     "ci": "pnpm lint && pnpm check:tours && pnpm build"
   },
   "dependencies": {

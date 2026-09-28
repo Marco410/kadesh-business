@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { Navigation, Footer } from 'kadesh/components/layout';
 import { ContactForm } from 'kadesh/components/contact';
+import { Routes } from 'kadesh/core/routes';
+import { SITE_URL } from 'kadesh/core/site';
 
 export default function ContactPage() {
   const fadeInUp = {
@@ -15,14 +17,16 @@ export default function ContactPage() {
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'ContactPage',
-    name: 'Contacto KADESH',
-    description: 'Página de contacto de KADESH - Plataforma para el bienestar animal en México',
-    url: 'https://www.kadesh.com.mx/contacto',
+    name: 'Contacto KADESH Negocios',
+    description:
+      'Página de contacto de KADESH Negocios — prospección B2B y CRM con leads desde Google Maps en México',
+    url: `${SITE_URL}${Routes.contact}`,
     mainEntity: {
       '@type': 'Organization',
-      name: 'KADESH',
-      url: 'https://www.kadesh.com.mx',
-      description: 'Plataforma digital para conectar adoptantes, rescatistas, veterinarias y tiendas para el bienestar animal en México',
+      name: 'KADESH Negocios',
+      url: SITE_URL,
+      description:
+        'Plataforma SaaS B2B que extrae leads de Google Maps y los guarda en un CRM integrado',
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'Soporte al cliente',

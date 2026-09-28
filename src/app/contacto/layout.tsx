@@ -1,4 +1,8 @@
 import { Metadata } from 'next';
+import { Routes } from 'kadesh/core/routes';
+import { SITE_URL } from 'kadesh/core/site';
+
+const CONTACT_URL = `${SITE_URL}${Routes.contact}`;
 
 export const metadata: Metadata = {
   title: 'Contacto',
@@ -6,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Contacto | KADESH Negocios',
     description: 'Contáctanos en KADESH Negocios. Estamos aquí para ayudarte con tu prospección B2B, acceso a leads o cualquier consulta sobre la plataforma.',
-    url: 'https://www.kadesh.com.mx/contacto',
+    url: CONTACT_URL,
     siteName: 'KADESH Negocios',
     locale: 'es_MX',
     type: 'website',
@@ -17,7 +21,7 @@ export const metadata: Metadata = {
     description: 'Contáctanos en KADESH Negocios. Estamos aquí para ayudarte con tu prospección B2B, acceso a leads o cualquier consulta sobre la plataforma.',
   },
   alternates: {
-    canonical: 'https://www.kadesh.com.mx/contacto',
+    canonical: CONTACT_URL,
   },
 };
 
