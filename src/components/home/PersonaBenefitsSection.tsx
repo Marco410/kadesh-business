@@ -89,7 +89,7 @@ export default function PersonaBenefitsSection() {
                 onClick={() => setActiveId(persona.id)}
                 className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all border ${
                   isActive
-                    ? "bg-orange-500 text-white border-orange-500 shadow-md"
+                    ? "bg-orange-800 text-white border-orange-800 shadow-md"
                     : "bg-[#f8f8f8] dark:bg-[#1e1e1e] text-[#374151] dark:text-[#e5e5e5] border-[#e0e0e0] dark:border-[#333] hover:border-orange-400/60"
                 }`}
               >
@@ -126,7 +126,7 @@ export default function PersonaBenefitsSection() {
             </ul>
             <Link
               href={Routes.auth.register}
-              className="inline-flex items-center justify-center px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl transition-colors"
+              className="inline-flex items-center justify-center px-6 py-3 bg-orange-800 hover:bg-orange-900 text-white font-semibold rounded-xl transition-colors"
             >
               Regístrate gratis
             </Link>

@@ -34,23 +34,23 @@ export default function FinalCTASection() {
     <section
       ref={sectionRef}
       id="cta-final"
-      className="relative py-20 sm:py-28 overflow-hidden bg-orange-500 dark:bg-orange-600"
+      className="relative py-20 sm:py-28 overflow-hidden bg-orange-800 dark:bg-orange-900"
     >
       <div className="pointer-events-none absolute -left-20 top-0 h-64 w-64 rounded-full bg-white/15 blur-3xl" />
-      <div className="pointer-events-none absolute -right-16 bottom-0 h-72 w-72 rounded-full bg-orange-800/40 blur-3xl" />
+      <div className="pointer-events-none absolute -right-16 bottom-0 h-72 w-72 rounded-full bg-orange-950/40 blur-3xl" />
 
       <div className="final-cta-copy relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 tracking-tight">
           ¿Listo para extraer tu primera lista de leads B2B?
         </h2>
-        <p className="text-lg text-white/90 mb-8 leading-relaxed">
+        <p className="text-lg text-white mb-8 leading-relaxed">
           Crea tu cuenta en menos de un minuto. 50 leads de Google Maps o INEGI
           incluidos, 7 días de prueba y sin tarjeta de crédito.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href={Routes.auth.register}
-            className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 hover:text-gray-900 font-bold text-lg rounded-2xl shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-orange-500 transition-all duration-150"
+            className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 hover:text-gray-900 font-bold text-lg rounded-2xl shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-orange-800 transition-all duration-150"
           >
             Acceder ahora a Kadesh
           </Link>

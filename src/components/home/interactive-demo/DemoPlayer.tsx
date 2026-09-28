@@ -234,7 +234,7 @@ export default function DemoPlayer() {
               <button
                 type="button"
                 onClick={togglePlay}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-orange-800 text-white hover:bg-orange-900 transition-colors"
                 aria-label={isPlaying ? "Pausar demo" : "Reproducir demo"}
               >
                 <HugeiconsIcon icon={isPlaying ? PauseIcon : PlayIcon} size={18} />
@@ -281,9 +281,9 @@ export default function DemoPlayer() {
                     <span
                       className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                         isActive
-                          ? "bg-orange-500 text-white"
+                          ? "bg-orange-800 text-white"
                           : isDone
-                            ? "bg-orange-500/20 text-orange-600 dark:text-orange-400"
+                            ? "bg-orange-800/15 text-orange-800 dark:text-orange-400"
                             : "bg-[#f0f0f0] dark:bg-[#2a2a2a] text-[#616161] dark:text-[#b0b0b0]"
                       }`}
                     >
@@ -293,7 +293,7 @@ export default function DemoPlayer() {
                       <p
                         className={`text-sm font-semibold ${
                           isActive
-                            ? "text-orange-600 dark:text-orange-400"
+                            ? "text-orange-800 dark:text-orange-400"
                             : "text-[#212121] dark:text-white"
                         }`}
                       >

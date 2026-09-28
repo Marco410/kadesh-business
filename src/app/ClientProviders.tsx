@@ -1,22 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import ApolloProviderWrapper from '../providers/ApolloProviderWrapper';
-import { ThemeProvider } from '../providers/ThemeProvider';
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from "@vercel/analytics/next"
+import { usePathname } from "next/navigation";
+import ApolloProviderWrapper from "../providers/ApolloProviderWrapper";
+import { ThemeProvider } from "../providers/ThemeProvider";
 import { UserProvider } from "kadesh/utils/UserContext";
-import { WorkspaceProvider } from "kadesh/components/profile/sales/workspaces";
 import {
   CookieConsentProvider,
   CookieConsentBanner,
   MetaPixelLoader,
 } from "kadesh/components/consent";
-import { OnboardingProvider } from "kadesh/components/onboarding";
-import { HeroUIProvider } from "@heroui/system";
 import { Toaster } from "sileo";
 import { useTheme } from "next-themes";
+
+const PanelAppProviders = dynamic(() => import("./PanelAppProviders"), {
+  ssr: true,
+});
+
+const AuthAppProviders = dynamic(() => import("./AuthAppProviders"), {
+  ssr: true,
+});
+
+const SpeedInsights = dynamic(
+  () =>
+    import("@vercel/speed-insights/next").then((mod) => mod.SpeedInsights),
+  { ssr: false },
+);
 
 function ThemedToaster() {
   const { resolvedTheme } = useTheme();
@@ -37,26 +48,38 @@ function ThemedToaster() {
   return createPortal(toaster, document.body);
 }
 
+function AppShell({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+
+  if (
+    pathname?.startsWith("/panel") ||
+    pathname?.startsWith("/admin")
+  ) {
+    return <PanelAppProviders>{children}</PanelAppProviders>;
+  }
+
+  if (pathname?.startsWith("/auth")) {
+    return <AuthAppProviders>{children}</AuthAppProviders>;
+  }
+
+  return children;
+}
+
 export default function ClientProviders({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <CookieConsentProvider>
       <ThemeProvider>
-        <HeroUIProvider locale="es-MX">
-          <ApolloProviderWrapper>
-            <UserProvider>
-              <WorkspaceProvider>
-                <OnboardingProvider>{children}</OnboardingProvider>
-              </WorkspaceProvider>
-              <ThemedToaster />
-              <SpeedInsights />
-              <Analytics />
-            </UserProvider>
-          </ApolloProviderWrapper>
-        </HeroUIProvider>
+        <ApolloProviderWrapper>
+          <UserProvider>
+            <AppShell>{children}</AppShell>
+            <ThemedToaster />
+            <SpeedInsights />
+          </UserProvider>
+        </ApolloProviderWrapper>
       </ThemeProvider>
       <CookieConsentBanner />
       <MetaPixelLoader />

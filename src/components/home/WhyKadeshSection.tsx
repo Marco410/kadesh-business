@@ -40,12 +40,12 @@ export default function WhyKadeshSection() {
               gestiona en un CRM. Evitas anuncios caros y semanas armando bases
               a mano; un flujo cubre búsqueda, contacto y cierre.
             </p>
-            <div className="rounded-3xl bg-orange-500 text-white p-7 sm:p-8 shadow-[0_18px_40px_rgba(231,124,58,0.28)]">
+            <div className="rounded-3xl bg-orange-800 text-white p-7 sm:p-8 shadow-[0_18px_40px_rgba(168,86,31,0.28)]">
               <span className="inline-flex w-12 h-12 rounded-2xl bg-white/15 items-center justify-center mb-4">
                 <HugeiconsIcon icon={Clock01Icon} size={26} />
               </span>
               <h3 className="text-2xl font-bold mb-3">Ahorra tiempo y dinero</h3>
-              <p className="text-white/90 leading-relaxed">
+              <p className="text-white leading-relaxed">
                 Genera listas de prospectos reales en minutos, sin anuncios
                 caros ni semanas construyendo bases de datos a mano. Con el
                 plan Pro el costo por lead queda en unos 1.60 MXN.
@@ -63,7 +63,7 @@ export default function WhyKadeshSection() {
                   <HugeiconsIcon
                     icon={item.icon}
                     size={24}
-                    className="text-orange-600 dark:text-orange-400"
+                    className="text-orange-800 dark:text-orange-400"
                   />
                 </span>
                 <h3 className="text-xl font-bold text-[#212121] dark:text-white mb-2">

@@ -91,7 +91,7 @@ export default function LeadCostComparisonSection() {
               MXN por lead, aprox.
             </p>
           </div>
-          <p className="text-center text-sm font-semibold uppercase tracking-wide text-[#9ca3af]">
+          <p className="text-center text-sm font-semibold uppercase tracking-wide text-[#6b7280]">
             vs
           </p>
           <div className="cost-panel rounded-3xl border border-orange-200 dark:border-orange-900/40 bg-orange-50 dark:bg-orange-950/25 px-6 py-6 text-center shadow-[0_16px_36px_rgba(231,124,58,0.16)]">
@@ -158,7 +158,7 @@ export default function LeadCostComparisonSection() {
           </table>
         </div>
 
-        <p className="text-xs text-[#757575] dark:text-[#9e9e9e] text-center mb-8 max-w-2xl mx-auto">
+        <p className="text-xs text-[#616161] dark:text-[#b0b0b0] text-center mb-8 max-w-2xl mx-auto">
           El rango de Meta Ads es una referencia de mercado y varía por sector y
           campaña. El costo en Kadesh usa el precio del plan Pro (
           {PRO_PLAN_PUBLIC.monthlyMxn} MXN) sobre {PRO_PLAN_PUBLIC.leadLimit}{" "}
@@ -168,7 +168,7 @@ export default function LeadCostComparisonSection() {
         <div className="text-center">
           <Link
             href={Routes.auth.register}
-            className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white hover:text-white font-bold text-lg rounded-2xl shadow-[0_12px_28px_rgba(231,124,58,0.3)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0d0d0d] transition-all duration-150"
+            className="inline-flex items-center justify-center px-8 py-4 bg-orange-800 hover:bg-orange-900 text-white hover:text-white font-bold text-lg rounded-2xl shadow-[0_12px_28px_rgba(168,86,31,0.3)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0d0d0d] transition-all duration-150"
           >
             Empieza gratis (50 leads incluidos)
           </Link>

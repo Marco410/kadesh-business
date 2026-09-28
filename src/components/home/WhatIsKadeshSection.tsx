@@ -31,7 +31,7 @@ export default function WhatIsKadeshSection() {
         <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-3 tracking-tight">
           ¿Qué es Kadesh?
         </h2>
-        <p className="text-sm text-[#757575] dark:text-[#9e9e9e] mb-5">
+        <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mb-5">
           <time dateTime="2026-09-15">Actualizado el 15 de septiembre de 2026</time>
         </p>
         <p className="text-lg text-[#424242] dark:text-[#d6d6d6] leading-relaxed max-w-3xl mb-4">
@@ -64,7 +64,7 @@ export default function WhatIsKadeshSection() {
               key={step.title}
               className="flex gap-4 rounded-2xl bg-[#f8f8f8] dark:bg-[#1e1e1e] border border-[#e8e8e8] dark:border-[#2a2a2a] p-5"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white text-sm font-bold shadow-[0_8px_18px_rgba(231,124,58,0.35)]">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-800 text-white text-sm font-bold shadow-[0_8px_18px_rgba(231,124,58,0.35)]">
                 {index + 1}
               </span>
               <div>
@@ -81,7 +81,7 @@ export default function WhatIsKadeshSection() {
 
         <Link
           href={Routes.auth.register}
-          className="inline-flex items-center justify-center px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white hover:text-white font-semibold rounded-xl shadow-[0_10px_24px_rgba(231,124,58,0.28)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#121212] transition-all duration-150"
+          className="inline-flex items-center justify-center px-6 py-3 bg-orange-800 hover:bg-orange-900 text-white hover:text-white font-semibold rounded-xl shadow-[0_10px_24px_rgba(168,86,31,0.28)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#121212] transition-all duration-150"
         >
           Empezar con 50 leads gratis
         </Link>

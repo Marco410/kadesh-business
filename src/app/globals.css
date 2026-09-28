@@ -111,6 +111,41 @@
     html:focus-within {
       scroll-behavior: auto;
     }
+
+    .animate-marquee-slow,
+    .animate-marquee-fast {
+      animation: none !important;
+    }
+  }
+}
+
+@keyframes kadesh-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes kadesh-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(12px, -18px, 0);
+  }
+}
+
+@layer utilities {
+  .animate-marquee-slow {
+    animation: kadesh-marquee 26s linear infinite;
+  }
+
+  .animate-marquee-fast {
+    animation: kadesh-marquee 22s linear infinite;
+    animation-delay: -5s;
   }
 }
 

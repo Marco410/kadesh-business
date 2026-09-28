@@ -25,6 +25,20 @@ const nextConfig: NextConfig = {
       "@internationalized/date": "./node_modules/@internationalized/date",
     },
   },
+  experimental: {
+    // Inlines CSS into HTML to remove render-blocking stylesheet waterfalls (LCP).
+    inlineCss: true,
+    optimizePackageImports: [
+      "@heroui/react",
+      "@heroui/system",
+      "@heroui/theme",
+      "@heroui/tabs",
+      "@heroui/date-picker",
+      "@hugeicons/react",
+      "@hugeicons/core-free-icons",
+      "framer-motion",
+    ],
+  },
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
