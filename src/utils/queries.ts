@@ -218,6 +218,7 @@ export const AUTHENTICATE_USER_WITH_GOOGLE_MUTATION = gql`
     ) {
       ... on UserAuthenticationWithGoogleSuccess {
         sessionToken
+        isNewUser
         item {
           id
           lastName
@@ -412,6 +413,7 @@ export interface AuthenticateUserWithGoogleResponse {
     | {
         __typename: "UserAuthenticationWithGoogleSuccess";
         sessionToken: string;
+        isNewUser: boolean;
         item: {
           id: string;
           lastName: string;
