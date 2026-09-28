@@ -17,6 +17,7 @@ import { Routes } from "kadesh/core/routes";
 import type { AuthenticatedItem } from "kadesh/utils/types";
 import { useTouchUserLastLogin } from "./useTouchUserLastLogin";
 import { useLogUserAuth } from "./useLogUserAuth";
+import { persistSessionToken } from "./session";
 import { maskEmailForAuthLog, safeLogMessage } from "kadesh/utils/auth-log-helpers";
 
 interface UseLoginOptions {
@@ -63,12 +64,8 @@ export function useLogin(options?: UseLoginOptions) {
         "UserAuthenticationWithPasswordSuccess"
       ) {
         const { sessionToken, item } = data.authenticateUserWithPassword;
-        if (sessionToken && typeof window !== "undefined") {
-          localStorage.setItem("keystonejs-session-token", sessionToken);
-          const expires = new Date();
-          expires.setTime(expires.getTime() + 30 * 24 * 60 * 60 * 1000);
-          const isSecure = window.location.protocol === "https:";
-          document.cookie = `keystonejs-session=${sessionToken}; expires=${expires.toUTCString()}; path=/; SameSite=Lax${isSecure ? "; Secure" : ""}`;
+        if (sessionToken) {
+          persistSessionToken(sessionToken);
         }
         logUserAuth({
           user: { connect: { id: item.id } },

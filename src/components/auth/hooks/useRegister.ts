@@ -21,15 +21,7 @@ import {
 import { Routes } from 'kadesh/core/routes';
 import { sileo } from 'sileo';
 import { useTouchUserLastLogin } from './useTouchUserLastLogin';
-
-function persistSessionToken(sessionToken: string) {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem('keystonejs-session-token', sessionToken);
-  const expires = new Date();
-  expires.setTime(expires.getTime() + 30 * 24 * 60 * 60 * 1000);
-  const isSecure = window.location.protocol === 'https:';
-  document.cookie = `keystonejs-session=${sessionToken}; expires=${expires.toUTCString()}; path=/; SameSite=Lax${isSecure ? '; Secure' : ''}`;
-}
+import { persistSessionToken } from './session';
 
 /** Texto crudo de error (GraphQL + mensaje) para detectar patrones sin filtrar al usuario. */
 function collectRegisterErrorText(err: unknown): string {
