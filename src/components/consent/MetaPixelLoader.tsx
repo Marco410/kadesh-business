@@ -3,38 +3,24 @@
 import { useEffect } from "react";
 import { useCookieConsent } from "./CookieConsentContext";
 
-const META_PIXEL_ID = "1085575667194114";
-
-let metaPixelInjected = false;
-
-function injectMetaPixel(): void {
-  if (metaPixelInjected) return;
-  metaPixelInjected = true;
-
-  const script = document.createElement("script");
-  script.id = "facebook-pixel";
-  script.textContent = `
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '${META_PIXEL_ID}');
-fbq('track', 'PageView');
-  `;
-  document.head.appendChild(script);
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
 }
 
+/**
+ * Aplica Consent Mode según la decisión del banner.
+ * El base code vive en `layout.tsx` (HTML inicial) para que Meta lo detecte
+ * al pegar la URL en Test Events / Event Setup Tool.
+ */
 export function MetaPixelLoader() {
   const { status } = useCookieConsent();
 
   useEffect(() => {
-    if (status === "accepted") {
-      injectMetaPixel();
-    }
+    const fbq = window.fbq;
+    if (typeof fbq !== "function") return;
+    fbq("consent", status === "accepted" ? "grant" : "revoke");
   }, [status]);
 
   return null;

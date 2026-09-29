@@ -1,10 +1,9 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { COOKIE_CONSENT_STORAGE_KEY } from "./meta-pixel";
 
 export type CookieConsentStatus = "pending" | "accepted" | "rejected";
-
-const COOKIE_CONSENT_STORAGE_KEY = "kadesh-cookie-consent";
 
 function readStoredConsent(): CookieConsentStatus {
   try {
