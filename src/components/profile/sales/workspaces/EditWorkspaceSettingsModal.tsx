@@ -438,7 +438,7 @@ export default function EditWorkspaceSettingsModal({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <motion.div data-body-scroll-lock
         key="ews-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

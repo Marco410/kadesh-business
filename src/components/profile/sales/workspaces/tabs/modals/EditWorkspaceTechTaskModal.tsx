@@ -173,7 +173,7 @@ export default function EditWorkspaceTechTaskModal({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <motion.div data-body-scroll-lock
         key="ewt-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

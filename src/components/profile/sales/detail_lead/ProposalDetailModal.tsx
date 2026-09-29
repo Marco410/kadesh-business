@@ -47,7 +47,7 @@ export default function ProposalDetailModal({
   return (
     <ModalPortal>
     <AnimatePresence>
-      <motion.div
+      <motion.div data-body-scroll-lock
         key="proposal-detail-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

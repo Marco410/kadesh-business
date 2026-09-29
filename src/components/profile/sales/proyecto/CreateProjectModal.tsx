@@ -140,7 +140,7 @@ export default function CreateProjectModal({
     <AnimatePresence>
       {isOpen ? (
         <>
-          <motion.div
+          <motion.div data-body-scroll-lock
             key="create-project-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

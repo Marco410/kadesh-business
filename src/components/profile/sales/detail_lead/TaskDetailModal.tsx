@@ -43,7 +43,7 @@ export default function TaskDetailModal({ taskId, isOpen, onClose }: TaskDetailM
   return (
     <ModalPortal>
       <AnimatePresence>
-        <motion.div
+        <motion.div data-body-scroll-lock
           key="task-detail-backdrop"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

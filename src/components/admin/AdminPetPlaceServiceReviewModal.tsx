@@ -79,7 +79,7 @@ export default function AdminPetPlaceServiceReviewModal({
     <AnimatePresence>
       {isOpen ? (
         <>
-          <motion.div
+          <motion.div data-body-scroll-lock
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

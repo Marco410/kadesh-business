@@ -12,6 +12,7 @@ import {
   CookieConsentBanner,
   MetaPixelLoader,
 } from "kadesh/components/consent";
+import { BodyScrollLock } from "kadesh/components/shared";
 import { Toaster } from "sileo";
 import { useTheme } from "next-themes";
 
@@ -76,6 +77,7 @@ export default function ClientProviders({
         <ApolloProviderWrapper>
           <UserProvider>
             <AppShell>{children}</AppShell>
+            <BodyScrollLock />
             <ThemedToaster />
             <SpeedInsights />
           </UserProvider>
