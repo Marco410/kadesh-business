@@ -177,6 +177,16 @@ export function petPlacePublicUrl(place: {
   return `${PET_PLACE_PUBLIC_ORIGIN}/veterinarias/${path}`;
 }
 
+/** Tipos de negocio del directorio Pet (mismo catálogo que `TYPES_PET_SHELTER` en back). */
+export const PET_PLACE_TYPE_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: "veterinary", label: "Veterinaria" },
+  { value: "pet_shelter", label: "Refugio" },
+  { value: "pet_store", label: "Tienda" },
+  { value: "pet_boarding", label: "Hotel/Guardería" },
+  { value: "pet_park", label: "Parque" },
+  { value: "other", label: "Otro" },
+];
+
 export type PetPlaceClaimStatus =
   (typeof PET_PLACE_CLAIM_STATUS)[keyof typeof PET_PLACE_CLAIM_STATUS];
 
