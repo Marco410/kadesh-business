@@ -12,7 +12,7 @@ import { SITE_URL } from 'kadesh/core/site';
 
 declare global {
   interface Window {
-    fbq?: (action: string, eventName: string, params?: Record<string, unknown>) => void;
+    fbq?: (...args: unknown[]) => void;
   }
 }
 

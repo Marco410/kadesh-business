@@ -8,6 +8,10 @@ import {
   FONT_SCALE_MIN,
   FONT_SCALE_STORAGE_KEY,
 } from "kadesh/components/layout/font-scale";
+import {
+  META_PIXEL_ID,
+  getMetaPixelBaseSnippet,
+} from "kadesh/components/consent/meta-pixel";
 
 export { metadata, viewport } from "./metadata";
 
@@ -154,10 +158,26 @@ export default function RootLayout({
             __html: `(function(){try{var n=parseFloat(localStorage.getItem("${FONT_SCALE_STORAGE_KEY}")||"");if(isNaN(n))n=${FONT_SCALE_DEFAULT};if(n<${FONT_SCALE_MIN})n=${FONT_SCALE_MIN};if(n>${FONT_SCALE_MAX})n=${FONT_SCALE_MAX};document.documentElement.style.setProperty("--kadesh-font-scale",String(n));}catch(e){}})();`,
           }}
         />
+        {/* Meta Pixel base siempre en el HTML (Consent Mode revoke hasta aceptar cookies). */}
+        <script
+          id="facebook-pixel"
+          dangerouslySetInnerHTML={{
+            __html: getMetaPixelBaseSnippet(META_PIXEL_ID),
+          }}
+        />
       </head>
       <body
         className={`${poppins.variable} ${inter.variable} font-sans bg-[#ffffff] dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] transition-colors duration-200`}
       >
+        <noscript>
+          <img
+            height={1}
+            width={1}
+            style={{ display: "none" }}
+            src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
+            alt=""
+          />
+        </noscript>
         <ClientProviders>{children}</ClientProviders>
         <Analytics />
       </body>
