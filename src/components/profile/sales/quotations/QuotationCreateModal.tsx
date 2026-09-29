@@ -99,7 +99,7 @@ export default function QuotationCreateModal({
     <AnimatePresence>
       {isOpen ? (
         <>
-          <motion.div
+          <motion.div data-body-scroll-lock
             key="qc-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

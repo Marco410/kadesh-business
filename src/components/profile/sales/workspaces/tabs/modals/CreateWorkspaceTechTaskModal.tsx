@@ -161,7 +161,7 @@ export default function CreateWorkspaceTechTaskModal({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <motion.div data-body-scroll-lock
         key="cwt-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

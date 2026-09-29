@@ -36,7 +36,7 @@ export default function FollowUpDetailModal({
   return (
     <ModalPortal>
     <AnimatePresence>
-      <motion.div
+      <motion.div data-body-scroll-lock
         key="followup-detail-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

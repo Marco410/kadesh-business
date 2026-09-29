@@ -197,7 +197,7 @@ export default function EditWorkspaceActivityModal({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <motion.div data-body-scroll-lock
         key="ewa-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

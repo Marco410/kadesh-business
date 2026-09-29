@@ -113,7 +113,7 @@ export default function CreateWorkspaceFollowUpModal({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <motion.div data-body-scroll-lock
         key="cwf-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

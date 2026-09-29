@@ -180,7 +180,7 @@ export default function QuotationProductFormModal({
 
   return (
     <AnimatePresence>
-      <motion.div
+      <motion.div data-body-scroll-lock
         key="qp-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
