@@ -154,6 +154,48 @@ export type AdminPetPlaceRow = {
   } | null;
 };
 
+/** Ficha completa para el editor de Operaciones (datos públicos + catálogo). */
+export type AdminPetPlaceDetail = AdminPetPlaceRow & {
+  description: string | null;
+  whatsapp: string | null;
+  website: string | null;
+  street: string | null;
+  country: string | null;
+  cp: string | null;
+  address: string | null;
+  lat: string | null;
+  lng: string | null;
+  emergencies: boolean | null;
+  parking: boolean | null;
+  appointmentRequired: boolean | null;
+  types: Array<{
+    id: string;
+    value: string | null;
+    label: string | null;
+  }>;
+  services: Array<{
+    id: string;
+    name: string | null;
+    description: string | null;
+    status: string | null;
+    active: boolean | null;
+  }>;
+};
+
+export type AdminPetPlaceCatalogService = {
+  id: string;
+  name: string | null;
+  description: string | null;
+  status: string | null;
+  active: boolean | null;
+};
+
+export type AdminPetPlaceTypeOption = {
+  id: string;
+  value: string | null;
+  label: string | null;
+};
+
 export type AdminPetPlaceServiceRow = {
   id: string;
   name: string | null;

@@ -2,8 +2,11 @@ import { gql } from "@apollo/client";
 import type {
   AdminBlogSubscriptionRow,
   AdminOverviewData,
+  AdminPetPlaceCatalogService,
+  AdminPetPlaceDetail,
   AdminPetPlaceRow,
   AdminPetPlaceServiceRow,
+  AdminPetPlaceTypeOption,
   AdminPlanRow,
   AdminRoleOption,
   AdminSubscriptionRow,
@@ -36,6 +39,37 @@ const PET_PLACE_FIELDS = gql`
       lastName
       email
       phone
+    }
+  }
+`;
+
+const PET_PLACE_DETAIL_FIELDS = gql`
+  ${PET_PLACE_FIELDS}
+  fragment AdminPetPlaceDetailFields on PetPlace {
+    ...AdminPetPlaceFields
+    description
+    whatsapp
+    website
+    street
+    country
+    cp
+    address
+    lat
+    lng
+    emergencies
+    parking
+    appointmentRequired
+    types {
+      id
+      value
+      label
+    }
+    services {
+      id
+      name
+      description
+      status
+      active
     }
   }
 `;
@@ -380,6 +414,61 @@ export const ADMIN_PET_PLACE_QUERY = gql`
   }
 `;
 
+export const ADMIN_PET_PLACE_DETAIL_QUERY = gql`
+  ${PET_PLACE_DETAIL_FIELDS}
+  query AdminPetPlaceDetail($id: ID!) {
+    petPlace(where: { id: $id }) {
+      ...AdminPetPlaceDetailFields
+    }
+  }
+`;
+
+export type AdminPetPlaceDetailResponse = {
+  petPlace: AdminPetPlaceDetail | null;
+};
+
+export const ADMIN_PET_PLACE_CATALOG_SERVICES_QUERY = gql`
+  query AdminPetPlaceCatalogServices($where: PetPlaceServiceWhereInput!) {
+    petPlaceServices(where: $where, orderBy: [{ name: asc }], take: 500) {
+      id
+      name
+      description
+      status
+      active
+    }
+  }
+`;
+
+export type AdminPetPlaceCatalogServicesResponse = {
+  petPlaceServices: AdminPetPlaceCatalogService[];
+};
+
+export const ADMIN_PET_PLACE_TYPES_QUERY = gql`
+  query AdminPetPlaceTypes {
+    petPlaceTypes(orderBy: [{ label: asc }]) {
+      id
+      value
+      label
+    }
+  }
+`;
+
+export type AdminPetPlaceTypesResponse = {
+  petPlaceTypes: AdminPetPlaceTypeOption[];
+};
+
+export const CREATE_PET_PLACE_SERVICE_MUTATION = gql`
+  mutation CreateAdminPetPlaceService($data: PetPlaceServiceCreateInput!) {
+    createPetPlaceService(data: $data) {
+      id
+      name
+      description
+      status
+      active
+    }
+  }
+`;
+
 export type AdminPetPlacesResponse = {
   petPlaces: AdminPetPlaceRow[];
   petPlacesCount: number;
@@ -436,10 +525,40 @@ export const UPDATE_PET_PLACE_MUTATION = gql`
   ) {
     updatePetPlace(where: $where, data: $data) {
       id
+      name
+      slug
+      description
+      phone
+      whatsapp
+      website
+      email
+      street
+      municipality
+      state
+      country
+      cp
+      address
+      lat
+      lng
+      emergencies
+      parking
+      appointmentRequired
       verified
       claimStatus
       pipelineStatus
       verifiedAt
+      types {
+        id
+        value
+        label
+      }
+      services {
+        id
+        name
+        description
+        status
+        active
+      }
     }
   }
 `;
