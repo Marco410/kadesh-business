@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Call02Icon, Link01Icon } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
 import {
   ADMIN_OVERVIEW_QUERY,
@@ -19,6 +21,7 @@ import {
   PET_PLACE_CLAIM_STATUS_OPTIONS,
   PET_PLACE_PIPELINE_OPTIONS,
   PET_PLACE_SERVICE_STATUS,
+  petPlacePublicUrl,
   type PetPlaceClaimStatus,
 } from "./constants";
 import type { AdminPetPlaceRow } from "./types";
@@ -45,6 +48,95 @@ import {
 
 const fieldClass =
   "h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
+
+const actionIconClass =
+  "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#424242] dark:text-[#e0e0e0] hover:border-orange-300 dark:hover:border-orange-500 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
+
+async function copyText(value: string) {
+  await navigator.clipboard.writeText(value);
+}
+
+function PlaceActionButtons({
+  place,
+  onReview,
+  fullWidthReview = false,
+}: {
+  place: AdminPetPlaceRow;
+  onReview: () => void;
+  fullWidthReview?: boolean;
+}) {
+  async function copyLink() {
+    try {
+      await copyText(petPlacePublicUrl(place));
+      sileo.success({ title: "Enlace copiado" });
+    } catch {
+      sileo.error({ title: "No se pudo copiar el enlace" });
+    }
+  }
+
+  async function copyPhone() {
+    const phone = place.phone?.trim();
+    if (!phone) {
+      sileo.warning({ title: "Esta ficha no tiene teléfono" });
+      return;
+    }
+    try {
+      await copyText(phone);
+      sileo.success({
+        title: "Teléfono copiado",
+        description: phone,
+      });
+    } catch {
+      sileo.error({
+        title: "No se pudo copiar el teléfono",
+        description: phone,
+      });
+    }
+  }
+
+  return (
+    <div
+      className={`flex items-center gap-2 ${
+        fullWidthReview ? "w-full" : "justify-end"
+      }`}
+    >
+      <button
+        type="button"
+        onClick={() => void copyLink()}
+        className={actionIconClass}
+        aria-label={`Copiar enlace de ${place.name}`}
+        title="Copiar enlace"
+      >
+        <HugeiconsIcon icon={Link01Icon} size={18} />
+      </button>
+      <button
+        type="button"
+        onClick={() => void copyPhone()}
+        disabled={!place.phone?.trim()}
+        className={actionIconClass}
+        aria-label={
+          place.phone?.trim()
+            ? `Ver y copiar teléfono de ${place.name}: ${place.phone}`
+            : `${place.name} no tiene teléfono`
+        }
+        title={place.phone?.trim() || "Sin teléfono"}
+      >
+        <HugeiconsIcon icon={Call02Icon} size={18} />
+      </button>
+      <button
+        type="button"
+        onClick={onReview}
+        className={
+          fullWidthReview
+            ? "h-11 flex-1 rounded-xl bg-orange-500 text-white text-sm font-semibold cursor-pointer"
+            : "h-11 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-4 text-xs font-semibold hover:border-orange-300 cursor-pointer"
+        }
+      >
+        Revisar
+      </button>
+    </div>
+  );
+}
 
 function PipelineSelect({
   place,
@@ -396,13 +488,18 @@ export default function AdminPetPlacesPanel({
                   onChange={changePipeline}
                   className="mt-3 w-full"
                 />
-                <button
-                  type="button"
-                  onClick={() => setSelectedId(place.id)}
-                  className="mt-4 h-11 w-full rounded-xl bg-orange-500 text-white text-sm font-semibold cursor-pointer"
-                >
-                  Revisar
-                </button>
+                {place.phone?.trim() ? (
+                  <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
+                    Tel. {place.phone}
+                  </p>
+                ) : null}
+                <div className="mt-4">
+                  <PlaceActionButtons
+                    place={place}
+                    onReview={() => setSelectedId(place.id)}
+                    fullWidthReview
+                  />
+                </div>
               </article>
             ))}
           </div>
@@ -474,13 +571,10 @@ export default function AdminPetPlacesPanel({
                       {place.verified ? "Sí" : "No"}
                     </td>
                     <td className="px-4 py-3 align-top text-right">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedId(place.id)}
-                        className="h-11 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-4 text-xs font-semibold hover:border-orange-300 cursor-pointer"
-                      >
-                        Revisar
-                      </button>
+                      <PlaceActionButtons
+                        place={place}
+                        onReview={() => setSelectedId(place.id)}
+                      />
                     </td>
                   </tr>
                 ))}
