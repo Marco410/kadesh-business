@@ -3,7 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Call02Icon, Link01Icon } from "@hugeicons/core-free-icons";
+import {
+  Call02Icon,
+  Edit02Icon,
+  Link01Icon,
+} from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
 import {
   ADMIN_OVERVIEW_QUERY,
@@ -26,6 +30,7 @@ import {
 } from "./constants";
 import type { AdminPetPlaceRow } from "./types";
 import { useDebouncedValue } from "./hooks/useDebouncedValue";
+import AdminPetPlaceEditor from "./AdminPetPlaceEditor";
 import AdminPetPlaceReviewModal from "./AdminPetPlaceReviewModal";
 import AdminPetPlaceServicesPanel from "./AdminPetPlaceServicesPanel";
 import {
@@ -59,10 +64,12 @@ async function copyText(value: string) {
 function PlaceActionButtons({
   place,
   onReview,
+  onEdit,
   fullWidthReview = false,
 }: {
   place: AdminPetPlaceRow;
   onReview: () => void;
+  onEdit: () => void;
   fullWidthReview?: boolean;
 }) {
   async function copyLink() {
@@ -96,7 +103,7 @@ function PlaceActionButtons({
 
   return (
     <div
-      className={`flex items-center gap-2 ${
+      className={`flex flex-wrap items-center gap-2 ${
         fullWidthReview ? "w-full" : "justify-end"
       }`}
     >
@@ -122,6 +129,15 @@ function PlaceActionButtons({
         title={place.phone?.trim() || "Sin teléfono"}
       >
         <HugeiconsIcon icon={Call02Icon} size={18} />
+      </button>
+      <button
+        type="button"
+        onClick={onEdit}
+        className={actionIconClass}
+        aria-label={`Editar ${place.name}`}
+        title="Editar ficha"
+      >
+        <HugeiconsIcon icon={Edit02Icon} size={18} />
       </button>
       <button
         type="button"
@@ -192,6 +208,7 @@ export default function AdminPetPlacesPanel({
   const [pipeline, setPipeline] = useState("all");
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const debouncedSearch = useDebouncedValue(search);
   const debouncedCity = useDebouncedValue(city);
@@ -387,6 +404,13 @@ export default function AdminPetPlacesPanel({
         onReject={() => (selected ? runVerify(selected, false) : Promise.resolve())}
         onUnverify={() => (selected ? runUnverify(selected) : Promise.resolve())}
       />
+      <AdminPetPlaceEditor
+        placeId={editId}
+        onClose={() => setEditId(null)}
+        onSaved={() => {
+          void refetch();
+        }}
+      />
 
       <div className="flex flex-col gap-3">
         <AdminSearchInput
@@ -497,6 +521,7 @@ export default function AdminPetPlacesPanel({
                   <PlaceActionButtons
                     place={place}
                     onReview={() => setSelectedId(place.id)}
+                    onEdit={() => setEditId(place.id)}
                     fullWidthReview
                   />
                 </div>
@@ -574,6 +599,7 @@ export default function AdminPetPlacesPanel({
                       <PlaceActionButtons
                         place={place}
                         onReview={() => setSelectedId(place.id)}
+                        onEdit={() => setEditId(place.id)}
                       />
                     </td>
                   </tr>

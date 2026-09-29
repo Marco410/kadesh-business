@@ -88,6 +88,8 @@ En fichas:
 - **Pipeline** (`pipelineStatus`): estatus comercial interno, el mismo de los leads del CRM (`PIPELINE_STATUS`). Se cambia con el selector de cada fila y guarda al instante. Es independiente del estado de reclamo y el dueño no lo ve. Default: `01 - Detectado`.
 - **Copiar enlace**: pone en el portapapeles la ficha pública `https://pet.kadesh.com.mx/veterinarias/{slug}` (si no hay slug, usa el id).
 - **Teléfono**: muestra y copia el teléfono público de la clínica. Si no hay, el botón queda deshabilitado.
+- **Editar**: abre el editor de la ficha (nombre, descripción, contacto, ubicación, características, pipeline, tipos y servicios). Guarda con **Guardar ficha**. No toca redes ni horario semanal (eso sigue en Pet).
+- **Servicios en el editor**: quitar o agregar del catálogo aprobado, o **Crear y agregar** (crea el servicio en el catálogo ya aprobado y lo marca en esa clínica). Distinto de la vista Servicios, donde se revisan pedidos de dueños.
 - **Filtros**: nombre/municipio (buscador), ciudad, pipeline y estado de reclamo (chips). Se combinan entre sí.
 
 En servicios: un dueño pidió algo que no estaba en el catálogo. Default **Pendientes**. Al **Aprobar y asignar**, el servicio entra al catálogo **y** se marca en la clínica elegida (prellenada con la que lo pidió; se puede cambiar). **Rechazar** no lo publica.
