@@ -166,6 +166,17 @@ export const PET_PLACE_CLAIM_STATUS = {
   REJECTED: "rejected",
 } as const;
 
+/** Origen de la ficha pública en Kadesh Pet (`/veterinarias/{slug}`). */
+export const PET_PLACE_PUBLIC_ORIGIN = "https://pet.kadesh.com.mx";
+
+export function petPlacePublicUrl(place: {
+  id: string;
+  slug?: string | null;
+}): string {
+  const path = place.slug?.trim() || place.id;
+  return `${PET_PLACE_PUBLIC_ORIGIN}/veterinarias/${path}`;
+}
+
 export type PetPlaceClaimStatus =
   (typeof PET_PLACE_CLAIM_STATUS)[keyof typeof PET_PLACE_CLAIM_STATUS];
 
