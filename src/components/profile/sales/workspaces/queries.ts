@@ -361,8 +361,16 @@ export function readStoredWorkspaceId(): string | null {
   return v && v.length > 0 ? v : null;
 }
 
+const WORKSPACE_ID_EVENT = "kadesh-crm-workspace-change";
+
+export function subscribeWorkspaceId(onChange: () => void) {
+  window.addEventListener(WORKSPACE_ID_EVENT, onChange);
+  return () => window.removeEventListener(WORKSPACE_ID_EVENT, onChange);
+}
+
 export function persistWorkspaceId(id: string | null) {
   if (typeof window === "undefined") return;
   if (id == null) sessionStorage.removeItem(STORAGE_KEY);
   else sessionStorage.setItem(STORAGE_KEY, id);
+  window.dispatchEvent(new Event(WORKSPACE_ID_EVENT));
 }

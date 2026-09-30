@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   type PlanFeatureKey,
@@ -10,6 +10,7 @@ import {
   SUBSCRIPTION_STATUS_OPTIONS,
 } from "kadesh/constants/constans";
 import { formatDateShort } from "kadesh/utils/format-date";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import type { AdminSubscriptionRow } from "./types";
 import {
   ADMIN_CREDIT_GRANT_MAX,
@@ -77,7 +78,7 @@ export default function AdminSubscriptionEditor({
   const [creditsToAdd, setCreditsToAdd] = useState("");
   const [hydratedId, setHydratedId] = useState<string | null>(null);
 
-  useEffect(() => {
+  useApplyOnKeyChange(`${isOpen}\0${subscription?.id ?? ""}`, () => {
     if (!isOpen || !subscription?.id) {
       setHydratedId(null);
       return;
@@ -94,7 +95,7 @@ export default function AdminSubscriptionEditor({
     setCurrentPeriodEndLocal(toCalendarDay(subscription.currentPeriodEnd));
     setCreditsToAdd("");
     setHydratedId(subscription.id);
-  }, [hydratedId, isOpen, subscription]);
+  });
 
   const contact = subscription?.company?.users?.[0];
   const credits = getSubscriptionCredits(subscription);

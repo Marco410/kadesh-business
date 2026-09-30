@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQuery, useMutation } from "@apollo/client";
 import {
@@ -111,7 +112,7 @@ export default function RegisterFollowUpModal({
   const submitting = creating || updating;
   const isEditing = editingTask != null;
 
-  useEffect(() => {
+  useApplyOnKeyChange(isOpen, () => {
     if (isOpen) {
       setScheduledDate(formatDateForInput(new Date().toISOString()));
       setStatus(FOLLOW_UP_TASK_STATUS.PENDIENTE);
@@ -120,7 +121,7 @@ export default function RegisterFollowUpModal({
       setSelectedId(null);
       setEditingTask(null);
     }
-  }, [isOpen]);
+  });
 
   const fillFormForEdit = (t: TaskItem) => {
     setEditingTask(t);

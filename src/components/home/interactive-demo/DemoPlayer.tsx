@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence, useInView } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   PlayIcon,
@@ -26,7 +26,6 @@ function lerpCursor(from: CursorPosition, to: CursorPosition, t: number): Cursor
 
 export default function DemoPlayer() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(containerRef, { once: false, margin: "-80px" });
   const [stepIndex, setStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [cursorPos, setCursorPos] = useState<CursorPosition>({ x: 88, y: 75 });
@@ -97,6 +96,8 @@ export default function DemoPlayer() {
     [schedule],
   );
 
+  const advancePlaybackRef = useRef<() => void>(() => {});
+
   const advancePlayback = useCallback(() => {
     if (!isPlayingRef.current) return;
 
@@ -107,7 +108,7 @@ export default function DemoPlayer() {
         stepIndexRef.current = 0;
         setStepIndex(0);
         runStepAnimation(0);
-        schedule(advancePlayback, DEMO_STEPS[0].duration);
+        schedule(() => advancePlaybackRef.current(), DEMO_STEPS[0].duration);
       }, 1400);
       return;
     }
@@ -115,8 +116,12 @@ export default function DemoPlayer() {
     stepIndexRef.current = next;
     setStepIndex(next);
     runStepAnimation(next);
-    schedule(advancePlayback, DEMO_STEPS[next].duration);
+    schedule(() => advancePlaybackRef.current(), DEMO_STEPS[next].duration);
   }, [runStepAnimation, schedule]);
+
+  useEffect(() => {
+    advancePlaybackRef.current = advancePlayback;
+  }, [advancePlayback]);
 
   const startPlayback = useCallback(
     (fromIndex = stepIndexRef.current) => {
@@ -156,17 +161,29 @@ export default function DemoPlayer() {
   );
 
   useEffect(() => {
-    if (isInView) {
-      if (!hasStartedRef.current) {
-        hasStartedRef.current = true;
-        startPlayback(0);
-      }
-      return;
-    }
+    const el = containerRef.current;
+    if (!el) return;
 
-    hasStartedRef.current = false;
-    stopPlayback();
-  }, [isInView, startPlayback, stopPlayback]);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.some((entry) => entry.isIntersecting);
+        if (visible) {
+          if (!hasStartedRef.current) {
+            hasStartedRef.current = true;
+            startPlayback(0);
+          }
+          return;
+        }
+
+        hasStartedRef.current = false;
+        stopPlayback();
+      },
+      { rootMargin: "-80px" },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [startPlayback, stopPlayback]);
 
   useEffect(() => () => clearTimers(), [clearTimers]);
 

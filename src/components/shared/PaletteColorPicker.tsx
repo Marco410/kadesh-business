@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon, ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 
@@ -147,8 +148,6 @@ export default function PaletteColorPicker({
   const [v, setV] = useState(1);
   const [hexDraft, setHexDraft] = useState("");
   const svDragging = useRef(false);
-  const hRef = useRef(0);
-  hRef.current = h;
 
   const safeHex = normalizeHex(value);
 
@@ -160,11 +159,12 @@ export default function PaletteColorPicker({
     setHexDraft(normalizeHex(hex));
   }, []);
 
+  useApplyOnKeyChange(open, () => {
+    if (!open) setPanelPos(null);
+  });
+
   useLayoutEffect(() => {
-    if (!open) {
-      setPanelPos(null);
-      return;
-    }
+    if (!open) return;
     function updatePosition() {
       const el = anchorRef.current;
       if (!el) return;
@@ -233,7 +233,7 @@ export default function PaletteColorPicker({
     const y = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
     setS(x);
     setV(1 - y);
-    setHexDraft(hsvToHex(hRef.current, x, 1 - y));
+    setHexDraft(hsvToHex(h, x, 1 - y));
   }
 
   const advancedPreview = hsvToHex(h, s, v);

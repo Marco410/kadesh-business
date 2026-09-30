@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useIsClient } from "kadesh/utils/useIsClient";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { usePathname, useRouter } from "next/navigation";
@@ -42,7 +43,7 @@ export default function Navigation() {
   const [nicheMobileOpen, setNicheMobileOpen] = useState(false);
   const [avatarDropdownOpen, setAvatarDropdownOpen] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsClient();
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -52,8 +53,6 @@ export default function Navigation() {
   const avatarDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setMounted(true);
-
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };

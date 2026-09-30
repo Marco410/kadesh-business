@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -16,6 +16,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import {
   COMPANY_WHATSAPP_SETTINGS_QUERY,
   COMPANY_WHATSAPP_WEBHOOK_INFO_QUERY,
@@ -131,26 +132,29 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
   // prueba de conexión (no se guarda en el back), así que vive aquí hasta la siguiente prueba.
   const [templateError, setTemplateError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setPhoneNumberId(saved?.whatsappPhoneNumberId ?? "");
-    setBusinessAccountId(saved?.whatsappBusinessAccountId ?? "");
-    setAccessToken("");
-    setAppSecret("");
-    setShowSecrets(false);
-    setConfirmClear(false);
-    setFormError("");
-    // testResult NO se limpia aquí: un test exitoso actualiza whatsappConnectedAt en el
-    // backend (ver testCompanyWhatsappConnection.ts), y el refetch de handleTestConnection
-    // vuelve a disparar este efecto — si limpiáramos testResult aquí, el mensaje de "Conexión
-    // OK" desaparecería solo justo después de aparecer. Ya se limpia explícitamente al
-    // iniciar cada prueba nueva.
-  }, [
-    saved?.id,
-    saved?.whatsappPhoneNumberId,
-    saved?.whatsappBusinessAccountId,
-    saved?.whatsappTokenPreview,
-    saved?.whatsappConnectedAt,
-  ]);
+  useApplyOnKeyChange(
+    [
+      saved?.id,
+      saved?.whatsappPhoneNumberId,
+      saved?.whatsappBusinessAccountId,
+      saved?.whatsappTokenPreview,
+      saved?.whatsappConnectedAt,
+    ].join("\0"),
+    () => {
+      setPhoneNumberId(saved?.whatsappPhoneNumberId ?? "");
+      setBusinessAccountId(saved?.whatsappBusinessAccountId ?? "");
+      setAccessToken("");
+      setAppSecret("");
+      setShowSecrets(false);
+      setConfirmClear(false);
+      setFormError("");
+      // testResult NO se limpia aquí: un test exitoso actualiza whatsappConnectedAt en el
+      // backend (ver testCompanyWhatsappConnection.ts), y el refetch de handleTestConnection
+      // vuelve a disparar esta sincronización — si limpiáramos testResult aquí, el mensaje de
+      // "Conexión OK" desaparecería solo justo después de aparecer. Ya se limpia explícitamente
+      // al iniciar cada prueba nueva.
+    },
+  );
 
   const [updateSettings, { loading: saving }] = useMutation<
     UpdateCompanyWhatsappSettingsResponse,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation } from "@apollo/client";
 import { sileo } from "sileo";
@@ -15,6 +15,7 @@ import {
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
 import { workspaceConnectPayload } from "kadesh/components/profile/sales/workspaces/workspace-connect";
 import { PROPOSAL_STATUS } from "kadesh/constants/constans";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 
 const PROPOSAL_STATUS_OPTIONS = Object.values(PROPOSAL_STATUS);
 
@@ -53,7 +54,7 @@ export default function CreateWorkspaceProposalModal({
   const [notes, setNotes] = useState("");
   const [fileOrUrl, setFileOrUrl] = useState("");
 
-  useEffect(() => {
+  useApplyOnKeyChange(isOpen, () => {
     if (!isOpen) return;
     setLeadId("");
     setSentDate(formatDateForInput(new Date().toISOString()));
@@ -62,7 +63,7 @@ export default function CreateWorkspaceProposalModal({
     setProduct("");
     setNotes("");
     setFileOrUrl("");
-  }, [isOpen]);
+  });
 
   const boardWhere: TechProposalsVariables["where"] = mergeWorkspaceFilter({}, workspaceId);
 

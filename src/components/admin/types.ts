@@ -180,6 +180,12 @@ export type AdminPetPlaceDetail = AdminPetPlaceRow & {
     status: string | null;
     active: boolean | null;
   }>;
+  schedules: Array<{
+    id: string;
+    day: string | null;
+    timeIni: number | null;
+    timeEnd: number | null;
+  }>;
 };
 
 export type AdminPetPlaceCatalogService = {

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import {
   ADMIN_OVERVIEW_QUERY,
   ADMIN_PET_PLACE_SERVICE_QUERY,
@@ -120,9 +121,13 @@ export default function AdminPetPlaceServicesPanel({
     selectedData?.petPlaceService ??
     null;
 
-  useEffect(() => {
+  useApplyOnKeyChange(initialServiceId ?? "", () => {
     if (!initialServiceId) return;
     setSelectedId(initialServiceId);
+  });
+
+  useEffect(() => {
+    if (!initialServiceId) return;
     onConsumedInitialService?.();
   }, [initialServiceId, onConsumedInitialService]);
 

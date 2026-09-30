@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   type PlanFeatureKey,
@@ -96,7 +97,17 @@ export function AdminCompanySubscriptionsModal({
     return v;
   }
 
-  useEffect(() => {
+  const subscriptionDraftKey = [
+    isOpen,
+    selectedId ?? "",
+    draftForSubscriptionId ?? "",
+    featureKeys.join("\u0001"),
+    normalizePlanFeatures(selected?.planFeatures)
+      .map((feature) => `${feature.key}:${String(feature.included)}`)
+      .join("\u0001"),
+  ].join("\0");
+
+  useApplyOnKeyChange(subscriptionDraftKey, () => {
     if (!isOpen) return;
     if (!selectedId) {
       setDraftForSubscriptionId(null);
@@ -116,7 +127,7 @@ export function AdminCompanySubscriptionsModal({
     setDraft(next);
     setActivatedAtLocal(toCalendarDay(selected?.activatedAt ?? null));
     setCurrentPeriodEndLocal(toCalendarDay(selected?.currentPeriodEnd ?? null));
-  }, [draftForSubscriptionId, featureKeys, isOpen, selected?.planFeatures, selectedId]);
+  });
 
   return (
     <AnimatePresence>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
@@ -23,6 +23,7 @@ import {
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
 import HiddenInWorkspaceSwitch from "./HiddenInWorkspaceSwitch";
 import { Routes } from "kadesh/core/routes";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { SALES_ACTIVITY_TYPE, TASK_PRIORITY } from "kadesh/constants/constans";
 
 const ACTIVITY_TYPE_OPTIONS = Object.values(SALES_ACTIVITY_TYPE);
@@ -121,21 +122,39 @@ export default function EditWorkspaceActivityModal({
     return opts;
   }, [wsDetail?.saasWorkspace?.members, activity?.assignedSeller]);
 
-  useEffect(() => {
-    if (!isOpen || !activity) return;
-    setTitle(activity.title?.trim() ?? activity.type);
-    setType(activity.type);
-    setActivityDate(formatDateTimeLocal(new Date(activity.activityDate)));
-    setDueDate(dueDateToDateInput(activity.dueDate));
-    setPriority(activity.priority ?? TASK_PRIORITY.MEDIA);
-    setResponsibleUserId(activity.assignedSeller?.id ?? "");
-    setResult(activity.result ?? "");
-    setComments(activity.comments ?? "");
-    setStatusCrmId(
-      activity.statusCrm?.id ?? defaultCrmStatusId ?? crmStatuses[0]?.id ?? ""
-    );
-    setHiddenInWorkspace(activity.hiddenInWorkspace === true);
-  }, [isOpen, activity, defaultCrmStatusId, crmStatuses]);
+  useApplyOnKeyChange(
+    [
+      isOpen,
+      activity?.id,
+      activity?.title,
+      activity?.type,
+      activity?.activityDate,
+      activity?.dueDate,
+      activity?.priority,
+      activity?.assignedSeller?.id,
+      activity?.result,
+      activity?.comments,
+      activity?.statusCrm?.id,
+      activity?.hiddenInWorkspace,
+      defaultCrmStatusId,
+      crmStatuses[0]?.id,
+    ].join("\0"),
+    () => {
+      if (!isOpen || !activity) return;
+      setTitle(activity.title?.trim() ?? activity.type);
+      setType(activity.type);
+      setActivityDate(formatDateTimeLocal(new Date(activity.activityDate)));
+      setDueDate(dueDateToDateInput(activity.dueDate));
+      setPriority(activity.priority ?? TASK_PRIORITY.MEDIA);
+      setResponsibleUserId(activity.assignedSeller?.id ?? "");
+      setResult(activity.result ?? "");
+      setComments(activity.comments ?? "");
+      setStatusCrmId(
+        activity.statusCrm?.id ?? defaultCrmStatusId ?? crmStatuses[0]?.id ?? ""
+      );
+      setHiddenInWorkspace(activity.hiddenInWorkspace === true);
+    },
+  );
 
   const boardWhere: TechSalesActivitiesVariables["where"] = mergeWorkspaceFilter(
     {},

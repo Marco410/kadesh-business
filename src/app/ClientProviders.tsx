@@ -1,8 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useIsClient } from "kadesh/utils/useIsClient";
 import { usePathname } from "next/navigation";
 import ApolloProviderWrapper from "../providers/ApolloProviderWrapper";
 import { ThemeProvider } from "../providers/ThemeProvider";
@@ -32,11 +33,7 @@ const SpeedInsights = dynamic(
 
 function ThemedToaster() {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useIsClient();
 
   const toaster = (
     <Toaster

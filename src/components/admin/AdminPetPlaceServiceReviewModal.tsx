@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { AnimatePresence, motion } from "framer-motion";
 import { formatDateShort } from "kadesh/utils/format-date";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import {
   ADMIN_PET_PLACE_SEARCH_QUERY,
   type AdminPetPlaceSearchRow,
@@ -44,15 +45,25 @@ export default function AdminPetPlaceServiceReviewModal({
   const debouncedSearch = useDebouncedValue(search, 250);
   const isPending = service?.status === PET_PLACE_SERVICE_STATUS.PENDING;
 
-  useEffect(() => {
-    if (!isOpen || !service) {
+  useApplyOnKeyChange(
+    [
+      isOpen,
+      service?.id,
+      service?.requestedFor?.id,
+      service?.requestedFor?.name,
+      service?.requestedFor?.municipality,
+      service?.requestedFor?.state,
+    ].join("\0"),
+    () => {
+      if (!isOpen || !service) {
+        setSearch("");
+        setSelectedPlace(null);
+        return;
+      }
       setSearch("");
-      setSelectedPlace(null);
-      return;
-    }
-    setSearch("");
-    setSelectedPlace(service.requestedFor ?? null);
-  }, [isOpen, service]);
+      setSelectedPlace(service.requestedFor ?? null);
+    },
+  );
 
   const searchWhere = useMemo(() => {
     const q = debouncedSearch.trim();

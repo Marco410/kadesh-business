@@ -177,6 +177,19 @@ export function petPlacePublicUrl(place: {
   return `${PET_PLACE_PUBLIC_ORIGIN}/veterinarias/${path}`;
 }
 
+/** Días del horario semanal. Los valores coinciden con `dayOfWeek` en el backend. */
+export const PET_PLACE_WEEK_DAYS = [
+  "Lunes",
+  "Martes",
+  "Miércoles",
+  "Jueves",
+  "Viernes",
+  "Sábado",
+  "Domingo",
+] as const;
+
+export const PET_PLACE_SCHEDULE_HOURS = Array.from({ length: 24 }, (_, hour) => hour);
+
 /** Tipos de negocio del directorio Pet (mismo catálogo que `TYPES_PET_SHELTER` en back). */
 export const PET_PLACE_TYPE_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "veterinary", label: "Veterinaria" },

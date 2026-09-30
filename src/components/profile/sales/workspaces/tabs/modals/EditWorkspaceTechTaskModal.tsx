@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
@@ -23,6 +23,7 @@ import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces
 import { Autocomplete, RequiredFieldMark, type AutocompleteOption } from "kadesh/components/shared";
 import HiddenInWorkspaceSwitch from "./HiddenInWorkspaceSwitch";
 import { Routes } from "kadesh/core/routes";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { TASK_PRIORITY } from "kadesh/constants/constans";
 
 const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
@@ -107,18 +108,35 @@ export default function EditWorkspaceTechTaskModal({
     return opts;
   }, [wsDetail?.saasWorkspace?.members, task?.responsible]);
 
-  useEffect(() => {
-    if (!isOpen || !task) return;
-    setTitle(task.title ?? "");
-    setStartDate(formatDateForInput(task.startDate));
-    setDueDate(task.dueDate ? formatDateForInput(task.dueDate) : "");
-    setPriority(task.priority);
-    setResult(task.result ?? "");
-    setComments(task.comments ?? "");
-    setStatusCrmId(task.statusCrm?.id ?? defaultCrmStatusId ?? crmStatuses[0]?.id ?? "");
-    setHiddenInWorkspace(task.hiddenInWorkspace === true);
-    setResponsibleUserId(task.responsible?.id ?? "");
-  }, [isOpen, task, defaultCrmStatusId, crmStatuses]);
+  useApplyOnKeyChange(
+    [
+      isOpen,
+      task?.id,
+      task?.title,
+      task?.startDate,
+      task?.dueDate,
+      task?.priority,
+      task?.result,
+      task?.comments,
+      task?.statusCrm?.id,
+      task?.hiddenInWorkspace,
+      task?.responsible?.id,
+      defaultCrmStatusId,
+      crmStatuses[0]?.id,
+    ].join("\0"),
+    () => {
+      if (!isOpen || !task) return;
+      setTitle(task.title ?? "");
+      setStartDate(formatDateForInput(task.startDate));
+      setDueDate(task.dueDate ? formatDateForInput(task.dueDate) : "");
+      setPriority(task.priority);
+      setResult(task.result ?? "");
+      setComments(task.comments ?? "");
+      setStatusCrmId(task.statusCrm?.id ?? defaultCrmStatusId ?? crmStatuses[0]?.id ?? "");
+      setHiddenInWorkspace(task.hiddenInWorkspace === true);
+      setResponsibleUserId(task.responsible?.id ?? "");
+    },
+  );
 
   const boardWhere: TechTasksVariables["where"] = mergeWorkspaceFilter({}, workspaceId);
 

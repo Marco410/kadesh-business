@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useSyncExternalStore } from "react";
 import { COOKIE_CONSENT_STORAGE_KEY } from "./meta-pixel";
 
 export type CookieConsentStatus = "pending" | "accepted" | "rejected";
@@ -15,12 +15,24 @@ function readStoredConsent(): CookieConsentStatus {
   }
 }
 
+const consentListeners = new Set<() => void>();
+
+function subscribeConsent(onChange: () => void) {
+  consentListeners.add(onChange);
+  return () => consentListeners.delete(onChange);
+}
+
+function emitConsent() {
+  consentListeners.forEach((listener) => listener());
+}
+
 function persistConsent(status: "accepted" | "rejected"): void {
   try {
     localStorage.setItem(COOKIE_CONSENT_STORAGE_KEY, status);
   } catch {
     /* ignore quota / private mode */
   }
+  emitConsent();
 }
 
 interface CookieConsentContextValue {
@@ -38,20 +50,18 @@ export function CookieConsentProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [status, setStatus] = useState<CookieConsentStatus>("pending");
-
-  useEffect(() => {
-    setStatus(readStoredConsent());
-  }, []);
+  const status = useSyncExternalStore(
+    subscribeConsent,
+    readStoredConsent,
+    () => "pending" as CookieConsentStatus,
+  );
 
   const accept = () => {
     persistConsent("accepted");
-    setStatus("accepted");
   };
 
   const reject = () => {
     persistConsent("rejected");
-    setStatus("rejected");
   };
 
   return (

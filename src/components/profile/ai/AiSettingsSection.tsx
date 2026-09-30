@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
@@ -16,6 +16,7 @@ import {
 import { sileo } from "sileo";
 import { Routes } from "kadesh/core/routes";
 import { formatDateShort } from "kadesh/utils/format-date";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useRemainingCredits } from "kadesh/components/panel/hooks";
 import {
   KADESH_URIM_AI_NAME,
@@ -114,35 +115,38 @@ export function AiSettingsSection({
     message: string;
   } | null>(null);
 
-  useEffect(() => {
-    if (!saved) {
-      setBillingMode(AI_BILLING_MODE.BYOK);
-      setProvider("");
-      setModel("");
+  useApplyOnKeyChange(
+    [
+      saved?.id,
+      saved?.aiBillingMode,
+      saved?.aiProvider,
+      saved?.aiModel,
+      saved?.aiApiKeyPreview,
+      saved?.aiKeyUpdatedAt,
+    ].join("\0"),
+    () => {
+      if (!saved) {
+        setBillingMode(AI_BILLING_MODE.BYOK);
+        setProvider("");
+        setModel("");
+        setApiKey("");
+        setShowApiKey(false);
+        setConfirmClearKey(false);
+        setFormError("");
+        setTestResult(null);
+        return;
+      }
+      const nextMode = saved.aiBillingMode ?? "";
+      setBillingMode(isAiBillingMode(nextMode) ? nextMode : AI_BILLING_MODE.BYOK);
+      setProvider(saved.aiProvider ?? "");
+      setModel(saved.aiModel ?? "");
       setApiKey("");
       setShowApiKey(false);
       setConfirmClearKey(false);
       setFormError("");
       setTestResult(null);
-      return;
-    }
-    const nextMode = saved.aiBillingMode ?? "";
-    setBillingMode(isAiBillingMode(nextMode) ? nextMode : AI_BILLING_MODE.BYOK);
-    setProvider(saved.aiProvider ?? "");
-    setModel(saved.aiModel ?? "");
-    setApiKey("");
-    setShowApiKey(false);
-    setConfirmClearKey(false);
-    setFormError("");
-    setTestResult(null);
-  }, [
-    saved?.id,
-    saved?.aiBillingMode,
-    saved?.aiProvider,
-    saved?.aiModel,
-    saved?.aiApiKeyPreview,
-    saved?.aiKeyUpdatedAt,
-  ]);
+    },
+  );
 
   const [updateSettings, { loading: saving }] = useMutation<
     UpdateCompanyAiSettingsResponse,
