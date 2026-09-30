@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Tabs, Tab } from "@heroui/tabs";
 import Logo from "kadesh/components/shared/Logo";
@@ -17,6 +17,7 @@ import {
   useGoogleLogin,
 } from "../../../components/auth/hooks";
 import { getRegisterPasswordStrength } from "kadesh/utils/register-password-strength";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import {
   META_REGISTER_SUCCESS_QUERY_KEY,
   preserveRegisterSuccessParam,
@@ -39,11 +40,10 @@ function LoginPageContent() {
 
   const [selectedTab, setSelectedTab] = useState(initialTab);
 
-  // Sincronizar tab con la URL al cargar (ej. /auth/login?tab=register)
-  useEffect(() => {
+  useApplyOnKeyChange(tabParam, () => {
     if (tabParam === "register") setSelectedTab("register");
     else if (tabParam === "login") setSelectedTab("login");
-  }, [tabParam]);
+  });
 
   const updateUrlForTab = (tab: string) => {
     const params = preserveRegisterSuccessParam(
@@ -59,11 +59,13 @@ function LoginPageContent() {
   };
   const [successMessage, setSuccessMessage] = useState("");
   const [showLoginPassword, setShowLoginPassword] = useState(false);
-  const [showReferralField, setShowReferralField] = useState(false);
+  const [showReferralField, setShowReferralField] = useState(
+    Boolean(referralCodeFromUrl),
+  );
 
-  useEffect(() => {
+  useApplyOnKeyChange(referralCodeFromUrl, () => {
     if (referralCodeFromUrl) setShowReferralField(true);
-  }, [referralCodeFromUrl]);
+  });
 
   const {
     email: loginEmail,

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon, Edit01Icon } from "@hugeicons/core-free-icons";
@@ -61,9 +62,9 @@ export default function QuotationProductsTablePanel({
 
   const companyId = userData?.user?.company?.id ?? null;
 
-  useEffect(() => {
+  useApplyOnKeyChange(companyId, () => {
     setPage(1);
-  }, [companyId]);
+  });
 
   const where = useMemo(() => {
     if (!companyId) return null;

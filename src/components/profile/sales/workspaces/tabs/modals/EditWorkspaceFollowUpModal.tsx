@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
@@ -23,6 +23,7 @@ import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces
 import { Autocomplete, RequiredFieldMark, type AutocompleteOption } from "kadesh/components/shared";
 import HiddenInWorkspaceSwitch from "./HiddenInWorkspaceSwitch";
 import { Routes } from "kadesh/core/routes";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { FOLLOW_UP_TASK_STATUS, TASK_PRIORITY } from "kadesh/constants/constans";
 
 const FOLLOW_UP_STATUS_OPTIONS = Object.values(FOLLOW_UP_TASK_STATUS);
@@ -101,16 +102,31 @@ export default function EditWorkspaceFollowUpModal({
     return opts;
   }, [wsDetail?.saasWorkspace?.members, task?.assignedSeller]);
 
-  useEffect(() => {
-    if (!isOpen || !task) return;
-    setScheduledDate(formatDateForInput(task.scheduledDate));
-    setStatus(task.status);
-    setPriority(task.priority);
-    setNotes(task.notes ?? "");
-    setStatusCrmId(task.statusCrm?.id ?? defaultCrmStatusId ?? crmStatuses[0]?.id ?? "");
-    setHiddenInWorkspace(task.hiddenInWorkspace === true);
-    setAssignedSellerId(task.assignedSeller?.id ?? "");
-  }, [isOpen, task, defaultCrmStatusId, crmStatuses]);
+  useApplyOnKeyChange(
+    [
+      isOpen,
+      task?.id,
+      task?.scheduledDate,
+      task?.status,
+      task?.priority,
+      task?.notes,
+      task?.statusCrm?.id,
+      task?.hiddenInWorkspace,
+      task?.assignedSeller?.id,
+      defaultCrmStatusId,
+      crmStatuses[0]?.id,
+    ].join("\0"),
+    () => {
+      if (!isOpen || !task) return;
+      setScheduledDate(formatDateForInput(task.scheduledDate));
+      setStatus(task.status);
+      setPriority(task.priority);
+      setNotes(task.notes ?? "");
+      setStatusCrmId(task.statusCrm?.id ?? defaultCrmStatusId ?? crmStatuses[0]?.id ?? "");
+      setHiddenInWorkspace(task.hiddenInWorkspace === true);
+      setAssignedSellerId(task.assignedSeller?.id ?? "");
+    },
+  );
 
   const boardWhere: TechFollowUpTasksVariables["where"] = mergeWorkspaceFilter(
     {},

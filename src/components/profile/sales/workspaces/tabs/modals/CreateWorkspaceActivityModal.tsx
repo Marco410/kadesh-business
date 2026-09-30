@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
@@ -25,6 +25,7 @@ import {
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
 import { workspaceConnectPayload } from "kadesh/components/profile/sales/workspaces/workspace-connect";
 import { Role, SALES_ACTIVITY_TYPE, TASK_PRIORITY } from "kadesh/constants/constans";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useUser } from "kadesh/utils/UserContext";
 
 const ACTIVITY_TYPE_OPTIONS = Object.values(SALES_ACTIVITY_TYPE);
@@ -111,7 +112,7 @@ export default function CreateWorkspaceActivityModal({
     }));
   }, [wsDetail?.saasWorkspace?.members]);
 
-  useEffect(() => {
+  useApplyOnKeyChange([isOpen, userId].join("\0"), () => {
     if (!isOpen) return;
     setLeadId("");
     setTitle("");
@@ -122,7 +123,7 @@ export default function CreateWorkspaceActivityModal({
     setResponsibleUserId(userId);
     setResult("");
     setComments("");
-  }, [isOpen, userId]);
+  });
 
   const boardWhere: TechSalesActivitiesVariables["where"] = mergeWorkspaceFilter(
     {},

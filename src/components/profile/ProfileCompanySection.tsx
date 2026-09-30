@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -16,6 +16,8 @@ import {
   type UpdateSaasCompanyVariables,
 } from "kadesh/utils/queries";
 import { Routes } from "kadesh/core/routes";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
+import { useObjectUrl } from "kadesh/utils/useObjectUrl";
 import { PaletteColorPicker } from "kadesh/components/shared";
 import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
 import { useRefreshCompanyAiBrief } from "kadesh/components/profile/ai/useRefreshCompanyAiBrief";
@@ -163,61 +165,54 @@ export default function ProfileCompanySection({
   const [contactPhone, setContactPhone] = useState("");
   const [companyLogoFile, setCompanyLogoFile] = useState<File | null>(null);
   const [companyLogoError, setCompanyLogoError] = useState("");
-  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
+  const logoPreviewUrl = useObjectUrl(companyLogoFile);
   const companyLogoInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!companyLogoFile) {
-      setLogoPreviewUrl(null);
-      return;
-    }
-    const url = URL.createObjectURL(companyLogoFile);
-    setLogoPreviewUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [companyLogoFile]);
-
-  useEffect(() => {
-    if (!savedCompany) {
-      setCompanyName("");
-      settermsQuotation("");
-      setOnboardingMainOffer("");
-      setOnboardingIdealCustomer("");
-      setOnboardingAvgTicketValue("");
-      setOnboardingSalesPain("");
-      setColorPrimary(DEFAULT_PRIMARY);
-      setColorSecondary(DEFAULT_SECONDARY);
-      setContactEmail("");
-      setContactPhone("");
+  useApplyOnKeyChange(
+    [
+      savedCompany?.id,
+      savedCompany?.name,
+      savedCompany?.termsQuotation,
+      savedCompany?.onboardingMainOffer,
+      savedCompany?.onboardingIdealCustomer,
+      savedCompany?.onboardingAvgTicketValue,
+      savedCompany?.onboardingSalesPain,
+      savedCompany?.colorPrimary,
+      savedCompany?.colorSecondary,
+      savedCompany?.contactEmail,
+      savedCompany?.contactPhone,
+      savedCompany?.logo?.url,
+    ].join("\0"),
+    () => {
+      if (!savedCompany) {
+        setCompanyName("");
+        settermsQuotation("");
+        setOnboardingMainOffer("");
+        setOnboardingIdealCustomer("");
+        setOnboardingAvgTicketValue("");
+        setOnboardingSalesPain("");
+        setColorPrimary(DEFAULT_PRIMARY);
+        setColorSecondary(DEFAULT_SECONDARY);
+        setContactEmail("");
+        setContactPhone("");
+        setCompanyLogoFile(null);
+        setCompanyLogoError("");
+        return;
+      }
+      setCompanyName(savedCompany.name ?? "");
+      settermsQuotation(savedCompany.termsQuotation ?? "");
+      setOnboardingMainOffer(savedCompany.onboardingMainOffer ?? "");
+      setOnboardingIdealCustomer(savedCompany.onboardingIdealCustomer ?? "");
+      setOnboardingAvgTicketValue(savedCompany.onboardingAvgTicketValue ?? "");
+      setOnboardingSalesPain(savedCompany.onboardingSalesPain ?? "");
+      setColorPrimary(savedCompany.colorPrimary ?? DEFAULT_PRIMARY);
+      setColorSecondary(savedCompany.colorSecondary ?? DEFAULT_SECONDARY);
+      setContactEmail(savedCompany.contactEmail ?? "");
+      setContactPhone(savedCompany.contactPhone ?? "");
       setCompanyLogoFile(null);
       setCompanyLogoError("");
-      return;
-    }
-    setCompanyName(savedCompany.name ?? "");
-    settermsQuotation(savedCompany.termsQuotation ?? "");
-    setOnboardingMainOffer(savedCompany.onboardingMainOffer ?? "");
-    setOnboardingIdealCustomer(savedCompany.onboardingIdealCustomer ?? "");
-    setOnboardingAvgTicketValue(savedCompany.onboardingAvgTicketValue ?? "");
-    setOnboardingSalesPain(savedCompany.onboardingSalesPain ?? "");
-    setColorPrimary(savedCompany.colorPrimary ?? DEFAULT_PRIMARY);
-    setColorSecondary(savedCompany.colorSecondary ?? DEFAULT_SECONDARY);
-    setContactEmail(savedCompany.contactEmail ?? "");
-    setContactPhone(savedCompany.contactPhone ?? "");
-    setCompanyLogoFile(null);
-    setCompanyLogoError("");
-  }, [
-    savedCompany?.id,
-    savedCompany?.name,
-    savedCompany?.termsQuotation,
-    savedCompany?.onboardingMainOffer,
-    savedCompany?.onboardingIdealCustomer,
-    savedCompany?.onboardingAvgTicketValue,
-    savedCompany?.onboardingSalesPain,
-    savedCompany?.colorPrimary,
-    savedCompany?.colorSecondary,
-    savedCompany?.contactEmail,
-    savedCompany?.contactPhone,
-    savedCompany?.logo?.url,
-  ]);
+    },
+  );
 
   const isCompanyDirty = Boolean(
     savedCompany &&

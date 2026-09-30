@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Location01Icon } from "@hugeicons/core-free-icons";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
@@ -138,12 +139,12 @@ export default function LocationPicker({
   const markerRef = useRef<LMarker | null>(null);
   const geocodeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
+  useApplyOnKeyChange([address, city, state, country].join("\0"), () => {
     setLocalAddress(address);
     setLocalCity(city);
     setLocalState(state);
     setLocalCountry(country);
-  }, [address, city, state, country]);
+  });
 
   useEffect(() => {
     if (!isVisible) return;

@@ -4,14 +4,15 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 import {
   persistWorkspaceId,
   readStoredWorkspaceId,
+  subscribeWorkspaceId,
 } from "kadesh/components/profile/sales/workspaces/queries";
 
 export interface WorkspaceContextValue {
@@ -25,8 +26,11 @@ export interface WorkspaceContextValue {
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
 
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
-  const [currentWorkspaceId, setId] = useState<string | null>(null);
-  const [hydrated, setHydrated] = useState(false);
+  const currentWorkspaceId = useSyncExternalStore(
+    subscribeWorkspaceId,
+    readStoredWorkspaceId,
+    () => null,
+  );
   const [isWorkspaceSwitching, setSwitching] = useState(false);
   const boardRefetchRef = useRef<(() => Promise<void>) | null>(null);
 
@@ -42,21 +46,15 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     if (fn) await fn();
   }, []);
 
-  useEffect(() => {
-    setId(readStoredWorkspaceId());
-    setHydrated(true);
-  }, []);
-
   const setCurrentWorkspaceId = useCallback((id: string | null) => {
     setSwitching(true);
-    setId(id);
     persistWorkspaceId(id);
     window.setTimeout(() => setSwitching(false), 280);
   }, []);
 
   const value = useMemo<WorkspaceContextValue>(
     () => ({
-      currentWorkspaceId: hydrated ? currentWorkspaceId : null,
+      currentWorkspaceId,
       setCurrentWorkspaceId,
       isWorkspaceSwitching,
       registerWorkspaceBoardRefetch,
@@ -64,7 +62,6 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     }),
     [
       currentWorkspaceId,
-      hydrated,
       isWorkspaceSwitching,
       registerWorkspaceBoardRefetch,
       refetchWorkspaceBoardData,

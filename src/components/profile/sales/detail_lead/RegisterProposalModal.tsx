@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQuery, useMutation } from "@apollo/client";
 import {
@@ -127,13 +128,13 @@ export default function RegisterProposalModal({
   const submitting = creating || updating;
   const isEditing = editingProposal != null;
 
-  useEffect(() => {
+  useApplyOnKeyChange(isOpen, () => {
     if (isOpen) {
-        resetForm();
-        setSelectedId(null);
-        setEditingProposal(null);
+      resetForm();
+      setSelectedId(null);
+      setEditingProposal(null);
     }
-  }, [isOpen]);
+  });
 
   const fillFormForEdit = (p: ProposalItem) => {
     setEditingProposal(p);

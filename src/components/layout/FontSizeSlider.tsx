@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "kadesh/utils/cn";
+import { useIsClient } from "kadesh/utils/useIsClient";
 import {
   FONT_SCALE_DEFAULT,
   FONT_SCALE_MAX,
   FONT_SCALE_MIN,
   FONT_SCALE_STEP,
+  applyFontScale,
   persistFontScale,
   readStoredFontScale,
+  subscribeFontScale,
 } from "./font-scale";
 
 const PANEL_WIDTH_PX = 252;
@@ -28,19 +31,20 @@ export default function FontSizeSlider({
   tone,
   className,
 }: FontSizeSliderProps) {
-  const [scale, setScale] = useState(FONT_SCALE_DEFAULT);
-  const [mounted, setMounted] = useState(false);
+  const scale = useSyncExternalStore(
+    subscribeFontScale,
+    readStoredFontScale,
+    () => FONT_SCALE_DEFAULT,
+  );
+  const mounted = useIsClient();
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const stored = readStoredFontScale();
-    setScale(stored);
-    persistFontScale(stored);
-    setMounted(true);
-  }, []);
+  useLayoutEffect(() => {
+    applyFontScale(scale);
+  }, [scale]);
 
   const placePanel = () => {
     const rect = buttonRef.current?.getBoundingClientRect();
@@ -136,9 +140,7 @@ export default function FontSizeSlider({
             step={FONT_SCALE_STEP}
             value={scale}
             onChange={(e) => {
-              const next = Number(e.target.value);
-              setScale(next);
-              persistFontScale(next);
+              persistFontScale(Number(e.target.value));
             }}
             aria-label="Tamaño de fuente"
             aria-valuemin={Math.round(FONT_SCALE_MIN * 100)}

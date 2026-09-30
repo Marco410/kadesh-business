@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
@@ -268,17 +269,20 @@ export default function QuotationDetail() {
   }, [quotationId, detail]);
 
   /** Fuera del “hydrate once”: tras refetch/mutación el servidor puede traer sentAt/acceptedAt nuevos. */
-  useEffect(() => {
-    if (!quotationId || !detail || detail.id !== quotationId) return;
-    setSentAt(isoLikeToLocalDateTimeMinute(detail.sentAt));
-    setAcceptedAt(isoLikeToLocalDateTimeMinute(detail.acceptedAt));
-  }, [
-    quotationId,
-    detail?.id,
-    detail?.sentAt,
-    detail?.acceptedAt,
-    detail?.updatedAt,
-  ]);
+  useApplyOnKeyChange(
+    [
+      quotationId,
+      detail?.id,
+      detail?.sentAt,
+      detail?.acceptedAt,
+      detail?.updatedAt,
+    ].join("\0"),
+    () => {
+      if (!quotationId || !detail || detail.id !== quotationId) return;
+      setSentAt(isoLikeToLocalDateTimeMinute(detail.sentAt));
+      setAcceptedAt(isoLikeToLocalDateTimeMinute(detail.acceptedAt));
+    },
+  );
 
   const [updateQuotation, { loading: savingQuotation }] = useMutation<
     UpdateSaasQuotationResponse,

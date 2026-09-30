@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -15,6 +15,7 @@ import {
   type UpdateSaasCompanyResponse,
   type UpdateSaasCompanyVariables,
 } from "kadesh/utils/queries";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import {
   KADESH_URIM_AI_NAME,
   ONBOARDING_CONTEXT_FIELDS,
@@ -68,24 +69,27 @@ export function AiCompanyInfoTab({
   const [formError, setFormError] = useState("");
   const [justSaved, setJustSaved] = useState(false);
 
-  useEffect(() => {
-    if (!saved) {
-      setValues(EMPTY_VALUES);
-      return;
-    }
-    setValues({
-      onboardingMainOffer: saved.onboardingMainOffer ?? "",
-      onboardingIdealCustomer: saved.onboardingIdealCustomer ?? "",
-      onboardingAvgTicketValue: saved.onboardingAvgTicketValue ?? "",
-      onboardingSalesPain: saved.onboardingSalesPain ?? "",
-    });
-  }, [
-    saved?.id,
-    saved?.onboardingMainOffer,
-    saved?.onboardingIdealCustomer,
-    saved?.onboardingAvgTicketValue,
-    saved?.onboardingSalesPain,
-  ]);
+  useApplyOnKeyChange(
+    [
+      saved?.id,
+      saved?.onboardingMainOffer,
+      saved?.onboardingIdealCustomer,
+      saved?.onboardingAvgTicketValue,
+      saved?.onboardingSalesPain,
+    ].join("\0"),
+    () => {
+      if (!saved) {
+        setValues(EMPTY_VALUES);
+        return;
+      }
+      setValues({
+        onboardingMainOffer: saved.onboardingMainOffer ?? "",
+        onboardingIdealCustomer: saved.onboardingIdealCustomer ?? "",
+        onboardingAvgTicketValue: saved.onboardingAvgTicketValue ?? "",
+        onboardingSalesPain: saved.onboardingSalesPain ?? "",
+      });
+    },
+  );
 
   const isDirty = Boolean(
     saved &&

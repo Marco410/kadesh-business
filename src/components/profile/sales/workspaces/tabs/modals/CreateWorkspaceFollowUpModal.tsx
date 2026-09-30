@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation } from "@apollo/client";
 import { sileo } from "sileo";
@@ -15,6 +15,7 @@ import {
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
 import { workspaceConnectPayload } from "kadesh/components/profile/sales/workspaces/workspace-connect";
 import { FOLLOW_UP_TASK_STATUS, TASK_PRIORITY } from "kadesh/constants/constans";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 
 const FOLLOW_UP_STATUS_OPTIONS = Object.values(FOLLOW_UP_TASK_STATUS);
 const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
@@ -52,14 +53,14 @@ export default function CreateWorkspaceFollowUpModal({
   const [priority, setPriority] = useState<string>(TASK_PRIORITY.MEDIA);
   const [notes, setNotes] = useState("");
 
-  useEffect(() => {
+  useApplyOnKeyChange(isOpen, () => {
     if (!isOpen) return;
     setLeadId("");
     setScheduledDate(formatDateForInput(new Date().toISOString()));
     setStatus(FOLLOW_UP_TASK_STATUS.PENDIENTE);
     setPriority(TASK_PRIORITY.MEDIA);
     setNotes("");
-  }, [isOpen]);
+  });
 
   const boardWhere: TechFollowUpTasksVariables["where"] = mergeWorkspaceFilter(
     {},

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQuery, useMutation } from "@apollo/client";
 import {
@@ -96,7 +97,7 @@ export default function RegisterActivityModal({
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  useEffect(() => {
+  useApplyOnKeyChange(isOpen, () => {
     if (isOpen) {
       setType(SALES_ACTIVITY_TYPE.LLAMADA);
       setActivityDate(formatDateTimeLocal(new Date()));
@@ -104,7 +105,7 @@ export default function RegisterActivityModal({
       setComments("");
       setSelectedId(null);
     }
-  }, [isOpen]);
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
