@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useQuery } from "@apollo/client";
 import { useUser } from "kadesh/utils/UserContext";
 import { Role } from "kadesh/constants/constans";
@@ -39,9 +40,9 @@ export function useQuotationsList({ userId }: UseQuotationsListOptions) {
 
   const companyId = userData?.user?.company?.id ?? null;
 
-  useEffect(() => {
+  useApplyOnKeyChange([companyId, isAdminCompany, userId].join("\0"), () => {
     setPage(1);
-  }, [companyId, isAdminCompany, userId]);
+  });
 
   const where = useMemo(() => {
     if (!companyId) return null;

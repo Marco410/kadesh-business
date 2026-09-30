@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@apollo/client";
 import {
@@ -202,32 +203,35 @@ export default function DetailLeadSection() {
   const [hasWebsite, setHasWebsite] = useState<boolean | null>(null);
   const [firstContactDate, setFirstContactDate] = useState("");
 
-  useEffect(() => {
-    if (lead) {
-      setPipelineStatus(status?.pipelineStatus ?? "");
-      setNotes(status?.notes ?? "");
-      setFacebook(lead.facebook ?? "");
-      setInstagram(lead.instagram ?? "");
-      setTiktok(lead.tiktok ?? "");
-      setXTwitter(lead.xTwitter ?? "");
-      setProductOffered(status?.productOffered ?? "");
-      setHasWebsite(lead.hasWebsite ?? null);
-      setFirstContactDate(status?.firstContactDate?.slice(0, 10) ?? "");
-      setWebsiteUrl(lead.websiteUrl ?? "");
-    }
-  }, [
-    lead?.id,
-    status?.pipelineStatus,
-    status?.notes,
-    status?.productOffered,
-    status?.firstContactDate,
-    lead?.facebook,
-    lead?.instagram,
-    lead?.tiktok,
-    lead?.xTwitter,
-    lead?.hasWebsite,
-    lead?.websiteUrl,
-  ]);
+  useApplyOnKeyChange(
+    [
+      lead?.id,
+      status?.pipelineStatus,
+      status?.notes,
+      status?.productOffered,
+      status?.firstContactDate,
+      lead?.facebook,
+      lead?.instagram,
+      lead?.tiktok,
+      lead?.xTwitter,
+      lead?.hasWebsite,
+      lead?.websiteUrl,
+    ].join("\0"),
+    () => {
+      if (lead) {
+        setPipelineStatus(status?.pipelineStatus ?? "");
+        setNotes(status?.notes ?? "");
+        setFacebook(lead.facebook ?? "");
+        setInstagram(lead.instagram ?? "");
+        setTiktok(lead.tiktok ?? "");
+        setXTwitter(lead.xTwitter ?? "");
+        setProductOffered(status?.productOffered ?? "");
+        setHasWebsite(lead.hasWebsite ?? null);
+        setFirstContactDate(status?.firstContactDate?.slice(0, 10) ?? "");
+        setWebsiteUrl(lead.websiteUrl ?? "");
+      }
+    },
+  );
 
   if (!id) {
     router.replace(Routes.panel);

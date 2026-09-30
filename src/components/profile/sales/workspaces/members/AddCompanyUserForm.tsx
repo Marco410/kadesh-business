@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, type InternalRefetchQueriesInclude } from "@apollo/client";
 import {
   ROLES_BY_NAMES_QUERY,
@@ -19,6 +19,7 @@ import {
   type UserBasicProfileVariables,
 } from "kadesh/components/profile/sales/workspaces/queries";
 import { Role } from "kadesh/constants/constans";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { sileo } from "sileo";
 
 const inputClassName =
@@ -58,20 +59,30 @@ export default function AddCompanyUserForm({
     fetchPolicy: "network-only",
   });
 
-  useEffect(() => {
-    if (!editingId) return;
-    const u = profileData?.user;
-    if (!u) return;
-    setName(u.name ?? "");
-    setLastName(u.lastName ?? "");
-    setEmail(u.email ?? "");
-    setPhone(u.phone ?? "");
-    setBirthday(u.birthday ? u.birthday.slice(0, 10) : "");
-    setPassword("");
-    setConfirmPassword("");
-  }, [editingId, profileData?.user]);
+  useApplyOnKeyChange(
+    [
+      editingId,
+      profileData?.user?.name,
+      profileData?.user?.lastName,
+      profileData?.user?.email,
+      profileData?.user?.phone,
+      profileData?.user?.birthday,
+    ].join("\0"),
+    () => {
+      if (!editingId) return;
+      const u = profileData?.user;
+      if (!u) return;
+      setName(u.name ?? "");
+      setLastName(u.lastName ?? "");
+      setEmail(u.email ?? "");
+      setPhone(u.phone ?? "");
+      setBirthday(u.birthday ? u.birthday.slice(0, 10) : "");
+      setPassword("");
+      setConfirmPassword("");
+    },
+  );
 
-  useEffect(() => {
+  useApplyOnKeyChange(editingId, () => {
     if (editingId) return;
     setName("");
     setLastName("");
@@ -80,7 +91,7 @@ export default function AddCompanyUserForm({
     setConfirmPassword("");
     setPhone("");
     setBirthday("");
-  }, [editingId]);
+  });
 
   const { data: rolesData } = useQuery<RolesByNamesResponse, RolesByNamesVariables>(
     ROLES_BY_NAMES_QUERY,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 
 type ExpandableCopyProps = {
   text: string;
@@ -17,9 +18,9 @@ export function ExpandableCopy({ text, lines = 2 }: ExpandableCopyProps) {
   const textRef = useRef<HTMLSpanElement>(null);
   const clamp = lines === 3 ? "line-clamp-3" : "line-clamp-2";
 
-  useLayoutEffect(() => {
+  useApplyOnKeyChange(text, () => {
     setOpen(false);
-  }, [text]);
+  });
 
   useLayoutEffect(() => {
     const el = textRef.current;

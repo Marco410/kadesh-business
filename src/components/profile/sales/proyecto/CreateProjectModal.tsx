@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQuery, useMutation } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -83,9 +84,13 @@ export default function CreateProjectModal({
     onClose();
   }
 
-  useEffect(() => {
+  useApplyOnKeyChange([isOpen, userId].join("\0"), () => {
     if (!isOpen) return;
     setSelectedLeadId(null);
+  });
+
+  useEffect(() => {
+    if (!isOpen) return;
     const t = window.setTimeout(() => nameInputRef.current?.focus(), 40);
     return () => window.clearTimeout(t);
   }, [isOpen, userId]);

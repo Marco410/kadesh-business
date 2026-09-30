@@ -27,6 +27,17 @@ export function readStoredFontScale(): number {
   }
 }
 
+const FONT_SCALE_EVENT = "kadesh-font-scale-change";
+
+export function subscribeFontScale(onChange: () => void) {
+  window.addEventListener(FONT_SCALE_EVENT, onChange);
+  window.addEventListener("storage", onChange);
+  return () => {
+    window.removeEventListener(FONT_SCALE_EVENT, onChange);
+    window.removeEventListener("storage", onChange);
+  };
+}
+
 export function persistFontScale(scale: number): void {
   const next = clampFontScale(scale);
   applyFontScale(next);
@@ -35,4 +46,5 @@ export function persistFontScale(scale: number): void {
   } catch {
     /* ignore quota / private mode */
   }
+  window.dispatchEvent(new Event(FONT_SCALE_EVENT));
 }

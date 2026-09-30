@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMutation } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -43,12 +44,12 @@ export default function QuotationCreateModal({
   const reduce = useReducedMotion();
   const transition = quotationMotionTransition(reduce);
 
-  useEffect(() => {
+  useApplyOnKeyChange(isOpen, () => {
     if (!isOpen) return;
     setLeadId("");
     setValidUntil("");
     setNotes("");
-  }, [isOpen]);
+  });
 
   const [createQuotation, { loading }] = useMutation<
     CreateSaasQuotationResponse,

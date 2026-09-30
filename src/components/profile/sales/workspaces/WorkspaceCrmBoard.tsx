@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useMutation, useQuery } from "@apollo/client";
 import type { InternalRefetchQueriesInclude } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -101,12 +102,15 @@ export default function WorkspaceCrmBoard({
     return "props";
   });
 
-  useEffect(() => {
-    if (validBoardTabKeys.length === 0) return;
-    if (!validBoardTabKeys.includes(boardViewTab)) {
-      setBoardViewTab(validBoardTabKeys[0]!);
-    }
-  }, [workspaceId, validBoardTabKeys, boardViewTab]);
+  useApplyOnKeyChange(
+    `${workspaceId ?? ""}\0${validBoardTabKeys.join(",")}`,
+    () => {
+      if (validBoardTabKeys.length === 0) return;
+      if (!validBoardTabKeys.includes(boardViewTab)) {
+        setBoardViewTab(validBoardTabKeys[0]!);
+      }
+    },
+  );
 
   const [openTechTask, setOpenTechTask] = useState(false);
   const [openActivity, setOpenActivity] = useState(false);
@@ -178,7 +182,18 @@ export default function WorkspaceCrmBoard({
     taskQ,
     propQ,
   });
-  boardQueriesRef.current = {
+  useLayoutEffect(() => {
+    boardQueriesRef.current = {
+      showTasks,
+      showActivities,
+      showFollowUpTasks,
+      showProposals,
+      techQ,
+      actQ,
+      taskQ,
+      propQ,
+    };
+  }, [
     showTasks,
     showActivities,
     showFollowUpTasks,
@@ -187,7 +202,7 @@ export default function WorkspaceCrmBoard({
     actQ,
     taskQ,
     propQ,
-  };
+  ]);
 
   useEffect(() => {
     const run = async () => {

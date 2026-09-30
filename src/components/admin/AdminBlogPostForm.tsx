@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { AnimatePresence, motion } from "framer-motion";
 import { sileo } from "sileo";
 import { getCategoryLabel } from "kadesh/components/blog/constants";
+import { useObjectUrl } from "kadesh/utils/useObjectUrl";
 import { useUser } from "kadesh/utils/UserContext";
 import { imageFileError } from "./blog-image";
 import { emptyBlogDocument, normalizeBlogDocument, type BlogDocument } from "./blog-document";
@@ -220,7 +221,7 @@ function PostFormFields({
   const [categoryId, setCategoryId] = useState(initialCategoryId);
   const [tagIds, setTagIds] = useState<string[]>(initialTagIds);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const previewUrl = useObjectUrl(imageFile);
 
   const { data: categoriesData } = useQuery<AdminBlogCategoriesResponse>(
     ADMIN_BLOG_CATEGORIES_QUERY,
@@ -239,16 +240,6 @@ function PostFormFields({
 
   const [createPost] = useMutation(CREATE_ADMIN_POST_MUTATION);
   const [updatePost] = useMutation(UPDATE_ADMIN_POST_MUTATION);
-
-  useEffect(() => {
-    if (!imageFile) {
-      setPreviewUrl(null);
-      return;
-    }
-    const url = URL.createObjectURL(imageFile);
-    setPreviewUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [imageFile]);
 
   const categories = useMemo(() => {
     const rows = categoriesData?.categories ?? [];

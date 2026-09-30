@@ -46,8 +46,31 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    refreshUser();
-  }, [refreshUser]);
+    let cancelled = false;
+
+    getAuthenticatedUser()
+      .then((userData) => {
+        if (cancelled) return;
+        const hasToken =
+          typeof window !== "undefined" &&
+          !!window.localStorage?.getItem(SESSION_TOKEN_KEY);
+        if (userData) {
+          setUser(userData);
+        } else if (!hasToken) {
+          setUser(undefined);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setUser(undefined);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, loading, refreshUser, setUser }}>

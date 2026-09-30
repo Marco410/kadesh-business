@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation } from "@apollo/client";
 import { sileo } from "sileo";
@@ -11,6 +11,7 @@ import {
   type CreateSaasWorkspaceVariables,
 } from "kadesh/components/profile/sales/workspaces/queries";
 import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 
 export interface CreateWorkspaceModalProps {
   isOpen: boolean;
@@ -32,14 +33,14 @@ export default function CreateWorkspaceModal({
   const [showFollowUpTasks, setShowFollowUpTasks] = useState(true);
   const { setCurrentWorkspaceId } = useWorkspaceContext();
 
-  useEffect(() => {
+  useApplyOnKeyChange(isOpen, () => {
     if (!isOpen) return;
     setName("");
     setShowTasks(true);
     setShowActivities(true);
     setShowProposals(true);
     setShowFollowUpTasks(true);
-  }, [isOpen]);
+  });
 
   const [createWs, { loading }] = useMutation<
     CreateSaasWorkspaceMutation,

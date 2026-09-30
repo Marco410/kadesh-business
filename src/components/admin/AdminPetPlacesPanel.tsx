@@ -9,6 +9,7 @@ import {
   Link01Icon,
 } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import {
   ADMIN_OVERVIEW_QUERY,
   ADMIN_PET_PLACE_QUERY,
@@ -289,9 +290,13 @@ export default function AdminPetPlacesPanel({
     selectedData?.petPlace ??
     null;
 
-  useEffect(() => {
+  useApplyOnKeyChange(initialPlaceId ?? "", () => {
     if (!initialPlaceId) return;
     setSelectedId(initialPlaceId);
+  });
+
+  useEffect(() => {
+    if (!initialPlaceId) return;
     onConsumedInitialPlace?.();
   }, [initialPlaceId, onConsumedInitialPlace]);
 

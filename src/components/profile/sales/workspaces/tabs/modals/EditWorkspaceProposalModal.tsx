@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
@@ -23,6 +23,7 @@ import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces
 import { Autocomplete, RequiredFieldMark, type AutocompleteOption } from "kadesh/components/shared";
 import HiddenInWorkspaceSwitch from "./HiddenInWorkspaceSwitch";
 import { Routes } from "kadesh/core/routes";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { PROPOSAL_STATUS } from "kadesh/constants/constans";
 
 const PROPOSAL_STATUS_OPTIONS = Object.values(PROPOSAL_STATUS);
@@ -102,20 +103,37 @@ export default function EditWorkspaceProposalModal({
     return opts;
   }, [wsDetail?.saasWorkspace?.members, proposal?.assignedSeller]);
 
-  useEffect(() => {
-    if (!isOpen || !proposal) return;
-    setSentDate(formatDateForInput(proposal.sentDate));
-    setAmount(proposal.amount != null ? String(proposal.amount) : "");
-    setStatus(proposal.status);
-    setProduct(proposal.product ?? "");
-    setNotes(proposal.notes ?? "");
-    setFileOrUrl(proposal.fileOrUrl ?? "");
-    setStatusCrmId(
-      proposal.statusCrm?.id ?? defaultCrmStatusId ?? crmStatuses[0]?.id ?? ""
-    );
-    setHiddenInWorkspace(proposal.hiddenInWorkspace === true);
-    setAssignedSellerId(proposal.assignedSeller?.id ?? "");
-  }, [isOpen, proposal, defaultCrmStatusId, crmStatuses]);
+  useApplyOnKeyChange(
+    [
+      isOpen,
+      proposal?.id,
+      proposal?.sentDate,
+      proposal?.amount,
+      proposal?.status,
+      proposal?.product,
+      proposal?.notes,
+      proposal?.fileOrUrl,
+      proposal?.statusCrm?.id,
+      proposal?.hiddenInWorkspace,
+      proposal?.assignedSeller?.id,
+      defaultCrmStatusId,
+      crmStatuses[0]?.id,
+    ].join("\0"),
+    () => {
+      if (!isOpen || !proposal) return;
+      setSentDate(formatDateForInput(proposal.sentDate));
+      setAmount(proposal.amount != null ? String(proposal.amount) : "");
+      setStatus(proposal.status);
+      setProduct(proposal.product ?? "");
+      setNotes(proposal.notes ?? "");
+      setFileOrUrl(proposal.fileOrUrl ?? "");
+      setStatusCrmId(
+        proposal.statusCrm?.id ?? defaultCrmStatusId ?? crmStatuses[0]?.id ?? ""
+      );
+      setHiddenInWorkspace(proposal.hiddenInWorkspace === true);
+      setAssignedSellerId(proposal.assignedSeller?.id ?? "");
+    },
+  );
 
   const boardWhere: TechProposalsVariables["where"] = mergeWorkspaceFilter({}, workspaceId);
 

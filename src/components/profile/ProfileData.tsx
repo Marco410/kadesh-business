@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMutation, useQuery } from "@apollo/client";
@@ -14,6 +14,7 @@ import {
   type UserQueryResponse,
   type UserQueryVariables,
 } from "kadesh/utils/queries";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useUser } from "kadesh/utils/UserContext";
 import { Routes } from "kadesh/core/routes";
 import { Role } from "kadesh/constants/constans";
@@ -102,18 +103,30 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
   const [imageError, setImageError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<{ phone?: string }>({});
 
-  useEffect(() => {
-    setName(user.name ?? "");
-    setLastName(user.lastName ?? "");
-    setSecondLastName(user.secondLastName ?? "");
-    setPhone(user.phone ?? "");
-    setBusinessEmail(user.businessEmail ?? "");
-    setBusinessPhone(user.businessPhone ?? "");
-    setFieldErrors({});
-    setBirthday(
-      toDateInputValue((user as { birthday?: string | null }).birthday),
-    );
-  }, [user]);
+  useApplyOnKeyChange(
+    [
+      user.id,
+      user.name,
+      user.lastName,
+      user.secondLastName,
+      user.phone,
+      user.businessEmail,
+      user.businessPhone,
+      (user as { birthday?: string | null }).birthday,
+    ].join("\0"),
+    () => {
+      setName(user.name ?? "");
+      setLastName(user.lastName ?? "");
+      setSecondLastName(user.secondLastName ?? "");
+      setPhone(user.phone ?? "");
+      setBusinessEmail(user.businessEmail ?? "");
+      setBusinessPhone(user.businessPhone ?? "");
+      setFieldErrors({});
+      setBirthday(
+        toDateInputValue((user as { birthday?: string | null }).birthday),
+      );
+    },
+  );
 
   const currentBirthdayIso = (user as { birthday?: string | null }).birthday
     ? toDateInputValue((user as { birthday?: string | null }).birthday)

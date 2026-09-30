@@ -426,7 +426,9 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   );
 
   const navigateLeadsUrlRef = useRef(navigateLeadsUrl);
-  navigateLeadsUrlRef.current = navigateLeadsUrl;
+  useLayoutEffect(() => {
+    navigateLeadsUrlRef.current = navigateLeadsUrl;
+  }, [navigateLeadsUrl]);
 
   const pushLeadsPage = useCallback((newPage: number) => {
     navigateLeadsUrlRef.current(newPage, false);
@@ -517,12 +519,14 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     salesPersonWhere2: leadsQueryVariables.salesPersonWhere2,
     totalCount,
   });
-  exportLeadsContextRef.current = {
-    where,
-    statusWhere: leadsQueryVariables.statusWhere,
-    salesPersonWhere2: leadsQueryVariables.salesPersonWhere2,
-    totalCount,
-  };
+  useLayoutEffect(() => {
+    exportLeadsContextRef.current = {
+      where,
+      statusWhere: leadsQueryVariables.statusWhere,
+      salesPersonWhere2: leadsQueryVariables.salesPersonWhere2,
+      totalCount,
+    };
+  });
 
   const handleExportExcel = useCallback(async () => {
     if (!userId) return;

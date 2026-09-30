@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQuery, useMutation } from "@apollo/client";
@@ -21,6 +21,7 @@ import {
 } from "kadesh/components/profile/sales/workspaces/queries";
 import AddCompanyUserForm from "kadesh/components/profile/sales/workspaces/members/AddCompanyUserForm";
 import { Routes } from "kadesh/core/routes";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 
 export interface WorkspaceMembersModalProps {
   isOpen: boolean;
@@ -61,16 +62,26 @@ export default function WorkspaceMembersModal({
 
   const companyUsers = usersData?.users ?? [];
 
-  useEffect(() => {
-    if (!isOpen || !workspaceId || wsLoading) return;
-    const ws = wsData?.saasWorkspace;
-    if (!ws) return;
-    setSelected(new Set(ws.members.map((m) => m.id)));
-  }, [isOpen, workspaceId, wsLoading, wsData?.saasWorkspace]);
+  useApplyOnKeyChange(
+    [
+      isOpen,
+      workspaceId,
+      wsLoading,
+      (wsData?.saasWorkspace?.members ?? [])
+        .map((member) => member.id)
+        .join(","),
+    ].join("\0"),
+    () => {
+      if (!isOpen || !workspaceId || wsLoading) return;
+      const ws = wsData?.saasWorkspace;
+      if (!ws) return;
+      setSelected(new Set(ws.members.map((m) => m.id)));
+    },
+  );
 
-  useEffect(() => {
+  useApplyOnKeyChange(isOpen, () => {
     if (!isOpen) setFormEditingId(null);
-  }, [isOpen]);
+  });
 
   const listRefetchQueries = useMemo(() => {
     if (!companyId || !workspaceId) return [];

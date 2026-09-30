@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useIsClient } from "kadesh/utils/useIsClient";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { CookieIcon } from "@hugeicons/core-free-icons";
@@ -10,11 +10,7 @@ import { useCookieConsent } from "./CookieConsentContext";
 
 export function CookieConsentBanner() {
   const { status, accept, reject } = useCookieConsent();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useIsClient();
 
   if (!mounted || status !== "pending") return null;
 

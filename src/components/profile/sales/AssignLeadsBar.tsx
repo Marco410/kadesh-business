@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowDown01Icon,
@@ -59,11 +60,12 @@ function VendedorPicker({
     return vendedores.filter((v) => normalizeSearch(vendedorLabel(v)).includes(q));
   }, [vendedores, query]);
 
+  useApplyOnKeyChange(open, () => {
+    if (!open) setQuery("");
+  });
+
   useEffect(() => {
-    if (!open) {
-      setQuery("");
-      return;
-    }
+    if (!open) return;
     const t = window.setTimeout(() => searchRef.current?.focus(), 0);
     return () => window.clearTimeout(t);
   }, [open]);

@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon, Delete02Icon, DragDropVerticalIcon } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
 import { ConfirmModal, PaletteColorPicker } from "kadesh/components/shared";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import {
   CREATE_SAAS_WORKSPACE_CRM_STATUS_MUTATION,
   DELETE_SAAS_WORKSPACE_CRM_STATUS_MUTATION,
@@ -125,7 +126,9 @@ export default function EditWorkspaceSettingsModal({
   });
 
   const statusRowsRef = useRef(statusRows);
-  statusRowsRef.current = statusRows;
+  useLayoutEffect(() => {
+    statusRowsRef.current = statusRows;
+  }, [statusRows]);
 
   const { data: wsData, loading: wsLoading, refetch: refetchWorkspaceDetail } = useQuery<
     SaasWorkspaceDetailResponse,
@@ -162,16 +165,38 @@ export default function EditWorkspaceSettingsModal({
     statusRows,
   ]);
 
-  useEffect(() => {
-    if (!isOpen || !workspaceId) return;
-    const w = wsData?.saasWorkspace;
-    if (!w) return;
-    setName(w.name ?? "");
-    setShowTasks(w.showTasks ?? true);
-    setShowActivities(w.showActivities ?? true);
-    setShowProposals(w.showProposals ?? true);
-    setShowFollowUpTasks(w.showFollowUpTasks ?? true);
-    const rows = (w.crmStatuses ?? [])
+  const workspaceFormKey = [
+    isOpen,
+    workspaceId,
+    ws?.id,
+    ws?.name,
+    ws?.showTasks,
+    ws?.showActivities,
+    ws?.showProposals,
+    ws?.showFollowUpTasks,
+    (ws?.crmStatuses ?? [])
+      .map((status) =>
+        [
+          status.id,
+          status.name,
+          status.color,
+          status.order,
+          status.key,
+          status.isArchived,
+          status.isDefault,
+        ].join(":"),
+      )
+      .join(","),
+  ].join("\0");
+
+  useApplyOnKeyChange(workspaceFormKey, () => {
+    if (!isOpen || !workspaceId || !ws) return;
+    setName(ws.name ?? "");
+    setShowTasks(ws.showTasks ?? true);
+    setShowActivities(ws.showActivities ?? true);
+    setShowProposals(ws.showProposals ?? true);
+    setShowFollowUpTasks(ws.showFollowUpTasks ?? true);
+    const rows = (ws.crmStatuses ?? [])
       .filter((s) => !s.isArchived)
       .sort((a, b) => a.order - b.order)
       .map((s) => ({
@@ -183,24 +208,27 @@ export default function EditWorkspaceSettingsModal({
         isDefault: Boolean(s.isDefault),
       }));
     setStatusRows(rows);
-  }, [isOpen, workspaceId, wsData?.saasWorkspace]);
+  });
 
-  useEffect(() => {
-    if (!isOpen) {
-      setAddStatusModalOpen(false);
-      setNewStatusName("");
-      setNewStatusColor("#6b7280");
-      setStatusPendingDelete(null);
-      setDraggingReorderId(null);
-      setReorderHoverRowId(null);
-      setReorderInsertBefore(null);
-    }
-  }, [isOpen]);
+  useApplyOnKeyChange(isOpen, () => {
+    if (isOpen) return;
+    setAddStatusModalOpen(false);
+    setNewStatusName("");
+    setNewStatusColor("#6b7280");
+    setStatusPendingDelete(null);
+    setDraggingReorderId(null);
+    setReorderHoverRowId(null);
+    setReorderInsertBefore(null);
+  });
+
+  useApplyOnKeyChange(draggingReorderId, () => {
+    if (draggingReorderId) return;
+    setReorderHoverRowId(null);
+    setReorderInsertBefore(null);
+  });
 
   useEffect(() => {
     if (!draggingReorderId) {
-      setReorderHoverRowId(null);
-      setReorderInsertBefore(null);
       reorderDropHintRef.current = { hoverId: null, insertBefore: true };
     }
   }, [draggingReorderId]);

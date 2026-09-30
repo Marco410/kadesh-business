@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import Link from "next/link";
 import { useQuery, useMutation } from "@apollo/client";
 import {
@@ -68,8 +69,22 @@ export default function AgregarVendedorSection() {
   });
 
   const vendedores = vendedoresData?.users ?? [];
+  const vendedoresKey = vendedores
+    .map((u) =>
+      [
+        u.id,
+        u.name ?? "",
+        u.lastName ?? "",
+        u.email ?? "",
+        u.phone ?? "",
+        u.birthday ?? "",
+        u.salesComission ?? "",
+        u.salesPersonVerified ?? "",
+      ].join("\u0001"),
+    )
+    .join("\u0002");
 
-  useEffect(() => {
+  useApplyOnKeyChange([editingId ?? "", vendedoresKey].join("\0"), () => {
     if (!editingId || vendedores.length === 0) return;
     const v = vendedores.find((u) => u.id === editingId);
     if (!v) return;
@@ -82,7 +97,7 @@ export default function AgregarVendedorSection() {
     setSalesPersonVerified(v.salesPersonVerified ?? false);
     setPassword("");
     setConfirmPassword("");
-  }, [editingId, vendedores]);
+  });
 
   const { data: rolesData } = useQuery<
     RolesByNamesResponse,

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQuery, useMutation } from "@apollo/client";
@@ -104,16 +105,28 @@ export default function ProjectDetailSection() {
 
   const project = data?.saasProject ?? null;
 
-  useEffect(() => {
-    if (!project) return;
-    setName(project.name ?? "");
-    setServiceType(project.serviceType ?? "");
-    setStatus(project.status ?? "");
-    setDescription(project.description ?? "");
-    setUrlData(project.urlData ?? "");
-    setStartDate(toDateInputValue(project.startDate));
-    setEstimatedEndDate(toDateInputValue(project.estimatedEndDate));
-  }, [project]);
+  useApplyOnKeyChange(
+    [
+      project?.id,
+      project?.name,
+      project?.serviceType,
+      project?.status,
+      project?.description,
+      project?.urlData,
+      project?.startDate,
+      project?.estimatedEndDate,
+    ].join("\0"),
+    () => {
+      if (!project) return;
+      setName(project.name ?? "");
+      setServiceType(project.serviceType ?? "");
+      setStatus(project.status ?? "");
+      setDescription(project.description ?? "");
+      setUrlData(project.urlData ?? "");
+      setStartDate(toDateInputValue(project.startDate));
+      setEstimatedEndDate(toDateInputValue(project.estimatedEndDate));
+    },
+  );
 
   const [updateProject, { loading: saving }] = useMutation<
     UpdateSaasProjectMutation,

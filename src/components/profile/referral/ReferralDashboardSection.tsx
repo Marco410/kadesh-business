@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { UserIcon, Chart01Icon, UserAdd01Icon } from "@hugeicons/core-free-icons";
@@ -110,18 +111,15 @@ function ReferredUsersTab({ userId }: { userId: string }) {
 
   const users = data?.users ?? [];
   const totalPages = Math.max(1, Math.ceil(users.length / REFERRED_USERS_PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
   const paginatedUsers = users.slice(
-    (page - 1) * REFERRED_USERS_PAGE_SIZE,
-    page * REFERRED_USERS_PAGE_SIZE,
+    (currentPage - 1) * REFERRED_USERS_PAGE_SIZE,
+    currentPage * REFERRED_USERS_PAGE_SIZE,
   );
 
-  useEffect(() => {
+  useApplyOnKeyChange(userId, () => {
     setPage(1);
-  }, [userId]);
-
-  useEffect(() => {
-    setPage((p) => Math.min(p, totalPages));
-  }, [totalPages]);
+  });
 
   if (loading) {
     return (
@@ -198,25 +196,25 @@ function ReferredUsersTab({ userId }: { userId: string }) {
         {totalPages > 1 && (
           <div className="flex flex-col gap-2 border-t border-[#f0f0f0] dark:border-[#2a2a2a] px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs text-[#9e9e9e] dark:text-[#616161]">
-              {(page - 1) * REFERRED_USERS_PAGE_SIZE + 1}–
-              {Math.min(page * REFERRED_USERS_PAGE_SIZE, users.length)} de {users.length}
+              {(currentPage - 1) * REFERRED_USERS_PAGE_SIZE + 1}–
+              {Math.min(currentPage * REFERRED_USERS_PAGE_SIZE, users.length)} de {users.length}
             </p>
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
+                onClick={() => setPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
                 className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-3 py-1.5 text-xs font-medium text-[#424242] dark:text-[#bdbdbd] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 ← Anterior
               </button>
               <span className="px-2 text-xs text-[#616161] dark:text-[#9e9e9e]">
-                {page} / {totalPages}
+                {currentPage} / {totalPages}
               </span>
               <button
                 type="button"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
+                onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
                 className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-3 py-1.5 text-xs font-medium text-[#424242] dark:text-[#bdbdbd] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Siguiente →

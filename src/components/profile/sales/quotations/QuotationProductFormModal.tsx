@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation } from "@apollo/client";
 import { sileo } from "sileo";
@@ -56,23 +57,36 @@ export default function QuotationProductFormModal({
   );
   const [discountValue, setDiscountValue] = useState("");
 
-  useEffect(() => {
-    if (!isOpen) return;
-    if (mode === "edit" && product) {
-      setQuotationId(product.quotation?.id ?? "");
-      setDescription(product.description ?? "");
-      setUnitPrice(
-        product.unitPrice != null ? String(product.unitPrice) : "",
-      );
-      setQuantity(product.quantity != null ? String(product.quantity) : "");
-      setTaxRate(product.taxRate != null ? String(product.taxRate) : "");
-      setDiscountType(
-        product.discountType?.trim() || QUOTATION_DISCOUNT_TYPE.NONE,
-      );
-      setDiscountValue(
-        product.discountValue != null ? String(product.discountValue) : "",
-      );
-    } else {
+  useApplyOnKeyChange(
+    [
+      isOpen,
+      mode,
+      presetQuotationId,
+      product?.id,
+      product?.quotation?.id,
+      product?.description,
+      product?.unitPrice,
+      product?.quantity,
+      product?.taxRate,
+      product?.discountType,
+      product?.discountValue,
+    ].join("\0"),
+    () => {
+      if (!isOpen) return;
+      if (mode === "edit" && product) {
+        setQuotationId(product.quotation?.id ?? "");
+        setDescription(product.description ?? "");
+        setUnitPrice(product.unitPrice != null ? String(product.unitPrice) : "");
+        setQuantity(product.quantity != null ? String(product.quantity) : "");
+        setTaxRate(product.taxRate != null ? String(product.taxRate) : "");
+        setDiscountType(
+          product.discountType?.trim() || QUOTATION_DISCOUNT_TYPE.NONE,
+        );
+        setDiscountValue(
+          product.discountValue != null ? String(product.discountValue) : "",
+        );
+        return;
+      }
       setQuotationId(presetQuotationId?.trim() ?? "");
       setDescription("");
       setUnitPrice("");
@@ -80,8 +94,8 @@ export default function QuotationProductFormModal({
       setTaxRate("");
       setDiscountType(QUOTATION_DISCOUNT_TYPE.NONE);
       setDiscountValue("");
-    }
-  }, [isOpen, mode, product, presetQuotationId]);
+    },
+  );
 
   const [createProduct, { loading: creating }] = useMutation<
     CreateSaasQuotationProductResponse,

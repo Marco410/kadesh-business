@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
+import { useApplyOnKeyChange } from 'kadesh/utils/useApplyOnKeyChange';
 import RequiredFieldMark from './RequiredFieldMark';
 
 /** Lowercase + sin acentos (fab → fábricas). */
@@ -90,13 +91,17 @@ export default function Autocomplete({
     };
   }, []);
 
-  useEffect(() => {
+  const selectedLabel = selectedOption
+    ? String(selectedOption[displayKey] || '')
+    : '';
+
+  useApplyOnKeyChange(`${value}\0${selectedLabel}\0${displayKey}`, () => {
     if (selectedOption) {
       setSearch(selectedOption[displayKey] || '');
     } else if (!value) {
       setSearch('');
     }
-  }, [value, selectedOption, displayKey]);
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newSearch = e.target.value;
@@ -221,7 +226,7 @@ export default function Autocomplete({
         {/* No results message */}
         {showDropdown && !disabled && !loading && search && filteredOptions.length === 0 && (
           <div className={`absolute z-[200] w-full mt-1 bg-white dark:bg-[#121212] border border-[#e0e0e0] dark:border-[#3a3a3a] rounded-lg shadow-xl p-4 text-center text-[#616161] dark:text-[#b0b0b0] ${dropdownClassName}`}>
-            No se encontraron resultados que coincidan con "{search}"
+            No se encontraron resultados que coincidan con &quot;{search}&quot;
           </div>
         )}
       </div>

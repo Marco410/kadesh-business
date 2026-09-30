@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useLazyQuery } from "@apollo/client";
 import { sileo } from "sileo";
 import { PLAN_FEATURE_KEYS } from "kadesh/constants/constans";
@@ -101,30 +102,30 @@ export function useAdminCompanySubscriptions(
     [],
   );
 
-  useEffect(() => {
+  const companyIdsKey = companyIds.join("\0");
+
+  useApplyOnKeyChange(companyIdsKey, () => {
     const uniqueCompanyIds = Array.from(new Set(companyIds)).filter(Boolean);
     if (uniqueCompanyIds.length === 0) {
       setSubscriptionByCompanyId({});
       setDraftBySubscriptionId({});
+      setLoadingSubscriptions(false);
       return;
     }
+    setLoadingSubscriptions(true);
+  });
+
+  useEffect(() => {
+    const uniqueCompanyIds = Array.from(new Set(companyIds)).filter(Boolean);
+    if (uniqueCompanyIds.length === 0) return;
 
     let cancelled = false;
-    const run = async () => {
-      setLoadingSubscriptions(true);
-      try {
-        await Promise.all(
-          uniqueCompanyIds.map(async (companyId) => {
-            if (cancelled) return;
-            await refreshCompanySubscription(companyId, false);
-          }),
-        );
-      } finally {
-        if (!cancelled) setLoadingSubscriptions(false);
-      }
-    };
+    Promise.all(
+      uniqueCompanyIds.map((companyId) => refreshCompanySubscription(companyId, false)),
+    ).finally(() => {
+      if (!cancelled) setLoadingSubscriptions(false);
+    });
 
-    run();
     return () => {
       cancelled = true;
     };

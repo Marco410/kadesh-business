@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -19,6 +19,7 @@ import {
 import { TourHelpButton } from "kadesh/components/onboarding";
 import { Routes } from "kadesh/core/routes";
 import { cn } from "kadesh/utils/cn";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useUser } from "kadesh/utils/UserContext";
 import { isAdminCompanyUser } from "kadesh/utils/user-roles";
 import PanelControlSection from "./PanelControlSection";
@@ -153,9 +154,9 @@ function PanelPageSectionContent() {
     };
   }, [updateIndicator]);
 
-  useEffect(() => {
+  useApplyOnKeyChange(`${tabFromUrl ?? ""}\0${canAccessExtraccion}`, () => {
     setActiveTab(getMainTabFromUrl(tabFromUrl, canAccessExtraccion));
-  }, [tabFromUrl, canAccessExtraccion]);
+  });
 
   const handleMainTabChange = (key: PanelMainTab) => {
     setActiveTab(key);

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -40,9 +41,9 @@ export default function LeadProjectsModal({
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const canCreateProject = Boolean(leadId && userId);
 
-  useEffect(() => {
+  useApplyOnKeyChange(isOpen, () => {
     if (!isOpen) setIsCreateProjectOpen(false);
-  }, [isOpen]);
+  });
 
   return (
     <ModalPortal>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -11,6 +11,7 @@ import {
   Edit02Icon,
 } from "@hugeicons/core-free-icons";
 import { Routes } from "kadesh/core/routes";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { USER_COMPANY_CATEGORIES_QUERY } from "kadesh/components/profile/sales/queries";
 import {
   UPDATE_USER_MUTATION,
@@ -65,11 +66,14 @@ export default function ReferralLinkSection({
     setFormCardNumber((cardNumber ?? "").trim());
   }, [bank, clabe, cardNumber]);
 
-  useEffect(() => {
-    if (!isEditing) {
-      syncFormFromProps();
-    }
-  }, [isEditing, syncFormFromProps]);
+  useApplyOnKeyChange(
+    [isEditing, bank ?? "", clabe ?? "", cardNumber ?? ""].join("\0"),
+    () => {
+      if (!isEditing) {
+        syncFormFromProps();
+      }
+    },
+  );
 
   const [updateUser, { loading: saving }] = useMutation<
     UpdateUserResponse,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
@@ -24,6 +24,7 @@ import {
 } from "kadesh/components/profile/sales/workspaces/queries";
 import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces/merge-workspace-where";
 import { Role, TASK_PRIORITY } from "kadesh/constants/constans";
+import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useUser } from "kadesh/utils/UserContext";
 
 const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
@@ -98,7 +99,7 @@ export default function CreateWorkspaceTechTaskModal({
     }));
   }, [wsDetail?.saasWorkspace?.members]);
 
-  useEffect(() => {
+  useApplyOnKeyChange(isOpen, () => {
     if (!isOpen) return;
     setTitle("");
     setStartDate(formatDateForInput(new Date().toISOString()));
@@ -107,7 +108,7 @@ export default function CreateWorkspaceTechTaskModal({
     setComments("");
     setLeadId("");
     setResponsibleUserId("");
-  }, [isOpen]);
+  });
 
   const boardWhere: TechTasksVariables["where"] = mergeWorkspaceFilter({}, workspaceId);
 

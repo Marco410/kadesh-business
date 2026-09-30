@@ -25,6 +25,7 @@ import {
   type LeadSyncSource,
 } from "kadesh/components/profile/sales/obtener-clientes/hooks";
 import RoleAccessDeniedSection from "../RoleAccessDeniedSection";
+import { useIsClient } from "kadesh/utils/useIsClient";
 import { useUser } from "kadesh/utils/UserContext";
 import { isAdminCompanyUser } from "kadesh/utils/user-roles";
 import { sileo } from "sileo";
@@ -320,7 +321,7 @@ export default function ObtenerClientesSection({
   } = useSyncLeadsArea();
   const { user, loading: userLoading } = useUser();
   const { resolvedTheme } = useTheme();
-  const [themeMounted, setThemeMounted] = useState(false);
+  const themeMounted = useIsClient();
   const reduceMotion = useReducedMotion();
   const motionTransition = reduceMotion
     ? { duration: 0 }
@@ -334,10 +335,6 @@ export default function ObtenerClientesSection({
   const circleRef = useRef<LeafletCircle | null>(null);
   const filtersPopoverRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    setThemeMounted(true);
-  }, []);
 
   const applyLeadMapBaseLayer = useCallback(() => {
     const L = window.L;
