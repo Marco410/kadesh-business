@@ -71,6 +71,12 @@ const PET_PLACE_DETAIL_FIELDS = gql`
       status
       active
     }
+    schedules: pet_place_schedules {
+      id
+      day
+      timeIni
+      timeEnd
+    }
   }
 `;
 
@@ -456,6 +462,25 @@ export const ADMIN_PET_PLACE_TYPES_QUERY = gql`
 export type AdminPetPlaceTypesResponse = {
   petPlaceTypes: AdminPetPlaceTypeOption[];
 };
+
+export const DELETE_PET_PLACE_SCHEDULES_MUTATION = gql`
+  mutation DeleteAdminPetPlaceSchedules($where: [ScheduleWhereUniqueInput!]!) {
+    deleteSchedules(where: $where) {
+      id
+    }
+  }
+`;
+
+export const CREATE_PET_PLACE_SCHEDULES_MUTATION = gql`
+  mutation CreateAdminPetPlaceSchedules($data: [ScheduleCreateInput!]!) {
+    createSchedules(data: $data) {
+      id
+      day
+      timeIni
+      timeEnd
+    }
+  }
+`;
 
 export const CREATE_PET_PLACE_SERVICE_MUTATION = gql`
   mutation CreateAdminPetPlaceService($data: PetPlaceServiceCreateInput!) {
