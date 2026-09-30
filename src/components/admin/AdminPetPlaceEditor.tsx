@@ -10,7 +10,9 @@ import {
   ADMIN_PET_PLACE_CATALOG_SERVICES_QUERY,
   ADMIN_PET_PLACE_DETAIL_QUERY,
   ADMIN_PET_PLACE_TYPES_QUERY,
+  CREATE_PET_PLACE_SCHEDULES_MUTATION,
   CREATE_PET_PLACE_SERVICE_MUTATION,
+  DELETE_PET_PLACE_SCHEDULES_MUTATION,
   UPDATE_PET_PLACE_MUTATION,
   type AdminPetPlaceCatalogServicesResponse,
   type AdminPetPlaceDetailResponse,
@@ -18,8 +20,10 @@ import {
 } from "./queries";
 import {
   PET_PLACE_PIPELINE_OPTIONS,
+  PET_PLACE_SCHEDULE_HOURS,
   PET_PLACE_SERVICE_STATUS,
   PET_PLACE_TYPE_OPTIONS,
+  PET_PLACE_WEEK_DAYS,
 } from "./constants";
 import type { AdminPetPlaceDetail } from "./types";
 import { AdminErrorState } from "./ui";
@@ -33,6 +37,13 @@ const inputClass =
 
 const textareaClass =
   "min-h-28 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:opacity-60";
+
+type PlaceScheduleSlot = {
+  key: string;
+  day: string;
+  timeIni: number;
+  timeEnd: number;
+};
 
 type PlaceDraft = {
   name: string;
@@ -55,7 +66,82 @@ type PlaceDraft = {
   pipelineStatus: string;
   typeIds: string[];
   serviceIds: string[];
+  schedules: PlaceScheduleSlot[];
 };
+
+let scheduleKey = 0;
+
+function nextScheduleKey() {
+  scheduleKey += 1;
+  return `slot-${scheduleKey}`;
+}
+
+function formatHour(hour: number) {
+  return `${String(hour).padStart(2, "0")}:00`;
+}
+
+function dayOrder(day: string) {
+  const index = PET_PLACE_WEEK_DAYS.indexOf(
+    day as (typeof PET_PLACE_WEEK_DAYS)[number],
+  );
+  return index === -1 ? PET_PLACE_WEEK_DAYS.length : index;
+}
+
+function toScheduleSlots(
+  rows: AdminPetPlaceDetail["schedules"],
+): PlaceScheduleSlot[] {
+  return [...rows]
+    .filter(
+      (row) =>
+        row.day &&
+        Number.isInteger(row.timeIni) &&
+        Number.isInteger(row.timeEnd),
+    )
+    .sort((a, b) => {
+      const byDay = dayOrder(a.day ?? "") - dayOrder(b.day ?? "");
+      if (byDay !== 0) return byDay;
+      return (a.timeIni ?? 0) - (b.timeIni ?? 0);
+    })
+    .map((row) => ({
+      key: row.id || nextScheduleKey(),
+      day: row.day as string,
+      timeIni: row.timeIni as number,
+      timeEnd: row.timeEnd as number,
+    }));
+}
+
+function scheduleSignature(slots: PlaceScheduleSlot[]) {
+  return [...slots]
+    .map((slot) => `${slot.day}|${slot.timeIni}|${slot.timeEnd}`)
+    .sort()
+    .join(";");
+}
+
+function scheduleError(slots: PlaceScheduleSlot[]): string | null {
+  for (const slot of slots) {
+    if (
+      !PET_PLACE_WEEK_DAYS.includes(
+        slot.day as (typeof PET_PLACE_WEEK_DAYS)[number],
+      )
+    ) {
+      return "Hay un día de horario que no reconocemos.";
+    }
+    if (
+      !Number.isInteger(slot.timeIni) ||
+      !Number.isInteger(slot.timeEnd) ||
+      slot.timeIni < 0 ||
+      slot.timeIni > 23 ||
+      slot.timeEnd < 0 ||
+      slot.timeEnd > 23
+    ) {
+      return "Las horas deben estar entre 0 y 23.";
+    }
+    if (slot.timeEnd <= slot.timeIni) {
+      return "La hora de cierre debe ser posterior a la de apertura.";
+    }
+  }
+  return null;
+}
 
 function toDraft(place: AdminPetPlaceDetail): PlaceDraft {
   return {
@@ -79,6 +165,7 @@ function toDraft(place: AdminPetPlaceDetail): PlaceDraft {
     pipelineStatus: place.pipelineStatus ?? PIPELINE_STATUS.DETECTADO,
     typeIds: place.types.map((t) => t.id),
     serviceIds: place.services.map((s) => s.id),
+    schedules: toScheduleSlots(place.schedules ?? []),
   };
 }
 
@@ -208,6 +295,8 @@ function EditorBody({
 
   const [updatePetPlace] = useMutation(UPDATE_PET_PLACE_MUTATION);
   const [createService] = useMutation(CREATE_PET_PLACE_SERVICE_MUTATION);
+  const [deleteSchedules] = useMutation(DELETE_PET_PLACE_SCHEDULES_MUTATION);
+  const [createSchedules] = useMutation(CREATE_PET_PLACE_SCHEDULES_MUTATION);
 
   const place = data?.petPlace ?? null;
   const typeOptions = typesData?.petPlaceTypes ?? [];
@@ -256,8 +345,12 @@ function EditorBody({
         draft.appointmentRequired !== initial.appointmentRequired ||
         draft.pipelineStatus !== initial.pipelineStatus ||
         !sameIds(draft.typeIds, initial.typeIds) ||
-        !sameIds(draft.serviceIds, initial.serviceIds)),
+        !sameIds(draft.serviceIds, initial.serviceIds) ||
+        scheduleSignature(draft.schedules) !==
+          scheduleSignature(initial.schedules)),
   );
+
+  const hoursError = draft ? scheduleError(draft.schedules) : null;
 
   const canSave =
     Boolean(hasChanges) &&
@@ -265,6 +358,7 @@ function EditorBody({
     !descriptionError &&
     !emailError &&
     !typesError &&
+    !hoursError &&
     !saving;
 
   function patch(next: Partial<PlaceDraft>) {
@@ -277,6 +371,33 @@ function EditorBody({
       typeIds: draft.typeIds.includes(typeId)
         ? draft.typeIds.filter((id) => id !== typeId)
         : [...draft.typeIds, typeId],
+    });
+  }
+
+  function updateSchedule(
+    key: string,
+    next: Partial<Pick<PlaceScheduleSlot, "day" | "timeIni" | "timeEnd">>,
+  ) {
+    if (!draft) return;
+    patch({
+      schedules: draft.schedules.map((slot) =>
+        slot.key === key ? { ...slot, ...next } : slot,
+      ),
+    });
+  }
+
+  function removeSchedule(key: string) {
+    if (!draft) return;
+    patch({ schedules: draft.schedules.filter((slot) => slot.key !== key) });
+  }
+
+  function addSchedule() {
+    if (!draft) return;
+    patch({
+      schedules: [
+        ...draft.schedules,
+        { key: nextScheduleKey(), day: "Lunes", timeIni: 9, timeEnd: 18 },
+      ],
     });
   }
 
@@ -411,13 +532,47 @@ function EditorBody({
       changes.services = { set: draft.serviceIds.map((id) => ({ id })) };
     }
 
-    if (Object.keys(changes).length === 0) return;
+    const schedulesChanged =
+      scheduleSignature(draft.schedules) !== scheduleSignature(initial.schedules);
+    if (schedulesChanged) {
+      const hoursIssue = scheduleError(draft.schedules);
+      if (hoursIssue) {
+        sileo.warning({ title: hoursIssue });
+        return;
+      }
+    }
+
+    if (Object.keys(changes).length === 0 && !schedulesChanged) return;
 
     setSaving(true);
     try {
-      await updatePetPlace({
-        variables: { where: { id: place.id }, data: changes },
-      });
+      if (Object.keys(changes).length > 0) {
+        await updatePetPlace({
+          variables: { where: { id: place.id }, data: changes },
+        });
+      }
+      if (schedulesChanged) {
+        const existingIds = (place.schedules ?? [])
+          .map((row) => row.id)
+          .filter(Boolean);
+        if (existingIds.length > 0) {
+          await deleteSchedules({
+            variables: { where: existingIds.map((id) => ({ id })) },
+          });
+        }
+        if (draft.schedules.length > 0) {
+          await createSchedules({
+            variables: {
+              data: draft.schedules.map((slot) => ({
+                day: slot.day,
+                timeIni: slot.timeIni,
+                timeEnd: slot.timeEnd,
+                pet_place: { connect: { id: place.id } },
+              })),
+            },
+          });
+        }
+      }
       await refetch();
       setEdits({});
       onSaved?.();
@@ -653,6 +808,109 @@ function EditorBody({
                   </select>
                 </Field>
               </div>
+            </section>
+
+            <section>
+              <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+                Horario
+              </h4>
+              <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+                Horario semanal de apertura. Un día sin fila está cerrado. La
+                hora de cierre tiene que ser después de la de apertura.
+              </p>
+              {hoursError ? (
+                <p className="text-xs text-red-600 dark:text-red-400 mb-2">
+                  {hoursError}
+                </p>
+              ) : null}
+              {draft.schedules.length === 0 ? (
+                <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mb-3">
+                  Sin horario. La ficha se muestra cerrada.
+                </p>
+              ) : (
+                <ul className="flex flex-col gap-2 mb-3">
+                  {draft.schedules.map((slot) => (
+                    <li
+                      key={slot.key}
+                      className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center"
+                    >
+                      <label className="block">
+                        <span className="sr-only">Día</span>
+                        <select
+                          value={slot.day}
+                          disabled={saving}
+                          onChange={(e) =>
+                            updateSchedule(slot.key, { day: e.target.value })
+                          }
+                          className={inputClass}
+                        >
+                          {PET_PLACE_WEEK_DAYS.map((day) => (
+                            <option key={day} value={day}>
+                              {day}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="block">
+                        <span className="sr-only">Apertura</span>
+                        <select
+                          value={slot.timeIni}
+                          disabled={saving}
+                          onChange={(e) =>
+                            updateSchedule(slot.key, {
+                              timeIni: Number(e.target.value),
+                            })
+                          }
+                          className={inputClass}
+                        >
+                          {PET_PLACE_SCHEDULE_HOURS.map((hour) => (
+                            <option key={hour} value={hour}>
+                              Abre {formatHour(hour)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="block">
+                        <span className="sr-only">Cierre</span>
+                        <select
+                          value={slot.timeEnd}
+                          disabled={saving}
+                          onChange={(e) =>
+                            updateSchedule(slot.key, {
+                              timeEnd: Number(e.target.value),
+                            })
+                          }
+                          className={inputClass}
+                        >
+                          {PET_PLACE_SCHEDULE_HOURS.map((hour) => (
+                            <option key={hour} value={hour}>
+                              Cierra {formatHour(hour)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <button
+                        type="button"
+                        disabled={saving}
+                        onClick={() => removeSchedule(slot.key)}
+                        className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#424242] dark:text-[#e0e0e0] cursor-pointer disabled:opacity-60"
+                        aria-label={`Quitar horario de ${slot.day}`}
+                      >
+                        <HugeiconsIcon icon={Cancel01Icon} size={16} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <button
+                type="button"
+                disabled={saving}
+                onClick={addSchedule}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-4 text-sm font-semibold cursor-pointer disabled:opacity-60 hover:border-orange-300"
+              >
+                <HugeiconsIcon icon={Add01Icon} size={18} />
+                Agregar horario
+              </button>
             </section>
 
             <section>
