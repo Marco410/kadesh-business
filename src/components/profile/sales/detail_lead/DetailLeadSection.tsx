@@ -37,6 +37,7 @@ import { Field, SectionCard, asExternalHref, leadInputClassName } from "./LeadDe
 import { LeadGoogleInfoCard, LeadInegiInfoCard } from "./LeadSourceInfoCards";
 import { GoogleMapsMark, InegiMark } from "../obtener-clientes/SourceMarks";
 import { getCategoryLabel } from "../helpers/category";
+import { CopyPhoneButton } from "../CopyPhoneButton";
 import { sileo } from "sileo";
 import { useUser } from "kadesh/utils/UserContext";
 import { formatDateShort } from "kadesh/utils/format-date";
@@ -408,12 +409,15 @@ export default function DetailLeadSection() {
             <Field label="Teléfono">
               {lead.phone ? (
                 <div className="flex flex-col gap-1.5">
-                  <a
-                    href={`tel:${lead.phone.replace(/\s/g, "")}`}
-                    className="text-orange-500 dark:text-orange-400 hover:underline w-fit"
-                  >
-                    {lead.phone}
-                  </a>
+                  <span className="inline-flex items-center gap-1">
+                    <a
+                      href={`tel:${lead.phone.replace(/\s/g, "")}`}
+                      className="text-orange-500 dark:text-orange-400 hover:underline w-fit"
+                    >
+                      {lead.phone}
+                    </a>
+                    <CopyPhoneButton phone={lead.phone} />
+                  </span>
                   {leadWhatsappDigits ? (
                     <a
                       href={`https://wa.me/${leadWhatsappDigits}`}
