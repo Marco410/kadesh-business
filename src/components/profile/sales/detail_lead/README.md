@@ -24,7 +24,7 @@ Un mismo negocio puede existir como Google y como INEGI; esta ficha muestra la f
 ## Copy
 
 - En UI: **cliente**, no “lead” en títulos.
-- WhatsApp y teléfono son acciones, no texto plano.
+- WhatsApp y teléfono son acciones, no texto plano. Junto al teléfono hay el mismo botón de copiar que en la tabla de Clientes; el icono pasa a palomita un momento.
 - No mencionar GraphQL, CLEE ni el establecimiento interno.
 
 ## Acceso

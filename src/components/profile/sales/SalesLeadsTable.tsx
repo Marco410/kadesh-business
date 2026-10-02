@@ -10,6 +10,7 @@ import { getCategoryLabel } from "./helpers/category";
 import { ApolloError } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
+import { CopyPhoneButton } from "./CopyPhoneButton";
 import {
   getVisiblePageItems,
   LEADS_PAGE_SIZES,
@@ -228,14 +229,18 @@ export default function SalesLeadsTable({
                   <td
                     className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0] whitespace-nowrap"
                     onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => e.stopPropagation()}
                   >
                     {lead.phone ? (
-                      <a
-                        href={`tel:${lead.phone.replace(/\s/g, "")}`}
-                        className="text-orange-500 dark:text-orange-400 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded"
-                      >
-                        {lead.phone}
-                      </a>
+                      <span className="inline-flex items-center gap-1">
+                        <a
+                          href={`tel:${lead.phone.replace(/\s/g, "")}`}
+                          className="text-orange-500 dark:text-orange-400 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded"
+                        >
+                          {lead.phone}
+                        </a>
+                        <CopyPhoneButton phone={lead.phone} />
+                      </span>
                     ) : (
                       "—"
                     )}
