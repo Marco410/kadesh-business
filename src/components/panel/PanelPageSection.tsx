@@ -23,6 +23,8 @@ import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useUser } from "kadesh/utils/UserContext";
 import { isAdminCompanyUser } from "kadesh/utils/user-roles";
 import PanelControlSection from "./PanelControlSection";
+import PanelControlSkeleton from "./PanelControlSkeleton";
+import PanelMapSkeleton from "./PanelMapSkeleton";
 import { ObtenerClientesPageContent } from "kadesh/components/profile/sales/obtener-clientes";
 
 type PanelMainTab = "control" | "extraccion";
@@ -96,7 +98,7 @@ function PanelPageSectionContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
-  const { user } = useUser();
+  const { user, loading: userLoading } = useUser();
   const canAccessExtraccion = isAdminCompanyUser(user);
   const { data: userData } = useQuery<
     UserCompanyCategoriesResponse,
@@ -110,14 +112,14 @@ function PanelPageSectionContent() {
     useRemainingCredits(companyId);
   const visibleTabs = useMemo(
     () =>
-      canAccessExtraccion
+      userLoading || canAccessExtraccion
         ? mainTabs
         : mainTabs.filter((tab) => tab.key !== "extraccion"),
-    [canAccessExtraccion]
+    [userLoading, canAccessExtraccion],
   );
 
   const [activeTab, setActiveTab] = useState<PanelMainTab>(() =>
-    getMainTabFromUrl(tabFromUrl, false)
+    tabFromUrl ? "control" : "extraccion",
   );
   const tablistRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<Record<PanelMainTab, HTMLButtonElement | null>>({
@@ -154,9 +156,16 @@ function PanelPageSectionContent() {
     };
   }, [updateIndicator]);
 
-  useApplyOnKeyChange(`${tabFromUrl ?? ""}\0${canAccessExtraccion}`, () => {
-    setActiveTab(getMainTabFromUrl(tabFromUrl, canAccessExtraccion));
-  });
+  useApplyOnKeyChange(
+    `${tabFromUrl ?? ""}\0${canAccessExtraccion}\0${userLoading}`,
+    () => {
+      if (userLoading) {
+        setActiveTab(tabFromUrl ? "control" : "extraccion");
+        return;
+      }
+      setActiveTab(getMainTabFromUrl(tabFromUrl, canAccessExtraccion));
+    },
+  );
 
   const handleMainTabChange = (key: PanelMainTab) => {
     setActiveTab(key);
@@ -240,7 +249,13 @@ function PanelPageSectionContent() {
        
           </div>
 
-          {activeTab === "control" || !canAccessExtraccion ? (
+          {userLoading ? (
+            tabFromUrl ? (
+              <PanelControlSkeleton embedded />
+            ) : (
+              <PanelMapSkeleton />
+            )
+          ) : activeTab === "control" || !canAccessExtraccion ? (
             <PanelControlSection embedded />
           ) : (
             <ObtenerClientesPageContent
@@ -255,17 +270,31 @@ function PanelPageSectionContent() {
   );
 }
 
-function PanelPageSectionFallback() {
+function PanelPageSectionFallback({
+  initialTab,
+}: {
+  initialTab: string | null;
+}) {
   return (
-    <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#0a0a0a] flex items-center justify-center">
-      <div className="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent" />
+    <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#0a0a0a]">
+      <Navigation />
+      <div className="pt-18 pb-5">
+        <div className="mx-auto px-2 sm:px-3 lg:px-4">
+          {initialTab ? <PanelControlSkeleton embedded /> : <PanelMapSkeleton />}
+        </div>
+      </div>
     </div>
   );
 }
 
-export default function PanelPageSection() {
+export default function PanelPageSection({
+  initialTab = null,
+}: {
+  /** `tab` de la URL. Sin valor, la ruta es el mapa (`/panel`). */
+  initialTab?: string | null;
+}) {
   return (
-    <Suspense fallback={<PanelPageSectionFallback />}>
+    <Suspense fallback={<PanelPageSectionFallback initialTab={initialTab} />}>
       <PanelPageSectionContent />
     </Suspense>
   );
