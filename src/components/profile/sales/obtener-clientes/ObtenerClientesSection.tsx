@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useTheme } from "next-themes";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -37,7 +37,17 @@ import {
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import LeadsStatsCards, { type LeadsStatsCardsHandle } from "./LeadsStatsCards";
+import LeadMapCategoryPanel from "./LeadMapCategoryPanel";
 import { GoogleMapsMark, InegiMark } from "./SourceMarks";
+import { useCompanyLeadLocations } from "./hooks/useCompanyLeadLocations";
+import {
+  UNCATEGORIZED_LEAD_CATEGORY,
+  buildLeadCategoryStats,
+  clientDotRadius,
+  readLeadCoordinate,
+} from "./leadCategoryColors";
+import { readLeadMapView, writeLeadMapView } from "./leadMapView";
+import { useFitLeadMapStage } from "./useFitLeadMapStage";
 
 const GOOGLE_CATEGORY_OPTIONS: AutocompleteOption[] =
   GOOGLE_PLACE_CATEGORIES.map((opt) => ({
@@ -98,6 +108,90 @@ function raiseLeadMapOverlays(
   marker?.bringToFront?.();
 }
 
+function sortPointsFromCenter<T extends { lat: number; lng: number }>(
+  points: readonly T[],
+  center: { lat: number; lng: number },
+): T[] {
+  return [...points].sort((a, b) => {
+    const da = (a.lat - center.lat) ** 2 + (a.lng - center.lng) ** 2;
+    const db = (b.lat - center.lat) ** 2 + (b.lng - center.lng) ** 2;
+    return da - db;
+  });
+}
+
+/** El velo sigue hasta que las calles están pintadas, no solo hasta que carga el script. */
+function watchLeadMapFirstPaint(
+  getLayer: () => LeafletTileLayer | null,
+  onPainted: () => void,
+): () => void {
+  let disposed = false;
+  let painted = false;
+  let pollId = 0;
+  let timeoutId = 0;
+  let bound: MapLibreMapHandle | null = null;
+  let onSignal: (() => void) | null = null;
+
+  const finish = () => {
+    if (disposed || painted) return;
+    painted = true;
+    window.clearTimeout(timeoutId);
+    window.clearInterval(pollId);
+    if (bound && onSignal) {
+      try {
+        bound.off("idle", onSignal);
+        bound.off("load", onSignal);
+      } catch {
+        // El mapa ya no está; igual hay que quitar el velo.
+      }
+    }
+    onPainted();
+  };
+
+  const bind = () => {
+    if (disposed || bound) return;
+    const gl = getLayer()?.getMaplibreMap?.();
+    if (!gl || typeof gl.loaded !== "function" || typeof gl.on !== "function") {
+      return;
+    }
+    bound = gl;
+    onSignal = () => {
+      try {
+        if (!gl.loaded()) return;
+      } catch {
+        return;
+      }
+      finish();
+    };
+    try {
+      gl.on("load", onSignal);
+      gl.on("idle", onSignal);
+      onSignal();
+    } catch {
+      bound = null;
+      onSignal = null;
+    }
+  };
+
+  timeoutId = window.setTimeout(finish, MAP_PAINT_TIMEOUT_MS);
+  bind();
+  if (!bound) {
+    pollId = window.setInterval(() => {
+      bind();
+      if (bound) window.clearInterval(pollId);
+    }, 50);
+  }
+
+  return () => {
+    disposed = true;
+    window.clearTimeout(timeoutId);
+    window.clearInterval(pollId);
+    if (bound && onSignal) {
+      bound.off("idle", onSignal);
+      bound.off("load", onSignal);
+    }
+  };
+}
+
 function isDarkMapTheme(resolvedTheme: string | undefined): boolean {
   if (
     typeof document !== "undefined" &&
@@ -121,6 +215,16 @@ function applyLeadMapThemeClass(
 /** Ciudad de México — ubicación por defecto al cargar el mapa */
 const DEFAULT_CENTER = { lat: 19.4326, lng: -99.1332 };
 const DEFAULT_ZOOM = 10;
+/** Si las calles no avisan, el velo no se queda para siempre. */
+const MAP_PAINT_TIMEOUT_MS = 8000;
+/** Si el velo sigue, el usuario puede recargar la página. */
+const MAP_RELOAD_BUTTON_DELAY_MS = 5000;
+/** El mapa se lee primero; los puntos entran cuando el velo ya se está yendo. */
+const CLIENT_DOTS_REVEAL_DELAY_MS = 420;
+const CLIENT_DOTS_INTRO_MS = 680;
+/** Tras una búsqueda, cada cliente nuevo se pinta desde el centro, no todos a la vez. */
+const SEARCH_DOT_STAGGER_MS = 48;
+const SEARCH_DOTS_MAX_MS = 2600;
 const DEFAULT_RADIUS_KM = 5;
 const RADIUS_OPTIONS_KM = [2, 5, 10, 25, 50] as const;
 /** DENUE en vivo no pasa de 5 km; el catálogo en BD sí admite radios mayores, pero aquí solo ofrecemos 2 y 5. */
@@ -221,7 +325,9 @@ interface LeafletLayer {
   bringToBack?(): LeafletLayer;
   bringToFront?(): LeafletLayer;
 }
-interface LeafletTileLayer extends LeafletLayer {}
+interface LeafletTileLayer extends LeafletLayer {
+  getMaplibreMap?: () => MapLibreMapHandle | undefined;
+}
 interface LeafletMap {
   setView(center: [number, number], zoom: number): LeafletMap;
   getZoom(): number;
@@ -230,11 +336,31 @@ interface LeafletMap {
     event: string,
     fn: (e: { latlng: { lat: number; lng: number } }) => void,
   ): void;
+  off(
+    event: string,
+    fn: (e: { latlng: { lat: number; lng: number } }) => void,
+  ): void;
+  getCenter(): { lat: number; lng: number };
   removeLayer(layer: LeafletTileLayer): LeafletMap;
   invalidateSize(): void;
   remove(): void;
   createPane(name: string): void;
   getPane(name: string): HTMLElement | undefined;
+}
+interface MapLibreMapHandle {
+  loaded(): boolean;
+  on(event: string, fn: () => void): void;
+  off(event: string, fn: () => void): void;
+}
+interface LeafletCircleMarker {
+  setRadius(radius: number): void;
+  setStyle(style: { fillColor?: string; radius?: number }): void;
+  addTo(layer: LeafletLayerGroup): LeafletCircleMarker;
+}
+interface LeafletLayerGroup {
+  addTo(map: LeafletMap): LeafletLayerGroup;
+  clearLayers(): void;
+  removeLayer(layer: LeafletCircleMarker): void;
 }
 interface LeafletMarker {
   setLatLng(latlng: [number, number]): LeafletMarker;
@@ -251,7 +377,7 @@ interface LeafletCircle {
 declare global {
   interface Window {
     L?: {
-      map(el: HTMLElement): LeafletMap;
+      map(el: HTMLElement, options?: { preferCanvas?: boolean }): LeafletMap;
       divIcon(options: {
         className: string;
         html: string;
@@ -273,6 +399,20 @@ declare global {
           dashArray?: string;
         },
       ): LeafletCircle;
+      circleMarker(
+        latlng: [number, number],
+        options: {
+          pane?: string;
+          radius: number;
+          color?: string;
+          opacity?: number;
+          fillColor?: string;
+          fillOpacity?: number;
+          weight?: number;
+          interactive?: boolean;
+        },
+      ): LeafletCircleMarker;
+      layerGroup(): LeafletLayerGroup;
       tileLayer(
         url: string,
         options: { attribution: string; subdomains?: string; maxZoom?: number },
@@ -312,7 +452,14 @@ export default function ObtenerClientesSection({
   const [showZeroResultsHint, setShowZeroResultsHint] = useState(false);
   const [resultDismissed, setResultDismissed] = useState(false);
   const [leafletReady, setLeafletReady] = useState(false);
+  const [mapVisualReady, setMapVisualReady] = useState(false);
+  const [showMapReload, setShowMapReload] = useState(false);
+  const [clientDotsReady, setClientDotsReady] = useState(false);
+  const [mapEpoch, setMapEpoch] = useState(0);
   const [locatingUser, setLocatingUser] = useState(false);
+  const [hiddenCategories, setHiddenCategories] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
 
   const {
     syncLeadsArea,
@@ -320,6 +467,9 @@ export default function ObtenerClientesSection({
     error: syncError,
   } = useSyncLeadsArea();
   const { user, loading: userLoading } = useUser();
+  const canExtractLeads = isAdminCompanyUser(user);
+  const { leads: companyLeads, refetch: refetchMapLeads } =
+    useCompanyLeadLocations(canExtractLeads && !userLoading);
   const { resolvedTheme } = useTheme();
   const themeMounted = useIsClient();
   const reduceMotion = useReducedMotion();
@@ -330,9 +480,21 @@ export default function ObtenerClientesSection({
   const statsRef = useRef<LeadsStatsCardsHandle>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
+  const invalidateMapSize = useCallback(() => {
+    mapRef.current?.invalidateSize();
+  }, []);
+  const setMapStage = useFitLeadMapStage(invalidateMapSize);
   const tileLayerRef = useRef<LeafletTileLayer | null>(null);
   const markerRef = useRef<LeafletMarker | null>(null);
   const circleRef = useRef<LeafletCircle | null>(null);
+  const clientDotsRef = useRef<LeafletLayerGroup | null>(null);
+  const dotsIntroPlayedRef = useRef(false);
+  const paintIncomingRef = useRef(false);
+  const markersByIdRef = useRef<Map<string, LeafletCircleMarker>>(new Map());
+  const pinRef = useRef(pin);
+  pinRef.current = pin;
+  /** El pin restaurado no debe volver a centrar el mapa encima de la última vista. */
+  const restoredPinRef = useRef<{ lat: number; lng: number } | null>(null);
   const filtersPopoverRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -388,7 +550,7 @@ export default function ObtenerClientesSection({
   }, []);
 
   const updateMapOverlays = useCallback(
-    (lat: number, lng: number, rKm: number) => {
+    (lat: number, lng: number, rKm: number, recenter = true) => {
       const L = window.L;
       const map = mapRef.current;
       if (!L || !map) return;
@@ -417,6 +579,8 @@ export default function ObtenerClientesSection({
 
       raiseLeadMapOverlays(markerRef.current, circleRef.current);
 
+      if (!recenter) return;
+
       const currentZoom = map.getZoom();
       map.setView([lat, lng], currentZoom);
     },
@@ -428,11 +592,22 @@ export default function ObtenerClientesSection({
     const container = mapContainerRef.current;
     if (!leafletReady || !container || !L) return;
 
-    const map = L.map(container).setView(
-      [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
-      DEFAULT_ZOOM,
+    const storedView = readLeadMapView();
+    const cameraLat = storedView?.lat ?? DEFAULT_CENTER.lat;
+    const cameraLng = storedView?.lng ?? DEFAULT_CENTER.lng;
+    const cameraZoom = storedView?.zoom ?? DEFAULT_ZOOM;
+    const pinLat = storedView?.pinLat ?? DEFAULT_CENTER.lat;
+    const pinLng = storedView?.pinLng ?? DEFAULT_CENTER.lng;
+    const restoredPin = { lat: pinLat, lng: pinLng };
+
+    const map = L.map(container, { preferCanvas: true }).setView(
+      [cameraLat, cameraLng],
+      cameraZoom,
     );
     mapRef.current = map;
+    pinRef.current = restoredPin;
+    restoredPinRef.current = restoredPin;
+    setPin(restoredPin);
 
     map.createPane("leadMapBase");
     const basePane = map.getPane("leadMapBase");
@@ -440,34 +615,256 @@ export default function ObtenerClientesSection({
       basePane.style.zIndex = "200";
     }
 
+    map.createPane("leadClients");
+    const clientsPane = map.getPane("leadClients");
+    if (clientsPane) {
+      clientsPane.style.zIndex = "400";
+      clientsPane.style.pointerEvents = "none";
+    }
+    clientDotsRef.current = L.layerGroup().addTo(map);
+    setMapEpoch((epoch) => epoch + 1);
+
     applyLeadMapBaseLayer();
     applyLeadMapThemeClass(container, resolvedTheme);
+    setMapVisualReady(false);
 
     map.on("click", (e: { latlng: { lat: number; lng: number } }) => {
       const { lat, lng } = e.latlng;
+      pinRef.current = { lat, lng };
       setPin({ lat, lng });
     });
 
-    updateMapOverlays(DEFAULT_CENTER.lat, DEFAULT_CENTER.lng, radiusKm);
+    updateMapOverlays(pinLat, pinLng, radiusKm, false);
+
+    const persistView = () => {
+      const center = map.getCenter();
+      const currentPin = pinRef.current;
+      writeLeadMapView({
+        lat: center.lat,
+        lng: center.lng,
+        zoom: map.getZoom(),
+        pinLat: currentPin.lat,
+        pinLng: currentPin.lng,
+      });
+    };
+    map.on("moveend", persistView);
+
+    const stopWatchingPaint = watchLeadMapFirstPaint(
+      () => tileLayerRef.current,
+      () => setMapVisualReady(true),
+    );
 
     requestAnimationFrame(() => {
       map.invalidateSize();
     });
 
     return () => {
+      stopWatchingPaint();
+      map.off("moveend", persistView);
       map.remove();
       mapRef.current = null;
       tileLayerRef.current = null;
       markerRef.current = null;
       circleRef.current = null;
+      clientDotsRef.current = null;
+      markersByIdRef.current.clear();
     };
   }, [leafletReady, updateMapOverlays, applyLeadMapBaseLayer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (pin && mapRef.current) {
-      updateMapOverlays(pin.lat, pin.lng, radiusKm);
+    if (mapVisualReady) {
+      setShowMapReload(false);
+      return;
     }
+    const reloadId = window.setTimeout(
+      () => setShowMapReload(true),
+      MAP_RELOAD_BUTTON_DELAY_MS,
+    );
+    return () => window.clearTimeout(reloadId);
+  }, [mapVisualReady]);
+
+  useEffect(() => {
+    if (!mapVisualReady) {
+      setClientDotsReady(false);
+      return;
+    }
+    if (reduceMotion) {
+      setClientDotsReady(true);
+      return;
+    }
+    const revealId = window.setTimeout(
+      () => setClientDotsReady(true),
+      CLIENT_DOTS_REVEAL_DELAY_MS,
+    );
+    return () => window.clearTimeout(revealId);
+  }, [mapVisualReady, reduceMotion]);
+
+  useEffect(() => {
+    if (!pin || !mapRef.current) return;
+    const restored = restoredPinRef.current;
+    if (restored) {
+      if (restored.lat === pin.lat && restored.lng === pin.lng) {
+        restoredPinRef.current = null;
+        updateMapOverlays(pin.lat, pin.lng, radiusKm, false);
+      }
+      return;
+    }
+    updateMapOverlays(pin.lat, pin.lng, radiusKm);
   }, [pin, radiusKm, updateMapOverlays]);
+
+  const categoryStats = useMemo(
+    () => buildLeadCategoryStats(companyLeads),
+    [companyLeads],
+  );
+
+  const mapPoints = useMemo(() => {
+    const colorByCategory = new Map(
+      categoryStats.categories.map((item) => [item.category, item.hex]),
+    );
+    const points: { id: string; lat: number; lng: number; color: string }[] =
+      [];
+    for (const lead of companyLeads) {
+      const key = lead.category ?? UNCATEGORIZED_LEAD_CATEGORY;
+      if (hiddenCategories.has(key)) continue;
+      const coord = readLeadCoordinate(lead.lat, lead.lng);
+      if (!coord) continue;
+      points.push({
+        id: lead.id,
+        lat: coord.lat,
+        lng: coord.lng,
+        color: colorByCategory.get(key) ?? "#9e9e9e",
+      });
+    }
+    return points;
+  }, [companyLeads, categoryStats.categories, hiddenCategories]);
+
+  useEffect(() => {
+    if (!clientDotsReady) return;
+    const L = window.L;
+    const map = mapRef.current;
+    const group = clientDotsRef.current;
+    if (!L?.circleMarker || !map || !group || mapEpoch === 0) return;
+
+    const markers = markersByIdRef.current;
+    const radiusNow = () => clientDotRadius(map.getZoom());
+    const visibleIds = new Set(mapPoints.map((point) => point.id));
+
+    for (const [id, marker] of markers) {
+      if (visibleIds.has(id)) continue;
+      group.removeLayer(marker);
+      markers.delete(id);
+    }
+
+    for (const point of mapPoints) {
+      const marker = markers.get(point.id);
+      if (!marker) continue;
+      marker.setStyle({ fillColor: point.color, radius: radiusNow() });
+    }
+
+    const fresh = mapPoints.filter((point) => !markers.has(point.id));
+    const paintSearch =
+      paintIncomingRef.current && fresh.length > 0 && !reduceMotion;
+    const paintIntro =
+      !paintSearch &&
+      !dotsIntroPlayedRef.current &&
+      fresh.length > 0 &&
+      !reduceMotion;
+
+    const addPoint = (point: (typeof mapPoints)[number]) => {
+      if (markers.has(point.id)) return;
+      markers.set(
+        point.id,
+        L.circleMarker([point.lat, point.lng], {
+          pane: "leadClients",
+          radius: radiusNow(),
+          weight: 1,
+          color: "#ffffff",
+          opacity: 0.85,
+          fillColor: point.color,
+          fillOpacity: 0.7,
+          interactive: false,
+        }).addTo(group),
+      );
+    };
+
+    const onZoom = () => {
+      const nextRadius = clientDotRadius(map.getZoom());
+      for (const marker of markers.values()) marker.setRadius(nextRadius);
+    };
+    map.on("zoomend", onZoom);
+
+    let cancelled = false;
+    let raf = 0;
+
+    if (!paintSearch && !paintIntro) {
+      for (const point of fresh) addPoint(point);
+      raiseLeadMapOverlays(markerRef.current, circleRef.current);
+    } else {
+      const ordered = sortPointsFromCenter(
+        fresh,
+        paintSearch ? pinRef.current : map.getCenter(),
+      );
+      const duration = paintSearch
+        ? Math.min(
+            SEARCH_DOTS_MAX_MS,
+            Math.max(640, ordered.length * SEARCH_DOT_STAGGER_MS),
+          )
+        : CLIENT_DOTS_INTRO_MS;
+      let cursor = 0;
+
+      const step = (now: number, startedAt: number) => {
+        if (cancelled) return;
+        const progress = Math.min(1, (now - startedAt) / duration);
+        const eased = paintSearch ? progress : 1 - (1 - progress) ** 3;
+        const targetCount =
+          progress >= 1
+            ? ordered.length
+            : Math.max(1, Math.ceil(ordered.length * eased));
+        while (cursor < targetCount) {
+          const point = ordered[cursor];
+          cursor += 1;
+          if (point) addPoint(point);
+        }
+        if (cursor < ordered.length) {
+          raf = requestAnimationFrame((next) => step(next, startedAt));
+          return;
+        }
+        raiseLeadMapOverlays(markerRef.current, circleRef.current);
+      };
+
+      raf = requestAnimationFrame((now) => {
+        if (cancelled) return;
+        if (paintSearch) paintIncomingRef.current = false;
+        if (paintIntro || paintSearch) dotsIntroPlayedRef.current = true;
+        step(now, now);
+      });
+    }
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      map.off("zoomend", onZoom);
+    };
+  }, [mapEpoch, mapPoints, clientDotsReady, reduceMotion]);
+
+  const toggleMapCategory = useCallback((category: string) => {
+    setHiddenCategories((current) => {
+      const next = new Set(current);
+      if (next.has(category)) next.delete(category);
+      else next.add(category);
+      return next;
+    });
+  }, []);
+
+  const showAllMapCategories = useCallback(() => {
+    setHiddenCategories(new Set());
+  }, []);
+
+  const hideAllMapCategories = useCallback(() => {
+    setHiddenCategories(
+      new Set(categoryStats.categories.map((item) => item.category)),
+    );
+  }, [categoryStats.categories]);
 
   useEffect(() => {
     if (!showAdvancedFilters) return;
@@ -510,7 +907,9 @@ export default function ObtenerClientesSection({
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        setPin({ lat: latitude, lng: longitude });
+        const nextPin = { lat: latitude, lng: longitude };
+        pinRef.current = nextPin;
+        setPin(nextPin);
         mapRef.current?.setView([latitude, longitude], 8);
         setLocatingUser(false);
       },
@@ -526,6 +925,7 @@ export default function ObtenerClientesSection({
   }, []);
 
   const centerOnMexicoCity = useCallback(() => {
+    pinRef.current = DEFAULT_CENTER;
     setPin(DEFAULT_CENTER);
     mapRef.current?.setView(
       [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
@@ -654,6 +1054,8 @@ export default function ObtenerClientesSection({
       setShowZeroResultsHint(syncedLeadsCount === 0);
 
       if (syncedLeadsCount > 0) {
+        paintIncomingRef.current = true;
+        void refetchMapLeads();
         statsRef.current?.refetch();
       }
 
@@ -711,37 +1113,83 @@ export default function ObtenerClientesSection({
   return (
     <div className="space-y-6">
       <div
-        className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[calc(100vh-64px)] min-h-[480px] w-screen overflow-visible bg-[#eef3f8] dark:bg-[#1e2a3a]"
+        ref={setMapStage}
+        className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[calc(100dvh-7.75rem)] w-screen overflow-visible bg-[#eef3f8] dark:bg-[#1e2a3a]"
         aria-label="Búsqueda de leads en mapa"
       >
         <div
           ref={mapContainerRef}
-          className={`absolute inset-0 z-0 h-full w-full overflow-hidden ${
+          className={`lead-exploration-map absolute inset-0 z-0 h-full w-full overflow-hidden ${
             themeMounted && isDarkMapTheme(resolvedTheme)
               ? "lead-exploration-map--night"
               : "lead-exploration-map--standard"
-          }`}
+          } ${mapVisualReady ? "lead-exploration-map--ready" : ""}`}
           role="application"
-          aria-label="Mapa interactivo. Haz clic para mover el punto de búsqueda."
+          aria-busy={!mapVisualReady}
+          aria-label="Mapa interactivo. Los clientes obtenidos se ven como puntos de color. Haz clic para mover el punto de búsqueda."
         />
-        {!leafletReady && (
-          <motion.div
-            className="absolute inset-0 z-[1] flex items-center justify-center bg-[#f8f8f8]/90 dark:bg-[#0a0a0a]/90"
-            role="status"
-            aria-busy="true"
-            initial={reduceMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={motionTransition}
-          >
-            <div className="flex flex-col items-center gap-3">
-              <span className="size-10 rounded-full border-2 border-orange-500 border-t-transparent motion-safe:animate-spin" />
-              <p className="text-sm font-medium text-[#424242] dark:text-[#e0e0e0]">
-                Cargando mapa…
-              </p>
-            </div>
-          </motion.div>
-        )}
+        <AnimatePresence>
+          {!mapVisualReady && (
+            <motion.div
+              key="lead-map-loading"
+              className="absolute inset-0 z-[1] flex items-center justify-center overflow-hidden bg-[#e8eef4] dark:bg-[#1e2a3a]"
+              role="status"
+              aria-live="polite"
+              aria-busy="true"
+              initial={false}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={
+                reduceMotion ? { duration: 0 } : { duration: 0.45, ease: MOTION_EASE }
+              }
+            >
+              <div
+                className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(247,148,94,0.18),transparent_58%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(224,124,58,0.16),transparent_55%)]"
+                aria-hidden
+              />
+              <div className="relative flex flex-col items-center gap-4 px-6 text-center">
+                <div className="relative flex size-36 items-center justify-center" aria-hidden>
+                  <span className="lead-map-loading-ring absolute size-32 rounded-full border-2 border-dashed border-[#e07c3a]/55" />
+                  <span className="lead-map-loading-ring lead-map-loading-ring--inner absolute size-[4.5rem] rounded-full border border-dashed border-[#f7945e]/70" />
+                  <svg
+                    className="lead-map-loading-pin relative"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 36 44"
+                    width="36"
+                    height="44"
+                  >
+                    <path
+                      fill="#e07c3a"
+                      stroke="#ffffff"
+                      strokeWidth="2"
+                      d="M18 2C10.82 2 5 7.82 5 15c0 9.75 13 25.5 13 25.5S31 24.75 31 15C31 7.82 25.18 2 18 2z"
+                    />
+                    <circle cx="18" cy="15" r="5.5" fill="#ffffff" />
+                    <circle cx="18" cy="15" r="3" fill="#f7945e" />
+                  </svg>
+                </div>
+                <p className="text-sm font-medium text-[#424242] dark:text-[#e0e0e0]">
+                  Cargando mapa…
+                </p>
+                <AnimatePresence>
+                  {showMapReload && (
+                    <motion.button
+                      type="button"
+                      initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={reduceMotion ? undefined : { opacity: 0 }}
+                      transition={motionTransition}
+                      onClick={() => window.location.reload()}
+                      className={`inline-flex min-h-11 cursor-pointer items-center justify-center rounded-xl bg-orange-500 px-5 text-sm font-semibold text-white hover:bg-orange-600 ${FOCUS_RING}`}
+                    >
+                      Recargar
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="pointer-events-none absolute inset-x-0 top-0 z-20 px-4 pt-4 sm:pt-6">
           <motion.div
@@ -1120,6 +1568,14 @@ export default function ObtenerClientesSection({
             CDMX
           </motion.button>
         </motion.div>
+
+        <LeadMapCategoryPanel
+          categories={categoryStats.categories}
+          hiddenCategories={hiddenCategories}
+          onToggle={toggleMapCategory}
+          onShowAll={showAllMapCategories}
+          onHideAll={hideAllMapCategories}
+        />
 
         <AnimatePresence>
           {showResultPanel && (

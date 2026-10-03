@@ -53,6 +53,7 @@ import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
 import { useCompanyAiLive } from "kadesh/components/profile/ai/useCompanyAiLive";
 import { WhatsAppSettingsSection } from "kadesh/components/profile/whatsapp/WhatsAppSettingsSection";
 import { cn } from "kadesh/utils/cn";
+import PanelControlSkeleton from "./PanelControlSkeleton";
 
 const VALID_TABS = [
   "inicio",
@@ -405,28 +406,7 @@ function PanelControlSectionContent({
   }, [user, loading, router]);
 
   if (loading) {
-    if (embedded) {
-      return (
-        <div className="flex items-center justify-center py-16">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent mx-auto" />
-            <p className="mt-3 text-sm text-[#616161] dark:text-[#b0b0b0]">
-              Cargando panel...
-            </p>
-          </div>
-        </div>
-      );
-    }
-    return (
-      <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#0a0a0a] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-orange-500 border-t-transparent mx-auto" />
-          <p className="mt-4 text-[#616161] dark:text-[#b0b0b0]">
-            Cargando panel...
-          </p>
-        </div>
-      </div>
-    );
+    return <PanelControlSkeleton embedded={embedded} />;
   }
 
   if (!user?.id) {
@@ -630,28 +610,7 @@ function PanelControlSectionContent({
 function PanelControlSectionFallback({
   embedded = false,
 }: PanelControlSectionProps) {
-  if (embedded) {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent mx-auto" />
-          <p className="mt-3 text-sm text-[#616161] dark:text-[#b0b0b0]">
-            Cargando panel...
-          </p>
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#0a0a0a] flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-orange-500 border-t-transparent mx-auto" />
-        <p className="mt-4 text-[#616161] dark:text-[#b0b0b0]">
-          Cargando panel...
-        </p>
-      </div>
-    </div>
-  );
+  return <PanelControlSkeleton embedded={embedded} />;
 }
 
 export default function PanelControlSection({
