@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowDown01Icon, ArrowUp01Icon } from "@hugeicons/core-free-icons";
 import { getCategoryLabel } from "kadesh/components/profile/sales/helpers/category";
 import { UNCATEGORIZED_LEAD_CATEGORY } from "./leadCategoryColors";
 
@@ -48,6 +51,7 @@ export default function LeadMapCategoryPanel({
   onShowAll: () => void;
   onHideAll: () => void;
 }) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   if (categories.length === 0) return null;
 
   const visibleCount = categories.filter(
@@ -59,15 +63,38 @@ export default function LeadMapCategoryPanel({
   return (
     <div className="pointer-events-none absolute bottom-4 left-4 z-10 w-[min(17.5rem,calc(100%-5.5rem))] sm:bottom-6 sm:left-6">
       <div className="pointer-events-auto flex max-h-[min(22rem,46vh)] flex-col overflow-hidden rounded-2xl border border-black/8 bg-white/92 shadow-[0_10px_30px_rgba(0,0,0,0.14)] backdrop-blur-md dark:border-white/10 dark:bg-[#171717]/92 dark:shadow-[0_14px_36px_rgba(0,0,0,0.45)]">
-        <div className="flex items-baseline justify-between gap-3 px-3 pt-2.5 pb-1">
+        <div className="flex items-center gap-2 pr-1 pl-3">
           <p className="text-[11px] font-semibold tracking-wide text-[#757575] dark:text-[#a3a3a3]">
             Categorías
           </p>
-          <p className="text-[11px] font-medium tabular-nums text-[#9e9e9e] dark:text-[#8a8a8a]">
+          <p className="ml-auto text-[11px] font-medium tabular-nums text-[#9e9e9e] dark:text-[#8a8a8a]">
             {visibleCount} en el mapa
           </p>
+          <button
+            type="button"
+            aria-expanded={!isCollapsed}
+            aria-controls="lead-map-categories"
+            onClick={() => setIsCollapsed((collapsed) => !collapsed)}
+            className={`flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-xl text-[#616161] motion-safe:transition-colors motion-safe:duration-150 hover:bg-black/5 dark:text-[#c7c7c7] dark:hover:bg-white/6 ${FOCUS_RING}`}
+          >
+            <HugeiconsIcon
+              icon={isCollapsed ? ArrowUp01Icon : ArrowDown01Icon}
+              size={18}
+              aria-hidden
+            />
+            <span className="sr-only">
+              {isCollapsed ? "Mostrar categorías" : "Ocultar categorías"}
+            </span>
+          </button>
         </div>
-        <ul className="min-h-0 space-y-0.5 overflow-y-auto px-1.5 pb-1.5">
+        <div
+          id="lead-map-categories"
+          className={`grid min-h-0 motion-reduce:transition-none motion-safe:transition-[grid-template-rows] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.2,0,0,1)] ${
+            isCollapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
+          }`}
+        >
+          <div className="overflow-hidden" inert={isCollapsed}>
+            <ul className="max-h-[min(16rem,34vh)] space-y-0.5 overflow-y-auto px-1.5 pb-1.5">
           {categories.map((item) => {
             const label = categoryLabel(item.category);
             const isVisible = !hiddenCategories.has(item.category);
@@ -128,6 +155,8 @@ export default function LeadMapCategoryPanel({
           >
             Ver todos
           </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
