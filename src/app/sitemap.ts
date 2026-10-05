@@ -58,6 +58,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: `${baseUrl}${Routes.dataDeletion}`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
   ];
 
   const nicheRoutes: MetadataRoute.Sitemap = Object.keys(NICHE_TARGET_MAPPING).map((key) => ({
