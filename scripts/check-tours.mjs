@@ -6,7 +6,7 @@ import { join } from "node:path";
 
 const SRC = "src";
 const REGISTRY = "src/components/onboarding/registry.ts";
-const PANEL_CONTROL = "src/components/panel/PanelControlSection.tsx";
+const PANEL_NAV = "src/components/panel/DashboardSidebar.tsx";
 
 /** Secciones del sidebar sin paso de tutorial todavía. Quitar de aquí al registrar su paso. */
 const EXEMPT_NAV_KEYS = new Set([
@@ -64,8 +64,8 @@ for (const target of new Set(targets)) {
   }
 }
 
-const panelControl = readFileSync(PANEL_CONTROL, "utf8");
-const navBlock = panelControl.match(/const navItems = \[([\s\S]*?)\n\];/);
+const panelNav = readFileSync(PANEL_NAV, "utf8");
+const navBlock = panelNav.match(/const navItems = \[([\s\S]*?)\n\];/);
 const navKeys = navBlock
   ? [...navBlock[1].matchAll(/\bkey:\s*"([\w-]+)"/g)].map((m) => m[1])
   : [];

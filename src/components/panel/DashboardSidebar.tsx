@@ -1,0 +1,300 @@
+"use client";
+
+import { useSyncExternalStore } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  DashboardSquare01Icon,
+  UserIcon,
+  Chart01Icon,
+  FileIcon,
+  FolderIcon,
+  CalendarIcon,
+  UserAdd01Icon,
+  UserGroupIcon,
+  WorkIcon,
+  FlashIcon,
+  SparklesIcon,
+  WhatsappIcon,
+  SidebarLeftIcon,
+  SidebarRightIcon,
+} from "@hugeicons/core-free-icons";
+import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
+import { cn } from "kadesh/utils/cn";
+
+const SIDEBAR_COLLAPSED_KEY = "kadesh.panel.navCollapsed";
+const SIDEBAR_COLLAPSED_EVENT = "kadesh-panel-nav-collapsed";
+
+const navItems = [
+  { key: "inicio" as const, label: "Inicio", icon: DashboardSquare01Icon },
+  { key: "profile" as const, label: "Datos del perfil", icon: UserIcon },
+  {
+    key: "ai" as const,
+    label: KADESH_URIM_AI_NAME,
+    icon: SparklesIcon,
+    requireAiManage: true,
+  },
+  {
+    key: "clientes" as const,
+    label: "Clientes",
+    icon: Chart01Icon,
+    requireVendedor: true,
+  },
+  {
+    key: "vendedores" as const,
+    label: "Vendedores",
+    icon: UserGroupIcon,
+    requireAdminCompany: true,
+    requireSalesPersonManagement: false,
+  },
+  { key: "archivos" as const, label: "Archivos", icon: FileIcon },
+  { key: "proyectos" as const, label: "Proyectos", icon: FolderIcon },
+  { key: "cotizaciones" as const, label: "Cotizaciones", icon: FileIcon },
+  { key: "calendar" as const, label: "Mi Calendario", icon: CalendarIcon },
+  {
+    key: "workspaces" as const,
+    label: "Espacios de trabajo",
+    icon: WorkIcon,
+  },
+  {
+    key: "whatsapp" as const,
+    label: "WhatsApp Business",
+    icon: WhatsappIcon,
+    requireAdminCompany: true,
+  },
+];
+
+const navItemsKadeshConfig = [
+  { key: "referidos" as const, label: "Referidos", icon: UserAdd01Icon },
+  { key: "novedades" as const, label: "Novedades", icon: FlashIcon },
+];
+
+type NavItem = (typeof navItems)[number] | (typeof navItemsKadeshConfig)[number];
+
+type DashboardSidebarProps = {
+  selectedTab: string;
+  onTabChange: (key: string) => void;
+  hasVendedorRole: boolean;
+  isAdminCompany: boolean;
+  hasSalesPersonManagement: boolean;
+  hasUploadFilesFeature: boolean;
+  hasWorkspacesFeature: boolean;
+  canManageAi: boolean;
+  isAiLive: boolean;
+};
+
+function readCollapsedPreference(): boolean {
+  try {
+    return window.localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function subscribeCollapsedPreference(onStoreChange: () => void) {
+  window.addEventListener(SIDEBAR_COLLAPSED_EVENT, onStoreChange);
+  window.addEventListener("storage", onStoreChange);
+  return () => {
+    window.removeEventListener(SIDEBAR_COLLAPSED_EVENT, onStoreChange);
+    window.removeEventListener("storage", onStoreChange);
+  };
+}
+
+function writeCollapsedPreference(collapsed: boolean) {
+  try {
+    window.localStorage.setItem(SIDEBAR_COLLAPSED_KEY, collapsed ? "1" : "0");
+  } catch {
+    // Preferencia local; si el navegador bloquea storage, el menú sigue usable.
+  }
+  window.dispatchEvent(new Event(SIDEBAR_COLLAPSED_EVENT));
+}
+
+function isNavItemVisible(
+  item: NavItem,
+  {
+    hasVendedorRole,
+    isAdminCompany,
+    hasSalesPersonManagement,
+    hasUploadFilesFeature,
+    hasWorkspacesFeature,
+    canManageAi,
+  }: DashboardSidebarProps,
+): boolean {
+  if ("requireVendedor" in item && item.requireVendedor && !hasVendedorRole) {
+    return false;
+  }
+  if (
+    "requireAdminCompany" in item &&
+    item.requireAdminCompany &&
+    !isAdminCompany
+  ) {
+    return false;
+  }
+  if ("requireAiManage" in item && item.requireAiManage && !canManageAi) {
+    return false;
+  }
+  if (
+    "requireSalesPersonManagement" in item &&
+    item.requireSalesPersonManagement &&
+    !hasSalesPersonManagement
+  ) {
+    return false;
+  }
+  if (
+    "requireUploadFilesFeature" in item &&
+    item.requireUploadFilesFeature &&
+    !hasUploadFilesFeature
+  ) {
+    return false;
+  }
+  if (
+    "requireWorkspacesFeature" in item &&
+    item.requireWorkspacesFeature &&
+    !hasWorkspacesFeature
+  ) {
+    return false;
+  }
+  return true;
+}
+
+function NavButton({
+  item,
+  isActive,
+  isCollapsed,
+  onTabChange,
+}: {
+  item: NavItem;
+  isActive: boolean;
+  isCollapsed: boolean;
+  onTabChange: (key: string) => void;
+}) {
+  const isAi = item.key === "ai";
+
+  return (
+    <button
+      type="button"
+      data-tour={`nav-${item.key}`}
+      title={isCollapsed ? item.label : undefined}
+      onClick={() => onTabChange(item.key)}
+      className={cn(
+        "flex items-center rounded-lg text-sm font-medium transition-colors",
+        isCollapsed
+          ? "size-11 shrink-0 justify-center lg:w-full"
+          : "w-full gap-3 px-4 py-3 text-left",
+        isActive
+          ? isAi
+            ? "ai-urim-fill shadow-[0_6px_14px_rgba(139,92,246,0.28)]"
+            : "bg-orange-500 text-white dark:bg-orange-500 dark:text-white"
+          : "text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]",
+      )}
+    >
+      <span className={isAi && !isActive ? "ai-urim-icon" : undefined}>
+        <HugeiconsIcon icon={item.icon} size={20} />
+      </span>
+      <span className={cn("truncate", isCollapsed && "sr-only")}>
+        {item.label}
+      </span>
+    </button>
+  );
+}
+
+export default function DashboardSidebar(props: DashboardSidebarProps) {
+  const { selectedTab, onTabChange, isAiLive } = props;
+  const isCollapsed = useSyncExternalStore(
+    subscribeCollapsedPreference,
+    readCollapsedPreference,
+    () => false,
+  );
+
+  const visibleNavItems = navItems.filter((item) =>
+    isNavItemVisible(item, props),
+  );
+  const collapseLabel = isCollapsed ? "Mostrar menú" : "Ocultar menú";
+
+  return (
+    <aside
+      className={cn(
+        "flex shrink-0 flex-col gap-3 overflow-visible transition-[width] duration-200",
+        isCollapsed ? "w-full lg:w-16" : "w-full lg:w-60",
+      )}
+    >
+      <div className={cn("flex", isCollapsed ? "lg:justify-center" : "justify-end")}>
+        <button
+          type="button"
+          aria-expanded={!isCollapsed}
+          aria-controls="panel-nav"
+          title={collapseLabel}
+          onClick={() => writeCollapsedPreference(!isCollapsed)}
+          className={cn(
+            "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] bg-white text-sm font-medium text-[#616161] shadow-sm transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a]",
+            isCollapsed ? "size-11" : "px-3",
+          )}
+        >
+          <HugeiconsIcon
+            icon={isCollapsed ? SidebarRightIcon : SidebarLeftIcon}
+            size={20}
+          />
+          <span className={cn(isCollapsed && "sr-only")}>{collapseLabel}</span>
+        </button>
+      </div>
+
+      <div id="panel-nav" className="flex flex-col gap-5">
+        <svg width="0" height="0" aria-hidden className="absolute">
+          <defs>
+            <linearGradient
+              id="kadesh-urim-icon-gradient"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" stopColor="var(--ai-urim-purple)" />
+              <stop offset="100%" stopColor="var(--ai-urim-blue)" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div
+          className={cn(
+            "rounded-2xl",
+            isAiLive ? "ai-live-ring shadow-sm" : "shadow-sm",
+          )}
+        >
+          <nav
+            className={cn(
+              "rounded-[14px] bg-white p-2 dark:bg-[#1e1e1e]",
+              isAiLive
+                ? undefined
+                : "rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a]",
+              isCollapsed && "flex flex-row flex-wrap gap-1 lg:flex-col",
+            )}
+          >
+            {visibleNavItems.map((item) => (
+              <NavButton
+                key={item.key}
+                item={item}
+                isActive={selectedTab === item.key}
+                isCollapsed={isCollapsed}
+                onTabChange={onTabChange}
+              />
+            ))}
+          </nav>
+        </div>
+        <nav
+          className={cn(
+            "rounded-2xl border border-[#e0e0e0] bg-white p-2 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e]",
+            isCollapsed && "flex flex-row flex-wrap gap-1 lg:flex-col",
+          )}
+        >
+          {navItemsKadeshConfig.map((item) => (
+            <NavButton
+              key={item.key}
+              item={item}
+              isActive={selectedTab === item.key}
+              isCollapsed={isCollapsed}
+              onTabChange={onTabChange}
+            />
+          ))}
+        </nav>
+      </div>
+    </aside>
+  );
+}

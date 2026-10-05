@@ -4,6 +4,7 @@ import {
   useState,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useCallback,
 } from "react";
@@ -15,6 +16,7 @@ import {
   USER_COMPANY_CATEGORIES_QUERY,
   COMPANY_VENDEDORES_QUERY,
   UPDATE_TECH_BUSINESS_LEAD_MUTATION,
+  UPDATE_TECH_STATUS_BUSINESS_LEAD_MUTATION,
   CREATE_TECH_STATUS_BUSINESS_LEAD_MUTATION,
   TECH_STATUS_BUSINESS_LEADS_BY_LEADS_AND_SALES_PERSON_QUERY,
   type TechBusinessLeadsResponse,
@@ -27,6 +29,8 @@ import {
   type CompanyVendedoresVariables,
   type UpdateTechBusinessLeadVariables,
   type UpdateTechBusinessLeadMutation,
+  type UpdateTechStatusBusinessLeadVariables,
+  type UpdateTechStatusBusinessLeadMutation,
   type CreateTechStatusBusinessLeadVariables,
   type CreateTechStatusBusinessLeadMutation,
   type TechStatusBusinessLeadsByLeadsAndSalesPersonResponse,
@@ -48,6 +52,8 @@ import { Add01Icon, Download04Icon } from "@hugeicons/core-free-icons";
 import { hasPlanFeature } from "./helpers/plan-features";
 import { downloadLeadsExcel } from "./exportLeadsExcel";
 import { buildClientLeadsQueryVariables } from "./helpers/client-leads-query";
+import LeadsViewToggle, { type LeadsView } from "./LeadsViewToggle";
+import LeadsKanbanBoard from "./LeadsKanbanBoard";
 import { SupportContactSection } from "kadesh/components/shared";
 import {
   DEFAULT_LEADS_PAGE_SIZE,
@@ -508,8 +514,30 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     },
   );
 
-  const leads =
-    data?.techBusinessLeads ?? previousData?.techBusinessLeads ?? [];
+  const leads = useMemo(
+    () => data?.techBusinessLeads ?? previousData?.techBusinessLeads ?? [],
+    [data, previousData],
+  );
+
+  const leadsView: LeadsView =
+    searchParams.get("vista") === "tablero" ? "board" : "list";
+
+  const [pendingPipelines, setPendingPipelines] = useState<
+    Record<string, string>
+  >({});
+
+  const setLeadsView = useCallback(
+    (view: LeadsView) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (view === "board") params.set("vista", "tablero");
+      else params.delete("vista");
+      const query = params.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, {
+        scroll: false,
+      });
+    },
+    [pathname, router, searchParams],
+  );
 
   const client = useApolloClient();
 
@@ -590,6 +618,79 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     CreateTechStatusBusinessLeadMutation,
     CreateTechStatusBusinessLeadVariables
   >(CREATE_TECH_STATUS_BUSINESS_LEAD_MUTATION);
+
+  const [updateLeadStatus] = useMutation<
+    UpdateTechStatusBusinessLeadMutation,
+    UpdateTechStatusBusinessLeadVariables
+  >(UPDATE_TECH_STATUS_BUSINESS_LEAD_MUTATION);
+
+  const handleMoveLead = useCallback(
+    async (leadId: string, pipelineStatus: string) => {
+      if (pendingPipelines[leadId]) return;
+      const lead = leads.find((item) => item.id === leadId);
+      if (!lead) return;
+      const statuses = Array.isArray(lead.status)
+        ? lead.status
+        : lead.status
+          ? [lead.status]
+          : [];
+      const status = statuses[0] ?? null;
+      if (status?.pipelineStatus === pipelineStatus) return;
+
+      setPendingPipelines((prev) => ({ ...prev, [leadId]: pipelineStatus }));
+      try {
+        if (status?.id) {
+          await updateLeadStatus({
+            variables: {
+              where: { id: status.id },
+              data: { pipelineStatus },
+            },
+          });
+        } else {
+          await createLeadStatus({
+            variables: {
+              data: {
+                businessLead: { connect: { id: leadId } },
+                pipelineStatus,
+                salesPerson: { connect: { id: userId } },
+                ...(companyId
+                  ? { saasCompany: { connect: { id: companyId } } }
+                  : {}),
+              },
+            },
+          });
+        }
+        await refetchLeads();
+        setPendingPipelines((prev) => {
+          const next = { ...prev };
+          delete next[leadId];
+          return next;
+        });
+      } catch (moveError) {
+        setPendingPipelines((prev) => {
+          const next = { ...prev };
+          delete next[leadId];
+          return next;
+        });
+        sileo.error({
+          title: "No se pudo mover el cliente",
+          description:
+            moveError instanceof Error
+              ? moveError.message
+              : "Intenta de nuevo.",
+        });
+      }
+    },
+    [
+      companyId,
+      createLeadStatus,
+      leads,
+      pendingPipelines,
+      refetchLeads,
+      updateLeadStatus,
+      userId,
+    ],
+  );
 
   const handleToggleLead = useCallback((leadId: string) => {
     setSelectedLeadIds((prev) => {
@@ -834,22 +935,44 @@ export default function SalesSection({ userId }: SalesSectionProps) {
             />
             </div>
           )}
-          <div className="clientes-band">
-          <SalesLeadsTable
-            leads={leads}
-            loading={loading}
-            error={error}
-            selectable={canAssign}
-            selectedLeadIds={selectedLeadIds}
-            onToggleLead={handleToggleLead}
-            onToggleAll={handleToggleAll}
-            totalCount={totalCount}
-            pageSize={pageSize}
-            currentPage={effectivePage}
-            onPageChange={pushLeadsPage}
-            onPageSizeChange={pushLeadsPageSize}
-            isAdminCompany={hasCompanyWideLeadScope}
-          />
+          <div className="clientes-band space-y-3">
+          <LeadsViewToggle view={leadsView} onChange={setLeadsView} />
+          {leadsView === "board" ? (
+            <LeadsKanbanBoard
+              leads={leads}
+              loading={loading}
+              error={error}
+              totalCount={totalCount}
+              pipelineOverrides={pendingPipelines}
+              onMove={(leadId, pipelineStatus) =>
+                void handleMoveLead(leadId, pipelineStatus)
+              }
+              selectable={canAssign}
+              selectedLeadIds={selectedLeadIds}
+              onToggleLead={handleToggleLead}
+              showAssignee={hasCompanyWideLeadScope}
+              pageSize={pageSize}
+              currentPage={effectivePage}
+              onPageChange={pushLeadsPage}
+              onPageSizeChange={pushLeadsPageSize}
+            />
+          ) : (
+            <SalesLeadsTable
+              leads={leads}
+              loading={loading}
+              error={error}
+              selectable={canAssign}
+              selectedLeadIds={selectedLeadIds}
+              onToggleLead={handleToggleLead}
+              onToggleAll={handleToggleAll}
+              totalCount={totalCount}
+              pageSize={pageSize}
+              currentPage={effectivePage}
+              onPageChange={pushLeadsPage}
+              onPageSizeChange={pushLeadsPageSize}
+              isAdminCompany={hasCompanyWideLeadScope}
+            />
+          )}
           </div>
         </div>
 

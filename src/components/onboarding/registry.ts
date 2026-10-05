@@ -134,7 +134,7 @@ export const TOURS: TourDefinition[] = [
   {
     id: "clientes",
     title: "Clientes",
-    version: 1,
+    version: 2,
     match: (pathname, tab) => pathname === Routes.panel && tab === "clientes",
     steps: [
       {
@@ -146,6 +146,12 @@ export const TOURS: TourDefinition[] = [
         target: ".clientes-band",
         title: "Filtra tu lista",
         description: "Encuentra clientes por estado, giro u otros filtros.",
+      },
+      {
+        target: '[data-tour="clientes-vista"]',
+        title: "Lista o tablero",
+        description:
+          "Pasa al tablero para ver los clientes como tarjetas por estado y moverlos arrastrando.",
       },
     ],
   },
