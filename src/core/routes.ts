@@ -28,6 +28,8 @@ export const Routes = {
   // Legal
   terms: "/terminos",
   privacy: "/privacidad",
+  /** Estado de eliminación de datos (callback de Meta). Pública, sin login. */
+  dataDeletion: "/eliminacion-de-datos",
   contact: "/contacto",
 
   // Profile
