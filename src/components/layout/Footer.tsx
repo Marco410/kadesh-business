@@ -16,8 +16,9 @@ const FOOTER_LINKS = {
     { label: "Registrarse", href: `${Routes.auth.login}?tab=register` },
   ],
   legal: [
-    { label: "Términos y condiciones", href: "/terminos" },
-    { label: "Privacidad", href: "/privacidad" },
+    { label: "Términos y condiciones", href: Routes.terms },
+    { label: "Privacidad", href: Routes.privacy },
+    { label: "Eliminación de datos", href: Routes.dataDeletion },
   ],
 };
 

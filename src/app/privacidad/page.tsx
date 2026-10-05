@@ -1,3 +1,4 @@
+import { Routes } from "kadesh/core/routes";
 import { SITE_URL } from "kadesh/core/site";
 
 const SITE_HOST = SITE_URL.replace(/^https?:\/\//, "");
@@ -14,7 +15,7 @@ export default function PrivacidadPage() {
             Kadesh — Plataforma de Prospección B2B
           </p>
           <p className="text-sm text-[#5c4033]/80 dark:text-[#d4c4b8]/80 text-center">
-            Última actualización: 28 de septiembre de 2026
+            Última actualización: 5 de octubre de 2026
           </p>
 
           <h2 className="text-2xl text-orange-500 mt-4 font-semibold">
@@ -64,6 +65,10 @@ export default function PrivacidadPage() {
               Datos de usuario de Google, cuando usted autoriza el inicio de
               sesión con Google o la integración con Google Calendar (ver
               sección IX)
+            </li>
+            <li>
+              Datos provenientes de Meta (WhatsApp Business y Facebook), cuando
+              usted o su empresa conectan esas integraciones (ver sección X)
             </li>
           </ul>
           <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
@@ -252,6 +257,17 @@ export default function PrivacidadPage() {
             información que debamos conservar por obligación legal.
           </p>
           <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
+            Para datos recibidos a través de Meta, consulte también la sección
+            X y la página{" "}
+            <a
+              href={Routes.dataDeletion}
+              className="text-orange-600 dark:text-orange-400 underline"
+            >
+              {`${SITE_HOST}${Routes.dataDeletion}`}
+            </a>
+            .
+          </p>
+          <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
             Respecto a los datos de Google en particular:
           </p>
           <ul className="list-disc pl-6 space-y-2 text-base text-[#5c4033] dark:text-[#d4c4b8]">
@@ -359,7 +375,78 @@ export default function PrivacidadPage() {
           </p>
 
           <h2 className="text-2xl text-orange-500 mt-4 font-semibold">
-            X. Cambios al Aviso de Privacidad
+            X. Datos de Meta (Facebook y WhatsApp)
+          </h2>
+          <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
+            Kadesh utiliza las API de Meta Platforms, Inc. (WhatsApp Business
+            Cloud API y la Graph API de Facebook) para funcionalidades que usted
+            o su empresa activan de forma explícita.
+          </p>
+          <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
+            <strong className="font-semibold">
+              Qué datos de Meta tratamos:
+            </strong>
+          </p>
+          <ul className="list-disc pl-6 space-y-2 text-base text-[#5c4033] dark:text-[#d4c4b8]">
+            <li>
+              WhatsApp Business: cuando su empresa conecta su número de WhatsApp
+              Business a Kadesh, tratamos el número telefónico y el nombre de
+              perfil de los contactos que escriben o a quienes se escribe, el
+              contenido de los mensajes (texto, imágenes y documentos), sus
+              fechas y estados de entrega, y los identificadores técnicos de la
+              cuenta (WABA, ID del número). Los tokens de acceso se almacenan
+              cifrados en el servidor.
+            </li>
+            <li>
+              Páginas de Facebook: Kadesh publica contenido en las Páginas de
+              Facebook propias de Kadesh y Kadesh Pet, usando tokens de Página
+              que no se exponen al navegador.
+            </li>
+          </ul>
+          <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
+            <strong className="font-semibold">Cómo usamos esos datos:</strong>{" "}
+            únicamente para mostrar y gestionar las conversaciones de WhatsApp
+            dentro del CRM de Kadesh, enviar los mensajes y plantillas que usted
+            genera, asociar las conversaciones con sus prospectos y publicar
+            contenido en nuestras Páginas. No usamos datos obtenidos de Meta
+            para publicidad dirigida, no los vendemos a terceros o brokers de
+            datos y no los usamos para entrenar modelos de inteligencia
+            artificial generalizados.
+          </p>
+          <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
+            <strong className="font-semibold">Con quién se comparten:</strong>{" "}
+            solo con proveedores de infraestructura necesarios para operar el
+            servicio (hosting, base de datos y almacenamiento), bajo obligaciones
+            de confidencialidad, y con Meta en la medida necesaria para enviar y
+            recibir los mensajes.
+          </p>
+          <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
+            <strong className="font-semibold">Eliminación de datos:</strong>{" "}
+            puede solicitar la eliminación de los datos que Kadesh haya recibido
+            a través de Meta (a) desde Facebook, en Configuración y privacidad
+            &gt; Configuración &gt; Apps y sitios web &gt; Kadesh &gt; Eliminar,
+            lo cual nos envía la solicitud automáticamente y le entrega un
+            código de confirmación que puede consultar en{" "}
+            <a
+              href={Routes.dataDeletion}
+              className="text-orange-600 dark:text-orange-400 underline"
+            >
+              {`${SITE_HOST}${Routes.dataDeletion}`}
+            </a>
+            ; o (b) escribiendo a{" "}
+            <a
+              href="mailto:contacto@kadesh.com.mx"
+              className="text-orange-600 dark:text-orange-400 underline"
+            >
+              contacto@kadesh.com.mx
+            </a>{" "}
+            con el asunto &quot;Eliminación de datos&quot;. Atendemos las
+            solicitudes en un plazo máximo de 30 días, conforme a la sección
+            VII.
+          </p>
+
+          <h2 className="text-2xl text-orange-500 mt-4 font-semibold">
+            XI. Cambios al Aviso de Privacidad
           </h2>
           <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
             El Responsable se reserva el derecho de modificar el presente Aviso
@@ -383,7 +470,7 @@ export default function PrivacidadPage() {
           </p>
 
           <h2 className="text-2xl text-orange-500 mt-4 font-semibold">
-            XI. Consentimiento
+            XII. Consentimiento
           </h2>
           <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
             Al proporcionar sus datos personales a través de los formularios de
