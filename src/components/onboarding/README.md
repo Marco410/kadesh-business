@@ -25,7 +25,7 @@ Los pasos se omiten solos si el elemento no existe (rol, plan o feature sin acce
 1. Pon `data-tour="<seccion>-<elemento>"` en el elemento (o reutiliza un `#id` estable).
 2. Agrega el paso en `registry.ts` (en el tour de la sección y, si es clave, en `welcome`).
 3. Si cambian pasos de un tour de forma relevante, sube su `version`: se vuelve a ofrecer.
-4. Si agregas una sección al sidebar (`navItems`), regístrala o exímela en `scripts/check-tours.mjs`.
+4. Si agregas una sección al sidebar (`navItems` en `DashboardSidebar.tsx`), regístrala o exímela en `scripts/check-tours.mjs`.
 5. Corre `pnpm check:tours`.
 
 ## Pendiente

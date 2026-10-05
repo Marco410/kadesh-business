@@ -8,14 +8,9 @@ import { PIPELINE_STATUS_COLORS } from "kadesh/constants/constans";
 import { Routes } from "kadesh/core/routes";
 import { getCategoryLabel } from "./helpers/category";
 import { ApolloError } from "@apollo/client";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import { CopyPhoneButton } from "./CopyPhoneButton";
-import {
-  getVisiblePageItems,
-  LEADS_PAGE_SIZES,
-  type LeadsPageSize,
-} from "./leadsPagination";
+import LeadsPageNav from "./LeadsPageNav";
+import type { LeadsPageSize } from "./leadsPagination";
 
 const DEFAULT_PIPELINE_COLOR =
   "bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300";
@@ -67,14 +62,6 @@ export default function SalesLeadsTable({
     const el = selectAllRef.current;
     if (el) el.indeterminate = someSelected && !allSelected;
   }, [someSelected, allSelected]);
-
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-  const effectivePage =
-    totalCount > 0 ? Math.min(currentPage, totalPages) : currentPage;
-  const from = totalCount === 0 ? 0 : (effectivePage - 1) * pageSize + 1;
-  const to = Math.min(effectivePage * pageSize, totalCount);
-  const pageItems = getVisiblePageItems(effectivePage, totalPages);
-  const showPageNav = totalCount > pageSize && onPageChange != null;
 
   if (error && leads.length === 0) {
     return (
@@ -322,87 +309,14 @@ export default function SalesLeadsTable({
           </tbody>
         </table>
       </div>
-      {totalCount > 0 && (
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between py-2">
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
-              {from}–{to} de {totalCount.toLocaleString("es-MX")}
-            </p>
-            {onPageSizeChange != null && (
-              <label className="inline-flex items-center gap-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
-                <span className="sr-only sm:not-sr-only">Por página</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) =>
-                    onPageSizeChange(Number(e.target.value) as LeadsPageSize)
-                  }
-                  className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-2 py-1.5 text-sm text-[#212121] dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  aria-label="Clientes por página"
-                >
-                  {LEADS_PAGE_SIZES.map((size) => (
-                    <option key={size} value={size}>
-                      {size}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
-          </div>
-          {showPageNav && (
-            <nav
-              className="flex items-center gap-1"
-              aria-label="Paginación de clientes"
-            >
-              <button
-                type="button"
-                onClick={() => onPageChange(Math.max(1, effectivePage - 1))}
-                disabled={effectivePage <= 1 || loading}
-                className="inline-flex items-center justify-center size-9 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-white hover:bg-orange-500/10 hover:border-orange-300 dark:hover:border-orange-700 hover:text-orange-700 dark:hover:text-orange-300 active:scale-[0.94] disabled:opacity-40 disabled:cursor-not-allowed transition-[transform,background-color,border-color,color] duration-150 ease-[cubic-bezier(0.2,0,0,1)]"
-                aria-label="Página anterior"
-              >
-                <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
-              </button>
-              {pageItems.map((item, index) =>
-                item === "ellipsis" ? (
-                  <span
-                    key={`e-${index}`}
-                    className="px-1.5 text-sm text-[#9e9e9e]"
-                    aria-hidden="true"
-                  >
-                    …
-                  </span>
-                ) : (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => onPageChange(item)}
-                    disabled={loading}
-                    aria-current={item === effectivePage ? "page" : undefined}
-                    className={`min-w-9 h-9 px-2 rounded-lg text-sm font-medium transition-[transform,background-color,color,box-shadow] duration-150 ease-[cubic-bezier(0.2,0,0,1)] ${
-                      item === effectivePage
-                        ? "bg-orange-500 text-white shadow-sm shadow-orange-500/30 scale-105"
-                        : "border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-white hover:bg-orange-500/10 hover:border-orange-300 dark:hover:border-orange-700 active:scale-[0.96]"
-                    }`}
-                  >
-                    {item}
-                  </button>
-                ),
-              )}
-              <button
-                type="button"
-                onClick={() =>
-                  onPageChange(Math.min(totalPages, effectivePage + 1))
-                }
-                disabled={effectivePage >= totalPages || loading}
-                className="inline-flex items-center justify-center size-9 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-white hover:bg-orange-500/10 hover:border-orange-300 dark:hover:border-orange-700 hover:text-orange-700 dark:hover:text-orange-300 active:scale-[0.94] disabled:opacity-40 disabled:cursor-not-allowed transition-[transform,background-color,border-color,color] duration-150 ease-[cubic-bezier(0.2,0,0,1)]"
-                aria-label="Página siguiente"
-              >
-                <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
-              </button>
-            </nav>
-          )}
-        </div>
-      )}
+      <LeadsPageNav
+        totalCount={totalCount}
+        pageSize={pageSize}
+        currentPage={currentPage}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+        loading={loading}
+      />
     </div>
   );
 }

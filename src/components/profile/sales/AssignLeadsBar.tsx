@@ -220,7 +220,7 @@ export default function AssignLeadsBar({
             <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
               {hasSelection
                 ? `${selectedLeadCount} ${selectedLeadCount === 1 ? "cliente seleccionado" : "clientes seleccionados"}. Elige el vendedor y confirma.`
-                : "Marca clientes en la tabla. Esto no filtra la lista: asigna dueño."}
+                : "Marca clientes para asignarles dueño. Esto no filtra la lista."}
             </p>
           </div>
         </div>

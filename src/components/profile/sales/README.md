@@ -8,7 +8,9 @@ Tres bandas distintas, de arriba a abajo:
 
 1. **Identidad y acciones.** Título `Clientes`, empresa y recuento a la izquierda. A la derecha: **Exportar** (secundario) y **Agregar cliente** (primario verde). El recuento no va en el título.
 2. **Filtrar lista.** Buscar y recortar _qué se ve_. El pipeline lleva color siempre (apagado al 70%); el estado activo sube a 100% + anillo. La tarjeta tiene un degradado suave naranja/verde para no quedar plana.
-3. **Asignar a un vendedor.** Acción, no filtro. Checkboxes siempre visibles si el plan y el rol lo permiten. Se marca en la tabla, se elige vendedor (buscable) y se confirma. El filtro “por vendedor” sigue dentro de filtros y no asigna a nadie. Con selección, la barra se enciende en naranja.
+3. **Asignar a un vendedor.** Acción, no filtro. Checkboxes siempre visibles si el plan y el rol lo permiten. Se marca en la lista o en el tablero, se elige vendedor (buscable) y se confirma. El filtro “por vendedor” sigue dentro de filtros y no asigna a nadie. Con selección, la barra se enciende en naranja.
+
+Encima de los registros hay **Lista** y **Tablero** (`?vista=tablero`). El tablero reparte la página actual en columnas por estado del pipeline: mismos filtros, mismo `page` y mismo `limit` que la lista. Arrastrar una tarjeta (el asa de la izquierda; en teclado, flechas izquierda/derecha) guarda ese estado. Cada columna se oculta con el botón de su encabezado y queda una franja con el nombre y el conteo; esa preferencia se guarda en el navegador. Soltar una tarjeta en una columna oculta la vuelve a abrir. La paginación (`1–10 de 606`, tamaño de página y números) es la misma en las dos vistas.
 
 En la columna **Teléfono**, el número abre la llamada. Al lado hay un botón pequeño que copia ese número al portapapeles; el icono pasa a palomita un momento. Ese clic no abre la ficha. El mismo botón está en el detalle del cliente.
 

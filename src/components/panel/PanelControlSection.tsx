@@ -6,21 +6,6 @@ import { useQuery } from "@apollo/client";
 import { useUser } from "kadesh/utils/UserContext";
 import { Routes } from "kadesh/core/routes";
 import { preserveRegisterSuccessParam } from "kadesh/utils/facebook-pixel";
-import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  DashboardSquare01Icon,
-  UserIcon,
-  Chart01Icon,
-  FileIcon,
-  FolderIcon,
-  CalendarIcon,
-  UserAdd01Icon,
-  UserGroupIcon,
-  WorkIcon,
-  FlashIcon,
-  SparklesIcon,
-  WhatsappIcon,
-} from "@hugeicons/core-free-icons";
 import ProfileData from "kadesh/components/profile/ProfileData";
 import { AiSection } from "kadesh/components/profile/ai/AiSection";
 import SalesSection from "kadesh/components/profile/sales/SalesSection";
@@ -52,8 +37,8 @@ import { NovedadesPage } from "../changelog";
 import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
 import { useCompanyAiLive } from "kadesh/components/profile/ai/useCompanyAiLive";
 import { WhatsAppSettingsSection } from "kadesh/components/profile/whatsapp/WhatsAppSettingsSection";
-import { cn } from "kadesh/utils/cn";
 import PanelControlSkeleton from "./PanelControlSkeleton";
+import DashboardSidebar from "./DashboardSidebar";
 
 const VALID_TABS = [
   "inicio",
@@ -103,191 +88,6 @@ function getValidTab(
   }
 
   return tabFromUrl as (typeof VALID_TABS)[number];
-}
-
-const navItems = [
-  { key: "inicio" as const, label: "Inicio", icon: DashboardSquare01Icon },
-  { key: "profile" as const, label: "Datos del perfil", icon: UserIcon },
-  {
-    key: "ai" as const,
-    label: KADESH_URIM_AI_NAME,
-    icon: SparklesIcon,
-    requireAiManage: true,
-  },
-  {
-    key: "clientes" as const,
-    label: "Clientes",
-    icon: Chart01Icon,
-    requireVendedor: true,
-  },
-  {
-    key: "vendedores" as const,
-    label: "Vendedores",
-    icon: UserGroupIcon,
-    requireAdminCompany: true,
-    requireSalesPersonManagement: false,
-  },
-  { key: "archivos" as const, label: "Archivos", icon: FileIcon },
-  { key: "proyectos" as const, label: "Proyectos", icon: FolderIcon },
-  { key: "cotizaciones" as const, label: "Cotizaciones", icon: FileIcon },
-  { key: "calendar" as const, label: "Mi Calendario", icon: CalendarIcon },
-  {
-    key: "workspaces" as const,
-    label: "Espacios de trabajo",
-    icon: WorkIcon,
-  },
-  {
-    key: "whatsapp" as const,
-    label: "WhatsApp Business",
-    icon: WhatsappIcon,
-    requireAdminCompany: true,
-  },
-];
-
-const navItemsKadeshConfig = [
-  { key: "referidos" as const, label: "Referidos", icon: UserAdd01Icon },
-  { key: "novedades" as const, label: "Novedades", icon: FlashIcon },
-];
-
-function DashboardSidebar({
-  selectedTab,
-  onTabChange,
-  hasVendedorRole,
-  isAdminCompany,
-  hasSalesPersonManagement,
-  hasUploadFilesFeature,
-  hasWorkspacesFeature,
-  canManageAi,
-  isAiLive,
-}: {
-  selectedTab: string;
-  onTabChange: (key: string) => void;
-  hasVendedorRole: boolean;
-  isAdminCompany: boolean;
-  hasSalesPersonManagement: boolean;
-  hasUploadFilesFeature: boolean;
-  hasWorkspacesFeature: boolean;
-  canManageAi: boolean;
-  isAiLive: boolean;
-}) {
-  return (
-    <aside className="w-full lg:w-60 shrink-0 flex flex-col gap-5 overflow-visible">
-      <svg width="0" height="0" aria-hidden className="absolute">
-        <defs>
-          <linearGradient
-            id="kadesh-urim-icon-gradient"
-            x1="0%"
-            y1="0%"
-            x2="100%"
-            y2="100%"
-          >
-            <stop offset="0%" stopColor="var(--ai-urim-purple)" />
-            <stop offset="100%" stopColor="var(--ai-urim-blue)" />
-          </linearGradient>
-        </defs>
-      </svg>
-      <div
-        className={cn(
-          "rounded-2xl",
-          isAiLive ? "ai-live-ring shadow-sm" : "shadow-sm",
-        )}
-      >
-        <nav
-          className={cn(
-            "rounded-[14px] bg-white p-2 dark:bg-[#1e1e1e]",
-            isAiLive
-              ? undefined
-              : "rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a]",
-          )}
-        >
-          {navItems.map((item) => {
-            if (
-              "requireVendedor" in item &&
-              item.requireVendedor &&
-              !hasVendedorRole
-            )
-              return null;
-            if (
-              "requireAdminCompany" in item &&
-              item.requireAdminCompany &&
-              !isAdminCompany
-            )
-              return null;
-            if (
-              "requireAiManage" in item &&
-              item.requireAiManage &&
-              !canManageAi
-            )
-              return null;
-            if (
-              "requireSalesPersonManagement" in item &&
-              item.requireSalesPersonManagement &&
-              !hasSalesPersonManagement
-            )
-              return null;
-            if (
-              "requireUploadFilesFeature" in item &&
-              item.requireUploadFilesFeature &&
-              !hasUploadFilesFeature
-            )
-              return null;
-            if (
-              "requireWorkspacesFeature" in item &&
-              item.requireWorkspacesFeature &&
-              !hasWorkspacesFeature
-            )
-              return null;
-            const isActive = selectedTab === item.key;
-            const isAi = item.key === "ai";
-            return (
-              <button
-                key={item.key}
-                type="button"
-                data-tour={`nav-${item.key}`}
-                onClick={() => onTabChange(item.key)}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium transition-colors",
-                  isActive
-                    ? isAi
-                      ? "ai-urim-fill shadow-[0_6px_14px_rgba(139,92,246,0.28)]"
-                      : "bg-orange-500 text-white dark:bg-orange-500 dark:text-white"
-                    : "text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]",
-                )}
-              >
-                <span
-                  className={isAi && !isActive ? "ai-urim-icon" : undefined}
-                >
-                  <HugeiconsIcon icon={item.icon} size={20} />
-                </span>
-                {item.label}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-      <nav className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-2 shadow-sm">
-        {navItemsKadeshConfig.map((item) => {
-          const isActive = selectedTab === item.key;
-          return (
-            <button
-              key={item.key}
-              type="button"
-              data-tour={`nav-${item.key}`}
-              onClick={() => onTabChange(item.key)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-sm font-medium transition-colors ${
-                isActive
-                  ? "bg-orange-500 text-white dark:bg-orange-500 dark:text-white"
-                  : "text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
-              }`}
-            >
-              <HugeiconsIcon icon={item.icon} size={20} />
-              {item.label}
-            </button>
-          );
-        })}
-      </nav>
-    </aside>
-  );
 }
 
 type PanelControlSectionProps = {
