@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowDown01Icon, CalendarIcon } from "@hugeicons/core-free-icons";
+import { Add01Icon, ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { useQuery } from "@apollo/client";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
@@ -31,6 +31,7 @@ import SalesCalendarView, { type CalendarEvent } from "kadesh/components/profile
 import { COMPANY_VENDEDORES_WITH_STATS_QUERY, type CompanyVendedoresWithStatsResponse, type CompanyVendedoresWithStatsVariables } from "./queries";
 import { useUser } from "kadesh/utils/UserContext";
 import GoogleCalendarConnectionsPanel from "kadesh/components/profile/sales/google-calendar/GoogleCalendarConnectionsPanel";
+import GoogleCalendarLogo from "kadesh/components/profile/sales/google-calendar/GoogleCalendarLogo";
 import CalendarEventModal from "kadesh/components/profile/sales/google-calendar/CalendarEventModal";
 import {
   accountDisplayLabel,
@@ -411,6 +412,22 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
     if (native) setEventModal({ open: true, event: native });
   };
 
+  const activeAccounts = accounts.filter((account) => account.isActive);
+  const visibleCalendarCount = activeAccounts.reduce(
+    (total, account) => total + account.calendars.filter((calendar) => calendar.isSelected).length,
+    0,
+  );
+  const googleStatus =
+    accounts.length === 0
+      ? "Conecta tu cuenta y elige qué calendarios ver"
+      : activeAccounts.length === 0
+        ? "Google pidió volver a conectar tu cuenta"
+        : `${activeAccounts.length === 1 ? "1 cuenta" : `${activeAccounts.length} cuentas`} · ${
+            visibleCalendarCount === 1
+              ? "1 calendario visible"
+              : `${visibleCalendarCount} calendarios visibles`
+          }`;
+
   if (!companyId) {
     return (
       <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8 shadow-sm">
@@ -423,40 +440,53 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-start">
-        <CalendarLayersBar
-          groups={layerGroups}
-          hiddenKeys={hiddenKeys}
-          onToggle={handleLayerToggle}
-          onToggleGroup={handleGroupToggle}
-        />
-        <div className="flex shrink-0 flex-row gap-2 lg:flex-col">
-          <button
-            type="button"
-            data-tour="calendar-new-event"
-            onClick={() => setEventModal({ open: true, event: null })}
-            className="inline-flex flex-1 items-center justify-center rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
-          >
-            Nuevo evento
-          </button>
-          <button
-            type="button"
-            data-tour="calendar-google-toggle"
-            aria-expanded={showGooglePanel}
-            aria-controls="google-calendar-panel"
-            onClick={() => setShowGooglePanel((v) => !v)}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] bg-white px-4 py-2.5 text-sm font-semibold text-[#212121] transition-colors hover:border-orange-500/50 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-[#e0e0e0]"
-          >
-            <HugeiconsIcon icon={CalendarIcon} size={16} />
-            Google Calendar
-            <HugeiconsIcon
-              icon={ArrowDown01Icon}
-              size={16}
-              className={`transition-transform duration-200 ${showGooglePanel ? "rotate-180" : ""}`}
-            />
-          </button>
-        </div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <button
+          type="button"
+          data-tour="calendar-new-event"
+          onClick={() => setEventModal({ open: true, event: null })}
+          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
+        >
+          <HugeiconsIcon icon={Add01Icon} size={18} />
+          Nuevo evento
+        </button>
+        <button
+          type="button"
+          data-tour="calendar-google-toggle"
+          aria-expanded={showGooglePanel}
+          aria-controls="google-calendar-panel"
+          onClick={() => setShowGooglePanel((v) => !v)}
+          className={`flex min-h-11 w-full items-center gap-3 rounded-xl border bg-white px-3 py-2.5 text-left transition-colors sm:w-auto sm:px-4 dark:bg-[#1e1e1e] ${
+            showGooglePanel
+              ? "border-[#1a73e8] ring-2 ring-[#1a73e8]/20"
+              : "border-[#e0e0e0] hover:border-[#1a73e8]/45 dark:border-[#3a3a3a]"
+          }`}
+        >
+          <GoogleCalendarLogo className="size-10 shrink-0" />
+          <span className="min-w-0 flex-1 sm:flex-none">
+            <span className="block text-sm font-semibold text-[#212121] dark:text-[#ffffff]">
+              Google Calendar
+            </span>
+            <span className="block text-xs text-[#616161] dark:text-[#b0b0b0]">
+              {googleStatus}
+            </span>
+          </span>
+          <HugeiconsIcon
+            icon={ArrowDown01Icon}
+            size={18}
+            className={`shrink-0 text-[#616161] transition-transform duration-200 dark:text-[#b0b0b0] ${
+              showGooglePanel ? "rotate-180" : ""
+            }`}
+          />
+        </button>
       </div>
+
+      <CalendarLayersBar
+        groups={layerGroups}
+        hiddenKeys={hiddenKeys}
+        onToggle={handleLayerToggle}
+        onToggleGroup={handleGroupToggle}
+      />
 
       {showGooglePanel ? (
         <div id="google-calendar-panel">
