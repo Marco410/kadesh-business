@@ -140,12 +140,44 @@
 
 @layer utilities {
   .animate-marquee-slow {
-    animation: kadesh-marquee 70s linear infinite;
+    animation: kadesh-marquee 760s linear infinite;
   }
 
   .animate-marquee-fast {
-    animation: kadesh-marquee 58s linear infinite;
-    animation-delay: -14s;
+    animation: kadesh-marquee 580s linear infinite;
+    animation-delay: -40s;
+  }
+
+  .categories-marquee-fade {
+    --marquee-fade: 5rem;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      rgb(0 0 0 / 0.2) 1.25rem,
+      #000 var(--marquee-fade),
+      #000 calc(100% - var(--marquee-fade)),
+      rgb(0 0 0 / 0.2) calc(100% - 1.25rem),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      rgb(0 0 0 / 0.2) 1.25rem,
+      #000 var(--marquee-fade),
+      #000 calc(100% - var(--marquee-fade)),
+      rgb(0 0 0 / 0.2) calc(100% - 1.25rem),
+      transparent 100%
+    );
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+  }
+
+  @media (min-width: 640px) {
+    .categories-marquee-fade {
+      --marquee-fade: 8rem;
+    }
   }
 }
 
@@ -362,8 +394,114 @@ html.dark {
   }
 }
 
-.lead-exploration-map--ready .lead-map-pin-icon svg {
+.lead-exploration-map--pin-intro .lead-map-pin-icon svg {
   animation: lead-map-pin-drop 0.52s cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+@keyframes lead-map-pin-search {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  45% {
+    transform: translateY(-6px) scale(1.05);
+  }
+}
+
+@keyframes lead-map-pin-sonar {
+  0% {
+    opacity: 0.55;
+    transform: translate(-50%, 50%) scale(0.35);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 50%) scale(2.6);
+  }
+}
+
+.lead-exploration-map--searching .lead-map-pin-icon svg {
+  transform-origin: 50% 100%;
+  animation: lead-map-pin-search 1.15s cubic-bezier(0.2, 0, 0, 1) infinite;
+}
+
+.lead-exploration-map--searching .lead-map-pin-icon::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: rgba(224, 124, 58, 0.42);
+  pointer-events: none;
+  animation: lead-map-pin-sonar 1.4s cubic-bezier(0.2, 0, 0, 1) infinite;
+}
+
+@keyframes lead-map-radius-scan {
+  to {
+    stroke-dashoffset: -36;
+  }
+}
+
+@keyframes lead-map-radius-breathe {
+  0%,
+  100% {
+    fill-opacity: 0.08;
+    stroke-opacity: 0.5;
+  }
+  50% {
+    fill-opacity: 0.3;
+    stroke-opacity: 1;
+  }
+}
+
+.lead-exploration-map--searching .lead-map-radius {
+  animation:
+    lead-map-radius-scan 0.9s linear infinite,
+    lead-map-radius-breathe 1.6s cubic-bezier(0.2, 0, 0, 1) infinite;
+}
+
+@keyframes lead-map-search-radar {
+  0% {
+    opacity: 0;
+    transform: scale(0.05);
+  }
+  14% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.lead-map-search-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+  animation: lead-map-search-radar 2.2s cubic-bezier(0.2, 0, 0, 1) infinite
+    backwards;
+}
+
+.lead-map-search-ring--1 {
+  animation-delay: 0.73s;
+}
+
+.lead-map-search-ring--2 {
+  animation-delay: 1.46s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lead-exploration-map--pin-intro .lead-map-pin-icon svg,
+  .lead-map-loading-ring,
+  .lead-map-loading-pin,
+  .lead-exploration-map--searching .lead-map-pin-icon svg,
+  .lead-exploration-map--searching .lead-map-pin-icon::after,
+  .lead-exploration-map--searching .lead-map-radius,
+  .lead-map-search-ring {
+    animation: none;
+  }
 }
 
 @keyframes lead-map-loading-ring {
@@ -399,14 +537,6 @@ html.dark {
 .lead-map-loading-pin {
   filter: drop-shadow(0 6px 10px rgba(122, 58, 15, 0.28));
   animation: lead-map-loading-pin 1.8s cubic-bezier(0.2, 0, 0, 1) infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lead-exploration-map--ready .lead-map-pin-icon svg,
-  .lead-map-loading-ring,
-  .lead-map-loading-pin {
-    animation: none;
-  }
 }
 
 /* Google Maps InfoWindow dark mode styles */
