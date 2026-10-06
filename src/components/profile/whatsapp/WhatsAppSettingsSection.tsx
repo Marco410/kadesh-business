@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import FeatureBetaBadge from "kadesh/components/profile/sales/planes/FeatureBetaBadge";
 import { WhatsAppChatsTab } from "./WhatsAppChatsTab";
 import { WhatsAppConfigTab } from "./WhatsAppConfigTab";
 
@@ -13,6 +14,8 @@ type WhatsAppTab = (typeof WHATSAPP_TABS)[number]["id"];
 
 export interface WhatsAppSettingsSectionProps {
   companyId: string | null;
+  /** El plan actual de la empresa tiene WhatsApp marcado en beta. */
+  beta?: boolean;
 }
 
 /**
@@ -22,11 +25,20 @@ export interface WhatsAppSettingsSectionProps {
  */
 export function WhatsAppSettingsSection({
   companyId,
+  beta = false,
 }: WhatsAppSettingsSectionProps) {
   const [tab, setTab] = useState<WhatsAppTab>("config");
 
   return (
     <div className="flex flex-col gap-4">
+      {beta && tab === "chats" ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
+            WhatsApp Business
+          </h2>
+          <FeatureBetaBadge />
+        </div>
+      ) : null}
       <div
         role="tablist"
         aria-label="WhatsApp Business"
@@ -56,7 +68,7 @@ export function WhatsAppSettingsSection({
       {tab === "chats" ? (
         <WhatsAppChatsTab companyId={companyId} />
       ) : (
-        <WhatsAppConfigTab companyId={companyId} />
+        <WhatsAppConfigTab companyId={companyId} beta={beta} />
       )}
     </div>
   );

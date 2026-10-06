@@ -30,12 +30,14 @@ export interface SubscriptionStatusVariables {
   companyId: string | null;
 }
 
-/** Plan feature item from subscription (key, name, included, description). */
+/** Plan feature item from subscription (key, name, included, description, beta). */
 export interface PlanFeatureItem {
   key: string;
   name: string;
   included: boolean;
   description: string;
+  /** Marcado en el plan. Ausente en JSON viejo = no está en beta. */
+  beta?: boolean;
 }
 
 export interface SubscriptionData {

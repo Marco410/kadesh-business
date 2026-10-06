@@ -5,7 +5,8 @@ El vendedor y el administrador ven en un solo calendario lo que pasa en Kadesh y
 
 ## Qué ve el usuario
 - **Nuevo evento**: crea un evento (título, inicio/fin o todo el día, lugar, descripción). Sin fin dura 1 hora. Se envía a los calendarios de Google marcados.
-- **Google Calendar**: barra plegable (con flecha y resumen "2 cuentas · 2 de 28 calendarios visibles") que despliega el panel de cuentas. Cada usuario conecta *su* cuenta; el administrador de empresa además puede conectar una cuenta **compartida** para todo el equipo.
+- **Google Calendar**: control ancho, con el logo de Google Calendar y una línea de estado ("Conecta tu cuenta…", "1 cuenta · 2 calendarios visibles" o "Google pidió volver a conectar tu cuenta"). Al pulsarlo se despliega el panel de cuentas. Cada usuario conecta *su* cuenta; el administrador de empresa además puede conectar una cuenta **compartida** para todo el equipo.
+- **Nuevo evento** y **Google Calendar** van en su propia fila, encima de las capas. La cuadrícula ocupa todo el ancho hasta que hay un día seleccionado o eventos próximos que mostrar.
 - Cada calendario de una cuenta se marca o desmarca: marcado = se ve en Mi Calendario y recibe los eventos de Kadesh.
 - Los tipos de Kadesh se distinguen por color: actividad (naranja), propuesta (azul), seguimiento (verde), **tarea** (ámbar; solo lectura, sale de `TechTask` por `responsible`) y **evento** (creado en Kadesh). Los eventos de **Google** conservan el color de su calendario en Google (puntos, etiqueta y borde); al hacer clic abren Google Calendar.
 - **Capas visibles** (barra sobre el calendario, sustituye a la leyenda): una casilla por cada tipo de Kadesh (Actividades, Propuestas, Seguimientos, Tareas, Eventos) y una por cada calendario de Google visible, agrupadas por cuenta, con el color de Google. Son casillas independientes (se pueden ver varias a la vez); "Todos/Ninguno" actúa sobre un grupo. Es solo de vista y se reinicia al recargar.

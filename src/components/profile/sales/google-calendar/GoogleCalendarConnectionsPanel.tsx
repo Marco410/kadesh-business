@@ -6,9 +6,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Alert02Icon,
   ArrowDown01Icon,
-  CalendarIcon,
   CheckmarkCircle02Icon,
 } from "@hugeicons/core-free-icons";
+import GoogleCalendarLogo from "./GoogleCalendarLogo";
 import { sileo } from "sileo";
 import { useUser } from "kadesh/utils/UserContext";
 import { isAdminCompanyUser, isPlatformAdminUser } from "kadesh/utils/user-roles";
@@ -285,15 +285,18 @@ export default function GoogleCalendarConnectionsPanel({
       data-tour="calendar-google-accounts"
       className="w-full rounded-xl border border-[#e0e0e0] bg-white p-4 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-5"
     >
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h3 className="text-base font-semibold text-[#212121] dark:text-[#ffffff]">
-            Cuentas y calendarios de Google
-          </h3>
-          <p className="mt-1 max-w-xl text-sm text-[#616161] dark:text-[#b0b0b0]">
-            Activa los calendarios que quieres ver. En cada uno decide qué envía Kadesh
-            automáticamente; los eventos que creas a mano eligen su calendario al crearlos.
-          </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 items-start gap-3">
+          <GoogleCalendarLogo className="size-11 shrink-0" />
+          <div className="min-w-0">
+            <h3 className="text-base font-semibold text-[#212121] dark:text-[#ffffff]">
+              Cuentas y calendarios de Google
+            </h3>
+            <p className="mt-1 max-w-xl text-sm text-[#616161] dark:text-[#b0b0b0]">
+              Activa los calendarios que quieres ver. En cada uno decide qué envía Kadesh
+              automáticamente; los eventos que creas a mano eligen su calendario al crearlos.
+            </p>
+          </div>
         </div>
         <div className="flex shrink-0 flex-col gap-2 sm:items-end">
           <button
@@ -303,7 +306,6 @@ export default function GoogleCalendarConnectionsPanel({
             disabled={gettingUrl}
             className={BUTTON_PRIMARY}
           >
-            <HugeiconsIcon icon={CalendarIcon} size={18} />
             Conectar mi cuenta
           </button>
           {canManageCompanyAccount ? (

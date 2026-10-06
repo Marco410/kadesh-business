@@ -16,6 +16,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
+import FeatureBetaBadge from "kadesh/components/profile/sales/planes/FeatureBetaBadge";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import {
   COMPANY_WHATSAPP_SETTINGS_QUERY,
@@ -39,6 +40,8 @@ const INPUT_CLASS =
 
 export interface WhatsAppConfigTabProps {
   companyId: string | null;
+  /** El plan actual marca WhatsApp en beta. */
+  beta?: boolean;
 }
 
 /** Botón pequeño para copiar un valor de la guía (URL del webhook, verify token, etc.). */
@@ -90,7 +93,10 @@ function HealthRow({ ok, label, hint }: { ok: boolean; label: string; hint?: str
  * Conectar WhatsApp Business (Cloud API de Meta) a la empresa: BYOK, cada empresa trae su
  * propia App de Meta. Mismo patrón de UI que AiSettingsSection (guardar / probar / quitar).
  */
-export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
+export function WhatsAppConfigTab({
+  companyId,
+  beta = false,
+}: WhatsAppConfigTabProps) {
   const { data, loading, refetch } = useQuery<
     CompanyWhatsappSettingsResponse,
     CompanyWhatsappSettingsVariables
@@ -265,8 +271,9 @@ export function WhatsAppConfigTab({ companyId }: WhatsAppConfigTabProps) {
           <HugeiconsIcon icon={WhatsappIcon} size={22} />
         </span>
         <div>
-          <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
+          <h2 className="flex flex-wrap items-center gap-2 text-xl font-semibold text-[#212121] dark:text-white">
             WhatsApp Business
+            {beta ? <FeatureBetaBadge /> : null}
           </h2>
           <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
             Conecta tu propia cuenta de WhatsApp Business (Cloud API de Meta) para mandar y

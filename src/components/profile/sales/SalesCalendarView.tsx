@@ -247,9 +247,16 @@ export default function SalesCalendarView({
       } ${className}`.trim()}
     >
       <div className="px-4 py-3 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a] flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0]">
-          {title}
-        </h2>
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0]">
+            {title}
+          </h2>
+          {!isCompact && !selectedDateKey ? (
+            <p className="mt-0.5 text-xs font-normal normal-case tracking-normal text-[#9e9e9e]">
+              Toca un día para ver sus eventos
+            </p>
+          ) : null}
+        </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -409,8 +416,10 @@ export default function SalesCalendarView({
               ) : null}
             </div>
           </div>
-        ) : isCompact ? (
-          <div className="w-full lg:w-[300px] xl:w-[320px] shrink-0 flex flex-col rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] overflow-hidden max-h-[420px]">
+        ) : upcomingEvents.length > 0 || isCompact ? (
+          <div className={`w-full shrink-0 flex flex-col rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] overflow-hidden ${
+            isCompact ? "lg:w-[300px] xl:w-[320px] max-h-[420px]" : "lg:w-[380px] xl:w-[420px]"
+          }`}>
             <div className="px-4 py-3 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f0f0f0] dark:bg-[#2a2a2a]">
               <h3 className="text-sm font-semibold text-[#212121] dark:text-[#ffffff]">
                 Próximos
@@ -427,7 +436,7 @@ export default function SalesCalendarView({
                     <EventListItem
                       key={`up-${e.id}`}
                       event={e}
-                      hideSeller
+                      hideSeller={isCompact}
                       onOpen={handleOpen}
                     />
                   ))}
@@ -435,13 +444,7 @@ export default function SalesCalendarView({
               )}
             </div>
           </div>
-        ) : (
-          <div className="hidden lg:flex w-[380px] xl:w-[420px] shrink-0 items-center justify-center rounded-lg border border-dashed border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525]/50">
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0] text-center px-4">
-              Selecciona un día para ver los eventos
-            </p>
-          </div>
-        )}
+        ) : null}
       </div>
 
       <ActivityDetailModal

@@ -11,6 +11,7 @@ import {
 } from "./queries";
 import { PLAN_FREQUENCY_OPTIONS } from "./constants";
 import type { AdminPlanDraft, AdminPlanRow } from "./types";
+import FeatureBetaBadge from "kadesh/components/profile/sales/planes/FeatureBetaBadge";
 import {
   mergePlanFeatures,
   toPlanFeaturesPayload,
@@ -121,7 +122,7 @@ function AdminPlanEditorForm({
 
   function patchFeature(
     featureKey: string,
-    patch: Partial<Pick<PlanFeatureEntry, "name" | "description" | "included">>,
+    patch: Partial<Pick<PlanFeatureEntry, "name" | "description" | "included" | "beta">>,
   ) {
     setDraft((prev) => ({
       ...prev,
@@ -496,34 +497,52 @@ function AdminPlanEditorForm({
                 <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
                   {includedCount} de {draft.features.length} módulos incluidos.
                   El nombre y la descripción se editan una sola vez para todos
-                  los planes, en Planes → Módulos.
+                  los planes, en Planes → Módulos. Si un módulo está en beta,
+                  márcalo aquí: en los planes se ve la etiqueta Beta.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {draft.features.map((f) => (
-                    <label
+                    <div
                       key={f.key}
-                      className="flex items-start gap-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-3 py-3 cursor-pointer min-h-11"
+                      className="flex flex-col gap-1 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-3 py-3"
                     >
-                      <input
-                        type="checkbox"
-                        checked={f.included}
-                        disabled={saving}
-                        onChange={(e) =>
-                          patchFeature(f.key, { included: e.target.checked })
-                        }
-                        className="mt-1 h-4 w-4 accent-orange-500"
-                      />
-                      <span>
-                        <span className="block text-sm font-medium text-[#212121] dark:text-white">
-                          {f.name}
-                        </span>
-                        {f.description ? (
-                          <span className="block text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
-                            {f.description}
+                      <label className="flex cursor-pointer items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={f.included}
+                          disabled={saving}
+                          onChange={(e) =>
+                            patchFeature(f.key, { included: e.target.checked })
+                          }
+                          className="mt-1 size-4 accent-orange-500"
+                        />
+                        <span className="min-w-0">
+                          <span className="flex flex-wrap items-center gap-2">
+                            <span className="text-sm font-medium text-[#212121] dark:text-white">
+                              {f.name}
+                            </span>
+                            {f.beta ? <FeatureBetaBadge /> : null}
                           </span>
-                        ) : null}
-                      </span>
-                    </label>
+                          {f.description ? (
+                            <span className="mt-0.5 block text-xs text-[#616161] dark:text-[#b0b0b0]">
+                              {f.description}
+                            </span>
+                          ) : null}
+                        </span>
+                      </label>
+                      <label className="ml-7 inline-flex min-h-11 cursor-pointer items-center gap-2 self-start text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+                        <input
+                          type="checkbox"
+                          checked={f.beta}
+                          disabled={saving}
+                          onChange={(e) =>
+                            patchFeature(f.key, { beta: e.target.checked })
+                          }
+                          className="size-4 accent-violet-500"
+                        />
+                        En fase beta
+                      </label>
+                    </div>
                   ))}
                 </div>
               </section>

@@ -5,6 +5,8 @@ export type PlanFeatureEntry = {
   name: string;
   description: string;
   included: boolean;
+  /** El módulo se muestra con la etiqueta Beta. Es por plan, no del catálogo. */
+  beta: boolean;
 };
 
 function metaFor(key: string) {
@@ -31,6 +33,7 @@ export function readPlanFeatures(value: unknown): PlanFeatureEntry[] {
         name: String(v.name ?? meta?.name ?? prettyKey(key)),
         description: String(v.description ?? meta?.description ?? ""),
         included: v.included === true,
+        beta: v.beta === true,
       };
     });
 }
@@ -51,6 +54,7 @@ export function mergePlanFeatures(value: unknown): PlanFeatureEntry[] {
       name: PLAN_FEATURES_MAP[key as PlanFeatureKey].name,
       description: PLAN_FEATURES_MAP[key as PlanFeatureKey].description,
       included: false,
+      beta: false,
     }));
   return [...stored, ...missing];
 }
@@ -64,13 +68,13 @@ export function deriveSharedFeatureCatalog(
 ): PlanFeatureEntry[] {
   const byKey = new Map<string, PlanFeatureEntry>();
   for (const base of mergePlanFeatures([])) {
-    byKey.set(base.key, { ...base, included: false });
+    byKey.set(base.key, { ...base, included: false, beta: false });
   }
   for (const plan of plans) {
     for (const f of readPlanFeatures(plan.planFeatures)) {
       const existing = byKey.get(f.key);
       if (!existing) {
-        byKey.set(f.key, { ...f, included: false });
+        byKey.set(f.key, { ...f, included: false, beta: false });
         continue;
       }
       if (f.name.trim()) existing.name = f.name;
@@ -89,6 +93,7 @@ export function toPlanFeaturesPayload(
     name: f.name.trim() || prettyKey(f.key),
     description: f.description.trim(),
     included: Boolean(f.included),
+    beta: Boolean(f.beta),
   }));
 }
 
