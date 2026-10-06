@@ -4,6 +4,10 @@ La home en `src/app/page.tsx` es la promesa pública: extraer leads B2B de Googl
 
 En copy: **INEGI**, nunca DENUE, SCIAN ni tokens. Rating y reseñas son de Google Maps; INEGI trae nombre, teléfono, dirección y categoría en México. Google Maps sigue siendo la fuente mundial.
 
+## Giros (marquee)
+
+Dos filas de chips con los giros de Google Maps e INEGI. Se desplazan despacio para poder leer el nombre (unos 32 px/s arriba y 44 px/s abajo). La de abajo empieza a mitad del catálogo. Entran y salen con un fundido en los dos bordes, no con un corte. Con `prefers-reduced-motion` se quedan quietas.
+
 ## Rendimiento y accesibilidad
 
 - El hero es **Server Component** sin GSAP: el copy debe ser visible en el primer paint (nada de fades que parten en opacity 0; retrasan LCP).

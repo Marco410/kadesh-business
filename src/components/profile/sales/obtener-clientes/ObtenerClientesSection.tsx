@@ -225,6 +225,8 @@ const CLIENT_DOTS_INTRO_MS = 680;
 /** Tras una búsqueda, cada cliente nuevo se pinta desde el centro, no todos a la vez. */
 const SEARCH_DOT_STAGGER_MS = 48;
 const SEARCH_DOTS_MAX_MS = 2600;
+/** Un anillo llega al borde del radio y el siguiente ya salió. */
+const SEARCH_RADAR_RING_COUNT = 3;
 const DEFAULT_RADIUS_KM = 5;
 const RADIUS_OPTIONS_KM = [2, 5, 10, 25, 50] as const;
 /** DENUE en vivo no pasa de 5 km; el catálogo en BD sí admite radios mayores, pero aquí solo ofrecemos 2 y 5. */
@@ -366,6 +368,10 @@ interface LeafletMarker {
   setLatLng(latlng: [number, number]): LeafletMarker;
   addTo(map: LeafletMap): LeafletMarker;
   bringToFront?(): LeafletMarker;
+  remove(): void;
+}
+interface LeafletSvgRenderer {
+  readonly kind?: "svg";
 }
 interface LeafletCircle {
   setLatLng(latlng: [number, number]): LeafletCircle;
@@ -373,6 +379,7 @@ interface LeafletCircle {
   getBounds(): unknown;
   addTo(map: LeafletMap): LeafletCircle;
   bringToFront?(): LeafletCircle;
+  remove(): void;
 }
 declare global {
   interface Window {
@@ -388,6 +395,7 @@ declare global {
         latlng: [number, number],
         options?: { icon: LeafletDivIcon },
       ): LeafletMarker;
+      svg(): LeafletSvgRenderer;
       circle(
         latlng: [number, number],
         options: {
@@ -395,8 +403,12 @@ declare global {
           color?: string;
           fillColor?: string;
           fillOpacity?: number;
+          opacity?: number;
           weight?: number;
           dashArray?: string;
+          className?: string;
+          interactive?: boolean;
+          renderer?: LeafletSvgRenderer;
         },
       ): LeafletCircle;
       circleMarker(
@@ -453,6 +465,7 @@ export default function ObtenerClientesSection({
   const [resultDismissed, setResultDismissed] = useState(false);
   const [leafletReady, setLeafletReady] = useState(false);
   const [mapVisualReady, setMapVisualReady] = useState(false);
+  const [pinIntro, setPinIntro] = useState(false);
   const [showMapReload, setShowMapReload] = useState(false);
   const [clientDotsReady, setClientDotsReady] = useState(false);
   const [mapEpoch, setMapEpoch] = useState(0);
@@ -487,6 +500,7 @@ export default function ObtenerClientesSection({
   const tileLayerRef = useRef<LeafletTileLayer | null>(null);
   const markerRef = useRef<LeafletMarker | null>(null);
   const circleRef = useRef<LeafletCircle | null>(null);
+  const radiusRendererRef = useRef<LeafletSvgRenderer | null>(null);
   const clientDotsRef = useRef<LeafletLayerGroup | null>(null);
   const dotsIntroPlayedRef = useRef(false);
   const paintIncomingRef = useRef(false);
@@ -563,12 +577,18 @@ export default function ObtenerClientesSection({
         }).addTo(map);
       }
 
+      if (!radiusRendererRef.current && L.svg) {
+        radiusRendererRef.current = L.svg();
+      }
+
       const radiusM = rKm * 1000;
       if (circleRef.current) {
         circleRef.current.setLatLng([lat, lng]).setRadius(radiusM);
       } else {
         circleRef.current = L.circle([lat, lng], {
           radius: radiusM,
+          renderer: radiusRendererRef.current ?? undefined,
+          className: "lead-map-radius",
           color: "#e07c3a",
           fillColor: "#f7945e",
           fillOpacity: 0.14,
@@ -666,6 +686,7 @@ export default function ObtenerClientesSection({
       tileLayerRef.current = null;
       markerRef.current = null;
       circleRef.current = null;
+      radiusRendererRef.current = null;
       clientDotsRef.current = null;
       markersByIdRef.current.clear();
     };
@@ -711,6 +732,44 @@ export default function ObtenerClientesSection({
     }
     updateMapOverlays(pin.lat, pin.lng, radiusKm);
   }, [pin, radiusKm, updateMapOverlays]);
+
+  useEffect(() => {
+    if (!mapVisualReady || reduceMotion) {
+      setPinIntro(false);
+      return;
+    }
+    setPinIntro(true);
+    const introId = window.setTimeout(() => setPinIntro(false), 560);
+    return () => window.clearTimeout(introId);
+  }, [mapVisualReady, reduceMotion]);
+
+  useEffect(() => {
+    if (!isLoading || reduceMotion || mapEpoch === 0) return;
+    const L = window.L;
+    const map = mapRef.current;
+    const renderer = radiusRendererRef.current;
+    if (!L || !map || !renderer) return;
+
+    const { lat, lng } = pinRef.current;
+    const radiusM = radiusKm * 1000;
+    const rings = Array.from({ length: SEARCH_RADAR_RING_COUNT }, (_, index) =>
+      L.circle([lat, lng], {
+        radius: radiusM,
+        renderer,
+        className: `lead-map-search-ring lead-map-search-ring--${index}`,
+        color: "#e07c3a",
+        fillColor: "#f7945e",
+        fillOpacity: 0.08,
+        opacity: 1,
+        weight: 2,
+        interactive: false,
+      }).addTo(map),
+    );
+
+    return () => {
+      rings.forEach((ring) => ring.remove());
+    };
+  }, [isLoading, reduceMotion, radiusKm, pin, mapEpoch]);
 
   const categoryStats = useMemo(
     () => buildLeadCategoryStats(companyLeads),
@@ -1123,9 +1182,11 @@ export default function ObtenerClientesSection({
             themeMounted && isDarkMapTheme(resolvedTheme)
               ? "lead-exploration-map--night"
               : "lead-exploration-map--standard"
-          } ${mapVisualReady ? "lead-exploration-map--ready" : ""}`}
+          } ${mapVisualReady ? "lead-exploration-map--ready" : ""} ${
+            pinIntro ? "lead-exploration-map--pin-intro" : ""
+          } ${isLoading && !reduceMotion ? "lead-exploration-map--searching" : ""}`}
           role="application"
-          aria-busy={!mapVisualReady}
+          aria-busy={!mapVisualReady || isLoading}
           aria-label="Mapa interactivo. Los clientes obtenidos se ven como puntos de color. Haz clic para mover el punto de búsqueda."
         />
         <AnimatePresence>

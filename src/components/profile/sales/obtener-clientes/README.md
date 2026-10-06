@@ -10,7 +10,7 @@ Vacío: tarjeta de panel (blanco / carbón, acento naranja), nunca púrpura de K
 
 Éxito: recuento + **Ver en Clientes**. No mostrar “0 ya en base” ni “0 omitidos”: esos renglones solo aparecen si el número es mayor a cero. Escape cierra filtros o el panel de resultado.
 
-El toggle de fuente lleva isotipos: pin de Google Maps y marca INEGI (azul institucional `#003057` / cian). El motion es de producto (Corporate): 280ms, `cubic-bezier(0.2, 0, 0, 1)`, respeta `prefers-reduced-motion`. El momento principal es el panel de resultado deslizándose desde la izquierda; el resto es feedback (pastilla del toggle, CTA, FABs).
+El toggle de fuente lleva isotipos: pin de Google Maps y marca INEGI (azul institucional `#003057` / cian). El motion es de producto (Corporate): 280ms, `cubic-bezier(0.2, 0, 0, 1)`, respeta `prefers-reduced-motion`. El momento principal es el panel de resultado deslizándose desde la izquierda; el resto es feedback (pastilla del toggle, CTA, FABs). Mientras **Buscar leads** está en curso, el pin palpita y del centro salen anillos hasta el borde del radio: el círculo punteado avanza y su relleno respira. Con movimiento reducido el mapa se queda quieto.
 
 Herramientas del mapa a la derecha: mi ubicación y **CDMX**. La primera vez abre en Ciudad de México. Si el usuario mueve el mapa, hace zoom o cambia el punto, esa vista queda en este navegador y la siguiente entrada abre ahí. En INEGI, el hint bajo la isla dice que el radio es 2 o 5 km y que no hay calificación ni reseñas.
 
