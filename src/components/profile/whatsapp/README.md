@@ -1,6 +1,6 @@
 # WhatsApp Business (panel)
 
-Tab del panel en `/panel?tab=whatsapp` (ítem **WhatsApp Business** del menú lateral, no una ruta nueva). Cada empresa conecta **su propio** número y su propia App de Meta (BYOK): no hay una App de Kadesh compartida. La parte de servidor, los permisos y por qué está así están en `kadesh-back/models/README.md` (entradas 2026-09-22 y 2026-09-23).
+Tab del panel en `/panel?tab=whatsapp` (ítem **WhatsApp Business** del menú lateral, no una ruta nueva). Si el plan actual lo tiene en beta, el menú y el título de esta sección muestran la etiqueta **Beta**. Cada empresa conecta **su propio** número y su propia App de Meta (BYOK): no hay una App de Kadesh compartida. La parte de servidor, los permisos y por qué está así están en `kadesh-back/models/README.md` (entradas 2026-09-22 y 2026-09-23).
 
 ## Acceso
 

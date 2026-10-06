@@ -14,6 +14,7 @@ import {
 import { useSubscription } from "kadesh/components/profile/sales/SubscriptionContext";
 import { Routes } from "kadesh/core/routes";
 import { cn } from "kadesh/utils/cn";
+import FeatureBetaBadge from "kadesh/components/profile/sales/planes/FeatureBetaBadge";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft01Icon,
@@ -280,6 +281,7 @@ function FeatureChip({ feature }: { feature: PlanFeatureItem }) {
           aria-hidden
         />
         {isAi ? KADESH_URIM_AI_NAME : feature.name}
+        {feature.beta ? <FeatureBetaBadge onFill={isAi} /> : null}
       </span>
     </li>
   );
@@ -335,6 +337,7 @@ function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
               aria-hidden
             />
             {KADESH_URIM_AI_NAME}
+            {feature.beta ? <FeatureBetaBadge onFill /> : null}
           </button>
           <span
             id={tooltipId}
@@ -365,7 +368,7 @@ function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
               />
             )}
           </span>
-          <span ref={wrapperRef} className="relative inline group/name">
+          <span ref={wrapperRef} className="relative inline-flex flex-wrap items-center gap-1.5 group/name">
             <button
               type="button"
               onClick={(e) => {
@@ -380,6 +383,9 @@ function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
             >
               {feature.name}
             </button>
+            {feature.beta ? (
+              <FeatureBetaBadge />
+            ) : null}
             <span
               id={tooltipId}
               role="tooltip"

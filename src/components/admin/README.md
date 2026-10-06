@@ -51,7 +51,7 @@ En la lista se ve el saldo **de este mes** (disponibles / extra). En **Ajustar p
 
 `?tab=planes` tiene dos vistas:
 
-- **Catálogo** (default): edita cada `SaasPlan` (precio, créditos, visibilidad, Stripe, **qué módulos incluye**).
+- **Catálogo** (default): edita cada `SaasPlan` (precio, créditos, visibilidad, Stripe, **qué módulos incluye**). En cada módulo hay **En fase beta**. Hay que **guardar el plan**: la marca no se aplica al marcar la casilla. Después, quien tenga ese plan ve la etiqueta **Beta** en el menú del panel (WhatsApp, Calendario, etc.), en precios y al pagar. Se lee del plan guardado, no de la copia que quedó al contratar. La marca es de ese plan, no del catálogo de Módulos. Quitar el módulo del plan no borra la marca.
 - **Módulos** (`&vista=modulos`): lista + editor (no una tarjeta por módulo). Buscas, eliges uno, editas nombre/descripción y guardas cuando hay cambios. Punto naranja = sin guardar. Mutación `updatePlanFeatureCatalog`.
 
 - Cambiar el catálogo **no** reescribe el `included` de empresas ya contratadas. El copy (nombre/descripción) sí se propaga a suscripciones al guardar Módulos.

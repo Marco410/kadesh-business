@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useQuery } from "@apollo/client";
 import { useUser } from "kadesh/utils/UserContext";
@@ -17,12 +17,17 @@ import VendedoresCalendarioTab from "kadesh/components/profile/sales/vendedores/
 import {
   USER_COMPANY_CATEGORIES_QUERY,
   SUBSCRIPTION_STATUS_QUERY,
+  SAAS_PLANS_QUERY,
   type UserCompanyCategoriesResponse,
   type UserCompanyCategoriesVariables,
   type SubscriptionStatusResponse,
   type SubscriptionStatusVariables,
+  type SaasPlansResponse,
 } from "kadesh/components/profile/sales/queries";
-import { hasPlanFeature } from "kadesh/components/profile/sales/helpers/plan-features";
+import {
+  betaFeatureKeysForSubscription,
+  hasPlanFeature,
+} from "kadesh/components/profile/sales/helpers/plan-features";
 import { Footer, Navigation } from "kadesh/components/layout";
 import { CompanyDashboard } from "kadesh/components/panel/dashboard";
 import { PLAN_FEATURE_KEYS, Role } from "kadesh/constants/constans";
@@ -131,6 +136,16 @@ function PanelControlSectionContent({
   });
   const subscription =
     subscriptionData?.subscriptionStatus?.subscription ?? null;
+  const { data: plansData } = useQuery<SaasPlansResponse>(SAAS_PLANS_QUERY, {
+    skip: !companyId,
+    fetchPolicy: "cache-and-network",
+  });
+  const betaFeatureKeys = useMemo(
+    () =>
+      betaFeatureKeysForSubscription(plansData?.saasPlans ?? [], subscription),
+    [plansData?.saasPlans, subscription],
+  );
+  const whatsappIsBeta = betaFeatureKeys.has(PLAN_FEATURE_KEYS.WHATSAPP);
   const hasAdminRole = user?.roles?.some((r) => r.name === Role.ADMIN) ?? false;
   const hasSalesPersonManagement = hasPlanFeature(
     subscription?.planFeatures ?? null,
@@ -241,6 +256,7 @@ function PanelControlSectionContent({
               hasWorkspacesFeature={hasWorkspacesFeature}
               canManageAi={canManageAi}
               isAiLive={isAiLive}
+              betaFeatureKeys={betaFeatureKeys}
             />
 
             <main className="flex-1 min-w-0">
@@ -352,7 +368,10 @@ function PanelControlSectionContent({
 
               {selectedTab === "whatsapp" &&
                 (isAdminCompany && hasWhatsappFeature ? (
-                  <WhatsAppSettingsSection companyId={companyId} />
+                  <WhatsAppSettingsSection
+                    companyId={companyId}
+                    beta={whatsappIsBeta}
+                  />
                 ) : (
                   <FeatureLockedSection sectionName="WhatsApp Business" />
                 ))}

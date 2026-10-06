@@ -29,6 +29,7 @@ import {
   KADESH_AI_CREDIT_HINT,
 } from "kadesh/components/profile/ai/constants";
 import { SupportContactSection } from "kadesh/components/shared";
+import FeatureBetaBadge from "./FeatureBetaBadge";
 import { useSubscriptionPayment } from "./hooks/useSubscriptionPayment";
 import EmptyCompanySection from "../EmptyCompanySection";
 
@@ -284,6 +285,7 @@ export default function SuscripcionSection() {
                             className="shrink-0 text-white"
                           />
                           {KADESH_URIM_AI_NAME}
+                          {f.beta ? <FeatureBetaBadge onFill /> : null}
                         </span>
                       ) : (
                         <>
@@ -292,8 +294,9 @@ export default function SuscripcionSection() {
                             size={20}
                             className="flex-shrink-0 text-orange-500 dark:text-orange-400"
                           />
-                          <span className="text-[#212121] dark:text-[#e0e0e0]">
+                          <span className="inline-flex flex-wrap items-center gap-1.5 text-[#212121] dark:text-[#e0e0e0]">
                             {f.name}
+                            {f.beta ? <FeatureBetaBadge /> : null}
                           </span>
                         </>
                       )}

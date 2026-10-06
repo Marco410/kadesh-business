@@ -102,6 +102,7 @@ export type AdminPlanDraft = {
     name: string;
     description: string;
     included: boolean;
+    beta: boolean;
   }>;
 };
 
