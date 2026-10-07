@@ -74,7 +74,7 @@ export function AdminTabBar<T extends string>({
   return (
     <nav
       aria-label={ariaLabel}
-      className="flex gap-1 overflow-x-auto border-b border-[#e0e0e0] dark:border-[#3a3a3a] -mx-4 px-4 sm:mx-0 sm:px-0"
+      className="flex gap-1 overflow-x-auto overflow-y-hidden border-b border-[#e0e0e0] dark:border-[#3a3a3a] -mx-4 px-4 sm:mx-0 sm:px-0 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       {items.map((item) => {
         const selected = item.id === value;

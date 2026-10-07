@@ -4,7 +4,7 @@ Pantalla interna en `/panel/clientes/admin`. No es el panel de un cliente: es de
 
 ## Promesa
 
-Ver y ajustar **usuarios**, **catálogo de planes**, **el blog** y **fichas de veterinarias** (reclamos y servicios pedidos) en un solo lugar. El default es Inicio, con recuentos, reclamos y servicios pendientes. Las otras vistas viven en `?tab=usuarios`, `?tab=planes`, `?tab=blog` y `?tab=veterinarias`.
+Ver y ajustar **usuarios**, **catálogo de planes**, **el blog**, **correos** y **fichas de veterinarias** (reclamos y servicios pedidos) en un solo lugar. El default es Inicio, con recuentos, reclamos y servicios pendientes. Las otras vistas viven en `?tab=usuarios`, `?tab=planes`, `?tab=blog`, `?tab=correos` y `?tab=veterinarias`.
 
 ## Acceso
 
@@ -16,7 +16,7 @@ El enlace **Operaciones** aparece en el menú del avatar y, de forma discreta, a
 
 Antes las tabs, la vista Fichas/Servicios y los filtros eran la misma píldora y no se distinguían. Ahora cada nivel tiene su propio componente en `ui.tsx`:
 
-1. **Secciones** (Inicio, Usuarios, Planes, Veterinarias, Blog) — `AdminTabBar`: texto con subrayado naranja en la activa, no píldoras.
+1. **Secciones** (Inicio, Usuarios, Planes, Veterinarias, Blog, Correos) — `AdminTabBar`: texto con subrayado naranja en la activa, no píldoras.
 2. **Vista dentro de una sección** (Cuentas / Suscripciones, Fichas / Servicios) — `AdminSegmented`: control segmentado, opción activa como pastilla blanca.
 3. **Filtros de una tabla** (rol, estado) — `AdminFilterChips`: chips pequeños, activo con tinte naranja (no relleno sólido), con etiqueta (**Rol**, **Estado**) para que se lea qué filtran.
 
@@ -94,7 +94,30 @@ En fichas:
 
 En servicios: un dueño pidió algo que no estaba en el catálogo. Default **Pendientes**. Al **Aprobar y asignar**, el servicio entra al catálogo **y** se marca en la clínica elegida (prellenada con la que lo pidió; se puede cambiar). **Rechazar** no lo publica.
 
+## Correos
+
+`?tab=correos` envía un correo con el layout de marca (Pet azul / Negocios naranja), el mismo que usan bienvenida, blog y releases.
+
+### Audiencia
+
+- **Negocios (SaaS)**: usuarios con empresa (excluye cuentas de prueba).
+- **Pet**: usuarios sin empresa.
+- **Todos**: ambas.
+- **Específicos**: lista de correos (máx. 200). Si el correo coincide con una cuenta, se usa el nombre en el saludo.
+
+La **marca** del correo (colores y nombre del remitente) es independiente de la audiencia: puedes avisar a Pet con look Negocios o al revés. Al cambiar audiencia se sugiere la marca habitual.
+
+### Contenido
+
+Asunto, título de cabecera, etiqueta superior, vista previa de bandeja, cuerpo, recuadro destacado, botón (texto + URL) y nota del pie. El cuerpo acepta párrafos (línea en blanco), `**negrita**` y `[texto](https://…)`. No se pega HTML libre.
+
+La columna derecha es vista previa en vivo. **Revisar y enviar** primero cuenta destinatarios (`dryRun`) y pide confirmación antes del envío real. Mutación `sendAdminBroadcastEmail` (solo admin de plataforma).
+
 ## Decisiones
+
+### 2026-10-07 — Tab Correos en Operaciones
+
+Envíos masivos o puntuales viven en Operaciones, no en el Admin de Keystone. Reutilizan `emailLayout` del backend (Pet / Negocios). El conteo previo evita enviar a ciegas.
 
 ### 2026-09-25 — Tab Planes = catálogo; suscripciones bajo Usuarios
 

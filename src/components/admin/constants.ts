@@ -6,6 +6,7 @@ export const ADMIN_TABS = {
   PLANS: "planes",
   PET_PLACES: "veterinarias",
   BLOG: "blog",
+  EMAILS: "correos",
 } as const;
 
 export type AdminTab = (typeof ADMIN_TABS)[keyof typeof ADMIN_TABS];
@@ -42,6 +43,11 @@ export const ADMIN_TAB_ITEMS: Array<{
     id: ADMIN_TABS.BLOG,
     label: "Blog",
     description: "Artículos, categorías y etiquetas",
+  },
+  {
+    id: ADMIN_TABS.EMAILS,
+    label: "Correos",
+    description: "Envíos a SaaS, Pet o usuarios específicos",
   },
 ];
 
@@ -109,7 +115,8 @@ export function parseAdminTab(value: string | null): AdminTab {
     value === ADMIN_TABS.USERS ||
     value === ADMIN_TABS.PLANS ||
     value === ADMIN_TABS.PET_PLACES ||
-    value === ADMIN_TABS.BLOG
+    value === ADMIN_TABS.BLOG ||
+    value === ADMIN_TABS.EMAILS
   ) {
     return value;
   }
