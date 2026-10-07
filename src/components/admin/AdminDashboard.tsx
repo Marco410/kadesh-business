@@ -27,6 +27,7 @@ import { AdminTabBar } from "./ui";
 import AdminUsersSection from "./AdminUsersSection";
 import AdminPlansPanel from "./AdminPlansPanel";
 import AdminBlogPanel from "./AdminBlogPanel";
+import AdminEmailsPanel from "./AdminEmailsPanel";
 import AdminPetPlacesPanel, {
   type PetPlacesVista,
 } from "./AdminPetPlacesPanel";
@@ -158,7 +159,7 @@ function AdminDashboardContent() {
     return (
       <RoleAccessDeniedSection
         title="Solo para administradores de Kadesh"
-        description="Esta pantalla controla usuarios, planes, el blog y el directorio de veterinarias. Si necesitas acceso, habla con el equipo de plataforma."
+        description="Esta pantalla controla usuarios, planes, el blog, correos y el directorio de veterinarias. Si necesitas acceso, habla con el equipo de plataforma."
         backHref={Routes.panel}
         backLabel="Volver al panel"
       />
@@ -172,8 +173,8 @@ function AdminDashboardContent() {
           Operaciones
         </h1>
         <p className="text-[#616161] dark:text-[#b0b0b0] mt-1 max-w-2xl">
-          Usuarios, planes, el blog y fichas del directorio. Lo que cambies aquí
-          aplica de inmediato.
+          Usuarios, planes, el blog, correos y fichas del directorio. Lo que
+          cambies aquí aplica de inmediato.
         </p>
       </header>
 
@@ -210,6 +211,7 @@ function AdminDashboardContent() {
           onConsumedInitialService={clearReviewService}
         />
       ) : null}
+      {tab === ADMIN_TABS.EMAILS ? <AdminEmailsPanel /> : null}
     </div>
   );
 }
