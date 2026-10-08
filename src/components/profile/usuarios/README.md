@@ -13,6 +13,8 @@ El administrador de la empresa (y Gerencia) agregan personas, les dan rol y marc
 - **Vendedor**: aparece en asignaciones de clientes.
 - **Usuario de empresa**: acceso de empresa (p. ej. espacios).
 
+En el formulario, cada tarjeta de rol tiene un **?** táctil. La explicación completa se abre **debajo de las tres tarjetas** (mismo alto siempre; no se estira una sola card). El ? no marca/desmarca el rol.
+
 Siempre se conecta también el rol base `user`. Nunca se asignan desde aquí admin de plataforma ni admin de empresa.
 
 ## Permisos

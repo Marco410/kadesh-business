@@ -38,6 +38,6 @@ El menú exige `clientes.ver` (o rol vendedor si el usuario no tiene lista de pe
 
 **Categoría / ubicación:** la categoría del filtro abarca Google e INEGI con la misma etiqueta (p. ej. Médicos → `médicos` y `medicina`). Empresa, ciudad, estado y país se filtran en cliente sin acentos (`México` = `mexico`), porque el API no hace unaccent.
 
-**Vendedores** (`?tab=vendedores`): ver `vendedores.ver` (legado: admin empresa). Altas: `vendedores.crear`. Editar / reasignar en el modal: `vendedores.editar` + `clientes.asignar`.
+**Vendedores** (`?tab=vendedores`): ver `vendedores.ver` (legado: admin empresa). Altas: `vendedores.crear`. Editar / reasignar en el modal: `vendedores.editar` + `clientes.asignar`. Detalle del modal (pestañas, resumen): `vendedores/README.md`.
 
-**Archivos / Calendario / Espacios**: `archivos.*`, `calendario.*`, `espacios.*` en el catálogo. Catálogo completo: `usuarios/README.md`.
+**Archivos / Calendario / Espacios**: `archivos.*`, `calendario.*`, `espacios.*` en el catálogo. Miembros del espacio (modal): `workspaces/members/README.md`. Catálogo completo: `usuarios/README.md`.

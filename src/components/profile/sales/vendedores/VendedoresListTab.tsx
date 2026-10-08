@@ -24,7 +24,7 @@ import { useSubscription } from "../SubscriptionContext";
 import { useUser } from "kadesh/utils/UserContext";
 import { can } from "kadesh/components/profile/usuarios/can";
 import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
-import { isAdminCompanyUser } from "kadesh/utils/user-roles";
+import { canManageCompanyUsers } from "kadesh/utils/user-roles";
 
 export interface VendedoresListTabProps {
   userId: string;
@@ -56,7 +56,7 @@ export default function VendedoresListTab({ userId }: VendedoresListTabProps) {
   const canCreateVendedores = can(
     user,
     PERMISSION_KEYS.VENDEDORES_CREAR,
-    () => isAdminCompanyUser(user),
+    () => canManageCompanyUsers(user),
   );
 
   const { data: userData } = useQuery<

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { ArrowLeft01Icon, HelpCircleIcon } from "@hugeicons/core-free-icons";
 import {
   ROLES_BY_NAMES_QUERY,
   type RolesByNamesResponse,
@@ -38,6 +38,16 @@ const ROLE_HINTS: Record<AssignableCompanyRole, string> = {
   gerencia: "Administra usuarios y permisos de la empresa.",
   vendedor: "Aparece en asignaciones de clientes y el CRM.",
   user_company: "Acceso de empresa (espacios y bolsa compartida).",
+};
+
+/** Texto del botón ? en cada tarjeta de rol (tap, no solo hover). */
+const ROLE_HELP: Record<AssignableCompanyRole, string> = {
+  gerencia:
+    "Puede abrir Usuarios, dar de alta personas y asignar roles y permisos. No administra al dueño de la empresa ni a admins de plataforma. Combínalo con Vendedor si también vende.",
+  vendedor:
+    "Sale en la lista para asignar clientes y trabaja el CRM (pipeline, actividades, propuestas). Sin este rol no aparece como opción al asignar un cliente. No implica ver toda la bolsa: eso lo marcan los permisos (o Usuario de empresa en legado).",
+  user_company:
+    "Pertenece a la empresa para espacios de trabajo y, si no hay permisos finos, ver la bolsa compartida de clientes. No vende por sí solo ni administra usuarios: úsalo solo o junto con Gerencia / Vendedor según el trabajo de la persona.",
 };
 
 const ALL_PERMISSION_KEYS = PERMISSION_MODULES.flatMap((m) =>
@@ -81,6 +91,8 @@ export default function UserEditorForm({
   const [selectedPermissions, setSelectedPermissions] = useState<
     PermissionKey[]
   >([]);
+  const [openRoleHelp, setOpenRoleHelp] =
+    useState<AssignableCompanyRole | null>(null);
 
   useApplyOnKeyChange(editingUser?.id ?? "new", () => {
     if (!editingUser) {
@@ -93,8 +105,10 @@ export default function UserEditorForm({
       setBirthday("");
       setSelectedRoles(["user_company"]);
       setSelectedPermissions([]);
+      setOpenRoleHelp(null);
       return;
     }
+    setOpenRoleHelp(null);
     setName(editingUser.name ?? "");
     setLastName(editingUser.lastName ?? "");
     setEmail(editingUser.email ?? "");
@@ -443,37 +457,82 @@ export default function UserEditorForm({
         <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
           Puedes combinar roles. Elige al menos uno.
         </p>
-        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3 sm:items-stretch">
           {ASSIGNABLE_COMPANY_ROLES.map((role) => {
             const checked = selectedRoles.includes(role);
+            const helpOpen = openRoleHelp === role;
             return (
-              <label
+              <div
                 key={role}
                 className={cn(
-                  "flex min-h-[5.5rem] cursor-pointer flex-col rounded-xl border px-3 py-3 transition-colors",
+                  "flex h-full flex-col rounded-xl border px-3 py-3 transition-colors",
                   checked
                     ? "border-orange-500 bg-orange-500/10"
-                    : "border-[#e0e0e0] dark:border-[#3a3a3a] hover:border-orange-500/40",
+                    : "border-[#e0e0e0] dark:border-[#3a3a3a]",
+                  helpOpen && "ring-2 ring-orange-500/30",
                 )}
               >
-                <span className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => toggleRole(role)}
-                    className="size-4 rounded border-[#c0c0c0] text-orange-500 focus:ring-orange-500"
-                  />
-                  <span className="text-sm font-semibold text-[#212121] dark:text-white">
-                    {ASSIGNABLE_ROLE_LABELS[role]}
-                  </span>
-                </span>
-                <span className="mt-1.5 pl-6 text-xs leading-snug text-[#616161] dark:text-[#b0b0b0]">
+                <div className="flex items-start gap-2">
+                  <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleRole(role)}
+                      className="size-4 shrink-0 rounded border-[#c0c0c0] text-orange-500 focus:ring-orange-500"
+                    />
+                    <span className="text-sm font-semibold text-[#212121] dark:text-white">
+                      {ASSIGNABLE_ROLE_LABELS[role]}
+                    </span>
+                  </label>
+                  <button
+                    type="button"
+                    aria-label={`Qué hace el rol ${ASSIGNABLE_ROLE_LABELS[role]}`}
+                    aria-expanded={helpOpen}
+                    aria-controls="role-help-panel"
+                    onClick={() =>
+                      setOpenRoleHelp((cur) => (cur === role ? null : role))
+                    }
+                    className={cn(
+                      "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors",
+                      helpOpen
+                        ? "bg-orange-500/15 text-orange-600 dark:text-orange-400"
+                        : "text-[#9e9e9e] hover:bg-[#f5f5f5] hover:text-[#212121] dark:hover:bg-[#2a2a2a] dark:hover:text-white",
+                    )}
+                  >
+                    <HugeiconsIcon icon={HelpCircleIcon} size={18} />
+                  </button>
+                </div>
+                <p className="mt-1.5 flex-1 pl-6 text-xs leading-snug text-[#616161] dark:text-[#b0b0b0]">
                   {ROLE_HINTS[role]}
-                </span>
-              </label>
+                </p>
+              </div>
             );
           })}
         </div>
+        {openRoleHelp && (
+          <div
+            id="role-help-panel"
+            role="region"
+            aria-live="polite"
+            className="mt-3 rounded-xl border border-orange-200/80 bg-[#fffaf5] px-3 py-3 dark:border-orange-900/40 dark:bg-orange-500/[0.07] sm:px-4"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-orange-700 dark:text-orange-300">
+                {ASSIGNABLE_ROLE_LABELS[openRoleHelp]}
+              </p>
+              <button
+                type="button"
+                onClick={() => setOpenRoleHelp(null)}
+                className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-2 text-xs font-medium text-[#616161] hover:bg-black/5 dark:text-[#b0b0b0] dark:hover:bg-white/10"
+              >
+                Cerrar
+              </button>
+            </div>
+            <p className="mt-1.5 text-sm leading-relaxed text-[#424242] dark:text-[#e0e0e0]">
+              {ROLE_HELP[openRoleHelp]}
+            </p>
+          </div>
+        )}
       </fieldset>
 
       <fieldset

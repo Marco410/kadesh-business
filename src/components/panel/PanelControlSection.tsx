@@ -481,17 +481,11 @@ function PanelControlSectionContent({
                     backHref={`${Routes.panel}?tab=inicio`}
                     backLabel="Volver al inicio"
                   />
-                ) : hasWhatsappFeature && canConfigureWhatsapp ? (
+                ) : hasWhatsappFeature ? (
                   <WhatsAppSettingsSection
                     companyId={companyId}
                     beta={whatsappIsBeta}
-                  />
-                ) : hasWhatsappFeature ? (
-                  <RoleAccessDeniedSection
-                    title="No puedes configurar WhatsApp Business"
-                    description="Puedes ver la sección si te dan el permiso de configurar, o pide ayuda al administrador."
-                    backHref={`${Routes.panel}?tab=inicio`}
-                    backLabel="Volver al inicio"
+                    canConfigure={canConfigureWhatsapp}
                   />
                 ) : (
                   <FeatureLockedSection sectionName="WhatsApp Business" />
