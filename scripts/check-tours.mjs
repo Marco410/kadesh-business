@@ -12,6 +12,7 @@ const PANEL_NAV = "src/components/panel/DashboardSidebar.tsx";
 const EXEMPT_NAV_KEYS = new Set([
   "inicio",
   "profile",
+  "usuarios",
   "vendedores",
   "archivos",
   "proyectos",

@@ -21,6 +21,10 @@ import { hasPlanFeature } from "../helpers/plan-features";
 import { Routes } from "kadesh/core/routes";
 import { useRouter } from "next/navigation";
 import { useSubscription } from "../SubscriptionContext";
+import { useUser } from "kadesh/utils/UserContext";
+import { can } from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
+import { isAdminCompanyUser } from "kadesh/utils/user-roles";
 
 export interface VendedoresListTabProps {
   userId: string;
@@ -45,9 +49,15 @@ function normalizeSearch(value: string): string {
 
 export default function VendedoresListTab({ userId }: VendedoresListTabProps) {
   const router = useRouter();
+  const { user } = useUser();
   const [searchInput, setSearchInput] = useState("");
   const [selectedVendedorId, setSelectedVendedorId] = useState<string | null>(null);
   const { subscription } = useSubscription();
+  const canCreateVendedores = can(
+    user,
+    PERMISSION_KEYS.VENDEDORES_CREAR,
+    () => isAdminCompanyUser(user),
+  );
 
   const { data: userData } = useQuery<
     UserCompanyCategoriesResponse,
@@ -129,11 +139,15 @@ export default function VendedoresListTab({ userId }: VendedoresListTabProps) {
           </p>
         </div>
         <div className="flex flex-row gap-3 w-full sm:w-auto items-center">
-          {hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT) && (
+          {canCreateVendedores &&
+            hasPlanFeature(
+              subscription?.planFeatures,
+              PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT,
+            ) && (
             <button
               type="button"
               onClick={() => router.push(Routes.panelAddSalesperson)}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors"
+              className="inline-flex min-h-11 items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] transition-colors"
             >
               <HugeiconsIcon icon={UserAdd02Icon} size={18} strokeWidth={2} />
               Gestionar vendedores

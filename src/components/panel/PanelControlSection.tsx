@@ -33,7 +33,17 @@ import { CompanyDashboard } from "kadesh/components/panel/dashboard";
 import { PLAN_FEATURE_KEYS, Role } from "kadesh/constants/constans";
 import FeatureLockedSection from "kadesh/components/profile/sales/FeatureLockedSection";
 import RoleAccessDeniedSection from "kadesh/components/profile/sales/RoleAccessDeniedSection";
-import { canManageCompanyAi } from "kadesh/utils/user-roles";
+import {
+  canManageCompanyAi,
+  canManageCompanyUsers,
+} from "kadesh/utils/user-roles";
+import {
+  can,
+  canAccessNavTab,
+  canViewCompanyWideLeads,
+} from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
+import { UsuariosSection } from "kadesh/components/profile/usuarios";
 import { SubscriptionProvider } from "kadesh/components/profile/sales/SubscriptionContext";
 import ReferralDashboardSection from "kadesh/components/profile/referral/ReferralDashboardSection";
 import WorkspacesTab from "kadesh/components/profile/sales/workspaces/WorkspacesTab";
@@ -48,6 +58,7 @@ import DashboardSidebar from "./DashboardSidebar";
 const VALID_TABS = [
   "inicio",
   "profile",
+  "usuarios",
   "ai",
   "clientes",
   "vendedores",
@@ -112,10 +123,37 @@ function PanelControlSectionContent({
     user?.roles?.some((r) => r.name === Role.VENDEDOR) ?? false;
   const isAdminCompany =
     user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
-  const isUserCompany =
-    user?.roles?.some((r) => r.name === Role.USER_COMPANY) ?? false;
-  const hasCompanyWideLeadScope = isAdminCompany || isUserCompany;
+  const hasCompanyWideLeadScope = canViewCompanyWideLeads(user);
   const canManageAi = canManageCompanyAi(user);
+  const canManageUsers = canManageCompanyUsers(user);
+  const navAccessCtx = {
+    hasVendedorRole,
+    isAdminCompany,
+    canManageAi,
+  };
+  const canSeeAi = canAccessNavTab(user, "ai", navAccessCtx);
+  const canSeeClientes = canAccessNavTab(user, "clientes", navAccessCtx);
+  const canSeeVendedores = canAccessNavTab(user, "vendedores", navAccessCtx);
+  const canSeeArchivos = canAccessNavTab(user, "archivos", navAccessCtx);
+  const canSeeProyectos = canAccessNavTab(user, "proyectos", navAccessCtx);
+  const canSeeCotizaciones = canAccessNavTab(
+    user,
+    "cotizaciones",
+    navAccessCtx,
+  );
+  const canSeeCalendar = canAccessNavTab(user, "calendar", navAccessCtx);
+  const canSeeWorkspaces = canAccessNavTab(user, "workspaces", navAccessCtx);
+  const canSeeWhatsapp = canAccessNavTab(user, "whatsapp", navAccessCtx);
+  const canSeeInicio = canAccessNavTab(user, "inicio", navAccessCtx);
+  const canSeeProfile = canAccessNavTab(user, "profile", navAccessCtx);
+  const canConfigureWhatsapp = can(
+    user,
+    PERMISSION_KEYS.WHATSAPP_CONFIGURAR,
+    () => isAdminCompany,
+  );
+  const canConfigureAi = can(user, PERMISSION_KEYS.AI_CONFIGURAR, () =>
+    canManageCompanyAi(user),
+  );
 
   const { data: userData, refetch: refetchUserCompany } = useQuery<
     UserCompanyCategoriesResponse,
@@ -247,68 +285,102 @@ function PanelControlSectionContent({
 
           <div className="flex flex-col lg:flex-row gap-6">
             <DashboardSidebar
+              user={user}
               selectedTab={selectedTab}
               onTabChange={handleTabChange}
               hasVendedorRole={hasVendedorRole}
               isAdminCompany={isAdminCompany}
-              hasSalesPersonManagement={hasSalesPersonManagement}
-              hasUploadFilesFeature={hasUploadFilesFeature}
-              hasWorkspacesFeature={hasWorkspacesFeature}
               canManageAi={canManageAi}
               isAiLive={isAiLive}
               betaFeatureKeys={betaFeatureKeys}
             />
 
             <main className="flex-1 min-w-0">
-              {selectedTab === "inicio" && (
-                <CompanyDashboard
-                  userId={user.id}
-                  userName={user.name ?? ""}
-                  companyId={companyId}
-                  hasCompanyWideLeadScope={hasCompanyWideLeadScope}
-                  isAdminCompany={isAdminCompany}
-                  hasVendedorRole={hasVendedorRole}
-                  canManageAi={canManageAi}
-                  hasAdminRole={hasAdminRole}
-                  subscription={subscription}
-                  referralCode={userData?.user?.referralCode ?? ""}
-                  bank={userData?.user?.bank}
-                  clabe={userData?.user?.clabe}
-                  cardNumber={userData?.user?.cardNumber}
-                  onCompanyCreated={refetchUserCompany}
-                />
-              )}
+              {selectedTab === "inicio" &&
+                (canSeeInicio ? (
+                  <CompanyDashboard
+                    userId={user.id}
+                    userName={user.name ?? ""}
+                    companyId={companyId}
+                    hasCompanyWideLeadScope={hasCompanyWideLeadScope}
+                    isAdminCompany={isAdminCompany}
+                    hasVendedorRole={hasVendedorRole}
+                    canManageAi={canSeeAi}
+                    hasAdminRole={hasAdminRole}
+                    subscription={subscription}
+                    referralCode={userData?.user?.referralCode ?? ""}
+                    bank={userData?.user?.bank}
+                    clabe={userData?.user?.clabe}
+                    cardNumber={userData?.user?.cardNumber}
+                    onCompanyCreated={refetchUserCompany}
+                  />
+                ) : (
+                  <RoleAccessDeniedSection
+                    title="No tienes acceso a Inicio"
+                    description="Pide a Gerencia o al administrador que te active el permiso de ver el inicio."
+                    backHref={`${Routes.panel}?tab=profile`}
+                    backLabel="Ir al perfil"
+                  />
+                ))}
 
-              {selectedTab === "profile" && (
-                <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8 shadow-sm">
-                  <ProfileData user={user} />
-                </div>
-              )}
+              {selectedTab === "profile" &&
+                (canSeeProfile ? (
+                  <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8 shadow-sm">
+                    <ProfileData user={user} />
+                  </div>
+                ) : (
+                  <RoleAccessDeniedSection
+                    title="No tienes acceso al perfil"
+                    description="Pide a Gerencia o al administrador que te active el permiso de ver el perfil."
+                    backHref={`${Routes.panel}?tab=inicio`}
+                    backLabel="Volver al inicio"
+                  />
+                ))}
+
+              {selectedTab === "usuarios" &&
+                (canManageUsers ? (
+                  <UsuariosSection />
+                ) : (
+                  <RoleAccessDeniedSection
+                    title="Solo administración y Gerencia gestionan usuarios"
+                    description="Pide acceso al administrador de tu empresa si necesitas agregar personas o cambiar permisos."
+                    backHref={`${Routes.panel}?tab=inicio`}
+                    backLabel="Volver al inicio"
+                  />
+                ))}
 
               {selectedTab === "ai" &&
-                (canManageAi ? (
+                (canSeeAi ? (
                   <AiSection
                     companyId={companyId}
-                    canManageAi={canManageAi}
+                    canManageAi={canConfigureAi}
                     isCompanyWide={hasCompanyWideLeadScope}
                   />
                 ) : (
                   <RoleAccessDeniedSection
-                    title={`Solo el administrador configura ${KADESH_URIM_AI_NAME}`}
-                    description={`Los vendedores usarán ${KADESH_URIM_AI_NAME} con la configuración de la empresa. Si necesitas cambiar proveedor, API key o modalidad, pide acceso al administrador.`}
+                    title={`No tienes acceso a ${KADESH_URIM_AI_NAME}`}
+                    description={`Pide a Gerencia o al administrador que te active el permiso de ver ${KADESH_URIM_AI_NAME}.`}
                     backHref={Routes.panel}
                     backLabel="Volver al inicio"
                   />
                 ))}
 
-              {selectedTab === "clientes" && hasVendedorRole && (
-                <div className="space-y-6">
-                  <SalesSection userId={user.id} />
-                </div>
-              )}
+              {selectedTab === "clientes" &&
+                (canSeeClientes ? (
+                  <div className="space-y-6">
+                    <SalesSection userId={user.id} />
+                  </div>
+                ) : null)}
 
               {selectedTab === "vendedores" &&
-                (isAdminCompany && hasSalesPersonManagement ? (
+                (!canSeeVendedores ? (
+                  <RoleAccessDeniedSection
+                    title="No tienes acceso a Vendedores"
+                    description="Pide a Gerencia o al administrador que te active el permiso de ver vendedores."
+                    backHref={`${Routes.panel}?tab=inicio`}
+                    backLabel="Volver al inicio"
+                  />
+                ) : hasSalesPersonManagement ? (
                   <div className="space-y-6">
                     <VendedoresSection userId={user.id} />
                   </div>
@@ -317,7 +389,14 @@ function PanelControlSectionContent({
                 ))}
 
               {selectedTab === "archivos" &&
-                (hasUploadFilesFeature ? (
+                (!canSeeArchivos ? (
+                  <RoleAccessDeniedSection
+                    title="No tienes acceso a Archivos"
+                    description="Pide a Gerencia o al administrador que te active el permiso de ver archivos."
+                    backHref={`${Routes.panel}?tab=inicio`}
+                    backLabel="Volver al inicio"
+                  />
+                ) : hasUploadFilesFeature ? (
                   <div className="space-y-6">
                     <ArchivosSection userId={user.id} />
                   </div>
@@ -326,7 +405,14 @@ function PanelControlSectionContent({
                 ))}
 
               {selectedTab === "proyectos" &&
-                (hasProjectsFeature ? (
+                (!canSeeProyectos ? (
+                  <RoleAccessDeniedSection
+                    title="No tienes acceso a Proyectos"
+                    description="Pide a Gerencia o al administrador que te active el permiso de ver proyectos."
+                    backHref={`${Routes.panel}?tab=inicio`}
+                    backLabel="Volver al inicio"
+                  />
+                ) : hasProjectsFeature ? (
                   <div className="space-y-6">
                     <ProyectosSection userId={user.id} />
                   </div>
@@ -335,7 +421,14 @@ function PanelControlSectionContent({
                 ))}
 
               {selectedTab === "cotizaciones" &&
-                (hasQuotationsFeature ? (
+                (!canSeeCotizaciones ? (
+                  <RoleAccessDeniedSection
+                    title="No tienes acceso a Cotizaciones"
+                    description="Pide a Gerencia o al administrador que te active el permiso de ver cotizaciones."
+                    backHref={`${Routes.panel}?tab=inicio`}
+                    backLabel="Volver al inicio"
+                  />
+                ) : hasQuotationsFeature ? (
                   <div className="space-y-6">
                     <QuotationsSection userId={user.id} />
                   </div>
@@ -344,7 +437,14 @@ function PanelControlSectionContent({
                 ))}
 
               {selectedTab === "calendar" &&
-                (hasCalendarFeature ? (
+                (!canSeeCalendar ? (
+                  <RoleAccessDeniedSection
+                    title="No tienes acceso al Calendario"
+                    description="Pide a Gerencia o al administrador que te active el permiso de ver el calendario."
+                    backHref={`${Routes.panel}?tab=inicio`}
+                    backLabel="Volver al inicio"
+                  />
+                ) : hasCalendarFeature ? (
                   <div className="space-y-6">
                     <VendedoresCalendarioTab userId={user.id} />
                   </div>
@@ -353,7 +453,14 @@ function PanelControlSectionContent({
                 ))}
 
               {selectedTab === "workspaces" &&
-                (hasWorkspacesFeature ? (
+                (!canSeeWorkspaces ? (
+                  <RoleAccessDeniedSection
+                    title="No tienes acceso a Espacios de trabajo"
+                    description="Pide a Gerencia o al administrador que te active el permiso de ver espacios."
+                    backHref={`${Routes.panel}?tab=inicio`}
+                    backLabel="Volver al inicio"
+                  />
+                ) : hasWorkspacesFeature ? (
                   <div className="space-y-6">
                     <WorkspacesTab
                       userId={user.id}
@@ -367,10 +474,24 @@ function PanelControlSectionContent({
                 ))}
 
               {selectedTab === "whatsapp" &&
-                (isAdminCompany && hasWhatsappFeature ? (
+                (!canSeeWhatsapp ? (
+                  <RoleAccessDeniedSection
+                    title="No tienes acceso a WhatsApp Business"
+                    description="Pide a Gerencia o al administrador que te active el permiso de ver WhatsApp Business."
+                    backHref={`${Routes.panel}?tab=inicio`}
+                    backLabel="Volver al inicio"
+                  />
+                ) : hasWhatsappFeature && canConfigureWhatsapp ? (
                   <WhatsAppSettingsSection
                     companyId={companyId}
                     beta={whatsappIsBeta}
+                  />
+                ) : hasWhatsappFeature ? (
+                  <RoleAccessDeniedSection
+                    title="No puedes configurar WhatsApp Business"
+                    description="Puedes ver la sección si te dan el permiso de configurar, o pide ayuda al administrador."
+                    backHref={`${Routes.panel}?tab=inicio`}
+                    backLabel="Volver al inicio"
                   />
                 ) : (
                   <FeatureLockedSection sectionName="WhatsApp Business" />
@@ -414,7 +535,9 @@ function PanelControlSectionContent({
           <Footer />
         </div>
       )}
-      {hasWorkspacesFeature && user?.id && (
+      {hasWorkspacesFeature &&
+        user?.id &&
+        can(user, PERMISSION_KEYS.ESPACIOS_CREAR, () => isAdminCompany) && (
         <CreateWorkspaceModal
           isOpen={createWorkspaceOpen}
           onClose={() => setCreateWorkspaceOpen(false)}

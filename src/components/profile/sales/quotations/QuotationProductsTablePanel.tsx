@@ -23,6 +23,9 @@ import {
   quotationTdClass,
 } from "./quotation-table-classes";
 import QuotationProductFormModal from "./QuotationProductFormModal";
+import { useUser } from "kadesh/utils/UserContext";
+import { can } from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 
 const PAGE_SIZE = 10;
 
@@ -46,6 +49,12 @@ export interface QuotationProductsTablePanelProps {
 export default function QuotationProductsTablePanel({
   userId,
 }: QuotationProductsTablePanelProps) {
+  const { user } = useUser();
+  const canEditQuotation = can(
+    user,
+    PERMISSION_KEYS.COTIZACIONES_EDITAR,
+    () => true,
+  );
   const [page, setPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
@@ -106,6 +115,7 @@ export default function QuotationProductsTablePanel({
   };
 
   const openEdit = (p: SaasQuotationProductRow) => {
+    if (!canEditQuotation) return;
     setEditingProduct(p);
     setModalMode("edit");
     setModalOpen(true);
@@ -237,14 +247,18 @@ export default function QuotationProductsTablePanel({
                       {formatDateShort(row.updatedAt, false)}
                     </td>
                     <td className={`${quotationTdClass} text-right`}>
-                      <button
-                        type="button"
-                        onClick={() => openEdit(row)}
-                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-orange-600 dark:text-orange-400 hover:bg-orange-500/10"
-                      >
-                        <HugeiconsIcon icon={Edit01Icon} size={16} />
-                        Editar
-                      </button>
+                      {canEditQuotation ? (
+                        <button
+                          type="button"
+                          onClick={() => openEdit(row)}
+                          className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-orange-600 dark:text-orange-400 hover:bg-orange-500/10"
+                        >
+                          <HugeiconsIcon icon={Edit01Icon} size={16} />
+                          Editar
+                        </button>
+                      ) : (
+                        <span className="text-xs text-[#9e9e9e]">—</span>
+                      )}
                     </td>
                   </tr>
                 ))

@@ -164,31 +164,55 @@ export interface TechStatusBusinessLeadWhereInputFilter {
   saasCompany?: { id: { equals: string } };
 }
 
-export interface TechBusinessLeadsVariables {
-  where: {
-    id?: { equals: string };
-    /** some: por vendedor; none: {} para leads sin asignar (salesPerson vacío). */
-    salesPerson?: { some: { id: { equals: string } } } | { none: Record<string, never> };
-    saasCompany?: { some: { id: { equals: string } } };
-    status?: {
-      pipelineStatus?: { equals: string | null };
-      some?: {
-        AND?: Array<{
-          salesPerson?: { id: { equals: string } } | null;
-          saasCompany?: { id: { equals: string } };
-          pipelineStatus?: { equals: string | null };
-        }>;
-        salesPerson?: { id: { equals: string } } | null;
-        saasCompany?: { id: { equals: string } };
-      };
-    };
-    category?: { equals: string } | { in: string[] };
-    source?: { equals: string };
-    businessName?: { contains: string; mode?: "insensitive" };
-    city?: { contains: string; mode?: "insensitive" };
-    state?: { contains: string; mode?: "insensitive" };
-    country?: { contains: string; mode?: "insensitive" };
+type TechBusinessLeadStatusRelFilter = {
+  AND?: Array<{
+    /** `null` = sin vendedor en el status (Keystone/Prisma). */
+    salesPerson?: { id: { equals: string } } | null;
+    saasCompany?: { id: { equals: string } };
+    pipelineStatus?: { equals: string | null };
+  }>;
+  salesPerson?: { id: { equals: string } } | null;
+  saasCompany?: { id: { equals: string } };
+  pipelineStatus?: { equals: string | null };
+};
+
+type TechBusinessLeadWhereFilter = {
+  id?: { equals: string };
+  /** some: por vendedor; none: {} para leads sin asignar (salesPerson vacío). */
+  salesPerson?:
+    | { some: { id: { equals: string } } }
+    | { some: Record<string, never> }
+    | { none: Record<string, never> };
+  saasCompany?: { some: { id: { equals: string } } };
+  status?: {
+    pipelineStatus?: { equals: string | null };
+    firstContactDate?: { not: null } | null;
+    some?: TechBusinessLeadStatusRelFilter;
+    none?: TechBusinessLeadStatusRelFilter;
   };
+  /** Filtro canónico: sin asignar O estatus del vendedor asignado (o fallback empresa). */
+  OR?: Array<{
+    AND?: Array<{
+      salesPerson?:
+        | { some: { id: { equals: string } } }
+        | { some: Record<string, never> }
+        | { none: Record<string, never> };
+      status?: {
+        some?: TechBusinessLeadStatusRelFilter;
+        none?: TechBusinessLeadStatusRelFilter;
+      };
+    }>;
+  }>;
+  category?: { equals: string } | { in: string[] };
+  source?: { equals: string };
+  businessName?: { contains: string; mode?: "insensitive" };
+  city?: { contains: string; mode?: "insensitive" };
+  state?: { contains: string; mode?: "insensitive" };
+  country?: { contains: string; mode?: "insensitive" };
+};
+
+export interface TechBusinessLeadsVariables {
+  where: TechBusinessLeadWhereFilter;
   /** Filtro aplicado a la relación status: solo se devuelven status que coincidan (company + opcionalmente salesPerson). */
   statusWhere?: TechStatusBusinessLeadWhereInputFilter | null;
   salesPersonWhere2?: UserWhereInput | null;
@@ -347,31 +371,7 @@ export const TECH_BUSINESS_LEADS_COUNT_QUERY = gql`
 `;
 
 export interface TechBusinessLeadsCountVariables {
-  where: {
-    id?: { equals: string };
-    /** some: por vendedor o some: {}; none: {} para leads sin asignar (salesPerson vacío). */
-    salesPerson?: { some: { id?: { equals: string } } } | { none: Record<string, never> };
-    saasCompany?: { some: { id: { equals: string } } };
-    status?: {
-      pipelineStatus?: { equals: string | null };
-      firstContactDate?: { not: null } | null;
-      some?: {
-        AND?: Array<{
-          salesPerson?: { id: { equals: string } } | null;
-          saasCompany?: { id: { equals: string } };
-          pipelineStatus?: { equals: string | null };
-        }>;
-        salesPerson?: { id: { equals: string } } | null;
-        saasCompany?: { id: { equals: string } };
-      };
-    };
-    category?: { equals: string } | { in: string[] };
-    source?: { equals: string };
-    businessName?: { contains: string; mode?: "insensitive" };
-    city?: { contains: string; mode?: "insensitive" };
-    state?: { contains: string; mode?: "insensitive" };
-    country?: { contains: string; mode?: "insensitive" };
-  };
+  where: TechBusinessLeadWhereFilter;
 }
 
 export interface TechBusinessLeadsCountResponse {
@@ -382,6 +382,7 @@ export const TECH_BUSINESS_LEAD_QUERY = gql`
   query TechBusinessLead(
     $where: TechBusinessLeadWhereUniqueInput!
     $statusWhere: TechStatusBusinessLeadWhereInput
+    $salesPersonWhere2: UserWhereInput!
   ) {
     techBusinessLead(where: $where) {
       id
@@ -412,6 +413,11 @@ export const TECH_BUSINESS_LEAD_QUERY = gql`
       topReview5
       updatedAt
       xTwitter
+      salesPerson(where: $salesPersonWhere2) {
+        id
+        name
+        lastName
+      }
       sourceEstablishment {
         legalName
         employeeStratum
@@ -464,6 +470,8 @@ export interface TechBusinessLeadVariables {
   where: { id: string };
   /** Filtro para la relación status: solo devolver el de esta company (y vendedor si no es admin). */
   statusWhere?: TechStatusBusinessLeadWhereInputFilter | null;
+  /** Filtro de asignados (p. ej. misma company). */
+  salesPersonWhere2?: { company?: { id?: { equals: string } } } | null;
 }
 
 export type TechInegiEstablishmentOnLead = {
@@ -515,6 +523,11 @@ export interface TechBusinessLeadResponse {
     updatedAt: string | null;
     sourceEstablishment: TechInegiEstablishmentOnLead | null;
     xTwitter: string | null;
+    salesPerson: Array<{
+      id: string;
+      name: string;
+      lastName: string | null;
+    }> | null;
     status: Array<{
       id: string;
       estimatedValue: number | null;

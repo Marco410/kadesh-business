@@ -3,6 +3,9 @@
 ## Promesa
 El vendedor y el administrador ven en un solo calendario lo que pasa en Kadesh y en sus calendarios de Google, y lo que crean en Kadesh aparece también en Google.
 
+## Acceso
+Menú `?tab=calendar`: `calendario.ver`. Crear/editar eventos nativos: `calendario.gestionar`. El plan `calendar_crm` sigue siendo el techo. Catálogo: `usuarios/README.md`.
+
 ## Qué ve el usuario
 - **Nuevo evento**: crea un evento (título, inicio/fin o todo el día, lugar, descripción). Sin fin dura 1 hora. Se envía a los calendarios de Google marcados.
 - **Google Calendar**: control ancho, con el logo de Google Calendar y una línea de estado ("Conecta tu cuenta…", "1 cuenta · 2 calendarios visibles" o "Google pidió volver a conectar tu cuenta"). Al pulsarlo se despliega el panel de cuentas. Cada usuario conecta *su* cuenta; el administrador de empresa además puede conectar una cuenta **compartida** para todo el equipo.

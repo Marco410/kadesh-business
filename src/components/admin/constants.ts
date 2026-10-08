@@ -153,6 +153,7 @@ export const ROLE_LABELS: Record<string, string> = {
   [Role.USER]: "Usuario",
   [Role.AUTHOR]: "Autor",
   [Role.ADMIN_COMPANY]: "Admin empresa",
+  [Role.GERENCIA]: "Gerencia",
   [Role.VENDEDOR]: "Vendedor",
   [Role.USER_COMPANY]: "Usuario empresa",
 };

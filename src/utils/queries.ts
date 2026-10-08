@@ -20,6 +20,7 @@ export const AUTHENTICATED_ITEM_QUERY = gql(`
         roles {
           name
         }
+        permissions
         birthday
         age
         createdAt

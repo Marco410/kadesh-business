@@ -48,6 +48,8 @@ import {
   QuotationStatus,
 } from "kadesh/constants/constans";
 import { useUser } from "kadesh/utils/UserContext";
+import { can } from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 import { hasPlanFeature } from "../helpers/plan-features";
 import { useSubscription } from "../SubscriptionContext";
 import FeatureLockedSection from "../FeatureLockedSection";
@@ -308,10 +310,15 @@ export default function QuotationDetail() {
     subscription?.planFeatures ?? null,
     PLAN_FEATURE_KEYS.QUOTATIONS,
   );
+  const canEditQuotation = can(
+    user,
+    PERMISSION_KEYS.COTIZACIONES_EDITAR,
+    () => true,
+  );
 
   function handleSaveQuotation(e?: React.FormEvent) {
     e?.preventDefault();
-    if (!quotationId) return;
+    if (!canEditQuotation || !quotationId) return;
 
     const payload: Record<string, unknown> = {
       quotationNumber: quotationNumber.trim(),
@@ -343,18 +350,21 @@ export default function QuotationDetail() {
   }
 
   function openCreateProduct() {
+    if (!canEditQuotation) return;
     setProductModalMode("create");
     setEditingProduct(null);
     setProductModalOpen(true);
   }
 
   function openEditProduct(row: SaasQuotationProductRow) {
+    if (!canEditQuotation) return;
     setProductModalMode("edit");
     setEditingProduct(row);
     setProductModalOpen(true);
   }
 
   function openDeleteProductConfirm(row: SaasQuotationProductRow) {
+    if (!canEditQuotation) return;
     setProductPendingDelete(row);
   }
 
@@ -438,7 +448,7 @@ export default function QuotationDetail() {
     return <FeatureLockedSection sectionName="Cotizaciones" />;
   }
 
-  const saveButton = (
+  const saveButton = canEditQuotation ? (
     <button
       type="submit"
       form="quotation-detail-form"
@@ -447,7 +457,7 @@ export default function QuotationDetail() {
     >
       {savingQuotation ? "Guardando…" : "Guardar"}
     </button>
-  );
+  ) : null;
 
   return (
     <>
@@ -545,6 +555,10 @@ export default function QuotationDetail() {
               onSubmit={handleSaveQuotation}
               className="space-y-6 rounded-2xl border border-[#e0e0e0] bg-white p-4 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-6"
             >
+              <fieldset
+                disabled={!canEditQuotation}
+                className="space-y-6 min-w-0 border-0 p-0 m-0 disabled:opacity-90"
+              >
               <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 <div>
                   <dt className="text-xs text-[#616161] dark:text-[#b0b0b0]">
@@ -744,6 +758,7 @@ export default function QuotationDetail() {
                   className={inputClassName}
                 />
               </div>
+              </fieldset>
             </motion.form>
 
             <motion.section
@@ -758,14 +773,16 @@ export default function QuotationDetail() {
                     {products.length}
                   </span>
                 </h2>
-                <button
-                  type="button"
-                  onClick={openCreateProduct}
-                  className={primaryBtnClass}
-                >
-                  <HugeiconsIcon icon={Add01Icon} size={18} />
-                  Agregar línea
-                </button>
+                {canEditQuotation ? (
+                  <button
+                    type="button"
+                    onClick={openCreateProduct}
+                    className={primaryBtnClass}
+                  >
+                    <HugeiconsIcon icon={Add01Icon} size={18} />
+                    Agregar línea
+                  </button>
+                ) : null}
               </div>
 
               {products.length === 0 ? (
@@ -777,14 +794,16 @@ export default function QuotationDetail() {
                     Agrega productos o servicios. El total de la cotización se
                     calcula con estas líneas.
                   </p>
-                  <button
-                    type="button"
-                    onClick={openCreateProduct}
-                    className={`${primaryBtnClass} mt-4`}
-                  >
-                    <HugeiconsIcon icon={Add01Icon} size={18} />
-                    Agregar línea
-                  </button>
+                  {canEditQuotation ? (
+                    <button
+                      type="button"
+                      onClick={openCreateProduct}
+                      className={`${primaryBtnClass} mt-4`}
+                    >
+                      <HugeiconsIcon icon={Add01Icon} size={18} />
+                      Agregar línea
+                    </button>
+                  ) : null}
                 </div>
               ) : (
                 <>
@@ -814,26 +833,28 @@ export default function QuotationDetail() {
                           <p className="font-semibold tabular-nums">
                             {formatMoney(row.lineTotal, cc)}
                           </p>
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() => openEditProduct(row)}
-                              disabled={deletingProduct}
-                              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a]"
-                              aria-label="Editar concepto"
-                            >
-                              <HugeiconsIcon icon={Edit01Icon} size={16} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => openDeleteProductConfirm(row)}
-                              disabled={deletingProduct}
-                              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-red-200 text-red-700 dark:border-red-900/60 dark:text-red-400"
-                              aria-label="Eliminar concepto"
-                            >
-                              <HugeiconsIcon icon={Delete02Icon} size={16} />
-                            </button>
-                          </div>
+                          {canEditQuotation ? (
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => openEditProduct(row)}
+                                disabled={deletingProduct}
+                                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a]"
+                                aria-label="Editar concepto"
+                              >
+                                <HugeiconsIcon icon={Edit01Icon} size={16} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => openDeleteProductConfirm(row)}
+                                disabled={deletingProduct}
+                                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-red-200 text-red-700 dark:border-red-900/60 dark:text-red-400"
+                                aria-label="Eliminar concepto"
+                              >
+                                <HugeiconsIcon icon={Delete02Icon} size={16} />
+                              </button>
+                            </div>
+                          ) : null}
                         </div>
                       </li>
                     ))}
@@ -943,34 +964,38 @@ export default function QuotationDetail() {
                                 {formatMoney(row.lineTotal, cc)}
                               </td>
                               <td className={`${quotationTdClass} text-right`}>
-                                <div className="inline-flex items-center justify-end gap-1">
-                                  <button
-                                    type="button"
-                                    onClick={() => openEditProduct(row)}
-                                    disabled={deletingProduct}
-                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#e0e0e0] hover:bg-[#f5f5f5] disabled:opacity-50 dark:border-[#3a3a3a] dark:hover:bg-[#333]"
-                                    aria-label="Editar concepto"
-                                  >
-                                    <HugeiconsIcon
-                                      icon={Edit01Icon}
-                                      size={14}
-                                    />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      openDeleteProductConfirm(row)
-                                    }
-                                    disabled={deletingProduct}
-                                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-200 text-red-700 hover:bg-red-50 disabled:opacity-50 dark:border-red-900/60 dark:text-red-400 dark:hover:bg-red-950/40"
-                                    aria-label="Eliminar concepto"
-                                  >
-                                    <HugeiconsIcon
-                                      icon={Delete02Icon}
-                                      size={14}
-                                    />
-                                  </button>
-                                </div>
+                                {canEditQuotation ? (
+                                  <div className="inline-flex items-center justify-end gap-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => openEditProduct(row)}
+                                      disabled={deletingProduct}
+                                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#e0e0e0] hover:bg-[#f5f5f5] disabled:opacity-50 dark:border-[#3a3a3a] dark:hover:bg-[#333]"
+                                      aria-label="Editar concepto"
+                                    >
+                                      <HugeiconsIcon
+                                        icon={Edit01Icon}
+                                        size={14}
+                                      />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        openDeleteProductConfirm(row)
+                                      }
+                                      disabled={deletingProduct}
+                                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-200 text-red-700 hover:bg-red-50 disabled:opacity-50 dark:border-red-900/60 dark:text-red-400 dark:hover:bg-red-950/40"
+                                      aria-label="Eliminar concepto"
+                                    >
+                                      <HugeiconsIcon
+                                        icon={Delete02Icon}
+                                        size={14}
+                                      />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <span className="sr-only">Sin acciones</span>
+                                )}
                               </td>
                             </tr>
                           ))}
@@ -985,7 +1010,7 @@ export default function QuotationDetail() {
         )}
       </motion.div>
 
-      {detail ? (
+      {detail && canEditQuotation ? (
         <div className="fixed inset-x-0 bottom-0 z-20 border-t border-[#e0e0e0] bg-white px-4 py-3 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:hidden">
           <button
             type="submit"

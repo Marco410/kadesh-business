@@ -1,6 +1,12 @@
 # Kadesh AI (panel)
 
-Pantalla de empresa en `/panel?tab=ai` (`Routes.panelAi`). Solo la ve quien `canManageCompanyAi` (admin de empresa o admin de plataforma). Los vendedores usan la IA con lo configurado aquí; no entran a esta tab.
+Pantalla de empresa en `/panel?tab=ai` (`Routes.panelAi`).
+
+## Acceso
+
+- Ver la tab: `ai.ver`. Sin lista de permisos (legado): solo admin de empresa / plataforma (`canManageCompanyAi`).
+- Tab **Configuración** y mutaciones de proveedor/key: `ai.configurar` (mismo fallback de legado).
+- Quien solo tiene `ai.ver` ve Dashboard e Información; no la config. Catálogo: `usuarios/README.md`.
 
 Marca en UI: `KADESH_URIM_AI_NAME` (`"Kadesh AI"`). No mostrar proveedor ni modelo al usuario en mensajes de éxito (p. ej. prueba de conexión: `"Conexión OK con Kadesh AI"`).
 

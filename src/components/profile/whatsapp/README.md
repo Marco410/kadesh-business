@@ -4,7 +4,7 @@ Tab del panel en `/panel?tab=whatsapp` (ítem **WhatsApp Business** del menú la
 
 ## Acceso
 
-Hoy el tab lo ve **solo el admin de empresa** con la feature de plan `WHATSAPP` (`requireAdminCompany` en el menú y `isAdminCompany && hasWhatsappFeature` al renderizar en `PanelControlSection`). Si no, `FeatureLockedSection`.
+El menú pide `whatsapp.ver` (o rol admin de empresa si el usuario no tiene lista de permisos). Configurar la sección exige `whatsapp.configurar` más la feature de plan `WHATSAPP`. Sin permiso de ver: acceso denegado. Sin plan: `FeatureLockedSection`.
 
 **Pendiente de decidir:** el backend ya deja que un vendedor vea _sus_ chats (los de clientes que tiene asignados y los internos donde participa), pero la UI no le da la bandeja. Hoy un vendedor solo llega a los chats de sus clientes desde la ficha del cliente (`LeadCrmActions` → `WhatsAppChatModal`), y **no tiene entrada a los chats internos**. Para que "asignar un chat para que solo ese vendedor lo vea" funcione de punta a punta hay que abrirle el tab de Chats (y dejar Configuración solo para el admin). No lo cambies sin decidir el acceso: es una decisión de rol/plan.
 

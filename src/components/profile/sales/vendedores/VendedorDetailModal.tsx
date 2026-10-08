@@ -38,6 +38,8 @@ import { hasPlanFeature } from "../helpers/plan-features";
 import { useSubscription } from "../SubscriptionContext";
 import { useUser } from "kadesh/utils/UserContext";
 import { Role } from "kadesh/constants/constans";
+import { can } from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 
 interface VendedorDetailModalProps {
   vendedorId: string | null;
@@ -146,6 +148,9 @@ export default function VendedorDetailModal({
   });
 
   const isAdminCompany = currentUser?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const canAssignLeads =
+    can(currentUser, PERMISSION_KEYS.VENDEDORES_EDITAR, () => isAdminCompany) &&
+    can(currentUser, PERMISSION_KEYS.CLIENTES_ASIGNAR, () => isAdminCompany);
 
   const [updatingProposalId, setUpdatingProposalId] = useState<string | null>(null);
   const [unassigningLeadId, setUnassigningLeadId] = useState<string | null>(null);
@@ -361,7 +366,7 @@ export default function VendedorDetailModal({
                               </span>
                             )}
                           </div>
-                          {hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.ASSIGN_SALES_PERSON) && isAdminCompany && (
+                          {hasPlanFeature(subscription?.planFeatures, PLAN_FEATURE_KEYS.ASSIGN_SALES_PERSON) && canAssignLeads && (
                           <button
                             type="button"
                             onClick={() => handleUnassignLead(s.id, s.salesPerson, s.businessLead?.id)}
