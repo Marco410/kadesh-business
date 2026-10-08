@@ -1,3 +1,7 @@
+import {
+  KADESH_LEGAL,
+  formatKadeshLegalAddress,
+} from "kadesh/constants/legal";
 import { Routes } from "kadesh/core/routes";
 import { SITE_URL } from "kadesh/core/site";
 
@@ -15,16 +19,22 @@ export default function PrivacidadPage() {
             Kadesh — Plataforma de Prospección B2B
           </p>
           <p className="text-sm text-[#5c4033]/80 dark:text-[#d4c4b8]/80 text-center">
-            Última actualización: 5 de octubre de 2026
+            Última actualización: 8 de octubre de 2026
           </p>
 
           <h2 className="text-2xl text-orange-500 mt-4 font-semibold">
             I. Responsable del tratamiento de datos personales
           </h2>
           <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
-            Marco Castañeda, en adelante &quot;el Responsable&quot;, con
-            domicilio en la ciudad de Morelia, Michoacán, México, y con
-            presencia digital en el sitio web{" "}
+            {KADESH_LEGAL.legalName}, en adelante &quot;el Responsable&quot;,
+            con domicilio en {formatKadeshLegalAddress()}, teléfono{" "}
+            <a
+              href={KADESH_LEGAL.tel}
+              className="text-orange-600 dark:text-orange-400 underline"
+            >
+              {KADESH_LEGAL.phoneDisplay}
+            </a>
+            , y con presencia digital en el sitio web{" "}
             <a
               href={SITE_URL}
               className="text-orange-600 dark:text-orange-400 underline"
@@ -37,11 +47,12 @@ export default function PrivacidadPage() {
             Para cualquier consulta relacionada con este Aviso de Privacidad,
             puede contactarnos a través del correo electrónico:{" "}
             <a
-              href="mailto:contacto@kadesh.com.mx"
+              href={`mailto:${KADESH_LEGAL.email}`}
               className="text-orange-600 dark:text-orange-400 underline"
             >
-              contacto@kadesh.com.mx
-            </a>
+              {KADESH_LEGAL.email}
+            </a>{" "}
+            o al teléfono indicado arriba.
           </p>
 
           <h2 className="text-2xl text-orange-500 mt-4 font-semibold">
@@ -481,7 +492,7 @@ export default function PrivacidadPage() {
           </p>
 
           <p className="text-[15px] text-gray-500 dark:text-gray-400 mt-8 text-center">
-            Morelia, Michoacán, México — Septiembre 2026
+            {formatKadeshLegalAddress()} — Octubre 2026
           </p>
         </div>
       </div>

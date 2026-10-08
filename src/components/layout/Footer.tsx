@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import Logo from '../shared/Logo';
 import { NICHE_TARGET_MAPPING } from 'kadesh/constants/constans';
+import {
+  KADESH_LEGAL,
+  formatKadeshLegalAddress,
+} from 'kadesh/constants/legal';
 import { Routes } from 'kadesh/core/routes';
 
 const FOOTER_LINKS = {
@@ -34,12 +38,32 @@ export default function Footer() {
     <footer className="w-full bg-gray-900 dark:bg-black text-gray-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-          {/* Brand */}
+          {/* Brand + identidad legal (NAP para verificación de marca) */}
           <div>
             <Logo className="mb-4" />
             <p className="text-gray-400 text-sm leading-relaxed">
               Prospección B2B inteligente. Extrae leads desde Google Maps e INEGI y gestiona ventas en un CRM integrado.
             </p>
+            <address className="mt-4 not-italic text-sm text-gray-400 leading-relaxed space-y-1">
+              <p className="text-white font-medium">{KADESH_LEGAL.legalName}</p>
+              <p>{formatKadeshLegalAddress()}</p>
+              <p>
+                <a
+                  href={KADESH_LEGAL.tel}
+                  className="hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+                >
+                  {KADESH_LEGAL.phoneDisplay}
+                </a>
+              </p>
+              <p>
+                <a
+                  href={`mailto:${KADESH_LEGAL.email}`}
+                  className="hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+                >
+                  {KADESH_LEGAL.email}
+                </a>
+              </p>
+            </address>
           </div>
 
           {/* Producto */}
