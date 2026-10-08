@@ -4,7 +4,7 @@ Pantalla interna en `/panel/clientes/admin`. No es el panel de un cliente: es de
 
 ## Promesa
 
-Ver y ajustar **usuarios**, **catálogo de planes**, **el blog**, **correos** y **fichas de veterinarias** (reclamos y servicios pedidos) en un solo lugar. El default es Inicio, con recuentos, reclamos y servicios pendientes. Las otras vistas viven en `?tab=usuarios`, `?tab=planes`, `?tab=blog`, `?tab=correos` y `?tab=veterinarias`.
+Ver y ajustar **usuarios**, **empresas** (créditos, sync y leads), **catálogo de planes**, **el blog**, **correos** y **fichas de veterinarias** en un solo lugar. El default es Inicio. Las otras vistas viven en `?tab=usuarios`, `?tab=empresas`, `?tab=planes`, `?tab=blog`, `?tab=correos` y `?tab=veterinarias`.
 
 ## Acceso
 
@@ -16,8 +16,8 @@ El enlace **Operaciones** aparece en el menú del avatar y, de forma discreta, a
 
 Antes las tabs, la vista Fichas/Servicios y los filtros eran la misma píldora y no se distinguían. Ahora cada nivel tiene su propio componente en `ui.tsx`:
 
-1. **Secciones** (Inicio, Usuarios, Planes, Veterinarias, Blog, Correos) — `AdminTabBar`: texto con subrayado naranja en la activa, no píldoras.
-2. **Vista dentro de una sección** (Cuentas / Suscripciones, Fichas / Servicios) — `AdminSegmented`: control segmentado, opción activa como pastilla blanca.
+1. **Secciones** (Inicio, Usuarios, Empresas, Planes, Veterinarias, Blog, Correos) — `AdminTabBar`: texto con subrayado naranja en la activa, no píldoras.
+2. **Vista dentro de una sección** (Cuentas / Suscripciones, Empresas / Sync, Fichas / Servicios) — `AdminSegmented`: control segmentado, opción activa como pastilla blanca.
 3. **Filtros de una tabla** (rol, estado) — `AdminFilterChips`: chips pequeños, activo con tinte naranja (no relleno sólido), con etiqueta (**Rol**, **Estado**) para que se lea qué filtran.
 
 Una pantalla nueva usa el componente de su nivel. No vuelvas a poner píldoras sólidas en las tabs: compiten con el filtro y con los botones de acción, que son los únicos naranja sólido.
@@ -46,6 +46,22 @@ Debajo va la **suscripción al blog**, con una tarjeta por blog (Pet y SaaS) que
 La lista son suscripciones de empresa (no el catálogo). Se ajustan fechas del periodo y módulos del plan de esa empresa. El modal de features debe seguir los nombres de `PLAN_FEATURES_MAP`.
 
 En la lista se ve el saldo **de este mes** (disponibles / extra). En **Ajustar plan** se pueden **agregar créditos extra**: se suman ahora y se mantienen cada mes, igual que una recarga. No decimos “bonus”, “ledger” ni “periodo Keystone”. Los montos rápidos (250 / 1 000 / 3 000) coinciden con los paquetes de recarga del panel del cliente.
+
+## Empresas
+
+Espacio dedicado en `?tab=empresas` (no mezclado con Cuentas/Suscripciones). Dos vistas:
+
+- **Empresas** (default): lista de `SaasCompany` con créditos del mes, conteo de leads y usuarios.
+- **Sync** (`&vista=sync`): concentrado de **todos** los `TechLeadSyncLog` (cualquier empresa). Filtro Todas / Falló / OK, búsqueda por empresa, mensaje, categoría o usuario. Filas con error resaltadas; el mensaje se expande al tocar. Clic en la empresa abre su detalle en Sync.
+
+Al abrir una empresa (`&empresa=<id>&detalle=…`):
+
+- **Resumen**: datos de la empresa, cupo del mes, personas y suscripciones recientes.
+- **Créditos**: tabla del `SaasCompanyCreditLedger` (altas, recargas, gasto sync/IA).
+- **Sync**: logs solo de esa company.
+- **Leads**: tabla paginada de `TechBusinessLead` de esa company.
+
+Detalle en URL: `&empresa=<id>&detalle=resumen|creditos|sync|leads`. En UI no digas nombres de listas GraphQL; sí “créditos”, “sync”, “leads”.
 
 ## Planes (catálogo)
 

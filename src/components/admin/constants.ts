@@ -3,6 +3,7 @@ import { PIPELINE_STATUS, Role } from "kadesh/constants/constans";
 export const ADMIN_TABS = {
   OVERVIEW: "inicio",
   USERS: "usuarios",
+  COMPANIES: "empresas",
   PLANS: "planes",
   PET_PLACES: "veterinarias",
   BLOG: "blog",
@@ -28,6 +29,11 @@ export const ADMIN_TAB_ITEMS: Array<{
     id: ADMIN_TABS.USERS,
     label: "Usuarios",
     description: "Cuentas y suscripciones",
+  },
+  {
+    id: ADMIN_TABS.COMPANIES,
+    label: "Empresas",
+    description: "Créditos, sync y leads",
   },
   {
     id: ADMIN_TABS.PLANS,
@@ -58,6 +64,67 @@ export const USERS_VISTAS = {
 } as const;
 
 export type UsersVista = (typeof USERS_VISTAS)[keyof typeof USERS_VISTAS];
+
+/** Vistas dentro de la sección Empresas. */
+export const COMPANIES_VISTAS = {
+  LIST: "empresas",
+  SYNC_LOGS: "sync",
+} as const;
+
+export type CompaniesVista =
+  (typeof COMPANIES_VISTAS)[keyof typeof COMPANIES_VISTAS];
+
+export function parseCompaniesVista(vista: string | null): CompaniesVista {
+  return vista === COMPANIES_VISTAS.SYNC_LOGS
+    ? COMPANIES_VISTAS.SYNC_LOGS
+    : COMPANIES_VISTAS.LIST;
+}
+
+/** Detalle dentro de Empresas (`?tab=empresas&detalle=`). */
+export const COMPANY_DETAIL_SECTIONS = {
+  RESUMEN: "resumen",
+  CREDITS: "creditos",
+  SYNC: "sync",
+  LEADS: "leads",
+} as const;
+
+export type CompanyDetailSection =
+  (typeof COMPANY_DETAIL_SECTIONS)[keyof typeof COMPANY_DETAIL_SECTIONS];
+
+export function parseCompanyDetailSection(
+  value: string | null,
+): CompanyDetailSection {
+  if (value === COMPANY_DETAIL_SECTIONS.CREDITS) {
+    return COMPANY_DETAIL_SECTIONS.CREDITS;
+  }
+  if (value === COMPANY_DETAIL_SECTIONS.SYNC) {
+    return COMPANY_DETAIL_SECTIONS.SYNC;
+  }
+  if (value === COMPANY_DETAIL_SECTIONS.LEADS) {
+    return COMPANY_DETAIL_SECTIONS.LEADS;
+  }
+  return COMPANY_DETAIL_SECTIONS.RESUMEN;
+}
+
+/** Filtro del concentrado global de sync logs. */
+export const SYNC_LOG_STATUS_FILTERS = [
+  { value: "all", label: "Todas" },
+  { value: "failed", label: "Falló" },
+  { value: "ok", label: "OK" },
+] as const;
+
+export type SyncLogStatusFilter =
+  (typeof SYNC_LOG_STATUS_FILTERS)[number]["value"];
+
+/** Etiquetas del ledger de créditos (UI en español). */
+export const CREDIT_LEDGER_TYPE_LABELS: Record<string, string> = {
+  GRANT_PLAN: "Alta del plan",
+  GRANT_PURCHASE: "Recarga",
+  GRANT_ADMIN: "Crédito admin",
+  CONSUME_SYNC: "Gasto sync",
+  CONSUME_AI: "Gasto IA",
+  ADJUST: "Ajuste",
+};
 
 /** Vistas dentro de la sección Planes. */
 export const PLANS_VISTAS = {
@@ -113,6 +180,7 @@ export function parseAdminTab(value: string | null): AdminTab {
   if (value === LEGACY_SUBSCRIPTIONS_TAB) return ADMIN_TABS.USERS;
   if (
     value === ADMIN_TABS.USERS ||
+    value === ADMIN_TABS.COMPANIES ||
     value === ADMIN_TABS.PLANS ||
     value === ADMIN_TABS.PET_PLACES ||
     value === ADMIN_TABS.BLOG ||
