@@ -15,6 +15,9 @@ import { formatDateShort } from "kadesh/utils/format-date";
 import QuotationCreateModal from "./QuotationCreateModal";
 import { Routes } from "kadesh/core/routes";
 import { useRouter } from "next/navigation";
+import { useUser } from "kadesh/utils/UserContext";
+import { can } from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 import {
   quotationTableWrapClass,
   quotationThClass,
@@ -146,6 +149,7 @@ export default function QuotationsListPanel({
   userId,
 }: QuotationsListPanelProps) {
   const router = useRouter();
+  const { user } = useUser();
   const reduce = useReducedMotion();
   const [createOpen, setCreateOpen] = useState(false);
   const {
@@ -160,6 +164,11 @@ export default function QuotationsListPanel({
     hasNextPage,
     hasPrevPage,
   } = useQuotationsList({ userId });
+  const canCreateQuotation = can(
+    user,
+    PERMISSION_KEYS.COTIZACIONES_CREAR,
+    () => true,
+  );
 
   const handleCreated = async () => {
     setPage(1);
@@ -170,7 +179,7 @@ export default function QuotationsListPanel({
   const isEmpty = !loading && !error && rows.length === 0;
   const fadeUp = quotationFadeUp(reduce);
 
-  const createButton = (
+  const createButton = canCreateQuotation ? (
     <motion.button
       type="button"
       onClick={() => setCreateOpen(true)}
@@ -182,7 +191,7 @@ export default function QuotationsListPanel({
       <HugeiconsIcon icon={Add01Icon} size={18} />
       Nueva cotización
     </motion.button>
-  );
+  ) : null;
 
   if (!companyId) {
     return (

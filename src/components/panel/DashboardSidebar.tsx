@@ -11,6 +11,7 @@ import {
   CalendarIcon,
   UserAdd01Icon,
   UserGroupIcon,
+  UserMultiple02Icon,
   WorkIcon,
   FlashIcon,
   SparklesIcon,
@@ -19,9 +20,11 @@ import {
   SidebarRightIcon,
 } from "@hugeicons/core-free-icons";
 import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
+import { canAccessNavTab } from "kadesh/components/profile/usuarios/can";
 import FeatureBetaBadge from "kadesh/components/profile/sales/planes/FeatureBetaBadge";
 import { PLAN_FEATURE_KEYS } from "kadesh/constants/constans";
 import { cn } from "kadesh/utils/cn";
+import type { User } from "kadesh/utils/types";
 
 const SIDEBAR_COLLAPSED_KEY = "kadesh.panel.navCollapsed";
 const SIDEBAR_COLLAPSED_EVENT = "kadesh-panel-nav-collapsed";
@@ -30,24 +33,25 @@ const navItems = [
   { key: "inicio" as const, label: "Inicio", icon: DashboardSquare01Icon },
   { key: "profile" as const, label: "Datos del perfil", icon: UserIcon },
   {
+    key: "usuarios" as const,
+    label: "Usuarios",
+    icon: UserMultiple02Icon,
+  },
+  {
     key: "ai" as const,
     label: KADESH_URIM_AI_NAME,
     icon: SparklesIcon,
-    requireAiManage: true,
     featureKey: "kadesh_ai",
   },
   {
     key: "clientes" as const,
     label: "Clientes",
     icon: Chart01Icon,
-    requireVendedor: true,
   },
   {
     key: "vendedores" as const,
     label: "Vendedores",
     icon: UserGroupIcon,
-    requireAdminCompany: true,
-    requireSalesPersonManagement: false,
     featureKey: PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT,
   },
   {
@@ -84,7 +88,6 @@ const navItems = [
     key: "whatsapp" as const,
     label: "WhatsApp Business",
     icon: WhatsappIcon,
-    requireAdminCompany: true,
     featureKey: PLAN_FEATURE_KEYS.WHATSAPP,
   },
 ];
@@ -97,13 +100,11 @@ const navItemsKadeshConfig = [
 type NavItem = (typeof navItems)[number] | (typeof navItemsKadeshConfig)[number];
 
 type DashboardSidebarProps = {
+  user: User | undefined;
   selectedTab: string;
   onTabChange: (key: string) => void;
   hasVendedorRole: boolean;
   isAdminCompany: boolean;
-  hasSalesPersonManagement: boolean;
-  hasUploadFilesFeature: boolean;
-  hasWorkspacesFeature: boolean;
   canManageAi: boolean;
   isAiLive: boolean;
   /** Keys de módulos incluidos y marcados en beta en el plan actual. */
@@ -139,49 +140,17 @@ function writeCollapsedPreference(collapsed: boolean) {
 function isNavItemVisible(
   item: NavItem,
   {
+    user,
     hasVendedorRole,
     isAdminCompany,
-    hasSalesPersonManagement,
-    hasUploadFilesFeature,
-    hasWorkspacesFeature,
     canManageAi,
   }: DashboardSidebarProps,
 ): boolean {
-  if ("requireVendedor" in item && item.requireVendedor && !hasVendedorRole) {
-    return false;
-  }
-  if (
-    "requireAdminCompany" in item &&
-    item.requireAdminCompany &&
-    !isAdminCompany
-  ) {
-    return false;
-  }
-  if ("requireAiManage" in item && item.requireAiManage && !canManageAi) {
-    return false;
-  }
-  if (
-    "requireSalesPersonManagement" in item &&
-    item.requireSalesPersonManagement &&
-    !hasSalesPersonManagement
-  ) {
-    return false;
-  }
-  if (
-    "requireUploadFilesFeature" in item &&
-    item.requireUploadFilesFeature &&
-    !hasUploadFilesFeature
-  ) {
-    return false;
-  }
-  if (
-    "requireWorkspacesFeature" in item &&
-    item.requireWorkspacesFeature &&
-    !hasWorkspacesFeature
-  ) {
-    return false;
-  }
-  return true;
+  return canAccessNavTab(user, item.key, {
+    hasVendedorRole,
+    isAdminCompany,
+    canManageAi,
+  });
 }
 
 function NavButton({

@@ -1,5 +1,6 @@
 import type { TechBusinessLeadsResponse } from "kadesh/components/profile/sales/queries";
 import { getCategoryLabel } from "kadesh/components/profile/sales/helpers/category";
+import { pickCanonicalLeadStatus } from "kadesh/components/profile/sales/helpers/canonical-lead-status";
 
 type LeadItem = TechBusinessLeadsResponse["techBusinessLeads"][number];
 
@@ -31,12 +32,7 @@ function formatAssigned(lead: LeadItem, isAdminCompany: boolean): string {
 }
 
 function leadToRow(lead: LeadItem, isAdminCompany: boolean): string[] {
-  const statuses = Array.isArray(lead.status)
-    ? lead.status
-    : lead.status
-      ? [lead.status]
-      : [];
-  const leadStatus = statuses[0] ?? null;
+  const leadStatus = pickCanonicalLeadStatus(lead.status, lead.salesPerson);
   const pipelineAppliedBy =
     leadStatus?.salesPerson != null
       ? [leadStatus.salesPerson.name, leadStatus.salesPerson.lastName]

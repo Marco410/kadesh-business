@@ -11,6 +11,7 @@ import { Routes } from "kadesh/core/routes";
 import { cn } from "kadesh/utils/cn";
 import { CopyPhoneButton } from "./CopyPhoneButton";
 import { getCategoryLabel } from "./helpers/category";
+import { pickCanonicalLeadStatus } from "./helpers/canonical-lead-status";
 import LeadsPageNav from "./LeadsPageNav";
 import type { LeadsPageSize } from "./leadsPagination";
 
@@ -98,15 +99,11 @@ type DragState = {
   name: string;
 };
 
-function leadStatuses(lead: LeadItem) {
-  if (Array.isArray(lead.status)) return lead.status;
-  return lead.status ? [lead.status] : [];
-}
-
 function pipelineOf(lead: LeadItem, overrides: Record<string, string>): string {
   const override = overrides[lead.id];
   if (override) return override;
-  const value = leadStatuses(lead)[0]?.pipelineStatus;
+  const value = pickCanonicalLeadStatus(lead.status, lead.salesPerson)
+    ?.pipelineStatus;
   if (value && PIPELINE_COLUMNS.includes(value as (typeof PIPELINE_COLUMNS)[number])) {
     return value;
   }
@@ -119,8 +116,9 @@ function shortPipelineLabel(status: string): string {
 }
 
 function assigneeLabel(lead: LeadItem): string | null {
-  const fromStatus = leadStatuses(lead)[0]?.salesPerson;
-  const person = fromStatus ?? lead.salesPerson?.[0];
+  const person =
+    pickCanonicalLeadStatus(lead.status, lead.salesPerson)?.salesPerson ??
+    lead.salesPerson?.[0];
   if (!person?.name) return null;
   return [person.name, person.lastName].filter(Boolean).join(" ");
 }
@@ -140,6 +138,7 @@ export default function LeadsKanbanBoard({
   currentPage,
   onPageChange,
   onPageSizeChange,
+  canMoveLeads = true,
 }: {
   leads: LeadItem[];
   loading: boolean;
@@ -155,6 +154,7 @@ export default function LeadsKanbanBoard({
   currentPage: number;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: LeadsPageSize) => void;
+  canMoveLeads?: boolean;
 }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<DragState | null>(null);
@@ -341,6 +341,7 @@ export default function LeadsKanbanBoard({
                         )}
                       >
                         <div className="flex items-start gap-1">
+                          {canMoveLeads ? (
                           <button
                             type="button"
                             className="inline-flex size-11 shrink-0 cursor-grab touch-none items-center justify-center rounded-lg text-[#9e9e9e] hover:bg-[#f5f5f5] active:cursor-grabbing dark:text-[#777] dark:hover:bg-[#2a2a2a]"
@@ -383,6 +384,7 @@ export default function LeadsKanbanBoard({
                           >
                             <HugeiconsIcon icon={DragDropVerticalIcon} size={18} />
                           </button>
+                          ) : null}
                           <div className="min-w-0 flex-1 pt-1">
                             <div className="flex items-start gap-2">
                               {selectable ? (

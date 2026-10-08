@@ -1,10 +1,16 @@
 # Perfil
 
-La ficha de empresa vive en `ProfileCompanySection` (perfil del panel, no una ruta nueva).
+La ficha de empresa vive en `ProfileCompanySection` (perfil del panel, no una ruta nueva). Los datos personales están en `ProfileData` (`?tab=profile`).
+
+## Acceso
+
+- Ver la tab: `perfil.ver` (sidebar y `PanelControlSection`).
+- Editar nombre, foto, teléfonos y datos de empresa del usuario: `perfil.editar`. Sin ese permiso el formulario queda en solo lectura.
+- Catálogo: `usuarios/README.md`.
 
 ## Cómo se presenta
 
-Una sola tarjeta: logo, datos de contacto, colores y el bloque **Información** (qué / quién / cuánto / cómo) para Kadesh AI. El copy de IA no habla de llamadas ni créditos por prompt; ver `ai/README.md`.
+Una sola tarjeta de empresa: logo, datos de contacto, colores y el bloque **Información** (qué / quién / cuánto / cómo) para Kadesh AI. El copy de IA no habla de llamadas ni créditos por prompt; ver `ai/README.md`.
 
 ## Motion
 

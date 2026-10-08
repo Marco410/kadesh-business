@@ -31,6 +31,8 @@ import {
 } from "kadesh/components/profile/sales/archivos/queries";
 import { useUser } from "kadesh/utils/UserContext";
 import { Role } from "kadesh/constants/constans";
+import { can } from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 import { sileo } from "sileo";
 
 interface ArchivosSectionProps {
@@ -40,6 +42,8 @@ interface ArchivosSectionProps {
 export default function ArchivosSection({ userId }: ArchivosSectionProps) {
   const { user } = useUser();
   const isAdminCompany = user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const canUpload = can(user, PERMISSION_KEYS.ARCHIVOS_SUBIR, () => isAdminCompany);
+  const canDelete = can(user, PERMISSION_KEYS.ARCHIVOS_ELIMINAR, () => isAdminCompany);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -186,7 +190,7 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
 
   return (
     <div className="space-y-8">
-      {isAdminCompany && (
+      {canUpload && (
         <div className="rounded-2xl border border-[#e5e5e5] dark:border-[#333] bg-white dark:bg-[#1a1a1a] shadow-sm overflow-hidden">
           <div className="border-l-4 border-orange-500 bg-[#fafafa] dark:bg-[#222] px-6 py-4">
             <h2 className="text-lg font-semibold text-[#1a1a1a] dark:text-white">Subir archivo</h2>
@@ -324,7 +328,7 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
               </span>
               <p className="text-[#374151] dark:text-[#d1d5db] font-medium">Aún no hay archivos</p>
               <p className="text-sm text-[#6b7280] dark:text-[#6b7280] mt-1 max-w-xs">
-                {isAdminCompany ? "Sube el primero usando el formulario de arriba." : "Los archivos que suba tu empresa aparecerán aquí."}
+                {canUpload ? "Sube el primero usando el formulario de arriba." : "Los archivos que suba tu empresa aparecerán aquí."}
               </p>
             </div>
           ) : (
@@ -366,7 +370,7 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
                           <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
                         </a>
                       )}
-                      {isAdminCompany && (
+                      {canDelete && (
                         <button
                           type="button"
                           onClick={() => handleDelete(file.id)}

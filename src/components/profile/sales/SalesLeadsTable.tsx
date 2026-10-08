@@ -7,6 +7,7 @@ import type { TechBusinessLeadsResponse } from "kadesh/components/profile/sales/
 import { PIPELINE_STATUS_COLORS } from "kadesh/constants/constans";
 import { Routes } from "kadesh/core/routes";
 import { getCategoryLabel } from "./helpers/category";
+import { pickCanonicalLeadStatus } from "./helpers/canonical-lead-status";
 import { ApolloError } from "@apollo/client";
 import { CopyPhoneButton } from "./CopyPhoneButton";
 import LeadsPageNav from "./LeadsPageNav";
@@ -145,12 +146,10 @@ export default function SalesLeadsTable({
           </thead>
           <tbody>
             {leads.map((lead, index) => {
-              const statuses = Array.isArray(lead.status)
-                ? lead.status
-                : lead.status
-                  ? [lead.status]
-                  : [];
-              const leadStatus = statuses[0] ?? null;
+              const leadStatus = pickCanonicalLeadStatus(
+                lead.status,
+                lead.salesPerson,
+              );
               return (
                 <tr
                   key={lead.id}
@@ -201,11 +200,16 @@ export default function SalesLeadsTable({
                         >
                           {leadStatus.pipelineStatus.replace(/^\d+\s*-\s*/, "")}
                         </span>
-                        {leadStatus.salesPerson?.name ? (
-                          <span className="text-[11px] text-[#9e9e9e] dark:text-[#777]">
-                            {leadStatus.salesPerson.name}
-                          </span>
-                        ) : null}
+                        {(() => {
+                          const byName =
+                            leadStatus.salesPerson?.name ??
+                            lead.salesPerson?.[0]?.name;
+                          return byName ? (
+                            <span className="text-[11px] text-[#9e9e9e] dark:text-[#777]">
+                              {byName}
+                            </span>
+                          ) : null;
+                        })()}
                       </div>
                     ) : (
                       <span className="text-[#616161] dark:text-[#b0b0b0]">

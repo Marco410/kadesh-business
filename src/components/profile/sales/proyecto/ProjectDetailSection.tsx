@@ -23,6 +23,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { getCategoryLabel } from "../helpers/category";
 import { sileo } from "sileo";
+import { useUser } from "kadesh/utils/UserContext";
+import { can } from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 
 function Field({
   label,
@@ -84,6 +87,8 @@ const labelClassName =
 export default function ProjectDetailSection() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useUser();
+  const canEditProject = can(user, PERMISSION_KEYS.PROYECTOS_EDITAR, () => true);
   const id = typeof params?.id === "string" ? params.id : "";
 
   const [isEditing, setIsEditing] = useState(false);
@@ -143,6 +148,7 @@ export default function ProjectDetailSection() {
   });
 
   function handleStartEdit() {
+    if (!canEditProject) return;
     if (project) {
       setName(project.name ?? "");
       setServiceType(project.serviceType ?? "");
@@ -169,7 +175,7 @@ export default function ProjectDetailSection() {
   }
 
   function handleSave() {
-    if (!id) return;
+    if (!canEditProject || !id) return;
     updateProject({
       variables: {
         where: { id },
@@ -474,13 +480,15 @@ export default function ProjectDetailSection() {
                   value={project.responsible?.name ?? null}
                 />
               </dl>
-              <button
-                type="button"
-                onClick={handleStartEdit}
-                className="mt-3 px-4 py-2 rounded-lg border border-orange-500 text-orange-500 text-sm font-medium hover:bg-orange-50 dark:hover:bg-orange-950/30"
-              >
-                Editar
-              </button>
+              {canEditProject ? (
+                <button
+                  type="button"
+                  onClick={handleStartEdit}
+                  className="mt-3 px-4 py-2 rounded-lg border border-orange-500 text-orange-500 text-sm font-medium hover:bg-orange-50 dark:hover:bg-orange-950/30"
+                >
+                  Editar
+                </button>
+              ) : null}
             </>
           )}
         </SectionCard>

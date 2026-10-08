@@ -50,8 +50,18 @@ import { Routes } from "kadesh/core/routes";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon, Download04Icon } from "@hugeicons/core-free-icons";
 import { hasPlanFeature } from "./helpers/plan-features";
+import {
+  can,
+  canViewCompanyWideLeads,
+} from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 import { downloadLeadsExcel } from "./exportLeadsExcel";
 import { buildClientLeadsQueryVariables } from "./helpers/client-leads-query";
+import {
+  pickCanonicalLeadStatus,
+  primaryAssignedSalesPersonId,
+} from "./helpers/canonical-lead-status";
+import { expandCategoryFilterValues } from "./helpers/category";
 import LeadsViewToggle, { type LeadsView } from "./LeadsViewToggle";
 import LeadsKanbanBoard from "./LeadsKanbanBoard";
 import { SupportContactSection } from "kadesh/components/shared";
@@ -164,9 +174,20 @@ function parsePageParam(value: string | null): number {
   return Number.isNaN(n) || n < 1 ? 1 : n;
 }
 
-/** Normaliza texto para búsqueda: quita acentos y diacríticos. */
+/** Normaliza texto para búsqueda en cliente: minúsculas sin acentos. */
 function normalizeSearch(value: string): string {
-  return value.normalize("NFD").replace(/\p{Diacritic}/gu, "");
+  return value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+}
+
+function matchesNormalized(
+  haystack: string | null | undefined,
+  needle: string,
+): boolean {
+  if (!needle) return true;
+  return normalizeSearch(haystack ?? "").includes(normalizeSearch(needle));
 }
 
 export default function SalesSection({ userId }: SalesSectionProps) {
@@ -299,9 +320,8 @@ export default function SalesSection({ userId }: SalesSectionProps) {
 
   const isAdminCompany =
     user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
-  const isUserCompany =
-    user?.roles?.some((r) => r.name === Role.USER_COMPANY) ?? false;
-  const hasCompanyWideLeadScope = isAdminCompany || isUserCompany;
+  const hasCompanyWideLeadScope = canViewCompanyWideLeads(user);
+  const canEditLeads = can(user, PERMISSION_KEYS.CLIENTES_EDITAR, () => true);
 
   const { data: vendedoresData } = useQuery<
     CompanyVendedoresResponse,
@@ -322,6 +342,32 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     lastName: u.lastName,
   }));
 
+  const filterBySpecificVendedor =
+    filterByVendedorId != null &&
+    filterByVendedorId !== "" &&
+    filterByVendedorId !== "sin_asignar";
+  const filterByUnassigned = filterByVendedorId === "sin_asignar";
+
+  /**
+   * Alcance empresa: el canónico y “Asignado a” se afinan en cliente
+   * (la query anida salesPerson por company; el status puede tener vendedor huérfano).
+   * Texto (empresa/ciudad/estado/país): en cliente, sin acentos (el API no hace unaccent).
+   */
+  const applyCanonicalPipelineClientFilter =
+    hasCompanyWideLeadScope && selectedPipeline != null;
+  const applyAssignmentClientFilter =
+    hasCompanyWideLeadScope &&
+    (filterBySpecificVendedor || filterByUnassigned);
+  const applyTextClientFilter =
+    debouncedSearch.length > 0 ||
+    debouncedCity.length > 0 ||
+    debouncedState.length > 0 ||
+    debouncedCountry.length > 0;
+  const applyClientListFilter =
+    applyCanonicalPipelineClientFilter ||
+    applyAssignmentClientFilter ||
+    applyTextClientFilter;
+
   const statusSomeConditions: Array<{
     salesPerson?: { id: { equals: string } } | null;
     saasCompany?: { id: { equals: string } };
@@ -334,65 +380,43 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   if (companyId != null) {
     statusSomeConditions.push({ saasCompany: { id: { equals: companyId } } });
   }
+  // Filtro de pipeline en servidor (simple y fiable). El canónico se afina en cliente.
   if (selectedPipeline != null) {
     statusSomeConditions.push({ pipelineStatus: { equals: selectedPipeline } });
   }
-  if (
-    filterByVendedorId != null &&
-    filterByVendedorId !== "" &&
-    filterByVendedorId !== "sin_asignar"
-  ) {
-    statusSomeConditions.push({
-      salesPerson: { id: { equals: filterByVendedorId } },
-    });
-  }
+
+  const categoryFilterValues =
+    selectedCategory != null && selectedCategory !== ""
+      ? expandCategoryFilterValues(selectedCategory)
+      : [];
 
   const where = {
-    ...(filterByVendedorId === "sin_asignar"
-      ? { salesPerson: { none: {} } }
+    // Asignación = relación del lead (columna “Asignado a”), no status.salesPerson.
+    ...(filterBySpecificVendedor
+      ? { salesPerson: { some: { id: { equals: filterByVendedorId } } } }
       : !hasCompanyWideLeadScope
         ? { salesPerson: { some: { id: { equals: userId } } } }
         : {}),
     ...(companyId != null && {
       saasCompany: { some: { id: { equals: companyId } } },
     }),
-    ...(statusSomeConditions.length > 0 && {
-      status: {
-        some: { AND: statusSomeConditions },
-      },
-    }),
-    ...(selectedCategory != null &&
-      selectedCategory !== "" && {
-        category: { equals: selectedCategory },
-      }),
+    ...(statusSomeConditions.length > 0
+      ? {
+          status: {
+            some: { AND: statusSomeConditions },
+          },
+        }
+      : {}),
+    ...(categoryFilterValues.length === 1
+      ? { category: { equals: categoryFilterValues[0] } }
+      : categoryFilterValues.length > 1
+        ? { category: { in: categoryFilterValues } }
+        : {}),
     ...(selectedSource != null &&
       selectedSource !== "" && {
         source: { equals: selectedSource },
       }),
-    ...(debouncedSearch.length > 0 && {
-      businessName: {
-        contains: normalizeSearch(debouncedSearch),
-        mode: "insensitive" as const,
-      },
-    }),
-    ...(debouncedCity.length > 0 && {
-      city: {
-        contains: normalizeSearch(debouncedCity),
-        mode: "insensitive" as const,
-      },
-    }),
-    ...(debouncedState.length > 0 && {
-      state: {
-        contains: normalizeSearch(debouncedState),
-        mode: "insensitive" as const,
-      },
-    }),
-    ...(debouncedCountry.length > 0 && {
-      country: {
-        contains: normalizeSearch(debouncedCountry),
-        mode: "insensitive" as const,
-      },
-    }),
+    // Empresa / ciudad / estado / país: filtro en cliente (acentos).
   };
 
   const navigateLeadsUrl = useCallback(
@@ -477,7 +501,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     debouncedCountry,
   ]);
 
-  const { data: countData } = useQuery<
+  const { data: countData, loading: countLoading } = useQuery<
     TechBusinessLeadsCountResponse,
     TechBusinessLeadsCountVariables
   >(TECH_BUSINESS_LEADS_COUNT_QUERY, {
@@ -485,17 +509,26 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     skip: !userId,
   });
 
-  const totalCount = countData?.techBusinessLeadsCount ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-  const effectivePage = totalCount > 0 ? Math.min(page, totalPages) : page;
+  const serverCount = countData?.techBusinessLeadsCount ?? 0;
+  const serverTotalPages = Math.max(1, Math.ceil(serverCount / pageSize));
+  const serverEffectivePage =
+    serverCount > 0 ? Math.min(page, serverTotalPages) : page;
+
+  /**
+   * Con filtros que se afinan en cliente (pipeline canónico / asignación):
+   * traemos todos los candidatos del API y paginamos/contamos tras filtrar.
+   */
+  const clientListFetchTake = applyClientListFilter
+    ? Math.min(Math.max(serverCount, 1), MAX_LEADS_EXPORT)
+    : pageSize;
 
   const leadsQueryVariables = buildClientLeadsQueryVariables({
     where,
     companyId,
     hasCompanyWideLeadScope,
     userId,
-    take: pageSize,
-    skip: (effectivePage - 1) * pageSize,
+    take: clientListFetchTake,
+    skip: applyClientListFilter ? 0 : (serverEffectivePage - 1) * pageSize,
     orderBy: [{ createdAt: "desc" }],
   });
 
@@ -509,15 +542,75 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     TECH_BUSINESS_LEADS_QUERY,
     {
       variables: leadsQueryVariables,
-      skip: !userId,
+      skip:
+        !userId || (applyClientListFilter && countLoading && !countData),
       notifyOnNetworkStatusChange: true,
     },
   );
 
-  const leads = useMemo(
-    () => data?.techBusinessLeads ?? previousData?.techBusinessLeads ?? [],
-    [data, previousData],
-  );
+  // No reutilizar previousData si la query ya resolvió (vacío o error).
+  const leadsRaw = useMemo(() => {
+    if (data?.techBusinessLeads) return data.techBusinessLeads;
+    if (loading && previousData?.techBusinessLeads) {
+      return previousData.techBusinessLeads;
+    }
+    return [];
+  }, [data, previousData, loading]);
+
+  const leadsFiltered = useMemo(() => {
+    let next = leadsRaw;
+    if (applyAssignmentClientFilter) {
+      if (filterByUnassigned) {
+        next = next.filter((lead) => (lead.salesPerson?.length ?? 0) === 0);
+      } else if (filterBySpecificVendedor && filterByVendedorId) {
+        next = next.filter((lead) =>
+          (lead.salesPerson ?? []).some((p) => p.id === filterByVendedorId),
+        );
+      }
+    }
+    if (applyCanonicalPipelineClientFilter && selectedPipeline) {
+      next = next.filter(
+        (lead) =>
+          pickCanonicalLeadStatus(lead.status, lead.salesPerson)
+            ?.pipelineStatus === selectedPipeline,
+      );
+    }
+    if (applyTextClientFilter) {
+      next = next.filter(
+        (lead) =>
+          matchesNormalized(lead.businessName, debouncedSearch) &&
+          matchesNormalized(lead.city, debouncedCity) &&
+          matchesNormalized(lead.state, debouncedState) &&
+          matchesNormalized(lead.country, debouncedCountry),
+      );
+    }
+    return next;
+  }, [
+    applyAssignmentClientFilter,
+    applyCanonicalPipelineClientFilter,
+    applyTextClientFilter,
+    debouncedCity,
+    debouncedCountry,
+    debouncedSearch,
+    debouncedState,
+    filterBySpecificVendedor,
+    filterByUnassigned,
+    filterByVendedorId,
+    leadsRaw,
+    selectedPipeline,
+  ]);
+
+  const totalCount = applyClientListFilter
+    ? leadsFiltered.length
+    : serverCount;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const effectivePage = totalCount > 0 ? Math.min(page, totalPages) : page;
+
+  const leads = useMemo(() => {
+    if (!applyClientListFilter) return leadsFiltered;
+    const start = (effectivePage - 1) * pageSize;
+    return leadsFiltered.slice(start, start + pageSize);
+  }, [applyClientListFilter, effectivePage, leadsFiltered, pageSize]);
 
   const leadsView: LeadsView =
     searchParams.get("vista") === "tablero" ? "board" : "list";
@@ -546,6 +639,19 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     statusWhere: leadsQueryVariables.statusWhere,
     salesPersonWhere2: leadsQueryVariables.salesPersonWhere2,
     totalCount,
+    serverCount,
+    applyClientListFilter,
+    applyCanonicalPipelineClientFilter,
+    applyAssignmentClientFilter,
+    applyTextClientFilter,
+    filterByUnassigned,
+    filterBySpecificVendedor,
+    filterByVendedorId,
+    selectedPipeline,
+    debouncedSearch,
+    debouncedCity,
+    debouncedState,
+    debouncedCountry,
   });
   useLayoutEffect(() => {
     exportLeadsContextRef.current = {
@@ -553,6 +659,19 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       statusWhere: leadsQueryVariables.statusWhere,
       salesPersonWhere2: leadsQueryVariables.salesPersonWhere2,
       totalCount,
+      serverCount,
+      applyClientListFilter,
+      applyCanonicalPipelineClientFilter,
+      applyAssignmentClientFilter,
+      applyTextClientFilter,
+      filterByUnassigned,
+      filterBySpecificVendedor,
+      filterByVendedorId,
+      selectedPipeline,
+      debouncedSearch,
+      debouncedCity,
+      debouncedState,
+      debouncedCountry,
     };
   });
 
@@ -568,7 +687,10 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     }
     setExportingExcel(true);
     try {
-      const take = Math.min(ctx.totalCount, MAX_LEADS_EXPORT);
+      const fetchCount = ctx.applyClientListFilter
+        ? ctx.serverCount
+        : ctx.totalCount;
+      const take = Math.min(Math.max(fetchCount, 1), MAX_LEADS_EXPORT);
       const { data: exportData, error: exportError } = await client.query<
         TechBusinessLeadsResponse,
         TechBusinessLeadsVariables
@@ -585,9 +707,38 @@ export default function SalesSection({ userId }: SalesSectionProps) {
         fetchPolicy: "network-only",
       });
       if (exportError) throw exportError;
-      const allLeads = exportData?.techBusinessLeads ?? [];
+      let allLeads = exportData?.techBusinessLeads ?? [];
+      if (ctx.applyAssignmentClientFilter) {
+        if (ctx.filterByUnassigned) {
+          allLeads = allLeads.filter(
+            (lead) => (lead.salesPerson?.length ?? 0) === 0,
+          );
+        } else if (ctx.filterBySpecificVendedor && ctx.filterByVendedorId) {
+          allLeads = allLeads.filter((lead) =>
+            (lead.salesPerson ?? []).some(
+              (p) => p.id === ctx.filterByVendedorId,
+            ),
+          );
+        }
+      }
+      if (ctx.applyCanonicalPipelineClientFilter && ctx.selectedPipeline) {
+        allLeads = allLeads.filter(
+          (lead) =>
+            pickCanonicalLeadStatus(lead.status, lead.salesPerson)
+              ?.pipelineStatus === ctx.selectedPipeline,
+        );
+      }
+      if (ctx.applyTextClientFilter) {
+        allLeads = allLeads.filter(
+          (lead) =>
+            matchesNormalized(lead.businessName, ctx.debouncedSearch) &&
+            matchesNormalized(lead.city, ctx.debouncedCity) &&
+            matchesNormalized(lead.state, ctx.debouncedState) &&
+            matchesNormalized(lead.country, ctx.debouncedCountry),
+        );
+      }
       downloadLeadsExcel(allLeads, hasCompanyWideLeadScope);
-      if (ctx.totalCount > MAX_LEADS_EXPORT) {
+      if (fetchCount > MAX_LEADS_EXPORT) {
         sileo.warning({
           title: "Exportación parcial",
           description: `Solo se exportaron los primeros ${MAX_LEADS_EXPORT} de ${ctx.totalCount} clientes. Ajusta los filtros para exportar el resto.`,
@@ -626,16 +777,17 @@ export default function SalesSection({ userId }: SalesSectionProps) {
 
   const handleMoveLead = useCallback(
     async (leadId: string, pipelineStatus: string) => {
+      if (!canEditLeads) return;
       if (pendingPipelines[leadId]) return;
       const lead = leads.find((item) => item.id === leadId);
       if (!lead) return;
-      const statuses = Array.isArray(lead.status)
-        ? lead.status
-        : lead.status
-          ? [lead.status]
-          : [];
-      const status = statuses[0] ?? null;
+      const status = pickCanonicalLeadStatus(lead.status, lead.salesPerson);
       if (status?.pipelineStatus === pipelineStatus) return;
+
+      const assignedSellerId = primaryAssignedSalesPersonId(lead.salesPerson);
+      const statusSalesPersonId = hasCompanyWideLeadScope
+        ? assignedSellerId
+        : userId;
 
       setPendingPipelines((prev) => ({ ...prev, [leadId]: pipelineStatus }));
       try {
@@ -643,7 +795,15 @@ export default function SalesSection({ userId }: SalesSectionProps) {
           await updateLeadStatus({
             variables: {
               where: { id: status.id },
-              data: { pipelineStatus },
+              data: {
+                pipelineStatus,
+                ...(statusSalesPersonId
+                  ? { salesPerson: { connect: { id: statusSalesPersonId } } }
+                  : {}),
+                ...(companyId
+                  ? { saasCompany: { connect: { id: companyId } } }
+                  : {}),
+              },
             },
           });
         } else {
@@ -652,7 +812,9 @@ export default function SalesSection({ userId }: SalesSectionProps) {
               data: {
                 businessLead: { connect: { id: leadId } },
                 pipelineStatus,
-                salesPerson: { connect: { id: userId } },
+                ...(statusSalesPersonId
+                  ? { salesPerson: { connect: { id: statusSalesPersonId } } }
+                  : {}),
                 ...(companyId
                   ? { saasCompany: { connect: { id: companyId } } }
                   : {}),
@@ -682,8 +844,10 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       }
     },
     [
+      canEditLeads,
       companyId,
       createLeadStatus,
+      hasCompanyWideLeadScope,
       leads,
       pendingPipelines,
       refetchLeads,
@@ -794,7 +958,9 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   }, [countData, totalPages, page]);
 
   useEffect(() => {
-    if (!userId || loading || !data) return;
+    if (!userId || loading || !data || applyClientListFilter) {
+      return;
+    }
     const ctx = exportLeadsContextRef.current;
     const prefetchPage = (targetPage: number) => {
       void client.query<
@@ -815,23 +981,37 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     };
     if (effectivePage < totalPages) prefetchPage(effectivePage + 1);
     if (effectivePage > 1) prefetchPage(effectivePage - 1);
-  }, [data, loading, userId, effectivePage, totalPages, pageSize, client]);
+  }, [
+    applyClientListFilter,
+    data,
+    loading,
+    userId,
+    effectivePage,
+    totalPages,
+    pageSize,
+    client,
+  ]);
 
-  const hasAddOwnLeadsFeature = hasPlanFeature(
-    subscription?.planFeatures,
-    PLAN_FEATURE_KEYS.ADD_OWN_LEADS,
-  );
-  const hasExportLeadsFeature = hasPlanFeature(
-    subscription?.planFeatures,
-    PLAN_FEATURE_KEYS.EXPORT_EXCEL,
-  );
+  const hasAddOwnLeadsFeature =
+    hasPlanFeature(
+      subscription?.planFeatures,
+      PLAN_FEATURE_KEYS.ADD_OWN_LEADS,
+    ) &&
+    can(user, PERMISSION_KEYS.CLIENTES_CREAR, () => true);
+  const hasExportLeadsFeature =
+    hasPlanFeature(
+      subscription?.planFeatures,
+      PLAN_FEATURE_KEYS.EXPORT_EXCEL,
+    ) &&
+    can(user, PERMISSION_KEYS.CLIENTES_EXPORTAR, () => true);
   const canAssign =
     hasCompanyWideLeadScope &&
     vendedores.length > 0 &&
     hasPlanFeature(
       subscription?.planFeatures,
       PLAN_FEATURE_KEYS.ASSIGN_SALES_PERSON,
-    );
+    ) &&
+    can(user, PERMISSION_KEYS.CLIENTES_ASIGNAR, () => isAdminCompany);
 
   if (!companyId) {
     return (
@@ -947,6 +1127,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
               onMove={(leadId, pipelineStatus) =>
                 void handleMoveLead(leadId, pipelineStatus)
               }
+              canMoveLeads={canEditLeads}
               selectable={canAssign}
               selectedLeadIds={selectedLeadIds}
               onToggleLead={handleToggleLead}

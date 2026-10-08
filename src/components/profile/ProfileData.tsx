@@ -21,6 +21,8 @@ import { Role } from "kadesh/constants/constans";
 import ProfileCompanySection from "./ProfileCompanySection";
 import type { AuthenticatedItem } from "kadesh/utils/types";
 import CurrentPlanSection from "./sales/CurrentPlanSection";
+import { can } from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 
 const INPUT_CLASS =
   "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
@@ -144,6 +146,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
     (data?.user?.roles ?? userProp.roles)?.some(
       (r) => r.name === Role.ADMIN_COMPANY,
     ) ?? false;
+  const canEditProfile = can(userProp, PERMISSION_KEYS.PERFIL_EDITAR, () => true);
 
   const [updateUser, { loading: saving }] = useMutation<
     UpdateUserResponse,
@@ -161,7 +164,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
   const [saveError, setSaveError] = useState("");
 
   const handleSave = async () => {
-    if (!isDirty || !user.id) return;
+    if (!canEditProfile || !isDirty || !user.id) return;
     const trimmedSecondLastName = secondLastName.trim();
     const trimmedPhone = phone.trim();
     const nextFieldErrors: { phone?: string } = {};
@@ -196,7 +199,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith("image/") || !user.id) {
+    if (!canEditProfile || !file || !file.type.startsWith("image/") || !user.id) {
       if (file && !file.type.startsWith("image/")) {
         setImageError("Selecciona un archivo de imagen (JPG, PNG, etc.).");
       }
@@ -253,11 +256,17 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
               Información Personal
             </h2>
             <SaveChangesButton
-              isDirty={isDirty}
+              isDirty={canEditProfile && isDirty}
               saving={saving}
               onSave={handleSave}
             />
           </div>
+
+          {!canEditProfile && (
+            <div className="mb-6 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f8f8f8] dark:bg-[#2a2a2a] p-3 text-sm text-[#616161] dark:text-[#b0b0b0]">
+              Solo puedes ver tu perfil. Pide a Gerencia permiso para editarlo.
+            </div>
+          )}
 
           {saveError && (
             <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm font-medium">
@@ -276,11 +285,12 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
                 className="sr-only"
                 aria-label="Subir nueva foto de perfil"
                 onChange={handleImageChange}
+                disabled={!canEditProfile}
               />
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={imageUploading}
+                disabled={imageUploading || !canEditProfile}
                 className="relative w-24 h-24 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-2xl overflow-hidden group cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {user.profileImage?.url ? (
@@ -352,6 +362,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
               onChange={(e) => setName(e.target.value)}
               placeholder="Tu nombre"
               className={INPUT_CLASS}
+              disabled={!canEditProfile}
             />
           </div>
 
@@ -366,6 +377,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
               onChange={(e) => setLastName(e.target.value)}
               placeholder="Apellido paterno"
               className={INPUT_CLASS}
+              disabled={!canEditProfile}
             />
           </div>
 
@@ -380,6 +392,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
               onChange={(e) => setSecondLastName(e.target.value)}
               placeholder="Apellido materno (opcional)"
               className={INPUT_CLASS}
+              disabled={!canEditProfile}
             />
           </div>
 
@@ -446,6 +459,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
               onChange={(e) => setBusinessEmail(e.target.value)}
               placeholder="empresa@dominio.com"
               className={INPUT_CLASS}
+              disabled={!canEditProfile}
             />
             <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
               Este correo se usará para las cotizaciones y ventas.
@@ -463,6 +477,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
               onChange={(e) => setBusinessPhone(e.target.value)}
               placeholder="+52 55 1234 5678"
               className={INPUT_CLASS}
+              disabled={!canEditProfile}
             />
             <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
               Este teléfono se usará para las cotizaciones y ventas.
@@ -488,6 +503,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
                 fieldErrors.phone ? "border-red-400 focus:ring-red-500 dark:border-red-500" : ""
               }`}
               required
+              disabled={!canEditProfile}
               aria-invalid={Boolean(fieldErrors.phone)}
             />
             {fieldErrors.phone ? (
@@ -509,6 +525,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
               value={birthday}
               onChange={(e) => setBirthday(e.target.value)}
               className={INPUT_CLASS}
+              disabled={!canEditProfile}
             />
           </div>
 
@@ -547,7 +564,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
           {/* Botón guardar abajo (visible en móvil) */}
           <div className="md:col-span-2 flex justify-center sm:justify-end pt-2">
             <SaveChangesButton
-              isDirty={isDirty}
+              isDirty={canEditProfile && isDirty}
               saving={saving}
               onSave={handleSave}
             />

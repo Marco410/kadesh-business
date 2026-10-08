@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useMutation, type InternalRefetchQueriesInclude } from "@apollo/client";
+import {
+  useQuery,
+  useMutation,
+  type InternalRefetchQueriesInclude,
+} from "@apollo/client";
 import {
   ROLES_BY_NAMES_QUERY,
   CREATE_SALES_PERSON_MUTATION,
@@ -22,8 +26,11 @@ import { Role } from "kadesh/constants/constans";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { sileo } from "sileo";
 
-const inputClassName =
-  "w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-sm text-[#212121] dark:text-[#ffffff] placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
+const fieldClass =
+  "w-full min-h-11 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
+
+const labelClass =
+  "block text-sm font-medium text-[#212121] dark:text-[#e0e0e0] mb-1.5";
 
 export interface AddCompanyUserFormProps {
   companyId: string | null;
@@ -93,14 +100,14 @@ export default function AddCompanyUserForm({
     setBirthday("");
   });
 
-  const { data: rolesData } = useQuery<RolesByNamesResponse, RolesByNamesVariables>(
-    ROLES_BY_NAMES_QUERY,
-    {
-      variables: {
-        where: { name: { in: [Role.USER, Role.USER_COMPANY] } },
-      },
-    }
-  );
+  const { data: rolesData } = useQuery<
+    RolesByNamesResponse,
+    RolesByNamesVariables
+  >(ROLES_BY_NAMES_QUERY, {
+    variables: {
+      where: { name: { in: [Role.USER, Role.USER_COMPANY] } },
+    },
+  });
 
   const [createUser, { loading: creating }] = useMutation<
     CreateSalesPersonResponse,
@@ -127,7 +134,9 @@ export default function AddCompanyUserForm({
         msg.includes("Unique constraint failed") &&
         (msg.includes("email") || msg.includes("username"));
       sileo.error({
-        title: isEmailTaken ? "Correo ya registrado" : "No se pudo agregar el usuario",
+        title: isEmailTaken
+          ? "Correo ya registrado"
+          : "No se pudo agregar el usuario",
         description: isEmailTaken
           ? "Usa otro correo o inicia sesión con esa cuenta."
           : msg || "Intenta de nuevo.",
@@ -157,17 +166,30 @@ export default function AddCompanyUserForm({
 
   const isEditMode = Boolean(editingId);
   const submitting = creating || updating;
+  const passwordMismatch =
+    password.length > 0 &&
+    confirmPassword.length > 0 &&
+    password !== confirmPassword;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!companyId) {
-      sileo.error({ title: "Sin empresa", description: "No hay empresa asignada." });
+      sileo.error({
+        title: "Sin empresa",
+        description: "No hay empresa asignada.",
+      });
       return;
     }
     const nameTrim = name.trim();
     const lastNameTrim = lastName.trim();
     const emailTrim = email.trim();
-    if (!nameTrim || !lastNameTrim || !emailTrim || !phone.trim() || !birthday.trim()) {
+    if (
+      !nameTrim ||
+      !lastNameTrim ||
+      !emailTrim ||
+      !phone.trim() ||
+      !birthday.trim()
+    ) {
       sileo.warning({
         title: "Campos requeridos",
         description:
@@ -220,7 +242,9 @@ export default function AddCompanyUserForm({
               email: emailTrim,
               password: password || undefined,
               phone: phone.trim() || undefined,
-              birthday: birthday.trim() ? birthday.trim().slice(0, 10) : undefined,
+              birthday: birthday.trim()
+                ? birthday.trim().slice(0, 10)
+                : undefined,
               product: "saas",
               roles: { connect: roleIds },
               company: { connect: { id: companyId } },
@@ -233,129 +257,184 @@ export default function AddCompanyUserForm({
     }
   };
 
-  const pad = compact ? "p-3 space-y-3" : "p-4 space-y-4";
-
   return (
-    <div
-      className={`rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden h-fit ${compact ? "text-sm" : ""}`}
+    <form
+      onSubmit={handleSubmit}
+      className={`overflow-hidden rounded-2xl border border-orange-200/70 bg-gradient-to-br from-orange-500/[0.07] via-white to-emerald-500/[0.04] shadow-sm dark:border-orange-900/40 dark:from-orange-500/10 dark:via-[#1e1e1e] dark:to-emerald-500/[0.06] ${compact ? "" : ""}`}
     >
-      <h3
-        className={`font-bold text-[#212121] dark:text-[#ffffff] bg-[#f5f5f5] dark:bg-[#2a2a2a] border-b border-[#e0e0e0] dark:border-[#3a3a3a] ${compact ? "px-3 py-2 text-sm" : "px-4 py-3 text-lg"}`}
-      >
-        {editingId ? "Editar usuario" : "Nuevo usuario (empresa)"}
-      </h3>
-      <form onSubmit={handleSubmit} className={pad}>
-        <div>
-          <label className="block text-sm font-medium text-[#212121] dark:text-[#e0e0e0] mb-1">
-            Nombre <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className={inputClassName}
-            placeholder="Nombre"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-[#212121] dark:text-[#e0e0e0] mb-1">
-            Apellido paterno <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            className={inputClassName}
-            placeholder="Apellido"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-[#212121] dark:text-[#e0e0e0] mb-1">
-            Correo electrónico <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={inputClassName}
-            placeholder="usuario@empresa.com"
-            required
-          />
-          <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
-            Se usará para iniciar sesión. Debe ser único.
-          </p>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-[#212121] dark:text-[#e0e0e0] mb-1">
-            Contraseña {!isEditMode && <span className="text-red-500">*</span>}
-          </label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={inputClassName}
-            placeholder={isEditMode ? "Dejar en blanco para no cambiar" : "Mínimo 8 caracteres"}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-[#212121] dark:text-[#e0e0e0] mb-1">
-            Confirmar contraseña {!isEditMode && <span className="text-red-500">*</span>}
-          </label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className={inputClassName}
-            placeholder="Repite la contraseña"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-[#212121] dark:text-[#e0e0e0] mb-1">
-            Teléfono <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="tel"
-            value={phone}
-            maxLength={10}
-            onChange={(e) => setPhone(e.target.value)}
-            className={inputClassName}
-            placeholder="10 dígitos"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-[#212121] dark:text-[#e0e0e0] mb-1">
-            Fecha de nacimiento <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="date"
-            value={birthday}
-            onChange={(e) => setBirthday(e.target.value)}
-            className={inputClassName}
-            required
-          />
-        </div>
-        <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
-          Rol asignado al crear: <span className="font-medium">user_company</span> (acceso de empresa).
+      <div className="border-b border-orange-200/50 px-4 py-3 dark:border-orange-900/30 sm:px-5">
+        <p className="text-xs font-semibold uppercase tracking-wide text-orange-700/80 dark:text-orange-300/80">
+          {isEditMode ? "Editando" : "Nueva alta"}
         </p>
+        <h3 className="mt-0.5 text-base font-bold text-[#212121] dark:text-white">
+          {isEditMode ? "Editar usuario" : "Usuario de empresa"}
+        </h3>
+        <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+          {isEditMode
+            ? "La contraseña solo cambia si escribes una nueva."
+            : "Rol al crear: acceso de empresa (user_company). El correo es su inicio de sesión."}
+        </p>
+      </div>
 
-        <div className="pt-1 flex flex-wrap gap-2">
+      <div className="space-y-5 px-4 py-4 sm:px-5">
+        <section className="space-y-3">
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+            Identidad
+          </h4>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label htmlFor="company-user-name" className={labelClass}>
+                Nombre <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="company-user-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className={fieldClass}
+                placeholder="Nombre"
+                autoComplete="given-name"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="company-user-lastname" className={labelClass}>
+                Apellido paterno <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="company-user-lastname"
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className={fieldClass}
+                placeholder="Apellido"
+                autoComplete="family-name"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="company-user-phone" className={labelClass}>
+                Teléfono <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="company-user-phone"
+                type="tel"
+                value={phone}
+                maxLength={10}
+                onChange={(e) =>
+                  setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+                }
+                className={fieldClass}
+                placeholder="5512345678"
+                inputMode="numeric"
+                autoComplete="tel"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="company-user-birthday" className={labelClass}>
+                Fecha de nacimiento <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="company-user-birthday"
+                type="date"
+                value={birthday}
+                onChange={(e) => setBirthday(e.target.value)}
+                className={fieldClass}
+                required
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+            Acceso al panel
+          </h4>
+          <div>
+            <label htmlFor="company-user-email" className={labelClass}>
+              Correo electrónico <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="company-user-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={fieldClass}
+              placeholder="usuario@empresa.com"
+              autoComplete="email"
+              required
+            />
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label htmlFor="company-user-password" className={labelClass}>
+                Contraseña{" "}
+                {!isEditMode && <span className="text-red-500">*</span>}
+              </label>
+              <input
+                id="company-user-password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={fieldClass}
+                placeholder={
+                  isEditMode
+                    ? "Dejar en blanco para no cambiar"
+                    : "Mínimo 8 caracteres"
+                }
+                autoComplete="new-password"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="company-user-confirm-password"
+                className={labelClass}
+              >
+                Confirmar{" "}
+                {(!isEditMode || password.length > 0) && (
+                  <span className="text-red-500">*</span>
+                )}
+              </label>
+              <input
+                id="company-user-confirm-password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className={fieldClass}
+                placeholder="Repite la contraseña"
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
+          {passwordMismatch && (
+            <p className="text-xs text-red-600 dark:text-red-400">
+              Las contraseñas no coinciden.
+            </p>
+          )}
+        </section>
+
+        {!companyId && (
+          <p className="rounded-xl border border-amber-300/50 bg-amber-50 px-3 py-2.5 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+            Sin empresa asignada. No podrás guardar.
+          </p>
+        )}
+
+        <div className="flex flex-col-reverse gap-2 border-t border-[#e8e8e8] pt-4 dark:border-[#333] sm:flex-row sm:justify-end">
           {editingId && (
             <button
               type="button"
               onClick={() => onEditingIdChange(null)}
               disabled={submitting}
-              className="inline-flex justify-center px-4 py-2 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-[#e0e0e0] text-sm font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#333]"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#e0e0e0] bg-white px-4 text-sm font-medium text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:bg-[#2a2a2a] dark:text-[#e0e0e0] dark:hover:bg-[#333]"
             >
               Cancelar edición
             </button>
           )}
           <button
             type="submit"
-            disabled={submitting || !companyId}
-            className="inline-flex justify-center px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={submitting || !companyId || passwordMismatch}
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-orange-500 px-5 text-sm font-semibold text-white shadow-sm shadow-orange-500/25 transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] hover:bg-orange-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting
               ? "Guardando…"
@@ -364,7 +443,7 @@ export default function AddCompanyUserForm({
                 : "Crear usuario"}
           </button>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 }

@@ -19,6 +19,7 @@ export default function LeadPipelineNotesFields({
   saving = false,
   notesDirty = false,
   onSaveNotes,
+  readOnly = false,
 }: {
   pipelineStatus: string;
   onPipelineStatusChange: (value: string) => void;
@@ -28,6 +29,7 @@ export default function LeadPipelineNotesFields({
   saving?: boolean;
   notesDirty?: boolean;
   onSaveNotes?: () => void;
+  readOnly?: boolean;
 }) {
   return (
     <div className={`grid grid-cols-1 sm:grid-cols-[minmax(12rem,16rem)_1fr] gap-3 ${className}`}>
@@ -42,7 +44,7 @@ export default function LeadPipelineNotesFields({
           className={selectClassName}
           aria-label="Estado del pipeline"
           title="Se guarda al elegir"
-          disabled={saving}
+          disabled={saving || readOnly}
         >
           <option value="">—</option>
           {PIPELINE_OPTIONS.map((opt) => (
@@ -60,7 +62,7 @@ export default function LeadPipelineNotesFields({
           <label htmlFor="lead-notes" className={`${labelClassName} mb-0`}>
             Notas
           </label>
-          {onSaveNotes ? (
+          {onSaveNotes && !readOnly ? (
             <button
               type="button"
               onClick={onSaveNotes}
@@ -77,7 +79,8 @@ export default function LeadPipelineNotesFields({
           onChange={(e) => onNotesChange(e.target.value)}
           rows={2}
           placeholder="Notas del cliente..."
-          disabled={saving}
+          disabled={saving || readOnly}
+          readOnly={readOnly}
           className={`${selectClassName} placeholder-[#9ca3af] resize-y min-h-[42px]`}
         />
       </div>
