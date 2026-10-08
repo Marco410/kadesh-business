@@ -10,13 +10,14 @@ export const KADESH_LEGAL = {
   phoneE164: "+523321648537",
   tel: "tel:+523321648537",
   email: "contacto@kadesh.com.mx",
-  streetAddress: "Antonia Morelos 163",
+  /** Como en Constancia de Situación Fiscal (tipo de vialidad + nombre + número). */
+  streetAddress: "Andador Antonia Morelos 163",
   addressLocality: "Morelia",
-  addressRegion: "Michoacán",
+  addressRegion: "Michoacán de Ocampo",
   postalCode: "58088",
   addressCountry: "MX",
   /** Colonia / asentamiento (no va en PostalAddress schema como campo estándar). */
-  neighborhood: "Juana Pavón",
+  neighborhood: "Juana Pavón Infonavit",
 } as const;
 
 /** Una línea legible para pie, contacto y privacidad. */
