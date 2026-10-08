@@ -30,4 +30,14 @@ Default **25** por página (10 / 25 / 50). `limit` y `page` viven en la URL; `li
 
 ## Acceso
 
-Admin empresa / usuario empresa ven toda la bolsa de la compañía y pueden asignar si el plan tiene `assign_sales_person`. El vendedor ve los suyos y no ve la barra de asignación. Exportar y agregar cliente siguen las features de plan `export_excel` y `add_own_leads`. **Agregar cliente** abre un wizard de 3 pasos en `/panel/clientes/lead/agregar` (ver `lead/README.md`).
+El menú exige `clientes.ver` (o rol vendedor si el usuario no tiene lista de permisos). Ver toda la bolsa de la compañía: `clientes.ver_empresa` (antes: admin empresa / usuario empresa). Editar ficha: `clientes.editar`. Asignar: `clientes.asignar` + plan `assign_sales_person`. Exportar y agregar: `clientes.exportar` / `clientes.crear` más el plan. **Agregar cliente** abre un wizard de 3 pasos en `/panel/clientes/lead/agregar` (ver `lead/README.md`).
+
+**Estatus de pipeline canónico:** con alcance empresa, la lista y la edición usan el estatus del **vendedor asignado** (si no hay, el de empresa). El filtro de pipeline pide candidatos en el API y, en alcance empresa, filtra/cuenta/pagina en cliente por el canónico (el número de arriba y el “1–N de N” coinciden con lo visible). Helper: `helpers/canonical-lead-status.ts`.
+
+**Filtro por vendedor:** coincide con la columna **Asignado a** (relación del lead), no con el vendedor colgado en un estatus de pipeline. “Sin asignar” = sin vendedor de la empresa en esa relación; un vendedor concreto = solo leads donde aparece en Asignado a.
+
+**Categoría / ubicación:** la categoría del filtro abarca Google e INEGI con la misma etiqueta (p. ej. Médicos → `médicos` y `medicina`). Empresa, ciudad, estado y país se filtran en cliente sin acentos (`México` = `mexico`), porque el API no hace unaccent.
+
+**Vendedores** (`?tab=vendedores`): ver `vendedores.ver` (legado: admin empresa). Altas: `vendedores.crear`. Editar / reasignar en el modal: `vendedores.editar` + `clientes.asignar`. Detalle del modal (pestañas, resumen): `vendedores/README.md`.
+
+**Archivos / Calendario / Espacios**: `archivos.*`, `calendario.*`, `espacios.*` en el catálogo. Miembros del espacio (modal): `workspaces/members/README.md`. Catálogo completo: `usuarios/README.md`.

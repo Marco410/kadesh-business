@@ -7,12 +7,17 @@ import {
   ArrowDown01Icon,
   ArrowRight01Icon,
   ArrowUp01Icon,
+  CalendarIcon,
   Chart01Icon,
   FileAttachmentIcon,
+  FileIcon,
   FlashIcon,
+  FolderIcon,
   InformationCircleIcon,
   SparklesIcon,
   UserIcon,
+  UserMultiple02Icon,
+  WorkIcon,
 } from "@hugeicons/core-free-icons";
 import { ReferralLinkSection } from "kadesh/components/home";
 import EmptyCompanySection from "kadesh/components/profile/sales/EmptyCompanySection";
@@ -27,6 +32,11 @@ import { Routes } from "kadesh/core/routes";
 import { formatCurrency } from "kadesh/utils/format-currency";
 import { formatDate, formatDateShort } from "kadesh/utils/format-date";
 import { cn } from "kadesh/utils/cn";
+import {
+  canAccessNavTab,
+  type NavAccessContext,
+} from "kadesh/components/profile/usuarios/can";
+import { useUser } from "kadesh/utils/UserContext";
 import type { SubscriptionData } from "kadesh/components/profile/sales/queries";
 import { PipelineBars, ShareBars, WeeklyBars } from "./charts";
 import { DailyDigestCard } from "./DailyDigestCard";
@@ -208,18 +218,24 @@ function SectionHead({
   );
 }
 
-function QuickActions({
-  hasVendedorRole,
-  canManageAi,
-}: {
-  hasVendedorRole: boolean;
-  canManageAi: boolean;
-}) {
+function QuickActions({ navCtx }: { navCtx: NavAccessContext }) {
+  const { user } = useUser();
   const reduce = useReducedMotion();
-  const actions = [
-    { label: "Editar perfil", href: Routes.panelProfile, icon: UserIcon },
+  const canTab = (tab: string) => canAccessNavTab(user, tab, navCtx);
+
+  type Action = {
+    label: string;
+    href: string;
+    icon: typeof UserIcon;
+    ai?: boolean;
+  };
+
+  const actions: Action[] = [
+    ...(canTab("profile")
+      ? [{ label: "Editar perfil", href: Routes.panelProfile, icon: UserIcon }]
+      : []),
     { label: "Novedades", href: Routes.novedades, icon: FlashIcon },
-    ...(canManageAi
+    ...(canTab("ai")
       ? [
           {
             label: KADESH_URIM_AI_NAME,
@@ -229,7 +245,7 @@ function QuickActions({
           },
         ]
       : []),
-    ...(hasVendedorRole
+    ...(canTab("clientes")
       ? [
           {
             label: "Ver clientes",
@@ -240,6 +256,51 @@ function QuickActions({
             label: "Planes",
             href: Routes.panelPlans,
             icon: FileAttachmentIcon,
+          },
+        ]
+      : []),
+    ...(canTab("cotizaciones")
+      ? [
+          {
+            label: "Cotizaciones",
+            href: `${Routes.panel}?tab=cotizaciones`,
+            icon: FileIcon,
+          },
+        ]
+      : []),
+    ...(canTab("proyectos")
+      ? [
+          {
+            label: "Proyectos",
+            href: `${Routes.panel}?tab=proyectos`,
+            icon: FolderIcon,
+          },
+        ]
+      : []),
+    ...(canTab("calendar")
+      ? [
+          {
+            label: "Calendario",
+            href: `${Routes.panel}?tab=calendar`,
+            icon: CalendarIcon,
+          },
+        ]
+      : []),
+    ...(canTab("workspaces")
+      ? [
+          {
+            label: "Espacios",
+            href: `${Routes.panel}?tab=workspaces`,
+            icon: WorkIcon,
+          },
+        ]
+      : []),
+    ...(canTab("usuarios")
+      ? [
+          {
+            label: "Usuarios",
+            href: `${Routes.panel}?tab=usuarios`,
+            icon: UserMultiple02Icon,
           },
         ]
       : []),
@@ -265,11 +326,7 @@ function QuickActions({
             transition={{ duration: 0.12, ease: DASHBOARD_EASE }}
             className="inline-flex items-center gap-1.5 rounded-full border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 py-1.5 text-sm font-medium text-[#212121] dark:text-white hover:border-orange-500/60 hover:text-orange-600 dark:hover:text-orange-400"
           >
-            <span
-              className={
-                "ai" in action && action.ai ? "ai-urim-icon" : undefined
-              }
-            >
+            <span className={action.ai ? "ai-urim-icon" : undefined}>
               <HugeiconsIcon icon={action.icon} size={16} />
             </span>
             {action.label}
@@ -280,25 +337,41 @@ function QuickActions({
   );
 }
 
-function AttentionList({ stats }: { stats: DashboardStats }) {
+function AttentionList({
+  stats,
+  navCtx,
+}: {
+  stats: DashboardStats;
+  navCtx: NavAccessContext;
+}) {
+  const { user } = useUser();
   const reduce = useReducedMotion();
   const items: Array<{ label: string; detail: string; href: string }> = [];
 
-  if (stats.overdueFollowUpsCount > 0) {
+  if (
+    stats.overdueFollowUpsCount > 0 &&
+    canAccessNavTab(user, "calendar", navCtx)
+  ) {
     items.push({
       label: `${stats.overdueFollowUpsCount} seguimientos vencidos`,
       detail: "Hay clientes esperando el siguiente contacto.",
       href: `${Routes.panel}?tab=calendar`,
     });
   }
-  if (stats.unassignedLeads > 0) {
+  if (
+    stats.unassignedLeads > 0 &&
+    canAccessNavTab(user, "clientes", navCtx)
+  ) {
     items.push({
       label: `${stats.unassignedLeads} clientes sin vendedor`,
       detail: "Asígnarlos para que no se enfríen en el pipeline.",
       href: `${Routes.panel}?tab=clientes`,
     });
   }
-  if (stats.expiringQuotations.length > 0) {
+  if (
+    stats.expiringQuotations.length > 0 &&
+    canAccessNavTab(user, "cotizaciones", navCtx)
+  ) {
     items.push({
       label: `${stats.expiringQuotations.length} cotizaciones por vencer`,
       detail: "Vigencia en los próximos 7 días.",
@@ -365,7 +438,19 @@ export function CompanyDashboard({
   cardNumber,
   onCompanyCreated,
 }: CompanyDashboardProps) {
+  const { user } = useUser();
   const reduce = useReducedMotion();
+  const navCtx: NavAccessContext = {
+    hasVendedorRole,
+    isAdminCompany,
+    canManageAi,
+  };
+  const canClientes = canAccessNavTab(user, "clientes", navCtx);
+  const canCalendar = canAccessNavTab(user, "calendar", navCtx);
+  const canCotizaciones = canAccessNavTab(user, "cotizaciones", navCtx);
+  const canProyectos = canAccessNavTab(user, "proyectos", navCtx);
+  const canVendedores = canAccessNavTab(user, "vendedores", navCtx);
+
   const firstName = userName?.split(/\s+/)[0] || "Usuario";
   const todayLabel = new Intl.DateTimeFormat("es-MX", {
     weekday: "long",
@@ -492,10 +577,7 @@ export function CompanyDashboard({
                 {planName ? ` · ${planName}` : ""}
               </p>
             </div>
-            <QuickActions
-              hasVendedorRole={hasVendedorRole}
-              canManageAi={canManageAi}
-            />
+            <QuickActions navCtx={navCtx} />
           </div>
         </div>
       </DashboardInView>
@@ -527,7 +609,11 @@ export function CompanyDashboard({
                 label="Clientes"
                 value={String(stats.leadsCount)}
                 hint="Leads de la empresa en el alcance actual."
-                href={`${Routes.panel}?tab=clientes`}
+                href={
+                  canClientes
+                    ? `${Routes.panel}?tab=clientes`
+                    : undefined
+                }
               />
             </motion.div>
             <motion.div
@@ -613,14 +699,16 @@ export function CompanyDashboard({
         </section>
       </DashboardInView>
 
-      <AttentionList stats={stats} />
+      <AttentionList stats={stats} navCtx={navCtx} />
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <DashboardInView className="lg:col-span-3">
         <section className={panelClass}>
           <SectionHead
             title="Pipeline comercial"
-            href={`${Routes.panel}?tab=clientes`}
+            href={
+              canClientes ? `${Routes.panel}?tab=clientes` : undefined
+            }
             hrefLabel="Ir a clientes"
           />
           {stats.pipelineTruncated ? (
@@ -646,7 +734,9 @@ export function CompanyDashboard({
         <section className={panelClass}>
           <SectionHead
             title="Agenda de seguimientos"
-            href={`${Routes.panel}?tab=calendar`}
+            href={
+              canCalendar ? `${Routes.panel}?tab=calendar` : undefined
+            }
           />
           {stats.followUpsOverdue.length +
             stats.followUpsToday.length +
@@ -679,7 +769,7 @@ export function CompanyDashboard({
                     className="flex items-start justify-between gap-3"
                   >
                     <div className="min-w-0">
-                      {task.businessLead ? (
+                      {task.businessLead && canClientes ? (
                         <Link
                           href={Routes.panelLead(task.businessLead.id)}
                           className="text-base font-medium text-[#212121] dark:text-white hover:text-orange-600 dark:hover:text-orange-400 truncate block"
@@ -687,8 +777,8 @@ export function CompanyDashboard({
                           {task.businessLead.businessName}
                         </Link>
                       ) : (
-                        <p className="text-base font-medium text-[#212121] dark:text-white">
-                          Seguimiento
+                        <p className="text-base font-medium text-[#212121] dark:text-white truncate">
+                          {task.businessLead?.businessName ?? "Seguimiento"}
                         </p>
                       )}
                       <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-0.5">
@@ -726,7 +816,9 @@ export function CompanyDashboard({
         <section className={panelClass}>
           <SectionHead
             title="Clientes recientes"
-            href={`${Routes.panel}?tab=clientes`}
+            href={
+              canClientes ? `${Routes.panel}?tab=clientes` : undefined
+            }
           />
           {stats.recentLeads.length === 0 ? (
             <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
@@ -743,12 +835,18 @@ export function CompanyDashboard({
                     className="flex items-start justify-between gap-3"
                   >
                     <div className="min-w-0">
-                      <Link
-                        href={Routes.panelLead(lead.id)}
-                        className="text-base font-medium text-[#212121] dark:text-white hover:text-orange-600 dark:hover:text-orange-400 truncate block"
-                      >
-                        {lead.businessName}
-                      </Link>
+                      {canClientes ? (
+                        <Link
+                          href={Routes.panelLead(lead.id)}
+                          className="text-base font-medium text-[#212121] dark:text-white hover:text-orange-600 dark:hover:text-orange-400 truncate block"
+                        >
+                          {lead.businessName}
+                        </Link>
+                      ) : (
+                        <p className="text-base font-medium text-[#212121] dark:text-white truncate">
+                          {lead.businessName}
+                        </p>
+                      )}
                       <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-0.5 truncate">
                         {[lead.category, lead.city]
                           .filter(Boolean)
@@ -812,7 +910,11 @@ export function CompanyDashboard({
         <section className={panelClass}>
           <SectionHead
             title="Cotizaciones"
-            href={`${Routes.panel}?tab=cotizaciones`}
+            href={
+              canCotizaciones
+                ? `${Routes.panel}?tab=cotizaciones`
+                : undefined
+            }
           />
           <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mb-3">
             {stats.quotationsCount} en total
@@ -836,15 +938,24 @@ export function CompanyDashboard({
                     key={quotation.id}
                     className="flex items-center justify-between gap-3"
                   >
-                    <Link
-                      href={Routes.panelQuotation(quotation.id)}
-                      className="text-base font-medium text-[#212121] dark:text-white hover:text-orange-600 dark:hover:text-orange-400 truncate"
-                    >
-                      {quotation.quotationNumber}
-                      {quotation.lead?.businessName
-                        ? ` · ${quotation.lead.businessName}`
-                        : ""}
-                    </Link>
+                    {canCotizaciones ? (
+                      <Link
+                        href={Routes.panelQuotation(quotation.id)}
+                        className="text-base font-medium text-[#212121] dark:text-white hover:text-orange-600 dark:hover:text-orange-400 truncate"
+                      >
+                        {quotation.quotationNumber}
+                        {quotation.lead?.businessName
+                          ? ` · ${quotation.lead.businessName}`
+                          : ""}
+                      </Link>
+                    ) : (
+                      <span className="text-base font-medium text-[#212121] dark:text-white truncate">
+                        {quotation.quotationNumber}
+                        {quotation.lead?.businessName
+                          ? ` · ${quotation.lead.businessName}`
+                          : ""}
+                      </span>
+                    )}
                     <span
                       className={cn(
                         "text-xs font-medium rounded-full px-2 py-0.5",
@@ -869,7 +980,9 @@ export function CompanyDashboard({
         <section className={panelClass}>
           <SectionHead
             title="Proyectos"
-            href={`${Routes.panel}?tab=proyectos`}
+            href={
+              canProyectos ? `${Routes.panel}?tab=proyectos` : undefined
+            }
           />
           <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mb-3">
             {stats.projectsCount} en total
@@ -891,12 +1004,18 @@ export function CompanyDashboard({
                     key={project.id}
                     className="flex items-center justify-between gap-3"
                   >
-                    <Link
-                      href={Routes.panelProject(project.id)}
-                      className="text-base font-medium text-[#212121] dark:text-white hover:text-orange-600 dark:hover:text-orange-400 truncate"
-                    >
-                      {project.name}
-                    </Link>
+                    {canProyectos ? (
+                      <Link
+                        href={Routes.panelProject(project.id)}
+                        className="text-base font-medium text-[#212121] dark:text-white hover:text-orange-600 dark:hover:text-orange-400 truncate"
+                      >
+                        {project.name}
+                      </Link>
+                    ) : (
+                      <span className="text-base font-medium text-[#212121] dark:text-white truncate">
+                        {project.name}
+                      </span>
+                    )}
                     <span
                       className={cn(
                         "text-xs font-medium rounded-full px-2 py-0.5",
@@ -921,7 +1040,11 @@ export function CompanyDashboard({
         <section className={panelClass}>
           <SectionHead
             title="Equipo comercial"
-            href={`${Routes.panel}?tab=vendedores`}
+            href={
+              canVendedores
+                ? `${Routes.panel}?tab=vendedores`
+                : undefined
+            }
           />
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">

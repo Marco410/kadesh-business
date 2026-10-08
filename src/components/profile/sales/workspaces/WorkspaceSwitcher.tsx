@@ -13,9 +13,6 @@ import {
   type SaasWorkspacesResponse,
 } from "kadesh/components/profile/sales/workspaces/queries";
 import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
-import { Role } from "kadesh/constants/constans";
-import { useUser } from "kadesh/utils/UserContext";
-
 export interface WorkspaceSwitcherProps {
   enabled: boolean;
   onRequestCreate?: () => void;
@@ -27,9 +24,7 @@ export default function WorkspaceSwitcher({
   onRequestCreate,
   className = "",
 }: WorkspaceSwitcherProps) {
-  const { user } = useUser();
-  const isAdminCompany =
-    user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const canCreateWorkspace = Boolean(onRequestCreate);
 
   const { currentWorkspaceId, setCurrentWorkspaceId } = useWorkspaceContext();
   const [open, setOpen] = useState(false);
@@ -128,21 +123,21 @@ export default function WorkspaceSwitcher({
           ))}
           {workspaces.length === 0 && !loading && (
             <p className="px-4 py-3 text-xs text-[#616161] dark:text-[#9e9e9e]">
-              {isAdminCompany ? (
+              {canCreateWorkspace ? (
                 <>
                   Aún no tienes espacios. Crea uno para organizar tareas, actividades, seguimientos y
                   propuestas.
                 </>
               ) : (
                 <>
-                  Aún no hay espacios de trabajo. Un administrador de empresa puede crearlos para
+                  Aún no hay espacios de trabajo. Un administrador o Gerencia puede crearlos para
                   organizar tareas, actividades, seguimientos y propuestas.
                 </>
               )}
             </p>
           )}
 
-          {isAdminCompany && (
+          {canCreateWorkspace && (
             <>
               <div className="my-1 h-px bg-[#e0e0e0] dark:bg-[#3a3a3a]" />
               <button

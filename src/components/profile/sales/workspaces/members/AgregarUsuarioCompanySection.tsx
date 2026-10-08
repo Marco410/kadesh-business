@@ -16,7 +16,7 @@ import {
 import { Role } from "kadesh/constants/constans";
 import { Routes } from "kadesh/core/routes";
 import { useUser } from "kadesh/utils/UserContext";
-import { isAdminCompanyUser } from "kadesh/utils/user-roles";
+import { canManageCompanyUsers } from "kadesh/utils/user-roles";
 import RoleAccessDeniedSection from "kadesh/components/profile/sales/RoleAccessDeniedSection";
 import AddCompanyUserForm from "kadesh/components/profile/sales/workspaces/members/AddCompanyUserForm";
 
@@ -80,7 +80,7 @@ export default function AgregarUsuarioCompanySection() {
     );
   }
 
-  if (!isAdminCompanyUser(user)) {
+  if (!canManageCompanyUsers(user)) {
     return (
       <div className="max-w-7xl mx-auto space-y-6">
         <RoleAccessDeniedSection

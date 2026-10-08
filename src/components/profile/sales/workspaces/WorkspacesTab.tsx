@@ -19,6 +19,8 @@ import {
 } from "kadesh/components/profile/sales/queries";
 import { Role } from "kadesh/constants/constans";
 import { useUser } from "kadesh/utils/UserContext";
+import { can } from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 import { HoverTooltip } from "kadesh/components/shared";
 import WorkspaceSwitcher from "kadesh/components/profile/sales/workspaces/WorkspaceSwitcher";
 import WorkspaceDashboard from "kadesh/components/profile/sales/workspaces/WorkspaceDashboard";
@@ -121,6 +123,16 @@ export default function WorkspacesTab({
   const companyId = userData?.user?.company?.id ?? null;
   const isAdminCompany =
     user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const canCreateWorkspace = can(
+    user,
+    PERMISSION_KEYS.ESPACIOS_CREAR,
+    () => isAdminCompany,
+  );
+  const canManageMembers = can(
+    user,
+    PERMISSION_KEYS.ESPACIOS_MIEMBROS,
+    () => isAdminCompany,
+  );
 
   return (
     <div className="space-y-8">
@@ -139,7 +151,9 @@ export default function WorkspacesTab({
         <div className="flex min-w-0 flex-wrap items-center gap-3">
           <WorkspaceSwitcher
             enabled
-            onRequestCreate={onRequestCreateWorkspace}
+            onRequestCreate={
+              canCreateWorkspace ? onRequestCreateWorkspace : undefined
+            }
           />
           {currentWorkspaceId && workspaceMembers.length > 0 && (
             <div
@@ -166,24 +180,28 @@ export default function WorkspacesTab({
             </div>
           )}
         </div>
-        {currentWorkspaceId && isAdminCompany && (
+        {currentWorkspaceId && (canManageMembers || isAdminCompany) && (
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setEditWorkspaceOpen(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-4 py-2.5 text-sm font-medium text-[#212121] dark:text-white shadow-sm hover:border-orange-500/40 transition-colors"
-            >
-              <HugeiconsIcon icon={Edit02Icon} size={18} />
-              Editar espacio de trabajo
-            </button>
-            <button
-              type="button"
-              onClick={() => setMembersOpen(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-4 py-2.5 text-sm font-medium text-[#212121] dark:text-white shadow-sm hover:border-orange-500/40 transition-colors"
-            >
-              <HugeiconsIcon icon={UserMultiple02Icon} size={18} />
-              Gestionar miembros
-            </button>
+            {isAdminCompany || canManageMembers ? (
+              <button
+                type="button"
+                onClick={() => setEditWorkspaceOpen(true)}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-4 py-2.5 text-sm font-medium text-[#212121] dark:text-white shadow-sm hover:border-orange-500/40 transition-colors"
+              >
+                <HugeiconsIcon icon={Edit02Icon} size={18} />
+                Editar espacio de trabajo
+              </button>
+            ) : null}
+            {canManageMembers ? (
+              <button
+                type="button"
+                onClick={() => setMembersOpen(true)}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-4 py-2.5 text-sm font-medium text-[#212121] dark:text-white shadow-sm hover:border-orange-500/40 transition-colors"
+              >
+                <HugeiconsIcon icon={UserMultiple02Icon} size={18} />
+                Gestionar miembros
+              </button>
+            ) : null}
           </div>
         )}
       </div>
@@ -240,11 +258,11 @@ export default function WorkspacesTab({
                 Crea uno para organizar tareas, actividades, seguimientos y propuestas por equipo o
                 cliente.
               </p>
-              {onRequestCreateWorkspace && (
+              {canCreateWorkspace && onRequestCreateWorkspace && (
                 <button
                   type="button"
                   onClick={onRequestCreateWorkspace}
-                  className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50"
+                  className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50"
                 >
                   <HugeiconsIcon icon={Add01Icon} size={18} />
                   Crear espacio de trabajo
@@ -286,7 +304,7 @@ export default function WorkspacesTab({
           workspaceId={currentWorkspaceId}
           userId={userId}
           showSkeleton={isWorkspaceSwitching}
-          canReassignAssignee={isAdminCompany}
+          canReassignAssignee={canManageMembers || isAdminCompany}
         />
       )}
 

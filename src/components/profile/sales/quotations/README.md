@@ -27,4 +27,4 @@ El momento autorado es el vacío: icono → título → copy → CTA en cascada.
 
 ## Acceso
 
-Admin empresa ve todas las de la compañía. El vendedor solo las asignadas a él. La feature de plan se valida en el shell del panel (`FeatureLockedSection`), no aquí.
+Menú: `cotizaciones.ver`. Crear: `cotizaciones.crear`. Editar: `cotizaciones.editar`. Alcance empresa vs propias: `clientes.ver_empresa` (mismo criterio que leads). La feature de plan se valida en el shell del panel (`FeatureLockedSection`). Catálogo: `usuarios/README.md`.

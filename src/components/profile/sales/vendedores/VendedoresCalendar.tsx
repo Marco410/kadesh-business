@@ -30,6 +30,11 @@ import { EVENT_LABELS } from "kadesh/constants/constans";
 import SalesCalendarView, { type CalendarEvent } from "kadesh/components/profile/sales/SalesCalendarView";
 import { COMPANY_VENDEDORES_WITH_STATS_QUERY, type CompanyVendedoresWithStatsResponse, type CompanyVendedoresWithStatsVariables } from "./queries";
 import { useUser } from "kadesh/utils/UserContext";
+import {
+  can,
+  canViewCompanyWideLeads,
+} from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 import GoogleCalendarConnectionsPanel from "kadesh/components/profile/sales/google-calendar/GoogleCalendarConnectionsPanel";
 import GoogleCalendarLogo from "kadesh/components/profile/sales/google-calendar/GoogleCalendarLogo";
 import CalendarEventModal from "kadesh/components/profile/sales/google-calendar/CalendarEventModal";
@@ -97,6 +102,13 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
   const { user } = useUser();
   const isAdminCompany =
     user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const canManageCalendar = can(
+    user,
+    PERMISSION_KEYS.CALENDARIO_GESTIONAR,
+    () => true,
+  );
+  const canSeeTeamCalendar =
+    canViewCompanyWideLeads(user) || isAdminCompany;
 
   const { data: userData } = useQuery<
     UserCompanyCategoriesResponse,
@@ -118,17 +130,17 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
         roles: { some: { name: { equals: Role.VENDEDOR } } },
       },
     },
-    skip: !companyId || !isAdminCompany,
+    skip: !companyId || !canSeeTeamCalendar,
   });
 
   const vendedores = vendedoresData?.users ?? [];
   const vendedorIds = useMemo(
-    () => (isAdminCompany ? vendedores.map((v) => v.id) : [userId]),
-    [vendedores, isAdminCompany, userId],
+    () => (canSeeTeamCalendar ? vendedores.map((v) => v.id) : [userId]),
+    [vendedores, canSeeTeamCalendar, userId],
   );
   const sellerIdToName = useMemo(() => {
     const map: Record<string, string> = {};
-    if (isAdminCompany) {
+    if (canSeeTeamCalendar) {
       vendedores.forEach((v) => {
         map[v.id] = formatSellerName(v.name, v.lastName, v.secondLastName);
       });
@@ -136,7 +148,7 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
       map[userId] = user?.name ?? "Yo";
     }
     return map;
-  }, [vendedores, isAdminCompany, userId, user?.name]);
+  }, [vendedores, canSeeTeamCalendar, userId, user?.name]);
 
   const whereCalendar: TechSalesActivitiesCalendarVariables["where"] =
     mergeWorkspaceFilter(
@@ -441,15 +453,19 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <button
-          type="button"
-          data-tour="calendar-new-event"
-          onClick={() => setEventModal({ open: true, event: null })}
-          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
-        >
-          <HugeiconsIcon icon={Add01Icon} size={18} />
-          Nuevo evento
-        </button>
+        {canManageCalendar ? (
+          <button
+            type="button"
+            data-tour="calendar-new-event"
+            onClick={() => setEventModal({ open: true, event: null })}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
+          >
+            <HugeiconsIcon icon={Add01Icon} size={18} />
+            Nuevo evento
+          </button>
+        ) : (
+          <span />
+        )}
         <button
           type="button"
           data-tour="calendar-google-toggle"
@@ -502,7 +518,7 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
 
       <SalesCalendarView
         eventsByDate={eventsByDate}
-        title={isAdminCompany ? "Calendario de vendedores" : "Mi calendario"}
+        title={canSeeTeamCalendar ? "Calendario de vendedores" : "Mi calendario"}
         hideLegend
         onVisibleMonthChange={handleVisibleMonthChange}
         onOpenExternalEvent={handleOpenExternalEvent}

@@ -72,19 +72,30 @@ export function AiSection({
     );
   }
 
-  if (!loading && tab === null) {
-    setTab(configured ? "dashboard" : "settings");
-  }
-
   const tabs: { key: AiTab; label: string; icon: typeof SparklesIcon }[] = [
     { key: "dashboard", label: "Dashboard", icon: DashboardSquare01Icon },
     { key: "info", label: "Información", icon: InformationCircleIcon },
-    { key: "settings", label: "Configuración", icon: AiSettingIcon },
+    ...(canManageAi
+      ? [
+          {
+            key: "settings" as const,
+            label: "Configuración",
+            icon: AiSettingIcon,
+          },
+        ]
+      : []),
   ];
+
+  if (!loading && tab === null) {
+    setTab(configured || !canManageAi ? "dashboard" : "settings");
+  }
+
+  const activeTab: AiTab | null =
+    tab === "settings" && !canManageAi ? "dashboard" : tab;
   const subtitle =
-    tab === "dashboard"
+    activeTab === "dashboard"
       ? "Hoy y el perfil de tu negocio."
-      : tab === "info"
+      : activeTab === "info"
         ? `Edita qué vendes, a quién y cómo cierras. Al guardar, el Dashboard actualiza el resumen de tu negocio.`
         : "Esta modalidad aplica a todo el equipo: los vendedores no ven esta pantalla, pero usarán la IA con lo que guardes aquí.";
 
@@ -105,7 +116,7 @@ export function AiSection({
             {KADESH_URIM_AI_NAME}
           </h2>
           <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
-            {tab ? subtitle : "Cargando tu configuración de IA…"}
+            {activeTab ? subtitle : "Cargando tu configuración de IA…"}
           </p>
         </div>
       </motion.div>
@@ -126,16 +137,16 @@ export function AiSection({
             type="button"
             role="tab"
             data-tour={`ai-tab-${item.key}`}
-            aria-selected={tab === item.key}
+            aria-selected={activeTab === item.key}
             onClick={() => setTab(item.key)}
             className={cn(
               "relative flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium",
-              tab === item.key
+              activeTab === item.key
                 ? "text-white"
                 : "text-[#616161] hover:bg-[#f5f5f5] dark:text-[#9e9e9e] dark:hover:bg-[#2a2a2a]",
             )}
           >
-            {tab === item.key ? (
+            {activeTab === item.key ? (
               <motion.span
                 layoutId={reduce ? undefined : "ai-tab-active"}
                 className="ai-urim-fill absolute inset-0 rounded-lg shadow-sm"
@@ -157,7 +168,7 @@ export function AiSection({
       </motion.div>
 
       <AnimatePresence mode="wait">
-        {!tab ? (
+        {!activeTab ? (
           <motion.div
             key="loading"
             initial={{ opacity: 0 }}
@@ -170,13 +181,13 @@ export function AiSection({
           </motion.div>
         ) : (
           <motion.div
-            key={tab}
+            key={activeTab}
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
             transition={aiTabSwitchTransition(reduce)}
           >
-            {tab === "dashboard" ? (
+            {activeTab === "dashboard" ? (
               <AiDashboardTab
                 companyId={companyId}
                 canManageAi={canManageAi}
@@ -184,7 +195,7 @@ export function AiSection({
                 onOpenSettings={() => setTab("settings")}
                 onOpenCompanyInfo={() => setTab("info")}
               />
-            ) : tab === "info" ? (
+            ) : activeTab === "info" ? (
               <AiCompanyInfoTab
                 companyId={companyId}
                 onOpenDashboard={() => setTab("dashboard")}

@@ -17,6 +17,8 @@ export interface User {
   roles?: {
     name: string;
   }[] | null;
+  /** Lista de llaves de permiso (`inicio.ver`, …). `null`/`undefined` = usuario legado (rige el rol). */
+  permissions?: string[] | null;
   birthday?: string | null;
   age?: string | null;
   createdAt: string;

@@ -20,4 +20,4 @@ El foco cae en el nombre al abrir. Escape cierra.
 
 ## Acceso
 
-Quien ve la lista de proyectos de su empresa (admin) o los que le asignaron (vendedor). El formulario conecta empresa, cliente y responsable (el usuario que crea).
+Menú: `proyectos.ver`. Crear: `proyectos.crear`. Editar: `proyectos.editar`. Alcance empresa vs asignados: `clientes.ver_empresa`. El formulario conecta empresa, cliente y responsable (el usuario que crea). Catálogo: `usuarios/README.md`.

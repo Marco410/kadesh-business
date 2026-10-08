@@ -41,9 +41,17 @@ import { CopyPhoneButton } from "../CopyPhoneButton";
 import { sileo } from "sileo";
 import { useUser } from "kadesh/utils/UserContext";
 import { formatDateShort } from "kadesh/utils/format-date";
-import { Role } from "kadesh/constants/constans";
 import { hasPlanFeature } from "../helpers/plan-features";
 import { useSubscription } from "../SubscriptionContext";
+import {
+  can,
+  canViewCompanyWideLeads,
+} from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
+import {
+  pickCanonicalLeadStatus,
+  primaryAssignedSalesPersonId,
+} from "kadesh/components/profile/sales/helpers/canonical-lead-status";
 
 function whatsappDigitsFromPhone(raw: string): string | null {
   const digits = raw.replace(/\D/g, "");
@@ -77,12 +85,14 @@ function SocialRow({
   value,
   onChange,
   placeholder,
+  readOnly = false,
 }: {
   id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
+  readOnly?: boolean;
 }) {
   const href = asExternalHref(value);
   return (
@@ -100,6 +110,8 @@ function SocialRow({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={leadInputClassName}
+        readOnly={readOnly}
+        disabled={readOnly}
       />
       {href ? (
         <a
@@ -131,12 +143,16 @@ export default function DetailLeadSection() {
   });
 
   const companyId = userCompanyData?.user?.company?.id ?? null;
-  const isAdminCompany = user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const hasCompanyWideLeadScope = canViewCompanyWideLeads(user);
+  const canEditLead = can(user, PERMISSION_KEYS.CLIENTES_EDITAR, () => true);
 
-  /** Mismo criterio que SalesSection: solo traer el status de esta company (y vendedor si no es admin). */
+  /**
+   * Alcance empresa: todos los status de la company (para elegir el canónico).
+   * Vendedor: solo el suyo.
+   */
   const statusWhere =
     companyId != null
-      ? isAdminCompany
+      ? hasCompanyWideLeadScope
         ? { saasCompany: { id: { equals: companyId } } }
         : user?.id
           ? {
@@ -148,9 +164,13 @@ export default function DetailLeadSection() {
           : { saasCompany: { id: { equals: companyId } } }
       : undefined;
 
+  const salesPersonWhere2 =
+    companyId != null ? { company: { id: { equals: companyId } } } : {};
+
   const queryVariables: TechBusinessLeadVariables = {
     where: { id },
     statusWhere: statusWhere ?? null,
+    salesPersonWhere2,
   };
 
   const { data, loading, error, refetch: refetchLead } = useQuery<
@@ -186,13 +206,7 @@ export default function DetailLeadSection() {
   const projectsList = lead?.projects ?? [];
   const projectsCount = projectsList.length;
   const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
-  const statusRaw = lead?.status;
-  const statuses = Array.isArray(statusRaw)
-    ? statusRaw
-    : statusRaw
-      ? [statusRaw]
-      : [];
-  const status = statuses[0] ?? null;
+  const status = pickCanonicalLeadStatus(lead?.status, lead?.salesPerson);
   const [pipelineStatus, setPipelineStatus] = useState("");
   const [notes, setNotes] = useState("");
   const [facebook, setFacebook] = useState("");
@@ -295,8 +309,17 @@ export default function DetailLeadSection() {
     const nextFirstContact = firstContactDate.trim().slice(0, 10);
     if (nextFirstContact) statusData.firstContactDate = nextFirstContact;
     if (productOffered.length > 0) statusData.productOffered = productOffered;
-    if (user?.id) statusData.salesPerson = { connect: { id: user.id } };
     if (companyId) statusData.saasCompany = { connect: { id: companyId } };
+
+    const assignedSellerId = primaryAssignedSalesPersonId(lead?.salesPerson);
+    if (hasCompanyWideLeadScope) {
+      // Escribir el canónico: vendedor asignado, no el editor (Gerencia/admin).
+      if (assignedSellerId) {
+        statusData.salesPerson = { connect: { id: assignedSellerId } };
+      }
+    } else if (user?.id) {
+      statusData.salesPerson = { connect: { id: user.id } };
+    }
 
     if (status) {
       await updateStatus({
@@ -316,6 +339,7 @@ export default function DetailLeadSection() {
   };
 
   const handlePipelineStatusChange = async (value: string) => {
+    if (!canEditLead) return;
     if (value === pipelineStatus) return;
     const previous = pipelineStatus;
     setPipelineStatus(value);
@@ -332,6 +356,7 @@ export default function DetailLeadSection() {
   };
 
   const handleSaveNotes = async () => {
+    if (!canEditLead) return;
     try {
       await persistStatus({ notes });
       sileo.success({ title: "Notas guardadas" });
@@ -344,7 +369,7 @@ export default function DetailLeadSection() {
   };
 
   const handleSaveLead = async () => {
-    if (!id) return;
+    if (!canEditLead || !id) return;
     try {
       const leadData: UpdateTechBusinessLeadVariables["data"] = {};
       if (facebook.length > 0) leadData.facebook = facebook;
@@ -394,7 +419,9 @@ export default function DetailLeadSection() {
             </span>
           ) : null}
         </div>
-        <SaveLeadButton saving={saving} handleSaveLead={handleSaveLead} />
+        {canEditLead ? (
+          <SaveLeadButton saving={saving} handleSaveLead={handleSaveLead} />
+        ) : null}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
@@ -479,6 +506,8 @@ export default function DetailLeadSection() {
                 onChange={(e) => setWebsiteUrl(e.target.value)}
                 placeholder="https://..."
                 className={leadInputClassName}
+                readOnly={!canEditLead}
+                disabled={!canEditLead}
               />
             </div>
           </dl>
@@ -517,6 +546,7 @@ export default function DetailLeadSection() {
                 value={facebook}
                 onChange={setFacebook}
                 placeholder="facebook.com/..."
+                readOnly={!canEditLead}
               />
               <SocialRow
                 id="lead-instagram"
@@ -524,6 +554,7 @@ export default function DetailLeadSection() {
                 value={instagram}
                 onChange={setInstagram}
                 placeholder="instagram.com/..."
+                readOnly={!canEditLead}
               />
               <SocialRow
                 id="lead-tiktok"
@@ -531,6 +562,7 @@ export default function DetailLeadSection() {
                 value={tiktok}
                 onChange={setTiktok}
                 placeholder="tiktok.com/..."
+                readOnly={!canEditLead}
               />
               <SocialRow
                 id="lead-xtwitter"
@@ -538,6 +570,7 @@ export default function DetailLeadSection() {
                 value={xTwitter}
                 onChange={setXTwitter}
                 placeholder="x.com/..."
+                readOnly={!canEditLead}
               />
             </div>
             <div>
@@ -559,6 +592,8 @@ export default function DetailLeadSection() {
                     value={firstContactDate}
                     onChange={(e) => setFirstContactDate(e.target.value)}
                     className={`${leadInputClassName} w-[10.5rem]`}
+                    readOnly={!canEditLead}
+                    disabled={!canEditLead}
                   />
                 </div>
                 <div className="relative mb-3">
@@ -618,6 +653,7 @@ export default function DetailLeadSection() {
             onSaveNotes={() => {
               void handleSaveNotes();
             }}
+            readOnly={!canEditLead}
           />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
             <button

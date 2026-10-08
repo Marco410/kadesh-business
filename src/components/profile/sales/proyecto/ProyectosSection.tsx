@@ -22,6 +22,8 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon, ArrowRight01Icon, FolderIcon } from "@hugeicons/core-free-icons";
 import { useUser } from "kadesh/utils/UserContext";
 import { Role } from "kadesh/constants/constans";
+import { can, canViewCompanyWideLeads } from "kadesh/components/profile/usuarios/can";
+import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 import CreateProjectModal from "./CreateProjectModal";
 
 interface ProyectosSectionProps {
@@ -32,6 +34,8 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
   const { user } = useUser();
   const isAdminCompany =
     user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const canSeeCompanyProjects = canViewCompanyWideLeads(user);
+  const canCreateProject = can(user, PERMISSION_KEYS.PROYECTOS_CREAR, () => true);
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
 
   const { data: userData } = useQuery<
@@ -47,7 +51,7 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
   const whereClause =
     companyId == null
       ? {}
-      : isAdminCompany
+      : canSeeCompanyProjects || isAdminCompany
         ? { company: { id: { equals: companyId } } }
         : {
             company: { id: { equals: companyId } },
@@ -95,7 +99,7 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
             Proyectos
           </h3>
           <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1">
-            {isAdminCompany
+            {canSeeCompanyProjects || isAdminCompany
               ? "Todos los proyectos de la empresa."
               : "Proyectos."}
           </p>
@@ -104,16 +108,18 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
           {projects.length} {projects.length === 1 ? "proyecto" : "proyectos"}
         </span>
       </div>
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => setIsCreateProjectOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 transition-colors"
-        >
-          <HugeiconsIcon icon={Add01Icon} size={16} />
-          Crear proyecto
-        </button>
-      </div>
+      {canCreateProject ? (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setIsCreateProjectOpen(true)}
+            className="inline-flex min-h-11 items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 transition-colors"
+          >
+            <HugeiconsIcon icon={Add01Icon} size={16} />
+            Crear proyecto
+          </button>
+        </div>
+      ) : null}
 
       {projects.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[#d0d0d0] dark:border-[#444] bg-white dark:bg-[#1e1e1e] p-8 sm:p-12 shadow-sm text-center">
@@ -124,8 +130,8 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
             Sin proyectos
           </p>
           <p className="text-sm text-[#616161] dark:text-[#b0b0b0] max-w-sm mx-auto">
-            {isAdminCompany
-              ? 'Crea un proyecto desde una propuesta con estado "Comprada" en la ficha de un lead.'
+            {canCreateProject
+              ? 'Crea un proyecto desde aquí o desde una propuesta con estado "Comprada".'
               : "Aún no tienes proyectos creados."}
           </p>
         </div>

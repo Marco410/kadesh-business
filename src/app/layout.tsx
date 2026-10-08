@@ -12,6 +12,7 @@ import {
   META_PIXEL_ID,
   getMetaPixelBaseSnippet,
 } from "kadesh/components/consent/meta-pixel";
+import { KADESH_LEGAL } from "kadesh/constants/legal";
 
 export { metadata, viewport } from "./metadata";
 
@@ -35,17 +36,20 @@ const globalGeoJsonLd = {
     {
       "@type": "Organization",
       "@id": "https://kadesh.com.mx/#organization",
-      name: "Kadesh",
-      legalName: "Kadesh",
+      name: KADESH_LEGAL.brandName,
+      legalName: KADESH_LEGAL.legalName,
       url: "https://kadesh.com.mx",
       logo: "https://kadesh.com.mx/logo.png",
-      email: "contacto@kadesh.com.mx",
+      email: KADESH_LEGAL.email,
+      telephone: KADESH_LEGAL.phoneE164,
       sameAs: ["https://www.facebook.com/profile.php?id=61576878181992"],
       address: {
         "@type": "PostalAddress",
-        addressLocality: "Morelia",
-        addressRegion: "Michoacán",
-        addressCountry: "MX",
+        streetAddress: `${KADESH_LEGAL.streetAddress}, ${KADESH_LEGAL.neighborhood}`,
+        addressLocality: KADESH_LEGAL.addressLocality,
+        addressRegion: KADESH_LEGAL.addressRegion,
+        postalCode: KADESH_LEGAL.postalCode,
+        addressCountry: KADESH_LEGAL.addressCountry,
       },
       areaServed: {
         "@type": "Country",
@@ -53,7 +57,8 @@ const globalGeoJsonLd = {
       },
       contactPoint: {
         "@type": "ContactPoint",
-        email: "contacto@kadesh.com.mx",
+        email: KADESH_LEGAL.email,
+        telephone: KADESH_LEGAL.phoneE164,
         contactType: "customer support",
         availableLanguage: ["Spanish"],
       },

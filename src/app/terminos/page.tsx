@@ -1,3 +1,8 @@
+import {
+  KADESH_LEGAL,
+  formatKadeshLegalAddress,
+} from "kadesh/constants/legal";
+
 export default function TermsPage() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -14,7 +19,20 @@ export default function TermsPage() {
             1. Identidad de la plataforma
           </h2>
           <p className="text-base text-brown-700">
-            KADESH es una plataforma operada y gestionada por el Ing. Marco Castañeda, con sede en México.
+            KADESH es una plataforma operada y gestionada por{" "}
+            {KADESH_LEGAL.legalName}, con domicilio en{" "}
+            {formatKadeshLegalAddress()}. Teléfono de contacto:{" "}
+            <a href={KADESH_LEGAL.tel} className="text-orange-600 underline">
+              {KADESH_LEGAL.phoneDisplay}
+            </a>
+            . Correo:{" "}
+            <a
+              href={`mailto:${KADESH_LEGAL.email}`}
+              className="text-orange-600 underline"
+            >
+              {KADESH_LEGAL.email}
+            </a>
+            .
           </p>
 
           <h2 className="text-2xl text-orange-500 mt-4 font-semibold">

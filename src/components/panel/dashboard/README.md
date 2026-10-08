@@ -2,9 +2,17 @@
 
 `CompanyDashboard` es la tab `inicio` del panel.
 
-El resumen diario de Kadesh AI (`DailyDigestCard`) **también** está en `/panel?tab=ai` (Dashboard). No lo quites de Inicio al cambiar la pantalla de IA.
+## Acceso
 
-El enlace **Operaciones** al pie solo lo ve el rol `admin` de plataforma (`src/components/admin/README.md`).
+- Entrar a Inicio exige `inicio.ver` cuando el usuario tiene lista de permisos (módulo `inicio` con `enforced: true`).
+- Los **accesos rápidos**, el bloque **Requiere atención**, los “Ver todo” de cada sección y los enlaces a clientes/cotizaciones/proyectos solo aparecen si `canAccessNavTab` permite ese módulo. Sin permiso, el dato se muestra sin enlace.
+- El enlace **Operaciones** al pie solo lo ve el rol `admin` de plataforma (`src/components/admin/README.md`).
+
+Catálogo y fases: `src/components/profile/usuarios/README.md`.
+
+## Digest de IA
+
+El resumen diario de Kadesh AI (`DailyDigestCard`) **también** está en `/panel?tab=ai` (Dashboard). No lo quites de Inicio al cambiar la pantalla de IA.
 
 Producto, copy y acceso de IA: `src/components/profile/ai/README.md`.
 

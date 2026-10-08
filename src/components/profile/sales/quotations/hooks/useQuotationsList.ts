@@ -10,6 +10,7 @@ import {
   type UserCompanyCategoriesResponse,
   type UserCompanyCategoriesVariables,
 } from "kadesh/components/profile/sales/queries";
+import { canViewCompanyWideLeads } from "kadesh/components/profile/usuarios/can";
 import {
   SAAS_QUOTATIONS_LIST_QUERY,
   type SaasQuotationRow,
@@ -27,6 +28,8 @@ export function useQuotationsList({ userId }: UseQuotationsListOptions) {
   const { user } = useUser();
   const isAdminCompany =
     user?.roles?.some((r) => r.name === Role.ADMIN_COMPANY) ?? false;
+  const canSeeCompanyQuotations =
+    canViewCompanyWideLeads(user) || isAdminCompany;
 
   const [page, setPage] = useState(1);
 
@@ -40,19 +43,22 @@ export function useQuotationsList({ userId }: UseQuotationsListOptions) {
 
   const companyId = userData?.user?.company?.id ?? null;
 
-  useApplyOnKeyChange([companyId, isAdminCompany, userId].join("\0"), () => {
-    setPage(1);
-  });
+  useApplyOnKeyChange(
+    [companyId, canSeeCompanyQuotations, userId].join("\0"),
+    () => {
+      setPage(1);
+    },
+  );
 
   const where = useMemo(() => {
     if (!companyId) return null;
     const byCompany = { company: { id: { equals: companyId } } };
-    if (isAdminCompany) return byCompany;
+    if (canSeeCompanyQuotations) return byCompany;
     if (!userId) return null;
     return {
       AND: [byCompany, { assignedSeller: { id: { equals: userId } } }],
     };
-  }, [companyId, isAdminCompany, userId]);
+  }, [companyId, canSeeCompanyQuotations, userId]);
 
   const skip = (page - 1) * QUOTATIONS_LIST_PAGE_SIZE;
 
@@ -80,7 +86,7 @@ export function useQuotationsList({ userId }: UseQuotationsListOptions) {
 
   return {
     companyId,
-    isAdminCompany,
+    isAdminCompany: canSeeCompanyQuotations,
     page,
     setPage,
     rows,
