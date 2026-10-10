@@ -20,7 +20,6 @@ import {
 } from 'kadesh/utils/facebook-pixel';
 import { Routes } from 'kadesh/core/routes';
 import { sileo } from 'sileo';
-import { useTouchUserLastLogin } from './useTouchUserLastLogin';
 import { persistSessionToken } from './session';
 
 /** Texto crudo de error (GraphQL + mensaje) para detectar patrones sin filtrar al usuario. */
@@ -68,7 +67,6 @@ interface UseRegisterOptions {
 
 export function useRegister(options?: UseRegisterOptions) {
   const router = useRouter();
-  const touchUserLastLoginAt = useTouchUserLastLogin();
   const { refreshUser, setUser } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState('');
@@ -122,7 +120,6 @@ export function useRegister(options?: UseRegisterOptions) {
 
     const loggedInUser = auth.item;
     if (loggedInUser?.id) {
-      await touchUserLastLoginAt(loggedInUser.id);
       const userFromLogin: AuthenticatedItem = {
         ...loggedInUser,
         roles: loggedInUser.roles ?? null,

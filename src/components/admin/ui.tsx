@@ -1,11 +1,15 @@
 "use client";
 
+import { useEffect, type ReactNode } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
+  Cancel01Icon,
   Search01Icon,
 } from "@hugeicons/core-free-icons";
+import { ModalPortal } from "kadesh/components/shared";
 import { getVisiblePageItems } from "kadesh/components/profile/sales/leadsPagination";
 import { cn } from "kadesh/utils/cn";
 
@@ -59,17 +63,22 @@ export function AdminSearchInput({
   );
 }
 
-/** Navegación principal de la pantalla: barra con subrayado, no compite con los filtros. */
+/**
+ * Navegación con subrayado: las secciones de Operaciones y, en variante `compact`,
+ * las secciones del detalle 360 de un cliente. No compite con los filtros.
+ */
 export function AdminTabBar<T extends string>({
   items,
   value,
   onChange,
   ariaLabel,
+  size = "default",
 }: {
-  items: Array<{ id: T; label: string }>;
+  items: Array<{ id: T; label: string; count?: number | null }>;
   value: T;
   onChange: (value: T) => void;
   ariaLabel: string;
+  size?: "default" | "compact";
 }) {
   return (
     <nav
@@ -85,13 +94,19 @@ export function AdminTabBar<T extends string>({
             aria-current={selected ? "page" : undefined}
             onClick={() => onChange(item.id)}
             className={cn(
-              "relative -mb-px h-12 shrink-0 border-b-2 px-4 text-base font-semibold transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-400",
+              "relative -mb-px shrink-0 whitespace-nowrap border-b-2 font-semibold transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-400",
+              size === "compact" ? "h-11 px-3 text-sm" : "h-12 px-4 text-base",
               selected
                 ? "border-orange-500 text-[#212121] dark:text-white"
                 : "border-transparent text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-white hover:border-[#d0d0d0] dark:hover:border-[#555]",
             )}
           >
             {item.label}
+            {item.count != null ? (
+              <span className="ml-1.5 text-xs font-medium tabular-nums text-[#9e9e9e]">
+                {item.count}
+              </span>
+            ) : null}
           </button>
         );
       })}
@@ -115,7 +130,7 @@ export function AdminSegmented<T extends string>({
     <div
       role="group"
       aria-label={ariaLabel}
-      className="inline-flex self-start rounded-xl bg-black/5 dark:bg-white/10 p-1"
+      className="inline-flex max-w-full self-start overflow-x-auto rounded-xl bg-black/5 dark:bg-white/10 p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       {items.map((item) => {
         const selected = item.id === value;
@@ -126,7 +141,7 @@ export function AdminSegmented<T extends string>({
             aria-pressed={selected}
             onClick={() => onChange(item.id)}
             className={cn(
-              "h-10 rounded-lg px-4 text-sm font-semibold transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400",
+              "h-10 shrink-0 whitespace-nowrap rounded-lg px-4 text-sm font-semibold transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400",
               selected
                 ? "bg-white dark:bg-[#3a3a3a] text-[#212121] dark:text-white shadow-sm"
                 : "text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-white",
@@ -331,4 +346,271 @@ export function formatPlanFrequency(frequency: string | null | undefined) {
   if (f === "monthly") return "al mes";
   if (f === "annual" || f === "yearly") return "al año";
   return frequency || "";
+}
+
+/** Tarjeta con título para agrupar un bloque dentro del detalle 360. */
+export function AdminSectionCard({
+  title,
+  description,
+  action,
+  children,
+  className,
+}: {
+  title: string;
+  description?: string;
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={cn(surfaceClass, "p-4 sm:p-5", className)}>
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold text-[#212121] dark:text-white">
+            {title}
+          </h3>
+          {description ? (
+            <p className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              {description}
+            </p>
+          ) : null}
+        </div>
+        {action ? <div className="shrink-0">{action}</div> : null}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+/** Número clave con etiqueta (uso del mes, KPIs). */
+export function AdminStatTile({
+  label,
+  value,
+  hint,
+  tone = "default",
+  onClick,
+}: {
+  label: string;
+  value: ReactNode;
+  hint?: ReactNode;
+  tone?: "default" | "warning" | "danger" | "success";
+  onClick?: () => void;
+}) {
+  const toneClass = {
+    default: "border-[#e8e8e8] dark:border-[#333]",
+    warning: "border-amber-300 dark:border-amber-600",
+    danger: "border-red-300 dark:border-red-700",
+    success: "border-emerald-300 dark:border-emerald-700",
+  }[tone];
+  const content = (
+    <>
+      <p className="text-[11px] font-medium uppercase tracking-wide text-[#9e9e9e]">
+        {label}
+      </p>
+      <p className="mt-0.5 text-xl font-semibold tabular-nums text-[#212121] dark:text-white">
+        {value}
+      </p>
+      {hint ? (
+        <p className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">{hint}</p>
+      ) : null}
+    </>
+  );
+  const className = cn("rounded-xl border px-3 py-2 text-left", toneClass);
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={cn(
+          className,
+          "cursor-pointer transition-colors hover:border-orange-300 dark:hover:border-orange-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400",
+        )}
+      >
+        {content}
+      </button>
+    );
+  }
+  return <div className={className}>{content}</div>;
+}
+
+/** Barra de consumo (créditos usados / disponibles). */
+export function AdminProgressBar({
+  value,
+  max,
+  label,
+}: {
+  value: number;
+  max: number;
+  label: string;
+}) {
+  const ratio = max > 0 ? Math.min(1, value / max) : 0;
+  const tone =
+    ratio >= 1 ? "bg-red-500" : ratio >= 0.8 ? "bg-amber-500" : "bg-orange-500";
+  return (
+    <div
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={max}
+      aria-valuenow={Math.min(value, max)}
+      className="h-2 w-full overflow-hidden rounded-full bg-[#f0f0f0] dark:bg-[#2a2a2a]"
+    >
+      <div
+        className={cn("h-full rounded-full", tone)}
+        style={{ width: `${Math.max(ratio * 100, value > 0 ? 3 : 0)}%` }}
+      />
+    </div>
+  );
+}
+
+/** Iniciales de una persona. */
+export function AdminAvatar({
+  name,
+  lastName,
+  size = 32,
+}: {
+  name?: string | null;
+  lastName?: string | null;
+  size?: number;
+}) {
+  const initials =
+    `${name?.trim()?.[0] ?? ""}${lastName?.trim()?.[0] ?? ""}`.toUpperCase() || "?";
+  return (
+    <span
+      aria-hidden
+      className="flex shrink-0 items-center justify-center rounded-full bg-orange-500/15 text-xs font-semibold text-orange-700 dark:text-orange-300"
+      style={{ width: size, height: size }}
+    >
+      {initials}
+    </span>
+  );
+}
+
+/** Lista etiqueta → valor (datos de la ficha, detalle de un lead). */
+export function AdminDefinitionList({
+  items,
+  columns = 1,
+}: {
+  items: Array<{ label: string; value: ReactNode }>;
+  columns?: 1 | 2;
+}) {
+  return (
+    <dl
+      className={cn(
+        "grid gap-x-4 gap-y-2 text-sm",
+        columns === 2 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1",
+      )}
+    >
+      {items.map((item) => (
+        <div key={item.label} className="min-w-0">
+          <dt className="text-xs text-[#9e9e9e]">{item.label}</dt>
+          <dd className="break-words text-[#212121] dark:text-white">
+            {item.value ?? "—"}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+/** Botón "Cargar más" para listas con cursor (feed de actividad). */
+export function AdminLoadMore({
+  onClick,
+  loading,
+}: {
+  onClick: () => void;
+  loading: boolean;
+}) {
+  return (
+    <div className="flex justify-center pt-2">
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={loading}
+        className="h-11 rounded-xl border border-[#e0e0e0] px-4 text-sm font-semibold text-[#212121] hover:border-orange-300 disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#3a3a3a] dark:text-white cursor-pointer"
+      >
+        {loading ? "Cargando..." : "Cargar más"}
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Panel lateral (abajo en móvil). Para editar o ver a fondo sin perder el contexto
+ * de la página (p. ej. una persona dentro del 360 de su empresa).
+ */
+export function AdminDrawer({
+  open,
+  onClose,
+  title,
+  subtitle,
+  children,
+  ariaLabel,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: ReactNode;
+  subtitle?: ReactNode;
+  children: ReactNode;
+  ariaLabel: string;
+}) {
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, onClose]);
+
+  return (
+    <ModalPortal>
+      <AnimatePresence>
+        {open ? (
+          <>
+            <motion.div
+              data-body-scroll-lock
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-black/50"
+              onClick={onClose}
+            />
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label={ariaLabel}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 24 }}
+              transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+              className="fixed inset-x-0 bottom-0 z-[60] flex max-h-[92vh] flex-col overflow-hidden rounded-t-2xl border border-[#e0e0e0] bg-white shadow-2xl dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:inset-y-0 sm:left-auto sm:right-0 sm:max-h-none sm:w-full sm:max-w-2xl sm:rounded-none sm:rounded-l-2xl"
+            >
+              <div className="flex items-start justify-between gap-3 border-b border-[#e0e0e0] px-4 py-4 dark:border-[#3a3a3a] sm:px-6">
+                <div className="min-w-0">
+                  <div className="text-lg font-bold text-[#212121] dark:text-white">
+                    {title}
+                  </div>
+                  {subtitle ? (
+                    <div className="mt-0.5 break-all text-sm text-[#616161] dark:text-[#b0b0b0]">
+                      {subtitle}
+                    </div>
+                  ) : null}
+                </div>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  aria-label="Cerrar"
+                  className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#616161] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] cursor-pointer"
+                >
+                  <HugeiconsIcon icon={Cancel01Icon} size={20} />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-6">{children}</div>
+            </motion.div>
+          </>
+        ) : null}
+      </AnimatePresence>
+    </ModalPortal>
+  );
 }

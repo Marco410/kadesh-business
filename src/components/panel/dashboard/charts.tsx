@@ -53,7 +53,15 @@ export function PipelineBars({ bars }: { bars: PipelineBar[] }) {
   );
 }
 
-export function WeeklyBars({ bars }: { bars: WeeklyBar[] }) {
+export function WeeklyBars({
+  bars,
+  ariaLabel = "Clientes nuevos por semana",
+  unitLabel = "clientes",
+}: {
+  bars: WeeklyBar[];
+  ariaLabel?: string;
+  unitLabel?: string;
+}) {
   const max = Math.max(...bars.map((bar) => bar.count), 1);
   const hasData = bars.some((bar) => bar.count > 0);
 
@@ -61,7 +69,7 @@ export function WeeklyBars({ bars }: { bars: WeeklyBar[] }) {
     <div
       className="flex items-end gap-1.5 h-32 min-h-32"
       role="img"
-      aria-label="Clientes nuevos por semana"
+      aria-label={ariaLabel}
     >
       {bars.map((bar, index) => {
         const height = hasData
@@ -91,7 +99,7 @@ export function WeeklyBars({ bars }: { bars: WeeklyBar[] }) {
               {bar.label}
             </span>
             <span className="sr-only">
-              {bar.count} clientes la semana del {bar.label}
+              {bar.count} {unitLabel} la semana del {bar.label}
             </span>
           </div>
         );

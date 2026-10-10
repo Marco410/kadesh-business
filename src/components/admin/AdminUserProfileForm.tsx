@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery } from "@apollo/client";
-import { AnimatePresence, motion } from "framer-motion";
 import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
 import {
@@ -13,7 +12,7 @@ import {
 import { ROLE_LABELS } from "./constants";
 import type { AdminUserDetail } from "./types";
 import AdminUserBlogSubscriptions from "./AdminUserBlogSubscriptions";
-import { AdminErrorState, formatPersonName } from "./ui";
+import { AdminErrorState } from "./ui";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -46,67 +45,11 @@ function sameIds(a: string[], b: string[]) {
 const inputClass =
   "h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm text-[#212121] dark:text-white";
 
-export default function AdminUserEditor({
-  userId,
-  onClose,
-}: {
-  userId: string | null;
-  onClose: () => void;
-}) {
-  const isOpen = Boolean(userId);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isOpen, onClose]);
-
-  return (
-    <AnimatePresence>
-      {isOpen ? (
-        <>
-          <motion.div data-body-scroll-lock
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50"
-            onClick={onClose}
-          />
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
-            className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none"
-          >
-            <div
-              role="dialog"
-              aria-modal="true"
-              aria-label="Detalle del usuario"
-              className="bg-white dark:bg-[#1e1e1e] rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {userId ? (
-                <EditorBody key={userId} userId={userId} onClose={onClose} />
-              ) : null}
-            </div>
-          </motion.div>
-        </>
-      ) : null}
-    </AnimatePresence>
-  );
-}
-
-function EditorBody({
-  userId,
-  onClose,
-}: {
-  userId: string;
-  onClose: () => void;
-}) {
+/**
+ * Datos, roles y suscripción al blog de una persona. Vive dentro del panel de la persona
+ * (360 de su empresa) y en la ficha de quien no tiene empresa.
+ */
+export default function AdminUserProfileForm({ userId }: { userId: string }) {
   const [edits, setEdits] = useState<Partial<ProfileDraft>>({});
   const [saving, setSaving] = useState(false);
 
@@ -119,7 +62,7 @@ function EditorBody({
   );
 
   const [updateUser] = useMutation(UPDATE_ADMIN_USER_MUTATION, {
-    refetchQueries: ["AdminUsers"],
+    refetchQueries: ["AdminUsers", "AdminCompanyProfile", "AdminPersonHeader"],
   });
 
   const user = data?.user ?? null;
@@ -204,30 +147,7 @@ function EditorBody({
 
   return (
     <>
-      <div className="sticky top-0 z-10 bg-white dark:bg-[#1e1e1e] px-4 sm:px-6 py-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a] flex items-start justify-between gap-3">
-        {user ? (
-          <div className="min-w-0">
-            <h3 className="text-xl font-bold text-[#212121] dark:text-white">
-              {formatPersonName(user.name, user.lastName, user.secondLastName)}
-            </h3>
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1 break-all">
-              {user.email ?? "Sin correo"}
-            </p>
-          </div>
-        ) : (
-          <div className="h-12 w-48 rounded-lg bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
-        )}
-        <button
-          type="button"
-          onClick={onClose}
-          className="h-11 w-11 shrink-0 rounded-xl text-2xl text-[#616161] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] cursor-pointer"
-          aria-label="Cerrar"
-        >
-          ×
-        </button>
-      </div>
-
-      <div className="px-4 sm:px-6 py-5 flex flex-col gap-6">
+      <div className="flex flex-col gap-6">
         {error ? (
           <AdminErrorState message="No se pudo cargar el usuario." />
         ) : !user || !draft ? (

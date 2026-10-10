@@ -4,7 +4,9 @@ Pantalla interna en `/panel/clientes/admin`. No es el panel de un cliente: es de
 
 ## Promesa
 
-Ver y ajustar **usuarios**, **empresas** (créditos, sync y leads), **catálogo de planes**, **el blog**, **correos** y **fichas de veterinarias** en un solo lugar. El default es Inicio. Las otras vistas viven en `?tab=usuarios`, `?tab=empresas`, `?tab=planes`, `?tab=blog`, `?tab=correos` y `?tab=veterinarias`.
+Ver y controlar a cada **cliente** en 360° (empresa, plan y pagos, equipo, CRM, consumo, integraciones y lo que hace cada persona), seguir la **actividad** de toda la plataforma, y ajustar el **catálogo de planes**, el **contenido** (blog y correos) y las **fichas de veterinarias**. El default es Inicio. Las secciones viven en `?tab=clientes`, `?tab=actividad`, `?tab=planes`, `?tab=contenido` y `?tab=veterinarias`.
+
+Los enlaces viejos (`?tab=usuarios`, `suscripciones`, `empresas`, `blog`, `correos`) se redirigen solos a la sección nueva (`normalizeLegacyAdminParams` en `constants.ts`).
 
 ## Acceso
 
@@ -16,52 +18,82 @@ El enlace **Operaciones** aparece en el menú del avatar y, de forma discreta, a
 
 Antes las tabs, la vista Fichas/Servicios y los filtros eran la misma píldora y no se distinguían. Ahora cada nivel tiene su propio componente en `ui.tsx`:
 
-1. **Secciones** (Inicio, Usuarios, Empresas, Planes, Veterinarias, Blog, Correos) — `AdminTabBar`: texto con subrayado naranja en la activa, no píldoras.
-2. **Vista dentro de una sección** (Cuentas / Suscripciones, Empresas / Sync, Fichas / Servicios) — `AdminSegmented`: control segmentado, opción activa como pastilla blanca.
-3. **Filtros de una tabla** (rol, estado) — `AdminFilterChips`: chips pequeños, activo con tinte naranja (no relleno sólido), con etiqueta (**Rol**, **Estado**) para que se lea qué filtran.
+1. **Secciones** (Inicio, Clientes, Actividad, Planes, Contenido, Veterinarias) — `AdminTabBar`: texto con subrayado naranja en la activa, no píldoras.
+2. **Vista dentro de una sección** (Empresas / Personas, Fichas / Servicios, Artículos / … / Correos) — `AdminSegmented`: control segmentado, opción activa como pastilla blanca. Hace scroll horizontal en móvil.
+3. **Filtros de una tabla** (estado, rol, tipo) — `AdminFilterChips`: chips pequeños, activo con tinte naranja (no relleno sólido), con etiqueta (**Estado**, **Rol**, **Tipo**) para que se lea qué filtran.
+
+Dentro del **detalle 360** de un cliente, sus secciones (Resumen, Actividad, CRM…) usan `AdminTabBar` en variante `compact` y las subvistas (Leads / Pipeline / …) usan `AdminSegmented`.
 
 Una pantalla nueva usa el componente de su nivel. No vuelvas a poner píldoras sólidas en las tabs: compiten con el filtro y con los botones de acción, que son los únicos naranja sólido.
+
+Toda la navegación vive en query params (`hooks/useAdminNavigation.ts`): cambiar filtros o sección usa `replace`; entrar a un detalle usa `push`, para que "atrás" regrese a la lista con sus filtros.
 
 ## Copy
 
 Decimos **Operaciones**, **planes**, **fichas**, **servicios**, **verificar**. Nunca GraphQL, Keystone ni `planFeatures` en la UI. Los IDs de Stripe (`price_…`, `prod_…`) solo aparecen en el editor de Planes, porque operaciones los necesita para ligar el cobro; en listados se dice “Ligado a Stripe” / “Sin precio de Stripe”.
 
-## Usuarios
+## Inicio
 
-Dos vistas dentro de `?tab=usuarios`: **Cuentas** (default) y **Suscripciones** (`&vista=suscripciones`). El enlace viejo `?tab=suscripciones` sigue entrando a la vista de suscripciones.
+KPIs de operación (`adminOpsSummary`): empresas activas, en prueba (cuántas vencen en ≤3 días), pagos con problema, registros y accesos de 7 días, extracciones fallidas en 24 h, créditos consumidos del mes y MRR estimado. Cada KPI lleva a la vista filtrada.
 
-### Cuentas
+**Requiere atención**: empresas con pago vencido o no pagado, prueba terminada o por vencer, sin créditos, extracciones fallando, intentos de pago sin completar o plan activo sin accesos en 14 días. Clic → 360 de la empresa.
 
-Al hacer clic en un usuario (fila en escritorio, tarjeta en móvil) se abre su detalle. Ahí se ve empresa, alta y último acceso, y se puede editar nombre, apellidos, teléfono, correo, cuenta verificada y **roles**. Se guarda con **Guardar usuario**.
+**Ahorro en búsquedas**: qué porcentaje de los leads del mes salió de la base de Kadesh (negocios que ya existían, por los que no se le pagó otra vez a Google Maps ni a INEGI) contra los que se tuvieron que buscar. Sale de `TechLeadSyncLog` (`alreadyInDb` contra `created`). El mismo dato por empresa está en el 360 → Consumo → Extracciones.
 
-Debajo va la **suscripción al blog**, con una tarjeta por blog (Pet y SaaS) que se guarda por separado, para no mezclar errores de un bloque con el otro:
+**Actividad reciente** y las colas de Veterinarias (reclamos y servicios por revisar) siguen aquí.
+
+## Clientes
+
+Junta lo que antes eran Usuarios (Cuentas / Suscripciones) y Empresas (Empresas / Sync): las cuatro eran vistas del mismo cliente. Dos vistas en `?tab=clientes`:
+
+- **Empresas** (default, `adminCompanies`): un solo buscador que también encuentra a la empresa por el correo o nombre de cualquier integrante. Chips de **Estado** con conteo (estado vigente = la suscripción más reciente) reemplazan la lista de Suscripciones. **Orden**: alta reciente, último acceso o nombre. Toda la fila abre el 360 (ya no hay botón naranja por fila).
+- **Personas** (`&vista=personas`): cuentas con rol, empresa, alta y último acceso. Filtros **Rol** y **Empresa** (con / sin). Clic en alguien con empresa abre el 360 de su empresa con esa persona en foco; sin empresa abre su ficha.
+
+Búsqueda, filtros y página viven en la URL (`q`, `estado`, `orden`, `rol`, `conEmpresa`, `pagina`): al volver del 360 la lista queda igual.
+
+### Detalle 360 de una empresa
+
+`&empresa=<id>&detalle=<sección>&sub=<subvista>&persona=<userId>`. Página dentro de la tab, no modal. En escritorio dos columnas:
+
+- **Ficha** (izquierda, fija): plan y estado, cuándo vence la prueba o renueva, créditos del mes con barra, equipo, contacto, respuestas del onboarding, IDs copiables y **Ver en Stripe**. Acciones: **Ajustar plan** (módulos, fechas y créditos extra; el mismo editor de antes) y **Enviar correo** (abre Contenido → Correos con el equipo como destinatarios).
+- **Persona en foco** (`persona`): franja con sus roles, último acceso, accesos y última acción; **Editar persona** abre el panel lateral (Perfil · Accesos · Actividad) y **Ver su actividad** filtra el feed.
+- **Secciones**:
+  - **Resumen**: alertas, uso de 30 días, pipeline, créditos por semana y actividad reciente.
+  - **Actividad**: línea de tiempo de la empresa, filtrable por tipo y por persona.
+  - **CRM**: Leads (con etapa, oportunidad y vendedor de *esta* empresa; clic abre una vista rápida de solo lectura) · Pipeline · Cotizaciones · Seguimiento (actividades, seguimientos, tareas y propuestas) · Espacios.
+  - **Consumo**: Créditos (periodos por mes + movimientos) · Extracciones · IA (las conversaciones se abren una por una con **Ver conversación**).
+  - **Plan y pagos**: suscripción vigente y módulos, historial de contratos, intentos de pago (con el paso donde fallaron), cobros, tarjetas y comisiones de referido.
+  - **Equipo**: cada persona con roles, accesos, última acción, leads asignados, actividades, cotizaciones, extracciones, IA, WhatsApp y tours; abajo el historial de accesos de la empresa.
+  - **Integraciones**: WhatsApp, IA (BYOK / administrada) y Google Calendar con sus últimos errores.
+
+El CRM de una empresa se acota igual que en el back: cuenta lo de sus espacios de trabajo o, sin espacio, lo que creó o tiene asignado alguien de la empresa. Los leads se comparten entre empresas, así que el lead solo no basta.
+
+### Ajustar plan
+
+Ajusta las fechas del periodo y los módulos del plan **de esa empresa** (no el catálogo). El modal de módulos sigue los nombres de `PLAN_FEATURES_MAP`.
+
+También se pueden **agregar créditos extra**: se suman ahora y se mantienen cada mes, igual que una recarga. No decimos “bonus”, “ledger” ni “periodo Keystone”. Los montos rápidos (250 / 1 000 / 3 000) coinciden con los paquetes de recarga del panel del cliente.
+
+### Panel de una persona
+
+Pestañas **Perfil** · **Accesos** · **Actividad**. En Perfil se editan nombre, apellidos, teléfono, correo, cuenta verificada y **roles** (**Guardar usuario**). Debajo va la **suscripción al blog**, con una tarjeta por blog (Pet y SaaS) que se guarda por separado, para no mezclar errores de un bloque con el otro:
 
 - Sin suscripción: **Suscribir** la crea con el correo del usuario (editable).
 - Con suscripción: se cambia el correo o se pausa/reactiva. Pausada = no recibe avisos de nuevos artículos. No se borra desde aquí.
 - Si alguien se suscribió con ese correo antes de tener cuenta, aparece igual y al guardar se liga a la cuenta.
 - Un mismo correo no puede repetirse en el mismo blog; el aviso de error viene del backend.
 
-### Suscripciones
+Accesos es el historial de `UserAuthLog` (logins, altas e intentos fallidos), escrito por el backend.
 
-La lista son suscripciones de empresa (no el catálogo). Se ajustan fechas del periodo y módulos del plan de esa empresa. El modal de features debe seguir los nombres de `PLAN_FEATURES_MAP`.
+### Persona sin empresa
 
-En la lista se ve el saldo **de este mes** (disponibles / extra). En **Ajustar plan** se pueden **agregar créditos extra**: se suman ahora y se mantienen cada mes, igual que una recarga. No decimos “bonus”, “ledger” ni “periodo Keystone”. Los montos rápidos (250 / 1 000 / 3 000) coinciden con los paquetes de recarga del panel del cliente.
+`&usuario=<id>`: ficha con roles, alta, último acceso y el mismo panel (Perfil · Accesos · Actividad).
 
-## Empresas
+## Actividad
 
-Espacio dedicado en `?tab=empresas` (no mezclado con Cuentas/Suscripciones). Dos vistas:
+`?tab=actividad` reemplaza el concentrado de Sync: una línea de tiempo de **todas** las empresas (`adminActivityFeed`), agrupada por día. Chips **Tipo** (Accesos, Extracción, CRM, IA, Créditos, Pagos, WhatsApp, Calendario, Kadesh) en `&tipo=` y **Estado** (Todas / Con error) en `&error=1`, más un buscador. Cada evento se expande para ver el detalle; la empresa y la persona abren su 360. Pagina con **Cargar más** (cursor por fecha).
 
-- **Empresas** (default): lista de `SaasCompany` con créditos del mes, conteo de leads y usuarios.
-- **Sync** (`&vista=sync`): concentrado de **todos** los `TechLeadSyncLog` (cualquier empresa). Filtro Todas / Falló / OK, búsqueda por empresa, mensaje, categoría o usuario. Filas con error resaltadas; el mensaje se expande al tocar. Clic en la empresa abre su detalle en Sync.
-
-Al abrir una empresa (`&empresa=<id>&detalle=…`):
-
-- **Resumen**: datos de la empresa, cupo del mes, personas y suscripciones recientes.
-- **Créditos**: tabla del `SaasCompanyCreditLedger` (altas, recargas, gasto sync/IA).
-- **Sync**: logs solo de esa company.
-- **Leads**: tabla paginada de `TechBusinessLead` de esa company.
-
-Detalle en URL: `&empresa=<id>&detalle=resumen|creditos|sync|leads`. En UI no digas nombres de listas GraphQL; sí “créditos”, “sync”, “leads”.
+Nunca muestra prompts de IA, cuerpos de WhatsApp ni contraseñas.
 
 ## Planes (catálogo)
 
@@ -74,9 +106,11 @@ Detalle en URL: `&empresa=<id>&detalle=resumen|creditos|sync|leads`. En UI no di
 - Si cambias monto, moneda, frecuencia o el ID del precio, el botón pasa a **Verificar y guardar**: se abre un diálogo que compara el borrador con Stripe (`stripePlanCheck`). Kadesh **nunca escribe** en Stripe; si no coincide, el admin crea un Price nuevo allá, pega el ID y confirma.
 - Se puede **Verificar con Stripe** sin guardar, solo para consultar.
 
-## Blog
+## Contenido
 
-`?tab=blog` tiene tres vistas: **Artículos** (default), **Categorías** (`&vista=categorias`) y **Etiquetas** (`&vista=etiquetas`).
+`?tab=contenido` junta Blog y Correos en cuatro vistas: **Artículos** (default), **Categorías** (`&vista=categorias`), **Etiquetas** (`&vista=etiquetas`) y **Correos** (`&vista=correos`). `&para=correo1,correo2` abre Correos en "Específicos" con esos destinatarios (lo usa **Enviar correo** del 360).
+
+## Blog
 
 ### Artículos
 
@@ -112,7 +146,7 @@ En servicios: un dueño pidió algo que no estaba en el catálogo. Default **Pen
 
 ## Correos
 
-`?tab=correos` envía un correo con el layout de marca (Pet azul / Negocios naranja), el mismo que usan bienvenida, blog y releases.
+`?tab=contenido&vista=correos` envía un correo con el layout de marca (Pet azul / Negocios naranja), el mismo que usan bienvenida, blog y releases.
 
 ### Audiencia
 
@@ -130,6 +164,20 @@ Asunto, título de cabecera, etiqueta superior, vista previa de bandeja, cuerpo,
 La columna derecha es vista previa en vivo. **Revisar y enviar** primero cuenta destinatarios (`dryRun`) y pide confirmación antes del envío real. Mutación `sendAdminBroadcastEmail` (solo admin de plataforma).
 
 ## Decisiones
+
+### 2026-10-10 — Clientes 360 y Actividad
+
+Usuarios, Suscripciones, Empresas y Sync eran cuatro vistas del mismo cliente: para entender a una persona había que saltar entre tabs y la empresa solo mostraba créditos, sync y leads. Ahora **Clientes** abre un 360 por empresa (o la ficha de quien no tiene empresa) y **Actividad** concentra lo que pasa en toda la plataforma. Blog y Correos pasan a **Contenido**. Los agregados (estado vigente, conteos por persona, feed mezclado) se calculan en el back (`graphql/customs/queries/admin`, solo admin) para no bajar miles de filas al navegador.
+
+Para que la auditoría sea confiable se cerraron huecos del back: los clientes ya no pueden editar su suscripción, créditos, pagos ni logs, y los accesos con contraseña los registra el servidor. Detalle en `kadesh-back/docs/operaciones/`.
+
+### 2026-10-10 — Ahorro en búsquedas visible
+
+Reutilizar negocios que ya están en la base es lo que evita pagar otra vez a Google Maps e INEGI. Ahora se ve: en Inicio (porcentaje del mes) y en el 360 de cada empresa (Consumo → Extracciones). En UI decimos "desde la base", no `alreadyInDb`.
+
+### 2026-10-10 — Fechas del periodo sin corrimiento en Ajustar plan
+
+El editor convertía `activatedAt` / `currentPeriodEnd` (`YYYY-MM-DD`) con `new Date()`, que los lee en UTC: en México mostraba un día antes y, al guardar, el periodo se recorría un día. Ahora los días de calendario se usan tal cual.
 
 ### 2026-10-07 — Tab Correos en Operaciones
 

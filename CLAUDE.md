@@ -50,11 +50,11 @@ Auth is KeystoneJS session-based: a `keystonejs-session-token` is stored in `loc
 
 Most of `/panel/*` is NOT separate App Router pages per view — `src/app/panel/page.tsx` renders a single `PanelPageSection`, which is a `"use client"` component that switches between sub-sections based on the `?tab=` query param (see `PanelPageSection.tsx`). CRM sub-views (leads, workspaces, quotations, credits, etc.) are swapped client-side inside that shell, driven by `usePathname`/`useSearchParams` + local state, not by navigating to new routes. When adding a new panel view, follow this tab-based pattern rather than assuming a new file under `src/app/panel/` is needed.
 
-`WorkspaceProvider` (`src/components/profile/sales/workspaces/WorkspaceContext.tsx`) tracks the currently selected CRM workspace (persisted client-side) and wraps the whole app in `ClientProviders`.
+`WorkspaceProvider` (`src/components/profile/sales/workspaces/WorkspaceContext.tsx`) tracks the currently selected CRM workspace (persisted client-side). It only wraps `/panel*` and `/admin*`, via `PanelAppProviders`.
 
 ### Provider stack
 
-`src/app/ClientProviders.tsx` composes, in order: `ThemeProvider` → `HeroUIProvider` → `ApolloProviderWrapper` → `UserProvider` → `WorkspaceProvider`. Anything needing user/auth/workspace context must render underneath this tree (it already wraps the whole app via `RootLayout`).
+`src/app/ClientProviders.tsx` composes, in order: `CookieConsentProvider` → `ThemeProvider` → `ApolloProviderWrapper` → `UserProvider`, and wraps the whole app via `RootLayout`. Inside it, `/panel*` and `/admin*` also get `PanelAppProviders` (`HeroUIProvider` → `WorkspaceProvider` → `OnboardingProvider`), and `/auth*` gets `AuthAppProviders`. This keeps driver.js and workspace state out of the marketing bundle. Anything needing workspace or onboarding context must render under a panel route.
 
 ### Plan-gated features
 

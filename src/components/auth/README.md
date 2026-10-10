@@ -18,4 +18,6 @@ Un alta nueva por Google queda con los mismos roles que el registro normal (`ven
 
 Lo que autentica de verdad es `localStorage`: el apollo-client lo manda como `Authorization: Bearer` y la cookie `httpOnly` que emite el backend no viaja cross-site hacia el API.
 
-El backend registra cada intento en `UserAuthLog` (`source: GOOGLE_AUTH`), así que el flujo de Google no llama `useLogUserAuth` desde el navegador: se duplicarían los registros.
+## Registro de accesos
+
+El backend registra cada intento en `UserAuthLog` y marca `lastLoginAt`: con contraseña (envuelve `authenticateUserWithPassword`), con Google y en el registro. El navegador no escribe estos registros ni el último acceso: antes los mandaba el front con un `createUserAuthLog` abierto y cualquiera podía inventar accesos. Operaciones los muestra en el historial de accesos de cada persona.
