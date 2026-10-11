@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
@@ -15,6 +15,7 @@ import {
   type ClientSection,
   type PersonTab,
 } from "../../constants";
+import { TRACK_EVENT, trackActivity } from "kadesh/utils/activity";
 import { getCurrentCreditPeriodParts } from "../../credits";
 import { useAdminNavigation } from "../../hooks/useAdminNavigation";
 import {
@@ -54,6 +55,24 @@ export default function AdminCompany360({ companyId }: { companyId: string }) {
   const [drawer, setDrawer] = useState<{ userId: string; tab: PersonTab } | null>(null);
   const [adjustOpen, setAdjustOpen] = useState(false);
   const period = getCurrentCreditPeriodParts();
+
+  // Queda registro de qué clientes abre Kadesh (el back junta vistas repetidas de 10 min).
+  useEffect(() => {
+    trackActivity(TRACK_EVENT.ADMIN_VIEWED_COMPANY, {
+      companyId,
+      entityType: "SaasCompany",
+      entityId: companyId,
+    });
+  }, [companyId]);
+
+  useEffect(() => {
+    if (!personaId) return;
+    trackActivity(TRACK_EVENT.ADMIN_VIEWED_PERSON, {
+      companyId,
+      entityType: "User",
+      entityId: personaId,
+    });
+  }, [companyId, personaId]);
 
   const profileQuery = useQuery<AdminCompanyProfileResponse>(ADMIN_COMPANY_PROFILE_QUERY, {
     variables: { id: companyId, year: period.year, month: period.month },

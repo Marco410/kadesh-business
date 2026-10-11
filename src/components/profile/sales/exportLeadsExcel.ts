@@ -1,6 +1,7 @@
 import type { TechBusinessLeadsResponse } from "kadesh/components/profile/sales/queries";
 import { getCategoryLabel } from "kadesh/components/profile/sales/helpers/category";
 import { pickCanonicalLeadStatus } from "kadesh/components/profile/sales/helpers/canonical-lead-status";
+import { TRACK_EVENT, trackActivity } from "kadesh/utils/activity";
 
 type LeadItem = TechBusinessLeadsResponse["techBusinessLeads"][number];
 
@@ -93,4 +94,8 @@ export function downloadLeadsExcel(
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+  // Exportar en masa es señal de riesgo (se llevan la cartera) o de uso fuerte: solo el conteo.
+  trackActivity(TRACK_EVENT.LEADS_EXPORTED, {
+    metadata: { count: leads.length, format: "csv", file: filenameBase },
+  });
 }

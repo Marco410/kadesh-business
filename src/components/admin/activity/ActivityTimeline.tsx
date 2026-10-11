@@ -8,15 +8,17 @@ import {
   Calendar03Icon,
   Coins01Icon,
   CreditCardIcon,
+  CursorPointer01Icon,
   Login01Icon,
   MapsLocation01Icon,
   Shield01Icon,
   UserMultipleIcon,
+  UserSettings01Icon,
   WhatsappIcon,
 } from "@hugeicons/core-free-icons";
 import { cn } from "kadesh/utils/cn";
 import { formatDateShort } from "kadesh/utils/format-date";
-import { ACTIVITY_TYPE_LABELS, AI_FEATURE_LABELS } from "../constants";
+import { ACTIVITY_TYPE_LABELS, AI_FEATURE_LABELS, PANEL_SECTION_LABELS } from "../constants";
 import {
   AdminEmptyState,
   AdminErrorState,
@@ -52,6 +54,11 @@ const TYPE_STYLE: Record<string, { icon: IconType; tone: string }> = {
   },
   calendar: { icon: Calendar03Icon, tone: "bg-blue-500/15 text-blue-700 dark:text-blue-300" },
   admin: { icon: Shield01Icon, tone: "bg-black/5 text-[#424242] dark:bg-white/10 dark:text-[#e0e0e0]" },
+  team: { icon: UserSettings01Icon, tone: "bg-teal-500/15 text-teal-700 dark:text-teal-300" },
+  product: {
+    icon: CursorPointer01Icon,
+    tone: "bg-slate-500/15 text-slate-700 dark:text-slate-300",
+  },
 };
 
 /** Etiquetas de `meta` que vale la pena mostrar al expandir un evento. */
@@ -80,18 +87,114 @@ const META_LABELS: Record<string, string> = {
   activityType: "Tipo",
   operation: "Operación",
   direction: "Dirección",
+  // Eventos propios (ActivityEvent)
+  fields: "Campos",
+  added: "Agregó",
+  removed: "Quitó",
+  section: "Sección",
+  cta: "Botón",
+  plan: "Plan",
+  count: "Cantidad",
+  attempt: "Intento",
+  nextAttempt: "Próximo intento",
+  periodEnd: "Nuevo fin de periodo",
+  currentPeriodEnd: "Fin de periodo",
+  currency: "Moneda",
+  reason: "Motivo",
+  recipientCount: "Destinatarios",
+  sentCount: "Enviados",
+  failedCount: "Fallidos",
+  subject: "Asunto",
+  imported: "Importados",
+  skippedDuplicates: "Ya existían",
+  linkedMessages: "Mensajes enlazados",
+  calendarsCount: "Calendarios",
+  allowance: "Cupo del mes",
+  used: "Usados",
+  tour: "Tour",
+  scheduledDate: "Fecha",
+  priority: "Prioridad",
+  keys: "Módulos",
 };
+
+/** Nombres legibles de campos que aparecen en `changes` y `fields`. */
+const FIELD_LABELS: Record<string, string> = {
+  status: "estado",
+  approved: "aprobada",
+  paid: "pagada",
+  planName: "plan",
+  planCost: "costo",
+  planFrequency: "frecuencia",
+  planLeadLimit: "créditos del plan",
+  newCreditsAdded: "créditos agregados",
+  activatedAt: "inicio",
+  currentPeriodEnd: "fin de periodo",
+  stripeSubscriptionId: "suscripción de Stripe",
+  estimatedValue: "valor estimado",
+  aiBillingMode: "cobro de IA",
+  aiProvider: "proveedor de IA",
+  aiModel: "modelo",
+  apiKeyAction: "llave",
+  accessToken: "token",
+  appSecret: "secreto",
+  name: "nombre",
+  cost: "costo",
+  costOld: "costo anterior",
+  leadLimit: "créditos",
+  creditsToAdd: "créditos",
+  active: "activo",
+  bestSeller: "más vendido",
+};
+
+function readable(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "—";
+  if (typeof value === "boolean") return value ? "Sí" : "No";
+  if (typeof value === "number") return formatCredits(value);
+  if (Array.isArray(value)) return value.map(readable).join(", ") || "—";
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+}
 
 function metaRows(meta: Record<string, unknown> | null) {
   if (!meta) return [];
-  return Object.entries(meta)
-    .filter(([key, value]) => META_LABELS[key] && value !== null && value !== "" && value !== undefined)
-    .map(([key, value]) => {
-      let text = String(value);
-      if (key === "feature") text = AI_FEATURE_LABELS[text] ?? text;
-      if (typeof value === "number" && key !== "radius") text = formatCredits(value);
-      return { key, label: META_LABELS[key], value: text };
-    });
+  const rows: Array<{ key: string; label: string; value: string }> = [];
+
+  // Cambio de un solo valor (etapa, estado, oportunidad…): una fila "antes → después".
+  if ("from" in meta || "to" in meta) {
+    rows.push({ key: "change", label: "Cambio", value: `${readable(meta.from)} → ${readable(meta.to)}` });
+  }
+
+  // Varios campos: { campo: [antes, después] }.
+  if (meta.changes && typeof meta.changes === "object" && !Array.isArray(meta.changes)) {
+    for (const [field, pair] of Object.entries(meta.changes as Record<string, unknown>)) {
+      const label = FIELD_LABELS[field] ?? field;
+      const value = Array.isArray(pair) && pair.length === 2
+        ? `${readable(pair[0])} → ${readable(pair[1])}`
+        : readable(pair);
+      rows.push({ key: `changes.${field}`, label: label.charAt(0).toUpperCase() + label.slice(1), value });
+    }
+  }
+
+  for (const [key, value] of Object.entries(meta)) {
+    if (!META_LABELS[key] || value === null || value === "" || value === undefined) continue;
+    let text = readable(value);
+    if (key === "feature") text = AI_FEATURE_LABELS[String(value)] ?? String(value);
+    if (key === "radius") text = String(value);
+    if (key === "fields" && Array.isArray(value)) {
+      text = value.map((field) => FIELD_LABELS[String(field)] ?? String(field)).join(", ");
+    }
+    rows.push({ key, label: META_LABELS[key], value: text });
+  }
+  return rows;
+}
+
+/** El back guarda la llave de la sección ("cotizaciones"); aquí se muestra su nombre. */
+function itemTitle(item: AdminActivityItem): string {
+  const section = typeof item.meta?.section === "string" ? item.meta.section : null;
+  if (item.kind === "ui.section_viewed" && section) {
+    return `Abrió ${PANEL_SECTION_LABELS[section] ?? section}`;
+  }
+  return item.title;
 }
 
 function dayLabel(iso: string) {
@@ -152,7 +255,7 @@ function TimelineRow({
               expandable && "cursor-pointer hover:text-orange-600 dark:hover:text-orange-400",
             )}
           >
-            {item.title}
+            {itemTitle(item)}
             {!item.success ? (
               <AdminStatusBadge
                 label="Error"

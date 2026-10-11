@@ -46,7 +46,7 @@ KPIs de operación (`adminOpsSummary`): empresas activas, en prueba (cuántas ve
 
 Junta lo que antes eran Usuarios (Cuentas / Suscripciones) y Empresas (Empresas / Sync): las cuatro eran vistas del mismo cliente. Dos vistas en `?tab=clientes`:
 
-- **Empresas** (default, `adminCompanies`): un solo buscador que también encuentra a la empresa por el correo o nombre de cualquier integrante. Chips de **Estado** con conteo (estado vigente = la suscripción más reciente) reemplazan la lista de Suscripciones. **Orden**: alta reciente, último acceso o nombre. Toda la fila abre el 360 (ya no hay botón naranja por fila).
+- **Empresas** (default, `adminCompanies`): un solo buscador que también encuentra a la empresa por el correo o nombre de cualquier integrante. Chips de **Estado** con conteo (estado vigente = la suscripción más reciente) reemplazan la lista de Suscripciones. **Orden**: alta reciente, último acceso o nombre. Toda la fila abre el 360 (ya no hay botón naranja por fila). "Último acceso" es lo más reciente entre el último login y la última vez que alguien del equipo tuvo el panel abierto (latido).
 - **Personas** (`&vista=personas`): cuentas con rol, empresa, alta y último acceso. Filtros **Rol** y **Empresa** (con / sin). Clic en alguien con empresa abre el 360 de su empresa con esa persona en foco; sin empresa abre su ficha.
 
 Búsqueda, filtros y página viven en la URL (`q`, `estado`, `orden`, `rol`, `conEmpresa`, `pagina`): al volver del 360 la lista queda igual.
@@ -58,12 +58,12 @@ Búsqueda, filtros y página viven en la URL (`q`, `estado`, `orden`, `rol`, `co
 - **Ficha** (izquierda, fija): plan y estado, cuándo vence la prueba o renueva, créditos del mes con barra, equipo, contacto, respuestas del onboarding, IDs copiables y **Ver en Stripe**. Acciones: **Ajustar plan** (módulos, fechas y créditos extra; el mismo editor de antes) y **Enviar correo** (abre Contenido → Correos con el equipo como destinatarios).
 - **Persona en foco** (`persona`): franja con sus roles, último acceso, accesos y última acción; **Editar persona** abre el panel lateral (Perfil · Accesos · Actividad) y **Ver su actividad** filtra el feed.
 - **Secciones**:
-  - **Resumen**: alertas, uso de 30 días, pipeline, créditos por semana y actividad reciente.
+  - **Resumen**: alertas, uso de 30 días, **Cómo usan el panel** (tiempo activo, personas que entraron, clics en mejorar plan, exportaciones, secciones que más abren y módulos bloqueados que vieron; se oculta hasta que el back tenga la migración de la Fase 2), pipeline, créditos por semana y actividad reciente.
   - **Actividad**: línea de tiempo de la empresa, filtrable por tipo y por persona.
   - **CRM**: Leads (con etapa, oportunidad y vendedor de *esta* empresa; clic abre una vista rápida de solo lectura) · Pipeline · Cotizaciones · Seguimiento (actividades, seguimientos, tareas y propuestas) · Espacios.
   - **Consumo**: Créditos (periodos por mes + movimientos) · Extracciones · IA (las conversaciones se abren una por una con **Ver conversación**).
   - **Plan y pagos**: suscripción vigente y módulos, historial de contratos, intentos de pago (con el paso donde fallaron), cobros, tarjetas y comisiones de referido.
-  - **Equipo**: cada persona con roles, accesos, última acción, leads asignados, actividades, cotizaciones, extracciones, IA, WhatsApp y tours; abajo el historial de accesos de la empresa.
+  - **Equipo**: cada persona con roles, accesos ("visto" = último login o latido), **tiempo activo** (minutos con el panel abierto y en cuántos días), última acción y cambios registrados, leads asignados, actividades, cotizaciones, extracciones, IA, WhatsApp y tours; abajo el historial de accesos de la empresa.
   - **Integraciones**: WhatsApp, IA (BYOK / administrada) y Google Calendar con sus últimos errores.
 
 El CRM de una empresa se acota igual que en el back: cuenta lo de sus espacios de trabajo o, sin espacio, lo que creó o tiene asignado alguien de la empresa. Los leads se comparten entre empresas, así que el lead solo no basta.
@@ -91,7 +91,11 @@ Accesos es el historial de `UserAuthLog` (logins, altas e intentos fallidos), es
 
 ## Actividad
 
-`?tab=actividad` reemplaza el concentrado de Sync: una línea de tiempo de **todas** las empresas (`adminActivityFeed`), agrupada por día. Chips **Tipo** (Accesos, Extracción, CRM, IA, Créditos, Pagos, WhatsApp, Calendario, Kadesh) en `&tipo=` y **Estado** (Todas / Con error) en `&error=1`, más un buscador. Cada evento se expande para ver el detalle; la empresa y la persona abren su 360. Pagina con **Cargar más** (cursor por fecha).
+`?tab=actividad` reemplaza el concentrado de Sync: una línea de tiempo de **todas** las empresas (`adminActivityFeed`), agrupada por día. Chips **Tipo** (Accesos, Extracción, CRM, Equipo, IA, Créditos, Pagos, WhatsApp, Calendario, Kadesh, Navegación) en `&tipo=` y **Estado** (Todas / Con error) en `&error=1`, más un buscador. Cada evento se expande para ver el detalle (los cambios salen como "antes → después"); la empresa y la persona abren su 360. Pagina con **Cargar más** (cursor por fecha).
+
+- **Equipo**: roles, permisos, altas de personas, espacios de trabajo y datos de la empresa.
+- **Kadesh**: lo que hace el admin, incluido qué 360, fichas y conversaciones de IA abrió.
+- **Navegación**: secciones del panel que abren, módulos bloqueados que ven, tours. Es mucho volumen, por eso **Todo** no la incluye: solo sale al elegirla.
 
 Nunca muestra prompts de IA, cuerpos de WhatsApp ni contraseñas.
 
@@ -164,6 +168,14 @@ Asunto, título de cabecera, etiqueta superior, vista previa de bandeja, cuerpo,
 La columna derecha es vista previa en vivo. **Revisar y enviar** primero cuenta destinatarios (`dryRun`) y pide confirmación antes del envío real. Mutación `sendAdminBroadcastEmail` (solo admin de plataforma).
 
 ## Decisiones
+
+### 2026-10-10 — Registro de uso y de lo que abre el admin (Fase 2)
+
+El back ahora guarda eventos propios (`ActivityEvent`) y el tiempo con el panel abierto (`UserActivityDay`). Aquí se ven en Actividad (tipos **Equipo**, **Navegación** y los cambios del CRM), en el 360 (**Cómo usan el panel**, tiempo activo por persona) y en el "último acceso".
+
+Abrir el 360 de una empresa, la ficha de una persona o una conversación de IA queda registrado (tipo **Kadesh**). Se decidió que el admin ve todo el CRM del cliente, así que cada acceso deja rastro.
+
+Lo del navegador lo manda `kadesh/utils/activity` (ver su README). Detalle del back en `kadesh-back/models/ActivityEvent/README.md`.
 
 ### 2026-10-10 — Clientes 360 y Actividad
 

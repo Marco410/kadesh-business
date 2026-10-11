@@ -24,6 +24,7 @@ export const ADMIN_COMPANIES_LIST_QUERY = gql`
         usersCount
         leadsCount
         lastLoginAt
+        lastSeenAt
         owner {
           id
           name
@@ -66,6 +67,8 @@ export type AdminCompanyListItem = {
   usersCount: number;
   leadsCount: number;
   lastLoginAt: string | null;
+  /** Última vez que alguien del equipo tuvo el panel abierto (latido). */
+  lastSeenAt: string | null;
   owner: AdminPersonRef | null;
 };
 
@@ -224,6 +227,10 @@ export const ADMIN_COMPANY_INSIGHTS_QUERY = gql`
         whatsappSent
         toursCompleted
         toursSkipped
+        lastSeenAt
+        activeDays
+        activeMinutes
+        changes
       }
       pipeline {
         key
@@ -278,6 +285,25 @@ export const ADMIN_COMPANY_INSIGHTS_QUERY = gql`
       calendarLastSyncedAt
       calendarLastError
       checkoutFailures
+      usage {
+        ready
+        activeUsers
+        activeMinutes
+        minutesByDay {
+          date
+          value
+        }
+        topSections {
+          key
+          count
+        }
+        lockedFeatures {
+          key
+          count
+        }
+        upgradeClicks
+        exports
+      }
     }
   }
 `;
@@ -296,6 +322,24 @@ export type AdminTeamMemberStats = {
   whatsappSent: number;
   toursCompleted: number;
   toursSkipped: number;
+  /** Última vez con el panel abierto (latido). La sesión dura 30 días: es más fiel que el login. */
+  lastSeenAt: string | null;
+  activeDays: number;
+  activeMinutes: number;
+  /** Cambios registrados (CRM, equipo, ajustes) en la ventana. */
+  changes: number;
+};
+
+/** Uso del panel. `ready: false` hasta que el back corra la migración de la Fase 2. */
+export type AdminUsageStats = {
+  ready: boolean;
+  activeUsers: number;
+  activeMinutes: number;
+  minutesByDay: Array<{ date: string; value: number }>;
+  topSections: Array<{ key: string; count: number }>;
+  lockedFeatures: Array<{ key: string; count: number }>;
+  upgradeClicks: number;
+  exports: number;
 };
 
 export type AdminCompanyInsights = {
@@ -335,6 +379,7 @@ export type AdminCompanyInsights = {
   calendarLastSyncedAt: string | null;
   calendarLastError: string | null;
   checkoutFailures: number;
+  usage: AdminUsageStats;
 };
 
 export type AdminCompanyInsightsResponse = {

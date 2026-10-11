@@ -60,6 +60,10 @@ Most of `/panel/*` is NOT separate App Router pages per view — `src/app/panel/
 
 Subscription plans gate CRM functionality via `PLAN_FEATURE_KEYS`/`PLAN_FEATURES_MAP` in `constants/constans.ts`, checked with helpers in `src/components/profile/sales/helpers/plan-features.ts` and surfaced via `FeatureLockedSection`/`RoleAccessDeniedSection`. When adding a gated CRM feature, register its key there first.
 
+### Activity tracking
+
+`kadesh/utils/activity` sends browser-only usage events (sections viewed, heartbeat, locked features, tours, exports, logout, and admin views in Operaciones) to the backend `trackEvents` mutation. Panel sections are tracked automatically from `?tab=`/path by `src/app/PanelActivityTracker.tsx`. A new client event type must be added both to `TRACK_EVENT` here and to `CLIENT_EVENT_TYPES` in kadesh-back, or the backend drops it. Never put personal data (lead names, phones, free text) in event metadata. See `src/utils/activity/README.md`.
+
 ### Onboarding tour
 
 `src/components/onboarding/` runs the guided tours (driver.js). `registry.ts` is the single source of truth; progress is stored in `User.onboardingState` (kadesh-back) plus localStorage. **Any new panel section, main button or flow must add a `data-tour` anchor and a step in the registry**, then run `pnpm check:tours` (see `.cursor/rules/onboarding-tour.mdc`).

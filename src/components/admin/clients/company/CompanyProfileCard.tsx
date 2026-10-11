@@ -23,7 +23,7 @@ import {
 import { getCurrentCreditPeriodParts } from "../../credits";
 import { SubscriptionStatusBadge } from "../AdminCompaniesList";
 import type { AdminCompanyInsights, AdminCompanyProfile } from "../clients-queries";
-import { daysUntil, monthLabel, stripeCustomerUrl } from "./format";
+import { daysUntil, lastAccessAt, monthLabel, stripeCustomerUrl } from "./format";
 
 function categoriesLabel(value: unknown): string {
   if (!Array.isArray(value) || value.length === 0) return "Todas (sin límite)";
@@ -188,6 +188,11 @@ export default function CompanyProfileCard({
           {company.users.map((user) => {
             const stats = teamStats.get(user.id);
             const selected = user.id === focusPersonId;
+            // Lo más reciente: acción registrada, panel abierto (latido) o login.
+            const seen = lastAccessAt(
+              lastAccessAt(stats?.lastActivityAt, stats?.lastSeenAt),
+              user.lastLoginAt,
+            );
             return (
               <li key={user.id}>
                 <button
@@ -208,11 +213,7 @@ export default function CompanyProfileCard({
                     <span className="block truncate text-xs text-[#9e9e9e]">
                       {ROLE_LABELS[user.roles[0]?.name ?? ""] ?? user.roles[0]?.name ?? "Sin rol"}
                       {" · "}
-                      {stats?.lastActivityAt
-                        ? formatDate(stats.lastActivityAt)
-                        : user.lastLoginAt
-                          ? formatDate(user.lastLoginAt)
-                          : "Nunca entró"}
+                      {seen ? formatDate(seen) : "Nunca entró"}
                     </span>
                   </span>
                 </button>

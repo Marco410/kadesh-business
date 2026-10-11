@@ -180,12 +180,15 @@ export const ACTIVITY_TYPES = [
   { slug: "accesos", type: "auth", label: "Accesos" },
   { slug: "extraccion", type: "extraction", label: "Extracción" },
   { slug: "crm", type: "crm", label: "CRM" },
+  { slug: "equipo", type: "team", label: "Equipo" },
   { slug: "ia", type: "ai", label: "IA" },
   { slug: "creditos", type: "credits", label: "Créditos" },
   { slug: "pagos", type: "billing", label: "Pagos" },
   { slug: "whatsapp", type: "whatsapp", label: "WhatsApp" },
   { slug: "calendario", type: "calendar", label: "Calendario" },
   { slug: "admin", type: "admin", label: "Kadesh" },
+  // Secciones que abren: mucho volumen, por eso "Todo" no la incluye (el back la excluye).
+  { slug: "navegacion", type: "product", label: "Navegación" },
 ] as const;
 
 export type ActivityTypeSlug = (typeof ACTIVITY_TYPES)[number]["slug"];
@@ -209,6 +212,27 @@ export function activityApiTypes(slug: ActivityTypeSlug | "todo"): ActivityApiTy
 export const ACTIVITY_TYPE_LABELS: Record<string, string> = Object.fromEntries(
   ACTIVITY_TYPES.map((t) => [t.type, t.label]),
 );
+
+/** Secciones del panel del cliente (`section` de `ui.section_viewed`). Las demás se muestran tal cual. */
+export const PANEL_SECTION_LABELS: Record<string, string> = {
+  extraccion: "Extracción (mapa)",
+  inicio: "Inicio",
+  profile: "Datos del perfil",
+  usuarios: "Usuarios",
+  ai: "IA",
+  clientes: "Clientes",
+  vendedores: "Vendedores",
+  archivos: "Archivos",
+  proyectos: "Proyectos",
+  cotizaciones: "Cotizaciones",
+  calendar: "Calendario",
+  workspaces: "Espacios de trabajo",
+  whatsapp: "WhatsApp",
+  referidos: "Referidos",
+  novedades: "Novedades",
+  creditos: "Créditos",
+  "google-calendar": "Google Calendar",
+};
 
 /** Filtro del feed: todas o solo errores. */
 export const ACTIVITY_STATUS_FILTERS = [

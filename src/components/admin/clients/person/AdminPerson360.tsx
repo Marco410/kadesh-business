@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { formatDate, formatDateShort } from "kadesh/utils/format-date";
+import { TRACK_EVENT, trackActivity } from "kadesh/utils/activity";
 import { ROLE_LABELS } from "../../constants";
 import { useAdminNavigation } from "../../hooks/useAdminNavigation";
 import {
@@ -32,6 +34,11 @@ export default function AdminPerson360({ userId }: { userId: string }) {
     { variables: { id: userId }, fetchPolicy: "cache-and-network" },
   );
   const person = data?.user;
+
+  useEffect(() => {
+    trackActivity(TRACK_EVENT.ADMIN_VIEWED_PERSON, { entityType: "User", entityId: userId });
+  }, [userId]);
+
   const back = () =>
     setParams({ usuario: null, empresa: null, persona: null, detalle: null, sub: null }, "push");
 

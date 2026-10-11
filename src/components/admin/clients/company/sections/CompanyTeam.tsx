@@ -13,6 +13,7 @@ import type {
   AdminCompanyInsights,
   AdminCompanyMember,
 } from "../../clients-queries";
+import { formatMinutes, lastAccessAt } from "../format";
 
 /** Quién usa la plataforma y quién no: uso por persona en la ventana de días. */
 export default function CompanyTeam({
@@ -39,12 +40,13 @@ export default function CompanyTeam({
         Uso de cada persona en los últimos {days} días. Toca una fila para ponerla en foco.
       </p>
       <div className={`${surfaceClass} relative overflow-x-auto`}>
-        <table className="w-full min-w-[1040px] text-left text-sm">
+        <table className="w-full min-w-[1160px] text-left text-sm">
           <thead className="border-b border-[#e8e8e8] text-xs uppercase tracking-wide text-[#616161] dark:border-[#333] dark:text-[#b0b0b0]">
             <tr>
               <th className="px-4 py-3">Persona</th>
               <th className="px-4 py-3">Rol</th>
               <th className="px-4 py-3">Accesos</th>
+              <th className="px-4 py-3">Tiempo activo</th>
               <th className="px-4 py-3">Última acción</th>
               <th className="px-4 py-3">Leads</th>
               <th className="px-4 py-3">Actividades</th>
@@ -62,6 +64,7 @@ export default function CompanyTeam({
             {members.map((member) => {
               const s = stats.get(member.id);
               const selected = member.id === focusPersonId;
+              const seenAt = lastAccessAt(member.lastLoginAt, s?.lastSeenAt);
               return (
                 <tr
                   key={member.id}
@@ -99,14 +102,31 @@ export default function CompanyTeam({
                         ({s.failedLogins} fallidos)
                       </span>
                     ) : null}
-                    <p className="text-xs text-[#9e9e9e]">
-                      {member.lastLoginAt
-                        ? `Último ${formatDateShort(member.lastLoginAt, false)}`
-                        : "Nunca entró"}
+                    <p className="whitespace-nowrap text-xs text-[#9e9e9e]">
+                      {seenAt ? `Visto ${formatDateShort(seenAt, false)}` : "Nunca entró"}
                     </p>
+                  </td>
+                  <td className="px-4 py-3 text-[#212121] dark:text-white">
+                    {s?.activeMinutes ? (
+                      <>
+                        <span className="whitespace-nowrap tabular-nums">
+                          {formatMinutes(s.activeMinutes)}
+                        </span>
+                        <p className="whitespace-nowrap text-xs text-[#9e9e9e]">
+                          en {s.activeDays} día{s.activeDays === 1 ? "" : "s"}
+                        </p>
+                      </>
+                    ) : (
+                      <span className="text-[#9e9e9e]">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
                     {s?.lastActivityAt ? formatDate(s.lastActivityAt) : "—"}
+                    {s?.changes ? (
+                      <p className="whitespace-nowrap text-xs text-[#9e9e9e]">
+                        {s.changes} cambio{s.changes === 1 ? "" : "s"} registrado{s.changes === 1 ? "" : "s"}
+                      </p>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3 tabular-nums">{s?.leadsAssigned ?? 0}</td>
                   <td className="px-4 py-3 tabular-nums">{s?.activities ?? 0}</td>

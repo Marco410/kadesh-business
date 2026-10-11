@@ -86,3 +86,24 @@ export function daysUntil(value: string | null | undefined): number | null {
 export function stripeCustomerUrl(customerId: string): string {
   return `https://dashboard.stripe.com/customers/${customerId}`;
 }
+
+/**
+ * Lo más reciente entre el último login y el último latido del panel. La sesión dura 30 días:
+ * alguien puede usar el panel a diario sin volver a iniciar sesión.
+ */
+export function lastAccessAt(
+  lastLoginAt: string | null | undefined,
+  lastSeenAt: string | null | undefined,
+): string | null {
+  if (!lastLoginAt) return lastSeenAt ?? null;
+  if (!lastSeenAt) return lastLoginAt;
+  return new Date(lastSeenAt) > new Date(lastLoginAt) ? lastSeenAt : lastLoginAt;
+}
+
+/** 95 → "1 h 35 min"; 40 → "40 min". */
+export function formatMinutes(minutes: number): string {
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return rest ? `${hours} h ${rest} min` : `${hours} h`;
+}

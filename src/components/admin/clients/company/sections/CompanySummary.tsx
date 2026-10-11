@@ -8,7 +8,7 @@ import { cn } from "kadesh/utils/cn";
 import { formatDateShort } from "kadesh/utils/format-date";
 import ActivityTimeline from "../../../activity/ActivityTimeline";
 import { useActivityFeed } from "../../../activity/useActivityFeed";
-import { CLIENT_SECTIONS } from "../../../constants";
+import { CLIENT_SECTIONS, PANEL_SECTION_LABELS } from "../../../constants";
 import {
   AdminErrorState,
   AdminSectionCard,
@@ -19,6 +19,7 @@ import type { AdminCompanyInsights, AdminCompanyProfile } from "../../clients-qu
 import {
   daysSince,
   daysUntil,
+  formatMinutes,
   pipelineLabel,
   sortByPipeline,
   weeklyBuckets,
@@ -92,6 +93,79 @@ function buildAlerts(company: AdminCompanyProfile, insights: AdminCompanyInsight
     }
   }
   return alerts;
+}
+
+function RankList({
+  title,
+  rows,
+  empty,
+  labels,
+}: {
+  title: string;
+  rows: Array<{ key: string; count: number }>;
+  empty: string;
+  labels?: Record<string, string>;
+}) {
+  return (
+    <div className="min-w-0">
+      <h4 className="text-xs font-semibold uppercase tracking-wide text-[#9e9e9e]">{title}</h4>
+      {rows.length === 0 ? (
+        <p className="mt-2 text-sm text-[#9e9e9e]">{empty}</p>
+      ) : (
+        <ol className="mt-2 flex flex-col gap-1.5">
+          {rows.slice(0, 5).map((row) => (
+            <li key={row.key} className="flex items-center justify-between gap-3 text-sm">
+              <span className="min-w-0 truncate text-[#212121] dark:text-white">
+                {labels?.[row.key] ?? row.key}
+              </span>
+              <span className="shrink-0 tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+                {formatCredits(row.count)}
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}
+
+/** Cómo usan el panel (latido y eventos de navegación, Fase 2). */
+function PanelUsageCard({ insights }: { insights: AdminCompanyInsights }) {
+  const { usage, days, team } = insights;
+  return (
+    <AdminSectionCard
+      title="Cómo usan el panel"
+      description={`Tiempo con el panel abierto y qué abren, últimos ${days} días.`}
+    >
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <AdminStatTile label="Tiempo activo" value={formatMinutes(usage.activeMinutes)} />
+        <AdminStatTile
+          label="Personas que entraron"
+          value={`${usage.activeUsers} / ${team.length}`}
+        />
+        <AdminStatTile
+          label="Clics en mejorar plan"
+          value={formatCredits(usage.upgradeClicks)}
+          tone={usage.upgradeClicks > 0 ? "warning" : "default"}
+          hint={usage.upgradeClicks > 0 ? "Oportunidad de venta" : undefined}
+        />
+        <AdminStatTile label="Exportaciones" value={formatCredits(usage.exports)} />
+      </div>
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <RankList
+          title="Secciones que más abren"
+          rows={usage.topSections}
+          labels={PANEL_SECTION_LABELS}
+          empty="Todavía no hay visitas registradas."
+        />
+        <RankList
+          title="Módulos bloqueados que vieron"
+          rows={usage.lockedFeatures}
+          empty="No han chocado con módulos fuera de su plan."
+        />
+      </div>
+    </AdminSectionCard>
+  );
 }
 
 export default function CompanySummary({
@@ -214,7 +288,7 @@ export default function CompanySummary({
               label="Equipo activo"
               value={
                 insights
-                  ? `${insights.team.filter((m) => m.lastActivityAt).length} / ${insights.team.length}`
+                  ? `${insights.team.filter((m) => m.lastActivityAt || m.activeDays > 0).length} / ${insights.team.length}`
                   : "—"
               }
               hint="con actividad en el periodo"
@@ -223,6 +297,8 @@ export default function CompanySummary({
           </div>
         </AdminSectionCard>
       )}
+
+      {insights?.usage.ready ? <PanelUsageCard insights={insights} /> : null}
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <AdminSectionCard title="Pipeline" description="Leads de esta empresa por etapa.">

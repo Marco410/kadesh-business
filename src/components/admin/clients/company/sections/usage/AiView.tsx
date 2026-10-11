@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { ShareBars } from "kadesh/components/panel/dashboard";
+import { TRACK_EVENT, trackActivity } from "kadesh/utils/activity";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { ADMIN_PAGE_SIZE, AI_FEATURE_LABELS } from "../../../../constants";
 import {
@@ -33,13 +34,31 @@ const BILLING_LABELS: Record<string, string> = {
 
 /**
  * Prompt y respuesta de una llamada. Se piden solo al abrirla: pueden traer datos del
- * negocio del cliente. (Con la Fase 2 cada apertura queda registrada.)
+ * negocio del cliente. Cada apertura queda registrada (`admin.viewed_ai_prompt`).
  */
-function ConversationDrawer({ callId, onClose }: { callId: string | null; onClose: () => void }) {
+function ConversationDrawer({
+  callId,
+  companyId,
+  onClose,
+}: {
+  callId: string | null;
+  companyId: string;
+  onClose: () => void;
+}) {
   const { data, loading, error } = useQuery<AdminAiCallConversationResponse>(
     ADMIN_AI_CALL_CONVERSATION_QUERY,
     { variables: { id: callId ?? "" }, skip: !callId, fetchPolicy: "network-only" },
   );
+
+  useEffect(() => {
+    if (!callId) return;
+    trackActivity(TRACK_EVENT.ADMIN_VIEWED_AI_PROMPT, {
+      companyId,
+      entityType: "TechAiCallLog",
+      entityId: callId,
+    });
+  }, [callId, companyId]);
+
   const call = data?.techAiCallLog;
   const blocks = [
     { label: "Instrucción de la función", value: call?.featurePrompt },
@@ -216,7 +235,11 @@ export default function AiView({
           />
         </>
       )}
-      <ConversationDrawer callId={openCallId} onClose={() => setOpenCallId(null)} />
+      <ConversationDrawer
+        callId={openCallId}
+        companyId={companyId}
+        onClose={() => setOpenCallId(null)}
+      />
     </div>
   );
 }

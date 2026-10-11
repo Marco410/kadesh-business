@@ -15,6 +15,7 @@ import { driver, type Driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import "./tour.css";
 import { useUser } from "kadesh/utils/UserContext";
+import { TRACK_EVENT, trackActivity } from "kadesh/utils/activity";
 import {
   ONBOARDING_LAUNCH_DATE,
   ONBOARDING_STORAGE_PREFIX,
@@ -185,6 +186,11 @@ export function OnboardingProvider({
         if (finished || runId !== runIdRef.current) return;
         finished = true;
         persist(tour, status);
+        // onboardingState guarda el último estado; el evento guarda cuándo y en qué paso.
+        trackActivity(
+          status === "completed" ? TRACK_EVENT.TOUR_COMPLETED : TRACK_EVENT.TOUR_SKIPPED,
+          { metadata: { tour: tour.id, steps: steps.length, step: d.getActiveIndex() ?? null } },
+        );
         stopTour();
       };
 

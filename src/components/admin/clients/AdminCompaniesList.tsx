@@ -36,6 +36,7 @@ import {
   type AdminCompaniesListResponse,
   type AdminCompanyListItem,
 } from "./clients-queries";
+import { lastAccessAt } from "./company/format";
 
 export function subscriptionStatusLabel(status: string | null | undefined) {
   if (!status) return "Sin plan";
@@ -52,6 +53,12 @@ export function SubscriptionStatusBadge({ status }: { status: string | null | un
       }
     />
   );
+}
+
+/** Último login o último latido del panel, lo más reciente. */
+function formatLastAccess(company: AdminCompanyListItem, empty: string, prefix = "") {
+  const at = lastAccessAt(company.lastLoginAt, company.lastSeenAt);
+  return at ? `${prefix}${formatDate(at)}` : empty;
 }
 
 function periodHint(company: AdminCompanyListItem) {
@@ -188,9 +195,7 @@ export default function AdminCompaniesList() {
                     {formatCredits(company.leadsCount)} leads
                   </p>
                   <p className="mt-1 text-xs text-[#9e9e9e]">
-                    {company.lastLoginAt
-                      ? `Último acceso: ${formatDate(company.lastLoginAt)}`
-                      : "Nadie ha entrado"}
+                    {formatLastAccess(company, "Nadie ha entrado", "Último acceso: ")}
                   </p>
                 </button>
               </li>
@@ -262,7 +267,7 @@ export default function AdminCompaniesList() {
                       {formatCredits(company.leadsCount)}
                     </td>
                     <td className="px-4 py-3 align-top text-[#616161] dark:text-[#b0b0b0]">
-                      {company.lastLoginAt ? formatDate(company.lastLoginAt) : "Nunca"}
+                      {formatLastAccess(company, "Nunca")}
                     </td>
                     <td className="px-2 py-3 align-top text-[#9e9e9e]">
                       <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
