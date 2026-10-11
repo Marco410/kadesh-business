@@ -33,6 +33,8 @@ import {
 import PersonDrawer from "../person/PersonDrawer";
 import { subscriptionRowFromProfile, useAdjustSubscription } from "../useAdjustSubscription";
 import CompanyProfileCard from "./CompanyProfileCard";
+import ExtendTrialDialog from "./ops/ExtendTrialDialog";
+import CompanyNotes from "./sections/CompanyNotes";
 import PersonFocusBanner from "./PersonFocusBanner";
 import CompanyActivity from "./sections/CompanyActivity";
 import CompanyBilling from "./sections/CompanyBilling";
@@ -54,6 +56,7 @@ export default function AdminCompany360({ companyId }: { companyId: string }) {
   const personaId = searchParams.get("persona");
   const [drawer, setDrawer] = useState<{ userId: string; tab: PersonTab } | null>(null);
   const [adjustOpen, setAdjustOpen] = useState(false);
+  const [extendOpen, setExtendOpen] = useState(false);
   const period = getCurrentCreditPeriodParts();
 
   // Queda registro de qué clientes abre Kadesh (el back junta vistas repetidas de 10 min).
@@ -151,6 +154,11 @@ export default function AdminCompany360({ companyId }: { companyId: string }) {
     );
   }
 
+  // La prueba solo existe en el plan gratuito (sin cobro en Stripe).
+  const latestSub = company.subscriptions[0] ?? null;
+  const isFreePlan =
+    Boolean(latestSub) && (latestSub?.planCost ?? 0) <= 0 && !latestSub?.stripeSubscriptionId;
+
   const focusPersonRecord = personaId
     ? company.users.find((u) => u.id === personaId) ?? null
     : null;
@@ -167,8 +175,10 @@ export default function AdminCompany360({ companyId }: { companyId: string }) {
           insights={insights}
           focusPersonId={personaId}
           onAdjustPlan={subscriptionRow ? () => setAdjustOpen(true) : null}
+          onExtendTrial={isFreePlan ? () => setExtendOpen(true) : null}
           onSendEmail={sendEmail}
           onFocusPerson={(userId) => focusPerson(userId === personaId ? null : userId)}
+          onRefresh={() => void profileQuery.refetch()}
         />
 
         <div className="flex min-w-0 flex-col gap-4">
@@ -227,6 +237,7 @@ export default function AdminCompany360({ companyId }: { companyId: string }) {
           {section === CLIENT_SECTIONS.INTEGRATIONS ? (
             <CompanyIntegrations companyId={company.id} insights={insights} />
           ) : null}
+          {section === CLIENT_SECTIONS.NOTES ? <CompanyNotes companyId={company.id} /> : null}
         </div>
       </div>
 
@@ -234,6 +245,18 @@ export default function AdminCompany360({ companyId }: { companyId: string }) {
         userId={drawer?.userId ?? null}
         initialTab={drawer?.tab}
         onClose={() => setDrawer(null)}
+      />
+
+      <ExtendTrialDialog
+        open={extendOpen}
+        companyId={company.id}
+        companyName={company.name}
+        trialEnd={latestSub?.currentPeriodEnd ?? null}
+        onClose={() => setExtendOpen(false)}
+        onDone={() => {
+          setExtendOpen(false);
+          void profileQuery.refetch();
+        }}
       />
 
       <AdminSubscriptionEditor

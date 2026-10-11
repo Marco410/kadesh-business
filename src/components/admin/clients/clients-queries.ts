@@ -31,6 +31,13 @@ export const ADMIN_COMPANIES_LIST_QUERY = gql`
           lastName
           email
         }
+        accountManager {
+          id
+          name
+          lastName
+          email
+        }
+        suspendedAt
       }
       total
       statusCounts {
@@ -70,6 +77,10 @@ export type AdminCompanyListItem = {
   /** Última vez que alguien del equipo tuvo el panel abierto (latido). */
   lastSeenAt: string | null;
   owner: AdminPersonRef | null;
+  /** Persona de Kadesh responsable de la cuenta. */
+  accountManager: AdminPersonRef | null;
+  /** Si Kadesh suspendió el acceso de la empresa. */
+  suspendedAt: string | null;
 };
 
 export type AdminCompaniesListResponse = {
@@ -97,6 +108,14 @@ export const ADMIN_COMPANY_PROFILE_QUERY = gql`
       onboardingIdealCustomer
       onboardingAvgTicketValue
       onboardingSalesPain
+      suspendedAt
+      suspendedReason
+      accountManager {
+        id
+        name
+        lastName
+        email
+      }
       plan {
         id
         name
@@ -121,6 +140,7 @@ export const ADMIN_COMPANY_PROFILE_QUERY = gql`
         verified
         createdAt
         lastLoginAt
+        suspendedAt
         roles {
           name
         }
@@ -156,6 +176,7 @@ export type AdminCompanyMember = {
   verified: boolean | null;
   createdAt: string | null;
   lastLoginAt: string | null;
+  suspendedAt: string | null;
   roles: Array<{ name: string }>;
 };
 
@@ -188,6 +209,9 @@ export type AdminCompanyProfile = {
   onboardingIdealCustomer: string | null;
   onboardingAvgTicketValue: string | null;
   onboardingSalesPain: string | null;
+  suspendedAt: string | null;
+  suspendedReason: string | null;
+  accountManager: AdminPersonRef | null;
   plan: { id: string; name: string; leadLimit: number | null } | null;
   creditPeriods: Array<{
     id: string;

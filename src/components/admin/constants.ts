@@ -71,6 +71,7 @@ export const CLIENT_SECTIONS = {
   BILLING: "plan",
   TEAM: "equipo",
   INTEGRATIONS: "integraciones",
+  NOTES: "notas",
 } as const;
 
 export type ClientSection = (typeof CLIENT_SECTIONS)[keyof typeof CLIENT_SECTIONS];
@@ -83,6 +84,7 @@ export const CLIENT_SECTION_ITEMS: Array<{ id: ClientSection; label: string }> =
   { id: CLIENT_SECTIONS.BILLING, label: "Plan y pagos" },
   { id: CLIENT_SECTIONS.TEAM, label: "Equipo" },
   { id: CLIENT_SECTIONS.INTEGRATIONS, label: "Integraciones" },
+  { id: CLIENT_SECTIONS.NOTES, label: "Notas" },
 ];
 
 export function parseClientSection(value: string | null): ClientSection {
@@ -167,6 +169,18 @@ export const COMPANY_SORT_OPTIONS = [
 ] as const;
 
 export type CompanySort = (typeof COMPANY_SORT_OPTIONS)[number]["value"];
+
+/** Filtro por dueño de cuenta de Kadesh (`&cuentas=mias`). */
+export const COMPANY_OWNER_FILTERS = [
+  { value: "todas", label: "Todas" },
+  { value: "mias", label: "Mis cuentas" },
+] as const;
+
+export type CompanyOwnerFilter = (typeof COMPANY_OWNER_FILTERS)[number]["value"];
+
+export function parseCompanyOwnerFilter(value: string | null): CompanyOwnerFilter {
+  return value === "mias" ? "mias" : "todas";
+}
 
 export function parseCompanySort(value: string | null): CompanySort {
   return COMPANY_SORT_OPTIONS.find((option) => option.value === value)?.value ?? "recent";
@@ -270,6 +284,7 @@ export const PERSON_TABS = {
   PROFILE: "perfil",
   ACCESS: "accesos",
   ACTIVITY: "actividad",
+  CONTROL: "control",
 } as const;
 
 export type PersonTab = (typeof PERSON_TABS)[keyof typeof PERSON_TABS];
@@ -423,6 +438,7 @@ export function normalizeLegacyAdminParams(
 
 /** Params que pertenecen a una sección: se limpian al cambiar de tab. */
 export const ADMIN_SCOPED_PARAMS = [
+  "cuentas",
   "vista",
   "empresa",
   "usuario",

@@ -9,10 +9,13 @@ import {
   SUBSCRIPTION_STATUS_OPTIONS,
 } from "kadesh/constants/constans";
 import { formatDate, formatDateShort } from "kadesh/utils/format-date";
+import { useUser } from "kadesh/utils/UserContext";
 import {
   ADMIN_PAGE_SIZE,
+  COMPANY_OWNER_FILTERS,
   COMPANY_SORT_OPTIONS,
   COMPANY_STATUS_FILTERS,
+  parseCompanyOwnerFilter,
   parseCompanySort,
   parseCompanyStatusFilter,
 } from "../constants";
@@ -55,6 +58,12 @@ export function SubscriptionStatusBadge({ status }: { status: string | null | un
   );
 }
 
+/** "Cuenta de Marco" si tiene dueño de cuenta en Kadesh. */
+function managerHint(company: AdminCompanyListItem) {
+  const manager = company.accountManager;
+  return manager ? `Cuenta de ${formatPersonName(manager.name, manager.lastName)}` : null;
+}
+
 /** Último login o último latido del panel, lo más reciente. */
 function formatLastAccess(company: AdminCompanyListItem, empty: string, prefix = "") {
   const at = lastAccessAt(company.lastLoginAt, company.lastSeenAt);
@@ -91,7 +100,10 @@ export default function AdminCompaniesList() {
   const search = useUrlSearch();
   const status = parseCompanyStatusFilter(searchParams.get("estado"));
   const sort = parseCompanySort(searchParams.get("orden"));
+  const owner = parseCompanyOwnerFilter(searchParams.get("cuentas"));
   const page = Math.max(1, Number(searchParams.get("pagina")) || 1);
+  const { user } = useUser();
+  const accountManagerId = owner === "mias" ? user?.id ?? null : null;
 
   const { data, loading, error } = useQuery<AdminCompaniesListResponse>(
     ADMIN_COMPANIES_LIST_QUERY,
@@ -101,6 +113,7 @@ export default function AdminCompaniesList() {
           search: search.query || null,
           status,
           sort,
+          accountManagerId,
           take: ADMIN_PAGE_SIZE,
           skip: (page - 1) * ADMIN_PAGE_SIZE,
         },
@@ -152,6 +165,14 @@ export default function AdminCompaniesList() {
             setParams({ orden: value === "recent" ? null : value, pagina: null })
           }
         />
+        <AdminFilterChips
+          label="Cuentas"
+          options={[...COMPANY_OWNER_FILTERS]}
+          value={owner}
+          onChange={(value) =>
+            setParams({ cuentas: value === "todas" ? null : value, pagina: null })
+          }
+        />
       </div>
 
       {error ? (
@@ -161,7 +182,11 @@ export default function AdminCompaniesList() {
       ) : rows.length === 0 ? (
         <AdminEmptyState
           title="No hay empresas que coincidan"
-          description="Prueba otro estado o busca por el correo de alguien del equipo."
+          description={
+            owner === "mias"
+              ? "Todavía no tienes cuentas asignadas. Asígnalas desde el 360 de cada empresa."
+              : "Prueba otro estado o busca por el correo de alguien del equipo."
+          }
         />
       ) : (
         <>
@@ -177,6 +202,11 @@ export default function AdminCompaniesList() {
                     <div className="min-w-0">
                       <p className="font-semibold text-[#212121] dark:text-white">
                         {company.name}
+                        {company.suspendedAt ? (
+                          <span className="ml-1.5 text-xs font-semibold text-red-600 dark:text-red-400">
+                            · Suspendida
+                          </span>
+                        ) : null}
                       </p>
                       <p className="mt-0.5 truncate text-xs text-[#616161] dark:text-[#b0b0b0]">
                         {company.owner
@@ -196,6 +226,7 @@ export default function AdminCompaniesList() {
                   </p>
                   <p className="mt-1 text-xs text-[#9e9e9e]">
                     {formatLastAccess(company, "Nadie ha entrado", "Último acceso: ")}
+                    {managerHint(company) ? ` · ${managerHint(company)}` : ""}
                   </p>
                 </button>
               </li>
@@ -241,10 +272,19 @@ export default function AdminCompaniesList() {
                           className="ml-2 bg-black/5 px-2 py-0.5 text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]"
                         />
                       ) : null}
+                      {company.suspendedAt ? (
+                        <AdminStatusBadge
+                          label="Suspendida"
+                          className="ml-2 bg-red-500/15 px-2 py-0.5 text-red-700 dark:text-red-300"
+                        />
+                      ) : null}
                       <p className="mt-0.5 text-xs text-[#9e9e9e]">
                         Alta {formatDateShort(company.createdAt, false)}
                         {company.owner?.email ? ` · ${company.owner.email}` : ""}
                       </p>
+                      {managerHint(company) ? (
+                        <p className="mt-0.5 text-xs text-[#9e9e9e]">{managerHint(company)}</p>
+                      ) : null}
                     </td>
                     <td className="px-4 py-3 align-top">
                       <p className="text-[#212121] dark:text-white">

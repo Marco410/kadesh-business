@@ -16,6 +16,7 @@ import {
   formatCredits,
 } from "../../../ui";
 import type { AdminCompanyInsights, AdminCompanyProfile } from "../../clients-queries";
+import TrendsCard from "./TrendsCard";
 import {
   daysSince,
   daysUntil,
@@ -299,6 +300,8 @@ export default function CompanySummary({
       )}
 
       {insights?.usage.ready ? <PanelUsageCard insights={insights} /> : null}
+
+      <TrendsCard companyId={company.id} />
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <AdminSectionCard title="Pipeline" description="Leads de esta empresa por etapa.">

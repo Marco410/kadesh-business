@@ -14,6 +14,7 @@ import {
   MetaPixelLoader,
 } from "kadesh/components/consent";
 import { BodyScrollLock } from "kadesh/components/shared";
+import { ImpersonationBanner } from "kadesh/components/impersonation";
 import { Toaster } from "sileo";
 import { useTheme } from "next-themes";
 
@@ -74,6 +75,8 @@ export default function ClientProviders({
         <ApolloProviderWrapper>
           <UserProvider>
             <AppShell>{children}</AppShell>
+            {/* Solo aparece cuando un admin de Kadesh está viendo el panel como otra persona. */}
+            <ImpersonationBanner />
             <BodyScrollLock />
             <ThemedToaster />
             <SpeedInsights />

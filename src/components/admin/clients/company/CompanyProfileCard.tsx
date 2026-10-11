@@ -24,6 +24,8 @@ import { getCurrentCreditPeriodParts } from "../../credits";
 import { SubscriptionStatusBadge } from "../AdminCompaniesList";
 import type { AdminCompanyInsights, AdminCompanyProfile } from "../clients-queries";
 import { daysUntil, lastAccessAt, monthLabel, stripeCustomerUrl } from "./format";
+import AccountManagerSelect from "./ops/AccountManagerSelect";
+import CompanyControl from "./ops/CompanyControl";
 
 function categoriesLabel(value: unknown): string {
   if (!Array.isArray(value) || value.length === 0) return "Todas (sin límite)";
@@ -67,15 +69,20 @@ export default function CompanyProfileCard({
   insights,
   focusPersonId,
   onAdjustPlan,
+  onExtendTrial,
   onSendEmail,
   onFocusPerson,
+  onRefresh,
 }: {
   company: AdminCompanyProfile;
   insights: AdminCompanyInsights | null;
   focusPersonId: string | null;
   onAdjustPlan: (() => void) | null;
+  /** Solo con plan gratuito (prueba). */
+  onExtendTrial: (() => void) | null;
   onSendEmail: () => void;
   onFocusPerson: (userId: string) => void;
+  onRefresh: () => void;
 }) {
   const [showMore, setShowMore] = useState(false);
   const sub = company.subscriptions[0] ?? null;
@@ -114,6 +121,12 @@ export default function CompanyProfileCard({
             className="bg-black/5 text-[#424242] dark:bg-white/10 dark:text-[#e0e0e0]"
           />
           <SubscriptionStatusBadge status={sub?.status} />
+          {company.suspendedAt ? (
+            <AdminStatusBadge
+              label="Acceso suspendido"
+              className="bg-red-500/15 text-red-700 dark:text-red-300"
+            />
+          ) : null}
         </div>
         <p className="mt-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
           Cliente desde {formatDateShort(company.createdAt, false)}
@@ -178,7 +191,24 @@ export default function CompanyProfileCard({
           <HugeiconsIcon icon={Mail01Icon} size={16} />
           Enviar correo
         </button>
+        {onExtendTrial ? (
+          <button
+            type="button"
+            onClick={onExtendTrial}
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] px-4 text-sm font-semibold text-[#212121] hover:border-orange-300 dark:border-[#3a3a3a] dark:text-white cursor-pointer"
+          >
+            Extender prueba
+          </button>
+        ) : null}
       </div>
+
+      <AccountManagerSelect
+        companyId={company.id}
+        manager={company.accountManager}
+        onChanged={onRefresh}
+      />
+
+      <CompanyControl company={company} onChanged={onRefresh} />
 
       <div>
         <p className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
@@ -209,6 +239,11 @@ export default function CompanyProfileCard({
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium text-[#212121] dark:text-white">
                       {formatPersonName(user.name, user.lastName)}
+                      {user.suspendedAt ? (
+                        <span className="ml-1.5 text-xs font-semibold text-red-600 dark:text-red-400">
+                          · Suspendida
+                        </span>
+                      ) : null}
                     </span>
                     <span className="block truncate text-xs text-[#9e9e9e]">
                       {ROLE_LABELS[user.roles[0]?.name ?? ""] ?? user.roles[0]?.name ?? "Sin rol"}

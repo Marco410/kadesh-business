@@ -79,6 +79,12 @@ export default function CompanyTeam({
                       <div className="min-w-0">
                         <p className="font-medium text-[#212121] dark:text-white">
                           {formatPersonName(member.name, member.lastName)}
+                          {member.suspendedAt ? (
+                            <AdminStatusBadge
+                              label="Suspendida"
+                              className="ml-2 bg-red-500/15 px-2 py-0.5 text-red-700 dark:text-red-300"
+                            />
+                          ) : null}
                         </p>
                         <p className="truncate text-xs text-[#9e9e9e]">{member.email ?? "—"}</p>
                       </div>

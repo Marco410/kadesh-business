@@ -49,22 +49,25 @@ Junta lo que antes eran Usuarios (Cuentas / Suscripciones) y Empresas (Empresas 
 - **Empresas** (default, `adminCompanies`): un solo buscador que también encuentra a la empresa por el correo o nombre de cualquier integrante. Chips de **Estado** con conteo (estado vigente = la suscripción más reciente) reemplazan la lista de Suscripciones. **Orden**: alta reciente, último acceso o nombre. Toda la fila abre el 360 (ya no hay botón naranja por fila). "Último acceso" es lo más reciente entre el último login y la última vez que alguien del equipo tuvo el panel abierto (latido).
 - **Personas** (`&vista=personas`): cuentas con rol, empresa, alta y último acceso. Filtros **Rol** y **Empresa** (con / sin). Clic en alguien con empresa abre el 360 de su empresa con esa persona en foco; sin empresa abre su ficha.
 
-Búsqueda, filtros y página viven en la URL (`q`, `estado`, `orden`, `rol`, `conEmpresa`, `pagina`): al volver del 360 la lista queda igual.
+Filtro **Cuentas** (`&cuentas=mias`): solo las empresas cuyo dueño de cuenta en Kadesh es quien está viendo. Cada fila dice "Cuenta de …" cuando tiene dueño.
+
+Búsqueda, filtros y página viven en la URL (`q`, `estado`, `orden`, `cuentas`, `rol`, `conEmpresa`, `pagina`): al volver del 360 la lista queda igual.
 
 ### Detalle 360 de una empresa
 
 `&empresa=<id>&detalle=<sección>&sub=<subvista>&persona=<userId>`. Página dentro de la tab, no modal. En escritorio dos columnas:
 
-- **Ficha** (izquierda, fija): plan y estado, cuándo vence la prueba o renueva, créditos del mes con barra, equipo, contacto, respuestas del onboarding, IDs copiables y **Ver en Stripe**. Acciones: **Ajustar plan** (módulos, fechas y créditos extra; el mismo editor de antes) y **Enviar correo** (abre Contenido → Correos con el equipo como destinatarios).
+- **Ficha** (izquierda, fija): plan y estado, cuándo vence la prueba o renueva, créditos del mes con barra, equipo, contacto, respuestas del onboarding, IDs copiables y **Ver en Stripe**. Acciones: **Ajustar plan** (módulos, fechas y créditos extra; el mismo editor de antes), **Enviar correo** (abre Contenido → Correos con el equipo como destinatarios) y, solo con plan gratuito, **Extender prueba** (+7, +14, +30 días o hasta una fecha; si ya venció, vuelve a "en prueba"). Abajo, **Dueño de cuenta en Kadesh** (quién del equipo lleva al cliente).
 - **Persona en foco** (`persona`): franja con sus roles, último acceso, accesos y última acción; **Editar persona** abre el panel lateral (Perfil · Accesos · Actividad) y **Ver su actividad** filtra el feed.
 - **Secciones**:
-  - **Resumen**: alertas, uso de 30 días, **Cómo usan el panel** (tiempo activo, personas que entraron, clics en mejorar plan, exportaciones, secciones que más abren y módulos bloqueados que vieron; se oculta hasta que el back tenga la migración de la Fase 2), pipeline, créditos por semana y actividad reciente.
+  - **Resumen**: alertas, uso de 30 días, **Tendencia** (minutos por semana de las últimas 12 y las últimas 4 semanas contra la mediana de las empresas de su plan; con menos de 3 empresas no se compara), **Cómo usan el panel** (tiempo activo, personas que entraron, clics en mejorar plan, exportaciones, secciones que más abren y módulos bloqueados que vieron; se oculta hasta que el back tenga la migración de la Fase 2), pipeline, créditos por semana y actividad reciente.
   - **Actividad**: línea de tiempo de la empresa, filtrable por tipo y por persona.
   - **CRM**: Leads (con etapa, oportunidad y vendedor de *esta* empresa; clic abre una vista rápida de solo lectura) · Pipeline · Cotizaciones · Seguimiento (actividades, seguimientos, tareas y propuestas) · Espacios.
   - **Consumo**: Créditos (periodos por mes + movimientos) · Extracciones · IA (las conversaciones se abren una por una con **Ver conversación**).
   - **Plan y pagos**: suscripción vigente y módulos, historial de contratos, intentos de pago (con el paso donde fallaron), cobros, tarjetas y comisiones de referido.
   - **Equipo**: cada persona con roles, accesos ("visto" = último login o latido), **tiempo activo** (minutos con el panel abierto y en cuántos días), última acción y cambios registrados, leads asignados, actividades, cotizaciones, extracciones, IA, WhatsApp y tours; abajo el historial de accesos de la empresa.
   - **Integraciones**: WhatsApp, IA (BYOK / administrada) y Google Calendar con sus últimos errores.
+  - **Notas**: notas internas del equipo de Kadesh (el cliente nunca las ve). Se pueden fijar arriba; quedan con autor y fecha.
 
 El CRM de una empresa se acota igual que en el back: cuenta lo de sus espacios de trabajo o, sin espacio, lo que creó o tiene asignado alguien de la empresa. Los leads se comparten entre empresas, así que el lead solo no basta.
 
@@ -76,7 +79,7 @@ También se pueden **agregar créditos extra**: se suman ahora y se mantienen ca
 
 ### Panel de una persona
 
-Pestañas **Perfil** · **Accesos** · **Actividad**. En Perfil se editan nombre, apellidos, teléfono, correo, cuenta verificada y **roles** (**Guardar usuario**). Debajo va la **suscripción al blog**, con una tarjeta por blog (Pet y SaaS) que se guarda por separado, para no mezclar errores de un bloque con el otro:
+Pestañas **Perfil** · **Accesos** · **Actividad** · **Control** (ver como, suspender, cerrar sesiones, exportar y anonimizar; no aplica al equipo de Kadesh). En Perfil se editan nombre, apellidos, teléfono, correo, cuenta verificada y **roles** (**Guardar usuario**). Debajo va la **suscripción al blog**, con una tarjeta por blog (Pet y SaaS) que se guarda por separado, para no mezclar errores de un bloque con el otro:
 
 - Sin suscripción: **Suscribir** la crea con el correo del usuario (editable).
 - Con suscripción: se cambia el correo o se pausa/reactiva. Pausada = no recibe avisos de nuevos artículos. No se borra desde aquí.
@@ -168,6 +171,12 @@ Asunto, título de cabecera, etiqueta superior, vista previa de bandeja, cuerpo,
 La columna derecha es vista previa en vivo. **Revisar y enviar** primero cuenta destinatarios (`dryRun`) y pide confirmación antes del envío real. Mutación `sendAdminBroadcastEmail` (solo admin de plataforma).
 
 ## Decisiones
+
+### 2026-10-11 — Notas, dueño de cuenta, extender prueba y tendencia (Fase 3)
+
+Lo que el equipo de Kadesh sabe de un cliente vivía fuera de la plataforma. Ahora queda en **Notas** del 360, con un **dueño de cuenta** por empresa y el filtro **Mis cuentas** para trabajar la cartera propia. **Extender prueba** existe porque "Ajustar plan" movía la fecha pero la prueba se seguía calculando desde el alta (arreglado en el back). La **Tendencia** sale del resumen diario de uso (cron nocturno), no de los logs crudos.
+
+**Control de acceso** (aprobado el 2026-10-11): en la ficha, "Acceso de la cuenta" suspende o reactiva a toda la empresa, cierra las sesiones del equipo o transfiere la propiedad. En cada persona, la pestaña **Control** permite verla "como ella" (solo lectura, una hora), suspenderla, cerrar sus sesiones, exportar sus datos y anonimizarla (ARCO). Todo pide motivo o confirmación y queda en Actividad → Kadesh. Detalle en `kadesh-back/docs/operaciones/decisiones.md` y `src/components/impersonation/README.md`.
 
 ### 2026-10-10 — Registro de uso y de lo que abre el admin (Fase 2)
 

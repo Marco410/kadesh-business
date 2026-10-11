@@ -8,6 +8,8 @@
  */
 
 const SESSION_TOKEN_KEY = "keystonejs-session-token";
+/** Marca de "entrar como" (src/components/impersonation): lo que hace el admin no es uso del cliente. */
+const IMPERSONATION_INFO_KEY = "kadesh-impersonation";
 const FLUSH_MS = 10_000;
 const MAX_BATCH = 50;
 
@@ -69,6 +71,14 @@ function isRepeated(key: string, now: number) {
   return false;
 }
 
+function isImpersonating(): boolean {
+  try {
+    return Boolean(window.localStorage.getItem(IMPERSONATION_INFO_KEY));
+  } catch {
+    return false;
+  }
+}
+
 function readToken(): string | null {
   try {
     return window.localStorage.getItem(SESSION_TOKEN_KEY);
@@ -119,7 +129,7 @@ export function trackActivity(
   type: TrackEventType,
   data: { metadata?: TrackMetadata; entityType?: string; entityId?: string; companyId?: string } = {},
 ) {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || isImpersonating()) return;
   const key = JSON.stringify([type, data.metadata ?? null, data.entityId ?? null, data.companyId ?? null]);
   if (isRepeated(key, Date.now())) return;
   listenForPageExit();

@@ -13,6 +13,9 @@ import { Routes } from "kadesh/core/routes";
 import type { AuthenticatedItem } from "kadesh/utils/types";
 import { persistSessionToken } from "./session";
 
+/** Mensaje genérico de @keystone-6/auth cuando el correo o la contraseña no coinciden. */
+const KEYSTONE_AUTH_FAILED = "Authentication failed.";
+
 interface UseLoginOptions {
   redirectTo?: string | null;
 }
@@ -63,8 +66,13 @@ export function useLogin(options?: UseLoginOptions) {
         data.authenticateUserWithPassword.__typename ===
         "UserAuthenticationWithPasswordFailure"
       ) {
+        // Keystone responde "Authentication failed." con datos incorrectos; cualquier otro
+        // mensaje viene del back (p. ej. "Tu acceso a Kadesh está suspendido…") y se muestra tal cual.
+        const serverMessage = data.authenticateUserWithPassword.message;
         setError(
-            "El correo electrónico o la contraseña ingresados son incorrectos. Por favor verifica tus datos e intenta nuevamente."
+          serverMessage && serverMessage !== KEYSTONE_AUTH_FAILED
+            ? serverMessage
+            : "El correo electrónico o la contraseña ingresados son incorrectos. Por favor verifica tus datos e intenta nuevamente."
         );
       }
     },

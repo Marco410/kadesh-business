@@ -16,6 +16,7 @@ import "driver.js/dist/driver.css";
 import "./tour.css";
 import { useUser } from "kadesh/utils/UserContext";
 import { TRACK_EVENT, trackActivity } from "kadesh/utils/activity";
+import { isImpersonating } from "kadesh/components/impersonation";
 import {
   ONBOARDING_LAUNCH_DATE,
   ONBOARDING_STORAGE_PREFIX,
@@ -256,7 +257,13 @@ export function OnboardingProvider({
 
   // Auto-inicio del tutorial de bienvenida para usuarios nuevos dentro del panel.
   useEffect(() => {
-    if (autoStartedRef.current || !userId || !pathname?.startsWith("/panel")) {
+    // Viendo como otra persona (Operaciones): el tour es de ella, no del admin; además no se guardaría.
+    if (
+      autoStartedRef.current ||
+      !userId ||
+      !pathname?.startsWith("/panel") ||
+      isImpersonating()
+    ) {
       return;
     }
     if (hasSeenTour(WELCOME_TOUR_ID)) return;
