@@ -20,3 +20,7 @@ Permite que un admin de Kadesh vea el panel exactamente como lo ve un cliente, p
 ### 2026-10-11 — Solo lectura y una hora
 
 Para soporte basta con ver. En solo lectura no hay riesgo de cambiar datos ni gastar créditos a nombre del cliente. La hora limita el tiempo dentro sin que el admin tenga que acordarse de salir.
+
+## Si el token deja de valer
+
+Si el token de "entrar como" ya no vale (pasó la hora o Kadesh cerró las sesiones de esa persona), el back lo avisa en la respuesta y `SessionEndedListener` (kadesh/components/auth) llama `finishImpersonation`: el admin vuelve a Operaciones con su propia sesión en lugar de quedarse en un panel vacío.

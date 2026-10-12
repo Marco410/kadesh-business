@@ -44,7 +44,7 @@ import { AnimalCard } from "kadesh/components/animals";
 
 ### Auth
 
-Auth is KeystoneJS session-based: a `keystonejs-session-token` is stored in `localStorage` and attached as a `Bearer` header by the Apollo auth link (`src/providers/apollo-client.ts`). `UserProvider`/`useUser()` (`src/utils/UserContext.tsx`) holds the client-side authenticated user, fetched via the `authenticatedItem` GraphQL query. Role checks go through `kadesh/utils/user-roles.ts` (e.g. `isAdminCompanyUser`), checking against `Role` in `constants/constans.ts`. Platform admins can "entrar como" another user from Operaciones: `kadesh/components/impersonation` swaps the session token for a read-only one (the backend blocks every mutation) and keeps the admin token in `kadesh-admin-session-token`.
+Auth is KeystoneJS session-based: a `keystonejs-session-token` is stored in `localStorage` and attached as a `Bearer` header by the Apollo auth link (`src/providers/apollo-client.ts`). `UserProvider`/`useUser()` (`src/utils/UserContext.tsx`) holds the client-side authenticated user, fetched via the `authenticatedItem` GraphQL query. Role checks go through `kadesh/utils/user-roles.ts` (e.g. `isAdminCompanyUser`), checking against `Role` in `constants/constans.ts`. Platform admins can "entrar como" another user from Operaciones: `kadesh/components/impersonation` swaps the session token for a read-only one (the backend blocks every mutation) and keeps the admin token in `kadesh-admin-session-token`. When the backend rejects a token (sessions closed, suspended, expired) it returns `extensions.session`; `SessionEndedListener` (`src/components/auth/`) then clears the token and sends the person to the login with the reason.
 
 ### The panel is a client-rendered SPA, not folder-routed
 

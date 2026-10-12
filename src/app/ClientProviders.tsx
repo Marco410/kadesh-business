@@ -16,6 +16,7 @@ import {
 } from "kadesh/components/consent";
 import { BodyScrollLock } from "kadesh/components/shared";
 import { ImpersonationBanner } from "kadesh/components/impersonation";
+import SessionEndedListener from "kadesh/components/auth/SessionEndedListener";
 import { Toaster } from "sileo";
 import { useTheme } from "next-themes";
 
@@ -78,6 +79,8 @@ export default function ClientProviders({
             <AppShell>{children}</AppShell>
             {/* Solo aparece cuando un admin de Kadesh está viendo el panel como otra persona. */}
             <ImpersonationBanner />
+            {/* Si el back dice que la sesión ya no vale, lleva al login con el motivo. */}
+            <SessionEndedListener />
             <BodyScrollLock />
             <ThemedToaster />
             <SpeedInsights />

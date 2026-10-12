@@ -7,6 +7,8 @@
  * Nunca lanza ni bloquea la UI: si falla, el evento se pierde.
  */
 
+import { notifySessionEnded, readSessionEndNotice } from "kadesh/utils/session-ended";
+
 const SESSION_TOKEN_KEY = "keystonejs-session-token";
 /** Marca de "entrar como" (src/components/impersonation): lo que hace el admin no es uso del cliente. */
 const IMPERSONATION_INFO_KEY = "kadesh-impersonation";
@@ -99,9 +101,16 @@ function send(events: QueuedEvent[], keepalive: boolean) {
       authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ query: TRACK_EVENTS_MUTATION, variables: { events } }),
-  }).catch(() => {
-    // Registro de uso: si no llega, no pasa nada.
-  });
+  })
+    // El latido llega aunque nadie toque el panel: también sirve para notar que la sesión terminó.
+    .then((response) => (keepalive ? null : response.json()))
+    .then((result) => {
+      const notice = readSessionEndNotice(result?.extensions);
+      if (notice) notifySessionEnded(notice);
+    })
+    .catch(() => {
+      // Registro de uso: si no llega, no pasa nada.
+    });
 }
 
 /** Manda lo pendiente ya. `keepalive` para cuando la página se está cerrando. */

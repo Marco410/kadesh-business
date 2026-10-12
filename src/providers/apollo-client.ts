@@ -3,6 +3,7 @@ import { setContext } from "@apollo/client/link/context";
 import { ApolloLink } from "@apollo/client";
 // @ts-ignore
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
+import { notifySessionEnded, readSessionEndNotice } from "kadesh/utils/session-ended";
 
 const SESSION_TOKEN_KEY = "keystonejs-session-token";
 
@@ -18,6 +19,15 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+/** Si el back avisa que el token ya no vale, se avisa a la app (la saca al login). */
+const sessionEndedLink = new ApolloLink((operation, forward) =>
+  forward(operation).map((result) => {
+    const notice = readSessionEndNotice(result.extensions);
+    if (notice) notifySessionEnded(notice);
+    return result;
+  }),
+);
+
 const uploadLink = createUploadLink({
   uri: process.env.NEXT_PUBLIC_API_URL,
   credentials: "include",
@@ -28,7 +38,7 @@ const uploadLink = createUploadLink({
 
 export const createApolloClient = () => {
   return new ApolloClient({
-    link: ApolloLink.from([authLink, uploadLink]),
+    link: ApolloLink.from([authLink, sessionEndedLink, uploadLink]),
     cache: new InMemoryCache({
       typePolicies: {
         Query: {

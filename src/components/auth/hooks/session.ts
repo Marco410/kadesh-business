@@ -15,3 +15,16 @@ export function persistSessionToken(sessionToken: string) {
   const isSecure = window.location.protocol === 'https:';
   document.cookie = `keystonejs-session=${sessionToken}; expires=${expires.toUTCString()}; path=/; SameSite=Lax${isSecure ? '; Secure' : ''}`;
 }
+
+/** Param del login que dice por qué terminó la sesión (`?sesion=expired`). Lo pone `SessionEndedListener`. */
+export const SESSION_ENDED_PARAM = 'sesion';
+
+/** Aviso del login cuando Kadesh sacó a la persona del panel (motivo que manda el back). */
+export function sessionEndedMessage(status: string | null | undefined): string | null {
+  if (!status) return null;
+  if (status === 'suspended') {
+    return 'Tu acceso a Kadesh está suspendido. Escríbenos a contacto@kadesh.com.mx para revisarlo.';
+  }
+  if (status === 'anonymized') return 'Esta cuenta ya no está disponible.';
+  return 'Tu sesión expiró. Vuelve a iniciar sesión.';
+}
