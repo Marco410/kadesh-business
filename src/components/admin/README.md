@@ -116,6 +116,14 @@ Nunca muestra prompts de IA, cuerpos de WhatsApp ni contraseñas.
 
 Todo sin cuentas de prueba interna ni las empresas del equipo de Kadesh: no son clientes.
 
+## Novedades
+
+`?tab=novedades`: lo nuevo de la plataforma (`SystemRelease`). Lista con filtros **Estado** (publicadas, borradores) y **Producto** (Negocios, Pet, Ambas). **Nueva novedad** abre el editor: versión, fecha, para quién es, título y notas con **Vista previa** (igual que en Novedades del panel: párrafos, listas con "- " y **negritas**).
+
+- **Guardar borrador**: solo lo ve Kadesh.
+- **Publicar y avisar**: pide confirmar y dice a quién le llega el correo antes de mandarlo. Quitando "Avisar por correo al publicar" se publica sin correo.
+- El correo sale una sola vez, al pasar a publicada; editar una publicada no lo vuelve a mandar (ver `kadesh-back/models/SystemRelease/README.md`).
+
 ## Planes (catálogo)
 
 `?tab=planes` tiene dos vistas:

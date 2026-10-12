@@ -7,6 +7,7 @@ export const ADMIN_TABS = {
   ANALYTICS: "analitica",
   PLANS: "planes",
   CONTENT: "contenido",
+  RELEASES: "novedades",
   PET_PLACES: "veterinarias",
 } as const;
 
@@ -46,6 +47,11 @@ export const ADMIN_TAB_ITEMS: Array<{
     id: ADMIN_TABS.CONTENT,
     label: "Contenido",
     description: "Blog y correos",
+  },
+  {
+    id: ADMIN_TABS.RELEASES,
+    label: "Novedades",
+    description: "Lo nuevo de la plataforma para tus clientes",
   },
   {
     id: ADMIN_TABS.PET_PLACES,
@@ -578,6 +584,7 @@ export const ADMIN_SCOPED_PARAMS = [
   "dias",
   "meses",
   "umbral",
+  "producto",
 ] as const;
 
 /** Arma un enlace interno de Operaciones (siempre sobre `Routes.panelAdmin`). */
