@@ -9,6 +9,7 @@ import ApolloProviderWrapper from "../providers/ApolloProviderWrapper";
 import { ThemeProvider } from "../providers/ThemeProvider";
 import { UserProvider } from "kadesh/utils/UserContext";
 import {
+  AttributionTracker,
   CookieConsentProvider,
   CookieConsentBanner,
   MetaPixelLoader,
@@ -85,6 +86,8 @@ export default function ClientProviders({
       </ThemeProvider>
       <CookieConsentBanner />
       <MetaPixelLoader />
+      {/* De dónde llegó (UTM, sitio que la mandó): se manda al registrarse. */}
+      <AttributionTracker />
     </CookieConsentProvider>
   );
 }

@@ -17,6 +17,7 @@ import {
 } from "../../../ui";
 import type { AdminCompanyInsights, AdminCompanyProfile } from "../../clients-queries";
 import TrendsCard from "./TrendsCard";
+import CompanyHealthCard from "../../../analytics/CompanyHealthCard";
 import {
   daysSince,
   daysUntil,
@@ -231,6 +232,8 @@ export default function CompanySummary({
           </ul>
         )}
       </AdminSectionCard>
+
+      <CompanyHealthCard companyId={company.id} />
 
       {insightsError ? (
         <AdminErrorState message="No se pudieron cargar las métricas de uso." />

@@ -40,6 +40,7 @@ import {
   type AdminCompanyListItem,
 } from "./clients-queries";
 import { lastAccessAt } from "./company/format";
+import { HealthBadge, HealthSignals } from "../analytics/HealthBadge";
 
 export function subscriptionStatusLabel(status: string | null | undefined) {
   if (!status) return "Sin plan";
@@ -215,8 +216,18 @@ export default function AdminCompaniesList() {
                         {company.owner?.email ? ` · ${company.owner.email}` : ""}
                       </p>
                     </div>
-                    <SubscriptionStatusBadge status={company.subscriptionStatus} />
+                    <div className="flex shrink-0 flex-col items-end gap-1">
+                      <SubscriptionStatusBadge status={company.subscriptionStatus} />
+                      {company.health ? (
+                        <HealthBadge score={company.health.score} label={company.health.label} showLabel />
+                      ) : null}
+                    </div>
                   </div>
+                  {company.health?.flags.length ? (
+                    <div className="mt-2">
+                      <HealthSignals flags={company.health.flags} compact />
+                    </div>
+                  ) : null}
                   <div className="mt-3">
                     <CreditsCell company={company} />
                   </div>
@@ -234,11 +245,12 @@ export default function AdminCompaniesList() {
           </ul>
 
           <div className={`${surfaceClass} relative hidden overflow-x-auto md:block`}>
-            <table className="w-full min-w-[920px] text-left text-sm">
+            <table className="w-full min-w-[1020px] text-left text-sm">
               <thead className="border-b border-[#e8e8e8] text-xs uppercase tracking-wide text-[#616161] dark:border-[#333] dark:text-[#b0b0b0]">
                 <tr>
                   <th className="px-4 py-3">Empresa</th>
                   <th className="px-4 py-3">Plan</th>
+                  <th className="px-4 py-3">Salud</th>
                   <th className="px-4 py-3">Créditos del mes</th>
                   <th className="px-4 py-3">Equipo</th>
                   <th className="px-4 py-3">Leads</th>
@@ -296,6 +308,20 @@ export default function AdminCompaniesList() {
                       {periodHint(company) ? (
                         <p className="mt-1 text-xs text-[#9e9e9e]">{periodHint(company)}</p>
                       ) : null}
+                    </td>
+                    <td className="px-4 py-3 align-top">
+                      {company.health ? (
+                        <>
+                          <HealthBadge score={company.health.score} label={company.health.label} />
+                          {company.health.flags.length ? (
+                            <div className="mt-1.5">
+                              <HealthSignals flags={company.health.flags} compact />
+                            </div>
+                          ) : null}
+                        </>
+                      ) : (
+                        <span className="text-xs text-[#9e9e9e]">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 align-top">
                       <CreditsCell company={company} />

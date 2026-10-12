@@ -22,6 +22,7 @@ import AdminOverview from "./AdminOverview";
 import { AdminTabBar } from "./ui";
 import AdminClientsSection from "./clients/AdminClientsSection";
 import AdminActivityPanel from "./activity/AdminActivityPanel";
+import AdminAnalyticsSection from "./analytics/AdminAnalyticsSection";
 import AdminPlansPanel from "./AdminPlansPanel";
 import AdminContentSection from "./AdminContentSection";
 import AdminPetPlacesPanel, {
@@ -152,8 +153,9 @@ function AdminDashboardContent() {
           Operaciones
         </h1>
         <p className="text-[#616161] dark:text-[#b0b0b0] mt-1 max-w-2xl">
-          Clientes y lo que hacen en Kadesh, planes, contenido y fichas del
-          directorio. Lo que cambies aquí aplica de inmediato.
+          Clientes y lo que hacen en Kadesh, cómo va el negocio, planes,
+          contenido y fichas del directorio. Lo que cambies aquí aplica de
+          inmediato.
         </p>
       </header>
 
@@ -173,6 +175,7 @@ function AdminDashboardContent() {
       ) : null}
       {tab === ADMIN_TABS.CLIENTS ? <AdminClientsSection /> : null}
       {tab === ADMIN_TABS.ACTIVITY ? <AdminActivityPanel /> : null}
+      {tab === ADMIN_TABS.ANALYTICS ? <AdminAnalyticsSection /> : null}
       {tab === ADMIN_TABS.PLANS ? (
         <AdminPlansPanel vista={plansVista} onVistaChange={setPlansVista} />
       ) : null}

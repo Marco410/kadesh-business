@@ -4,7 +4,7 @@ Pantalla interna en `/panel/clientes/admin`. No es el panel de un cliente: es de
 
 ## Promesa
 
-Ver y controlar a cada **cliente** en 360° (empresa, plan y pagos, equipo, CRM, consumo, integraciones y lo que hace cada persona), seguir la **actividad** de toda la plataforma, y ajustar el **catálogo de planes**, el **contenido** (blog y correos) y las **fichas de veterinarias**. El default es Inicio. Las secciones viven en `?tab=clientes`, `?tab=actividad`, `?tab=planes`, `?tab=contenido` y `?tab=veterinarias`.
+Ver y controlar a cada **cliente** en 360° (empresa, plan y pagos, equipo, CRM, consumo, integraciones y lo que hace cada persona), seguir la **actividad** de toda la plataforma, y ajustar el **catálogo de planes**, el **contenido** (blog y correos) y las **fichas de veterinarias**. El default es Inicio. Las secciones viven en `?tab=clientes`, `?tab=actividad`, `?tab=analitica`, `?tab=planes`, `?tab=contenido` y `?tab=veterinarias`.
 
 Los enlaces viejos (`?tab=usuarios`, `suscripciones`, `empresas`, `blog`, `correos`) se redirigen solos a la sección nueva (`normalizeLegacyAdminParams` en `constants.ts`).
 
@@ -18,7 +18,7 @@ El enlace **Operaciones** aparece en el menú del avatar y, de forma discreta, a
 
 Antes las tabs, la vista Fichas/Servicios y los filtros eran la misma píldora y no se distinguían. Ahora cada nivel tiene su propio componente en `ui.tsx`:
 
-1. **Secciones** (Inicio, Clientes, Actividad, Planes, Contenido, Veterinarias) — `AdminTabBar`: texto con subrayado naranja en la activa, no píldoras.
+1. **Secciones** (Inicio, Clientes, Actividad, Analítica, Planes, Contenido, Veterinarias) — `AdminTabBar`: texto con subrayado naranja en la activa, no píldoras.
 2. **Vista dentro de una sección** (Empresas / Personas, Fichas / Servicios, Artículos / … / Correos) — `AdminSegmented`: control segmentado, opción activa como pastilla blanca. Hace scroll horizontal en móvil.
 3. **Filtros de una tabla** (estado, rol, tipo) — `AdminFilterChips`: chips pequeños, activo con tinte naranja (no relleno sólido), con etiqueta (**Estado**, **Rol**, **Tipo**) para que se lea qué filtran.
 
@@ -36,7 +36,7 @@ Decimos **Operaciones**, **planes**, **fichas**, **servicios**, **verificar**. N
 
 KPIs de operación (`adminOpsSummary`): empresas activas, en prueba (cuántas vencen en ≤3 días), pagos con problema, registros y accesos de 7 días, extracciones fallidas en 24 h, créditos consumidos del mes y MRR estimado. Cada KPI lleva a la vista filtrada.
 
-**Requiere atención**: empresas con pago vencido o no pagado, prueba terminada o por vencer, sin créditos, extracciones fallando, intentos de pago sin completar o plan activo sin accesos en 14 días. Clic → 360 de la empresa.
+**Requiere atención**: empresas con pago vencido o no pagado, prueba terminada o por vencer, sin créditos, extracciones fallando, intentos de pago sin completar o plan activo sin accesos en 14 días. Desde la Fase 4 también **Riesgo de baja** (el uso cayó, salud baja o prueba en la que nadie entra) y **Oportunidad de venta** (sin créditos antes del día 20, vio módulos de otro plan o prueba con buen uso), sin repetir lo que ya sale por otro motivo. Clic → 360 de la empresa.
 
 **Ahorro en búsquedas**: qué porcentaje de los leads del mes salió de la base de Kadesh (negocios que ya existían, por los que no se le pagó otra vez a Google Maps ni a INEGI) contra los que se tuvieron que buscar. Sale de `TechLeadSyncLog` (`alreadyInDb` contra `created`). El mismo dato por empresa está en el 360 → Consumo → Extracciones.
 
@@ -46,7 +46,7 @@ KPIs de operación (`adminOpsSummary`): empresas activas, en prueba (cuántas ve
 
 Junta lo que antes eran Usuarios (Cuentas / Suscripciones) y Empresas (Empresas / Sync): las cuatro eran vistas del mismo cliente. Dos vistas en `?tab=clientes`:
 
-- **Empresas** (default, `adminCompanies`): un solo buscador que también encuentra a la empresa por el correo o nombre de cualquier integrante. Chips de **Estado** con conteo (estado vigente = la suscripción más reciente) reemplazan la lista de Suscripciones. **Orden**: alta reciente, último acceso o nombre. Toda la fila abre el 360 (ya no hay botón naranja por fila). "Último acceso" es lo más reciente entre el último login y la última vez que alguien del equipo tuvo el panel abierto (latido).
+- **Empresas** (default, `adminCompanies`): un solo buscador que también encuentra a la empresa por el correo o nombre de cualquier integrante. Chips de **Estado** con conteo (estado vigente = la suscripción más reciente) reemplazan la lista de Suscripciones. **Orden**: alta reciente, último acceso, salud (peor primero) o nombre. Columna **Salud** con el puntaje y sus señales (vacía hasta que haya resumen diario). Toda la fila abre el 360 (ya no hay botón naranja por fila). "Último acceso" es lo más reciente entre el último login y la última vez que alguien del equipo tuvo el panel abierto (latido).
 - **Personas** (`&vista=personas`): cuentas con rol, empresa, alta y último acceso. Filtros **Rol** y **Empresa** (con / sin). Clic en alguien con empresa abre el 360 de su empresa con esa persona en foco; sin empresa abre su ficha.
 
 Filtro **Cuentas** (`&cuentas=mias`): solo las empresas cuyo dueño de cuenta en Kadesh es quien está viendo. Cada fila dice "Cuenta de …" cuando tiene dueño.
@@ -60,7 +60,7 @@ Búsqueda, filtros y página viven en la URL (`q`, `estado`, `orden`, `cuentas`,
 - **Ficha** (izquierda, fija): plan y estado, cuándo vence la prueba o renueva, créditos del mes con barra, equipo, contacto, respuestas del onboarding, IDs copiables y **Ver en Stripe**. Acciones: **Ajustar plan** (módulos, fechas y créditos extra; el mismo editor de antes), **Enviar correo** (abre Contenido → Correos con el equipo como destinatarios) y, solo con plan gratuito, **Extender prueba** (+7, +14, +30 días o hasta una fecha; si ya venció, vuelve a "en prueba"). Abajo, **Dueño de cuenta en Kadesh** (quién del equipo lleva al cliente).
 - **Persona en foco** (`persona`): franja con sus roles, último acceso, accesos y última acción; **Editar persona** abre el panel lateral (Perfil · Accesos · Actividad) y **Ver su actividad** filtra el feed.
 - **Secciones**:
-  - **Resumen**: alertas, uso de 30 días, **Tendencia** (minutos por semana de las últimas 12 y las últimas 4 semanas contra la mediana de las empresas de su plan; con menos de 3 empresas no se compara), **Cómo usan el panel** (tiempo activo, personas que entraron, clics en mejorar plan, exportaciones, secciones que más abren y módulos bloqueados que vieron; se oculta hasta que el back tenga la migración de la Fase 2), pipeline, créditos por semana y actividad reciente.
+  - **Resumen**: alertas, **Salud** (puntaje, tendencia, señales y de dónde sale cada punto; no aparece sin resumen diario), uso de 30 días, **Tendencia** (minutos por semana de las últimas 12 y las últimas 4 semanas contra la mediana de las empresas de su plan; con menos de 3 empresas no se compara), **Cómo usan el panel** (tiempo activo, personas que entraron, clics en mejorar plan, exportaciones, secciones que más abren y módulos bloqueados que vieron; se oculta hasta que el back tenga la migración de la Fase 2), pipeline, créditos por semana y actividad reciente.
   - **Actividad**: línea de tiempo de la empresa, filtrable por tipo y por persona.
   - **CRM**: Leads (con etapa, oportunidad y vendedor de *esta* empresa; clic abre una vista rápida de solo lectura) · Pipeline · Cotizaciones · Seguimiento (actividades, seguimientos, tareas y propuestas) · Espacios.
   - **Consumo**: Créditos (periodos por mes + movimientos) · Extracciones · IA (las conversaciones se abren una por una con **Ver conversación**).
@@ -101,6 +101,19 @@ Accesos es el historial de `UserAuthLog` (logins, altas e intentos fallidos), es
 - **Navegación**: secciones del panel que abren, módulos bloqueados que ven, tours. Es mucho volumen, por eso **Todo** no la incluye: solo sale al elegirla.
 
 Nunca muestra prompts de IA, cuerpos de WhatsApp ni contraseñas.
+
+## Analítica
+
+`?tab=analitica`: cómo va el negocio, no una empresa. Seis vistas (`AdminSegmented`, `&vista=`); cambiar de vista limpia sus filtros.
+
+- **Salud** (default, `adminHealth`): puntaje de 0 a 100 de cada cuenta viva con las últimas 4 semanas. Tarjetas con conteo de **Sana / Por observar / En riesgo** y de las señales **Riesgo de baja / Oportunidad de venta** (clic = filtro). Buscador, filtros **Nivel**, **Señal**, **Orden** (peor salud, mayor caída, mejor salud, nombre) y **Cuentas** (mis cuentas). Cada fila muestra puntaje, tendencia, señales con su motivo, las 5 partes en barras y cuántos del equipo entraron. Abajo, **¿Cómo se calcula la salud?** con la regla en palabras.
+- **Activación** (`adminActivationFunnel`): de las registradas en el periodo (`&dias=`), qué parte llegó a cada paso y la mediana de días; tabla por mes de registro. Cada paso se cuenta por separado (hay quien paga sin cotizar).
+- **Retención** (`adminCohorts`): tabla por mes de registro con el % que usó Kadesh cada mes después (más uso, más intenso el naranja). `&meses=6|12`.
+- **Uso** (`adminEngagement`): activas al día (promedio), en la semana, en el mes, qué tanto vuelven (DAU ÷ MAU), empresas activas, barras por día, módulos que usa cada plan y secciones más abiertas. Hasta ayer: hoy va a medias.
+- **Demanda** (`adminDemandGaps`): extracciones con pocos resultados (`&umbral=0|5|10`) por giro + zona, por giro y por zona, con enlace a Google Maps.
+- **Adquisición** (`adminAcquisition`): empresas por canal, página de entrada y campaña, con cuántas extrajeron y pagaron. El origen lo guarda el front al registrarse (`kadesh/utils/attribution`); las anteriores salen como "Sin dato".
+
+Todo sin cuentas de prueba interna ni las empresas del equipo de Kadesh: no son clientes.
 
 ## Planes (catálogo)
 
@@ -171,6 +184,17 @@ Asunto, título de cabecera, etiqueta superior, vista previa de bandeja, cuerpo,
 La columna derecha es vista previa en vivo. **Revisar y enviar** primero cuenta destinatarios (`dryRun`) y pide confirmación antes del envío real. Mutación `sendAdminBroadcastEmail` (solo admin de plataforma).
 
 ## Decisiones
+
+### 2026-10-11 — Analítica (Fase 4)
+
+El equipo necesitaba decidir a quién llamar (riesgo de baja), a quién venderle más y qué canales traen clientes que sí usan y pagan. Se agregó la sección **Analítica** y la salud aparece donde ya se trabaja: lista de Empresas, Resumen del 360 y "Requiere atención" de Inicio.
+
+- La salud es una regla simple que se puede explicar (por eso está **¿Cómo se calcula?** en la misma pantalla), no un modelo: con pocas empresas un modelo no sería confiable.
+- Sin resumen diario la salud no se muestra en ningún lado: saldría en ceros y engañaría.
+- Las señales traen el motivo en palabras ("Nadie entra hace 18 días"), no solo la etiqueta, para saber qué decir al llamar.
+- En Uso, las barras por día no llevan fecha en cada una (con 30–90 días no caben en un teléfono): solo los extremos y la fecha al pasar el cursor.
+
+Detalle del back en `kadesh-back/docs/operaciones/decisiones.md`.
 
 ### 2026-10-11 — Notas, dueño de cuenta, extender prueba y tendencia (Fase 3)
 

@@ -4,6 +4,7 @@ export const ADMIN_TABS = {
   OVERVIEW: "inicio",
   CLIENTS: "clientes",
   ACTIVITY: "actividad",
+  ANALYTICS: "analitica",
   PLANS: "planes",
   CONTENT: "contenido",
   PET_PLACES: "veterinarias",
@@ -30,6 +31,11 @@ export const ADMIN_TAB_ITEMS: Array<{
     id: ADMIN_TABS.ACTIVITY,
     label: "Actividad",
     description: "Lo que pasa en la plataforma, de todas las empresas",
+  },
+  {
+    id: ADMIN_TABS.ANALYTICS,
+    label: "Analítica",
+    description: "Salud, activación, retención, uso, demanda y de dónde llegan",
   },
   {
     id: ADMIN_TABS.PLANS,
@@ -165,6 +171,7 @@ export function parseCompanyStatusFilter(value: string | null): CompanyStatusFil
 export const COMPANY_SORT_OPTIONS = [
   { value: "recent", label: "Alta reciente" },
   { value: "activity", label: "Último acceso" },
+  { value: "health", label: "Salud (peor primero)" },
   { value: "name", label: "Nombre" },
 ] as const;
 
@@ -264,6 +271,112 @@ export const ATTENTION_REASON_LABELS: Record<string, string> = {
   sync_failures: "Extracciones fallando",
   checkout_failed: "Pago sin completar",
   inactive: "Sin actividad",
+  churn_risk: "Riesgo de baja",
+  upsell: "Oportunidad de venta",
+};
+
+/** Vistas de Analítica (`&vista=`). */
+export const ANALYTICS_VISTAS = {
+  HEALTH: "salud",
+  ACTIVATION: "activacion",
+  RETENTION: "retencion",
+  ENGAGEMENT: "uso",
+  DEMAND: "demanda",
+  ACQUISITION: "adquisicion",
+} as const;
+
+export type AnalyticsVista = (typeof ANALYTICS_VISTAS)[keyof typeof ANALYTICS_VISTAS];
+
+export const ANALYTICS_VISTA_ITEMS: Array<{ id: AnalyticsVista; label: string }> = [
+  { id: ANALYTICS_VISTAS.HEALTH, label: "Salud" },
+  { id: ANALYTICS_VISTAS.ACTIVATION, label: "Activación" },
+  { id: ANALYTICS_VISTAS.RETENTION, label: "Retención" },
+  { id: ANALYTICS_VISTAS.ENGAGEMENT, label: "Uso" },
+  { id: ANALYTICS_VISTAS.DEMAND, label: "Demanda" },
+  { id: ANALYTICS_VISTAS.ACQUISITION, label: "Adquisición" },
+];
+
+export function parseAnalyticsVista(value: string | null): AnalyticsVista {
+  return ANALYTICS_VISTA_ITEMS.find((item) => item.id === value)?.id ?? ANALYTICS_VISTAS.HEALTH;
+}
+
+/** Nivel de salud (`label` de `adminHealth`). `slug` va en la URL (`&nivel=`). */
+export const HEALTH_LEVELS = [
+  { slug: "sana", value: "healthy", label: "Sana" },
+  { slug: "observar", value: "watch", label: "Por observar" },
+  { slug: "riesgo", value: "risk", label: "En riesgo" },
+] as const;
+
+export const HEALTH_LEVEL_LABELS: Record<string, string> = Object.fromEntries(
+  HEALTH_LEVELS.map((level) => [level.value, level.label]),
+);
+
+export const HEALTH_LEVEL_CLASSES: Record<string, string> = {
+  healthy: "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300",
+  watch: "bg-amber-500/15 text-amber-800 dark:text-amber-300",
+  risk: "bg-red-500/15 text-red-700 dark:text-red-300",
+};
+
+/** Señales de la salud (`flags[].key`). `slug` va en la URL (`&senal=`). */
+export const HEALTH_SIGNALS = [
+  { slug: "baja", value: "churn_risk", label: "Riesgo de baja" },
+  { slug: "venta", value: "upsell", label: "Oportunidad de venta" },
+] as const;
+
+export const HEALTH_SIGNAL_LABELS: Record<string, string> = Object.fromEntries(
+  HEALTH_SIGNALS.map((signal) => [signal.value, signal.label]),
+);
+
+export const HEALTH_TREND_LABELS: Record<string, string> = {
+  up: "Subiendo",
+  down: "Bajando",
+  stable: "Estable",
+  new: "Nueva",
+  inactive: "Sin uso",
+};
+
+/** Partes de la salud y su máximo (mismo orden que en el back). */
+export const HEALTH_COMPONENTS = [
+  { key: "activity", label: "Constancia", max: 30, hint: "Días con actividad" },
+  { key: "adoption", label: "Equipo", max: 15, hint: "Parte del equipo que entra" },
+  { key: "usage", label: "Uso", max: 25, hint: "Extracciones, CRM, cotizaciones, WhatsApp" },
+  { key: "engagement", label: "Tiempo", max: 15, hint: "Minutos con el panel abierto por persona" },
+  { key: "billing", label: "Pago", max: 15, hint: "Plan activo y sin pagos fallidos" },
+] as const;
+
+export const HEALTH_SORT_OPTIONS = [
+  { value: "risk", label: "Peor salud" },
+  { value: "drop", label: "Mayor caída" },
+  { value: "best", label: "Mejor salud" },
+  { value: "name", label: "Nombre" },
+] as const;
+
+export type HealthSort = (typeof HEALTH_SORT_OPTIONS)[number]["value"];
+
+export function parseHealthSort(value: string | null): HealthSort {
+  return HEALTH_SORT_OPTIONS.find((option) => option.value === value)?.value ?? "risk";
+}
+
+/** Periodos (días) de las vistas de Analítica. */
+export const ANALYTICS_DAY_OPTIONS = [
+  { value: "30", label: "30 días" },
+  { value: "90", label: "90 días" },
+  { value: "180", label: "6 meses" },
+  { value: "365", label: "1 año" },
+] as const;
+
+export function parseAnalyticsDays(value: string | null, fallback = "90"): string {
+  return ANALYTICS_DAY_OPTIONS.find((option) => option.value === value)?.value ?? fallback;
+}
+
+/** Módulos de `adminEngagement.plans[].modules`. */
+export const PRODUCT_MODULE_LABELS: Record<string, string> = {
+  extraction: "Extracción",
+  crm: "Pipeline y leads",
+  activities: "Actividades",
+  quotations: "Cotizaciones",
+  whatsapp: "WhatsApp",
+  ai: "IA",
 };
 
 /** Pasos de `UserAuthLog` (historial de accesos). */
@@ -454,6 +567,11 @@ export const ADMIN_SCOPED_PARAMS = [
   "tipo",
   "error",
   "para",
+  "nivel",
+  "senal",
+  "dias",
+  "meses",
+  "umbral",
 ] as const;
 
 /** Arma un enlace interno de Operaciones (siempre sobre `Routes.panelAdmin`). */

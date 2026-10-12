@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import type { AdminHealthBrief } from "../analytics/analytics-queries";
 
 /* ───────────────────────── Lista de empresas ───────────────────────── */
 
@@ -38,6 +39,17 @@ export const ADMIN_COMPANIES_LIST_QUERY = gql`
           email
         }
         suspendedAt
+        health {
+          score
+          label
+          trend
+          changePct
+          flags {
+            key
+            reason
+            label
+          }
+        }
       }
       total
       statusCounts {
@@ -81,6 +93,8 @@ export type AdminCompanyListItem = {
   accountManager: AdminPersonRef | null;
   /** Si Kadesh suspendió el acceso de la empresa. */
   suspendedAt: string | null;
+  /** Salud de las últimas 4 semanas; null mientras no haya resumen diario. */
+  health: AdminHealthBrief | null;
 };
 
 export type AdminCompaniesListResponse = {

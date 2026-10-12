@@ -27,3 +27,13 @@ Ambos providers se montan desde `ClientProviders` (marketing + `/panel`).
 4. Deberías ver `PageView`. Conversiones custom: ver `NEXT_PUBLIC_META_PIXEL_TEST_EVENT_CODE` en `facebook-pixel.ts`.
 
 El mensaje “A pixel wasn't detected” con el setup anterior era porque el script **solo** se inyectaba tras aceptar, y el checker de Meta no acepta el banner.
+
+## Origen del registro (`AttributionTracker`)
+
+Desde 2026-10-11, `AttributionTracker` guarda de dónde llegó la persona (primer contacto): `utm_*` de la URL, el dominio del sitio que la mandó y la primera página que vio. Lo guarda en `localStorage` (`kadesh-attribution`, 90 días) con `kadesh/utils/attribution` y se manda una sola vez, al registrarse. Operaciones → Analítica → Adquisición lo usa para ver qué canales traen clientes que usan y pagan.
+
+- Es analítica del sitio, así que **si la persona rechazó las cookies no se guarda nada** y se borra lo que hubiera. Mientras no decide, sí se guarda: es de Kadesh, no sale a terceros y solo se envía si se registra (consentimiento tácito; tiene que estar en el Aviso de privacidad).
+- Primer contacto: si ya hay uno guardado no se pisa.
+- Del referrer solo el dominio y de la página la ruta sin query: la URL completa puede traer datos de la persona.
+- Dentro de `/panel` y `/admin` no se guarda: ya es cliente.
+- Si el back todavía no acepta `attribution` (el front salió antes), el registro se reintenta sin ese dato y no se rompe (`isAttributionArgumentError`).

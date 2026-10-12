@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMutation } from '@apollo/client';
 import {
   AUTHENTICATE_USER_MUTATION,
+  REGISTER_USER_LEGACY_MUTATION,
   REGISTER_USER_MUTATION,
   type RegisterUserVariables,
   type RegisterUserResponse,
@@ -12,6 +13,7 @@ import {
   type AuthenticateUserResponse,
 } from 'kadesh/utils/queries';
 import { useUser } from 'kadesh/utils/UserContext';
+import { isAttributionArgumentError, readAttribution } from 'kadesh/utils/attribution';
 import type { AuthenticatedItem } from 'kadesh/utils/types';
 import {
   setRegisterSuccessUrl,
@@ -89,6 +91,11 @@ export function useRegister(options?: UseRegisterOptions) {
     RegisterUserVariables
   >(REGISTER_USER_MUTATION);
 
+  const [registerUserLegacy, { loading: legacyLoading }] = useMutation<
+    RegisterUserResponse,
+    RegisterUserVariables
+  >(REGISTER_USER_LEGACY_MUTATION);
+
   const clearForm = () => {
     setName('');
     setLastName('');
@@ -158,20 +165,25 @@ export function useRegister(options?: UseRegisterOptions) {
 
     setIsSubmitting(true);
     try {
-      await registerUser({
-        variables: {
-          data: {
-            name,
-            lastName,
-            email,
-            password,
-            phone: phone || undefined,
-            product: 'saas',
-          },
-          referrerCode: referralCode || null,
-          companyName: companyName.trim(),
+      const variables: RegisterUserVariables = {
+        data: {
+          name,
+          lastName,
+          email,
+          password,
+          phone: phone || undefined,
+          product: 'saas',
         },
-      });
+        referrerCode: referralCode || null,
+        companyName: companyName.trim(),
+      };
+      try {
+        await registerUser({ variables: { ...variables, attribution: readAttribution() } });
+      } catch (attributionErr) {
+        // Back sin `attribution` todavía: se registra igual, sin el dato de origen.
+        if (!isAttributionArgumentError(attributionErr)) throw attributionErr;
+        await registerUserLegacy({ variables });
+      }
 
       setRegisterSuccessUrl(router);
       trackCompleteRegistration();
@@ -220,7 +232,7 @@ export function useRegister(options?: UseRegisterOptions) {
     setReferralCode,
     error,
     setError,
-    loading: loading || isSubmitting,
+    loading: loading || legacyLoading || isSubmitting,
     handleSubmit,
   };
 }
