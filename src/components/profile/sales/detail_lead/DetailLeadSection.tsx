@@ -43,15 +43,9 @@ import { useUser } from "kadesh/utils/UserContext";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { hasPlanFeature } from "../helpers/plan-features";
 import { useSubscription } from "../SubscriptionContext";
-import {
-  can,
-  canViewCompanyWideLeads,
-} from "kadesh/components/profile/usuarios/can";
+import { can } from "kadesh/components/profile/usuarios/can";
 import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
-import {
-  pickCanonicalLeadStatus,
-  primaryAssignedSalesPersonId,
-} from "kadesh/components/profile/sales/helpers/canonical-lead-status";
+import { companyLeadStatus } from "kadesh/components/profile/sales/helpers/company-lead-status";
 
 function whatsappDigitsFromPhone(raw: string): string | null {
   const digits = raw.replace(/\D/g, "");
@@ -143,26 +137,11 @@ export default function DetailLeadSection() {
   });
 
   const companyId = userCompanyData?.user?.company?.id ?? null;
-  const hasCompanyWideLeadScope = canViewCompanyWideLeads(user);
   const canEditLead = can(user, PERMISSION_KEYS.CLIENTES_EDITAR, () => true);
 
-  /**
-   * Alcance empresa: todos los status de la company (para elegir el canónico).
-   * Vendedor: solo el suyo.
-   */
+  // Estatus compartido de la empresa (uno por lead): todo el equipo ve y edita el mismo.
   const statusWhere =
-    companyId != null
-      ? hasCompanyWideLeadScope
-        ? { saasCompany: { id: { equals: companyId } } }
-        : user?.id
-          ? {
-              AND: [
-                { saasCompany: { id: { equals: companyId } } },
-                { salesPerson: { id: { equals: user.id } } },
-              ],
-            }
-          : { saasCompany: { id: { equals: companyId } } }
-      : undefined;
+    companyId != null ? { saasCompany: { id: { equals: companyId } } } : undefined;
 
   const salesPersonWhere2 =
     companyId != null ? { company: { id: { equals: companyId } } } : {};
@@ -206,7 +185,7 @@ export default function DetailLeadSection() {
   const projectsList = lead?.projects ?? [];
   const projectsCount = projectsList.length;
   const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
-  const status = pickCanonicalLeadStatus(lead?.status, lead?.salesPerson);
+  const status = companyLeadStatus(lead?.status);
   const [pipelineStatus, setPipelineStatus] = useState("");
   const [notes, setNotes] = useState("");
   const [facebook, setFacebook] = useState("");
@@ -309,17 +288,6 @@ export default function DetailLeadSection() {
     const nextFirstContact = firstContactDate.trim().slice(0, 10);
     if (nextFirstContact) statusData.firstContactDate = nextFirstContact;
     if (productOffered.length > 0) statusData.productOffered = productOffered;
-    if (companyId) statusData.saasCompany = { connect: { id: companyId } };
-
-    const assignedSellerId = primaryAssignedSalesPersonId(lead?.salesPerson);
-    if (hasCompanyWideLeadScope) {
-      // Escribir el canónico: vendedor asignado, no el editor (Gerencia/admin).
-      if (assignedSellerId) {
-        statusData.salesPerson = { connect: { id: assignedSellerId } };
-      }
-    } else if (user?.id) {
-      statusData.salesPerson = { connect: { id: user.id } };
-    }
 
     if (status) {
       await updateStatus({
@@ -332,6 +300,7 @@ export default function DetailLeadSection() {
       variables: {
         data: {
           businessLead: { connect: { id } },
+          ...(companyId ? { saasCompany: { connect: { id: companyId } } } : {}),
           ...statusData,
         },
       },

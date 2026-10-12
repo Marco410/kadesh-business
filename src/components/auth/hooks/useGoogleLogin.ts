@@ -4,10 +4,12 @@ import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
 import {
+  AUTHENTICATE_USER_WITH_GOOGLE_LEGACY_MUTATION,
   AUTHENTICATE_USER_WITH_GOOGLE_MUTATION,
   type AuthenticateUserWithGoogleResponse,
   type AuthenticateUserWithGoogleVariables,
 } from "kadesh/utils/queries";
+import { isAttributionArgumentError, readAttribution } from "kadesh/utils/attribution";
 import { useUser } from "kadesh/utils/UserContext";
 import { Routes } from "kadesh/core/routes";
 import type { AuthenticatedItem } from "kadesh/utils/types";
@@ -55,67 +57,92 @@ export function useGoogleLogin(options?: UseGoogleLoginOptions) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const renderedOnContainerRef = useRef<HTMLDivElement | null>(null);
 
+  /** Último intento, para reintentarlo sin `attribution` si el back todavía no la acepta. */
+  const lastRequest = useRef<AuthenticateUserWithGoogleVariables | null>(null);
+
+  const handleCompleted = async (data: AuthenticateUserWithGoogleResponse) => {
+    const result = data?.authenticateUserWithGoogle;
+    if (!result) {
+      setError("Error al iniciar sesión con Google");
+      setLoading(false);
+      return;
+    }
+
+    if (result.__typename === "UserAuthenticationWithGoogleSuccess") {
+      const { item, sessionToken, isNewUser } = result;
+      // Solo el alta es una conversión: antes se mandaba el evento también
+      // en cada inicio de sesión de una cuenta ya existente.
+      if (isNewUser) {
+        trackCompleteRegistration();
+      }
+      // Mismo token sellado que devuelve el login con contraseña: se guarda
+      // igual. Los roles y la empresa los asigna el backend en el alta.
+      if (sessionToken) {
+        persistSessionToken(sessionToken);
+      }
+      const u = item as AuthenticatedItem & {
+        roles?: Array<{ name: string; __typename?: string }>;
+        __typename?: string;
+      };
+      const userFromLogin: AuthenticatedItem = {
+        id: u.id,
+        name: u.name ?? "",
+        lastName: u.lastName ?? "",
+        secondLastName: u.secondLastName ?? null,
+        username: u.username ?? u.email ?? "",
+        email: u.email ?? "",
+        verified: u.verified ?? false,
+        phone: u.phone && u.phone !== "" ? u.phone : null,
+        profileImage: u.profileImage ?? null,
+        roles: Array.isArray(u.roles)
+          ? u.roles.map((r) => ({ name: r.name }))
+          : null,
+        birthday: u.birthday ?? null,
+        age: u.age ?? null,
+        createdAt: u.createdAt ?? new Date().toISOString(),
+      };
+      setUser(userFromLogin);
+      await refreshUser();
+      setLoading(false);
+      if (options?.redirectTo) {
+        router.push(options.redirectTo);
+      } else {
+        router.push(Routes.panel);
+      }
+    } else if (result.__typename === "UserAuthenticationWithGoogleFailure") {
+      setError(result.message || "No se pudo iniciar sesión con Google");
+      setLoading(false);
+    }
+  };
+
+  const handleError = (err: Error) => {
+    setError(err.message || "Error al iniciar sesión con Google");
+    setLoading(false);
+  };
+
+  const [authenticateWithGoogleLegacy] = useMutation<
+    AuthenticateUserWithGoogleResponse,
+    AuthenticateUserWithGoogleVariables
+  >(AUTHENTICATE_USER_WITH_GOOGLE_LEGACY_MUTATION, {
+    onCompleted: handleCompleted,
+    onError: handleError,
+  });
+
   const [authenticateWithGoogle] = useMutation<
     AuthenticateUserWithGoogleResponse,
     AuthenticateUserWithGoogleVariables
   >(AUTHENTICATE_USER_WITH_GOOGLE_MUTATION, {
-    onCompleted: async (data) => {
-      const result = data?.authenticateUserWithGoogle;
-      if (!result) {
-        setError("Error al iniciar sesión con Google");
-        setLoading(false);
+    onCompleted: handleCompleted,
+    onError: (err) => {
+      const last = lastRequest.current;
+      lastRequest.current = null;
+      // Back sin `attribution` todavía: se reintenta igual, sin el dato de origen.
+      if (last && isAttributionArgumentError(err)) {
+        const { attribution: _attribution, ...variables } = last;
+        void authenticateWithGoogleLegacy({ variables });
         return;
       }
-
-      if (result.__typename === "UserAuthenticationWithGoogleSuccess") {
-        const { item, sessionToken, isNewUser } = result;
-        // Solo el alta es una conversión: antes se mandaba el evento también
-        // en cada inicio de sesión de una cuenta ya existente.
-        if (isNewUser) {
-          trackCompleteRegistration();
-        }
-        // Mismo token sellado que devuelve el login con contraseña: se guarda
-        // igual. Los roles y la empresa los asigna el backend en el alta.
-        if (sessionToken) {
-          persistSessionToken(sessionToken);
-        }
-        const u = item as AuthenticatedItem & {
-          roles?: Array<{ name: string; __typename?: string }>;
-          __typename?: string;
-        };
-        const userFromLogin: AuthenticatedItem = {
-          id: u.id,
-          name: u.name ?? "",
-          lastName: u.lastName ?? "",
-          secondLastName: u.secondLastName ?? null,
-          username: u.username ?? u.email ?? "",
-          email: u.email ?? "",
-          verified: u.verified ?? false,
-          phone: u.phone && u.phone !== "" ? u.phone : null,
-          profileImage: u.profileImage ?? null,
-          roles: Array.isArray(u.roles)
-            ? u.roles.map((r) => ({ name: r.name }))
-            : null,
-          birthday: u.birthday ?? null,
-          age: u.age ?? null,
-          createdAt: u.createdAt ?? new Date().toISOString(),
-        };
-        setUser(userFromLogin);
-        await refreshUser();
-        setLoading(false);
-        if (options?.redirectTo) {
-          router.push(options.redirectTo);
-        } else {
-          router.push(Routes.panel);
-        }
-      } else if (result.__typename === "UserAuthenticationWithGoogleFailure") {
-        setError(result.message || "No se pudo iniciar sesión con Google");
-        setLoading(false);
-      }
-    },
-    onError: (err) => {
-      setError(err.message || "Error al iniciar sesión con Google");
-      setLoading(false);
+      handleError(err);
     },
   });
 
@@ -123,13 +150,14 @@ export function useGoogleLogin(options?: UseGoogleLoginOptions) {
     (response: { credential: string }) => {
       setError("");
       setLoading(true);
-      authenticateWithGoogle({
-        variables: {
-          idToken: response.credential,
-          referrerCode: options?.referralCode ?? null,
-          product: "saas",
-        },
-      });
+      const variables: AuthenticateUserWithGoogleVariables = {
+        idToken: response.credential,
+        referrerCode: options?.referralCode ?? null,
+        product: "saas",
+        attribution: readAttribution(),
+      };
+      lastRequest.current = variables;
+      authenticateWithGoogle({ variables });
     },
     [authenticateWithGoogle, options?.referralCode],
   );

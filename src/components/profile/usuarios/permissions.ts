@@ -34,6 +34,8 @@ export const PERMISSION_KEYS = {
   ESPACIOS_MIEMBROS: "espacios.miembros",
   WHATSAPP_VER: "whatsapp.ver",
   WHATSAPP_CONFIGURAR: "whatsapp.configurar",
+  ANALITICA_VER: "analitica.ver",
+  ANALITICA_VER_EQUIPO: "analitica.ver_equipo",
 } as const;
 
 export type PermissionKey =
@@ -56,7 +58,8 @@ export type PermissionModuleId =
   | "cotizaciones"
   | "calendario"
   | "espacios"
-  | "whatsapp";
+  | "whatsapp"
+  | "analitica";
 
 export type PermissionModule = {
   id: PermissionModuleId;
@@ -206,6 +209,19 @@ export const PERMISSION_MODULES: PermissionModule[] = [
       {
         key: PERMISSION_KEYS.WHATSAPP_CONFIGURAR,
         label: "Configurar WhatsApp Business",
+      },
+    ],
+  },
+  {
+    id: "analitica",
+    label: "Analítica",
+    enforced: true,
+    permissions: [
+      { key: PERMISSION_KEYS.ANALITICA_VER, label: "Ver analítica" },
+      {
+        key: PERMISSION_KEYS.ANALITICA_VER_EQUIPO,
+        label: "Ver la analítica de todo el equipo",
+        description: "Sin este permiso solo ve los números de sus propios leads.",
       },
     ],
   },

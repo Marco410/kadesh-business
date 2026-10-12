@@ -1092,6 +1092,7 @@ export const PLAN_FEATURE_KEYS = {
   QUOTATIONS: "quotations",
   WORKSPACES: "workspaces",
   WHATSAPP: "whatsapp",
+  ANALYTICS: "analytics",
 } as const;
 
 export type PlanFeatureKey =
@@ -1170,6 +1171,11 @@ export const PLAN_FEATURES_MAP: Record<
   [PLAN_FEATURE_KEYS.WHATSAPP]: {
     name: "WhatsApp Business",
     description: "Mandar y recibir WhatsApp con tus leads desde el CRM",
+  },
+  [PLAN_FEATURE_KEYS.ANALYTICS]: {
+    name: "Analítica de ventas",
+    description:
+      "Tasa de cierre, ciclo de venta, tiempo de respuesta, tratos estancados y desempeño de cada vendedor",
   },
 };
 

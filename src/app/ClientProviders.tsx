@@ -9,11 +9,14 @@ import ApolloProviderWrapper from "../providers/ApolloProviderWrapper";
 import { ThemeProvider } from "../providers/ThemeProvider";
 import { UserProvider } from "kadesh/utils/UserContext";
 import {
+  AttributionTracker,
   CookieConsentProvider,
   CookieConsentBanner,
   MetaPixelLoader,
 } from "kadesh/components/consent";
 import { BodyScrollLock } from "kadesh/components/shared";
+import { ImpersonationBanner } from "kadesh/components/impersonation";
+import SessionEndedListener from "kadesh/components/auth/SessionEndedListener";
 import { Toaster } from "sileo";
 import { useTheme } from "next-themes";
 
@@ -74,6 +77,10 @@ export default function ClientProviders({
         <ApolloProviderWrapper>
           <UserProvider>
             <AppShell>{children}</AppShell>
+            {/* Solo aparece cuando un admin de Kadesh está viendo el panel como otra persona. */}
+            <ImpersonationBanner />
+            {/* Si el back dice que la sesión ya no vale, lleva al login con el motivo. */}
+            <SessionEndedListener />
             <BodyScrollLock />
             <ThemedToaster />
             <SpeedInsights />
@@ -82,6 +89,8 @@ export default function ClientProviders({
       </ThemeProvider>
       <CookieConsentBanner />
       <MetaPixelLoader />
+      {/* De dónde llegó (UTM, sitio que la mandó): se manda al registrarse. */}
+      <AttributionTracker />
     </CookieConsentProvider>
   );
 }

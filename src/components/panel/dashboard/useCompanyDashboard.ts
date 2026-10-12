@@ -47,11 +47,12 @@ export function useCompanyDashboard({
     if (!companyId) return null;
 
     const sellerLeads = hasCompanyWideLeadScope ? {} : sellerLeadFilter(userId);
+    // Estatus compartido de la empresa (uno por lead). El vendedor ve el de sus leads asignados.
     const statusWhere = hasCompanyWideLeadScope
       ? { saasCompany: { id: { equals: companyId } } }
       : {
           saasCompany: { id: { equals: companyId } },
-          salesPerson: { id: { equals: userId } },
+          businessLead: sellerLeadFilter(userId),
         };
     const quotationsWhere = hasCompanyWideLeadScope
       ? {}
@@ -93,9 +94,6 @@ export function useCompanyDashboard({
           some: {
             pipelineStatus: { equals: PIPELINE_STATUS.CERRADO_GANADO },
             saasCompany: { id: { equals: companyId } },
-            ...(hasCompanyWideLeadScope
-              ? {}
-              : { salesPerson: { id: { equals: userId } } }),
           },
         },
       },
@@ -105,9 +103,6 @@ export function useCompanyDashboard({
           some: {
             firstContactDate: { gte: "1970-01-01" },
             saasCompany: { id: { equals: companyId } },
-            ...(hasCompanyWideLeadScope
-              ? {}
-              : { salesPerson: { id: { equals: userId } } }),
           },
         },
       },

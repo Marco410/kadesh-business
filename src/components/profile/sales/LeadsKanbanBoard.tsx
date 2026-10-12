@@ -11,7 +11,7 @@ import { Routes } from "kadesh/core/routes";
 import { cn } from "kadesh/utils/cn";
 import { CopyPhoneButton } from "./CopyPhoneButton";
 import { getCategoryLabel } from "./helpers/category";
-import { pickCanonicalLeadStatus } from "./helpers/canonical-lead-status";
+import { companyLeadStatus } from "./helpers/company-lead-status";
 import LeadsPageNav from "./LeadsPageNav";
 import type { LeadsPageSize } from "./leadsPagination";
 
@@ -102,8 +102,7 @@ type DragState = {
 function pipelineOf(lead: LeadItem, overrides: Record<string, string>): string {
   const override = overrides[lead.id];
   if (override) return override;
-  const value = pickCanonicalLeadStatus(lead.status, lead.salesPerson)
-    ?.pipelineStatus;
+  const value = companyLeadStatus(lead.status)?.pipelineStatus;
   if (value && PIPELINE_COLUMNS.includes(value as (typeof PIPELINE_COLUMNS)[number])) {
     return value;
   }
@@ -116,9 +115,7 @@ function shortPipelineLabel(status: string): string {
 }
 
 function assigneeLabel(lead: LeadItem): string | null {
-  const person =
-    pickCanonicalLeadStatus(lead.status, lead.salesPerson)?.salesPerson ??
-    lead.salesPerson?.[0];
+  const person = lead.salesPerson?.[0];
   if (!person?.name) return null;
   return [person.name, person.lastName].filter(Boolean).join(" ");
 }

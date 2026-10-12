@@ -37,6 +37,9 @@ function normalizePlanFeatures(
 
 function toCalendarDay(value: string | null) {
   if (!value) return "";
+  // Keystone manda los días de calendario como `YYYY-MM-DD`. `new Date()` los lee en UTC y en
+  // México los mostraba un día antes; al guardar, el periodo se recorría un día cada vez.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return "";
   const y = d.getFullYear();

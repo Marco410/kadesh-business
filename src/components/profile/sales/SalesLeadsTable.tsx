@@ -7,7 +7,7 @@ import type { TechBusinessLeadsResponse } from "kadesh/components/profile/sales/
 import { PIPELINE_STATUS_COLORS } from "kadesh/constants/constans";
 import { Routes } from "kadesh/core/routes";
 import { getCategoryLabel } from "./helpers/category";
-import { pickCanonicalLeadStatus } from "./helpers/canonical-lead-status";
+import { companyLeadStatus } from "./helpers/company-lead-status";
 import { ApolloError } from "@apollo/client";
 import { CopyPhoneButton } from "./CopyPhoneButton";
 import LeadsPageNav from "./LeadsPageNav";
@@ -146,10 +146,7 @@ export default function SalesLeadsTable({
           </thead>
           <tbody>
             {leads.map((lead, index) => {
-              const leadStatus = pickCanonicalLeadStatus(
-                lead.status,
-                lead.salesPerson,
-              );
+              const leadStatus = companyLeadStatus(lead.status);
               return (
                 <tr
                   key={lead.id}
@@ -200,16 +197,6 @@ export default function SalesLeadsTable({
                         >
                           {leadStatus.pipelineStatus.replace(/^\d+\s*-\s*/, "")}
                         </span>
-                        {(() => {
-                          const byName =
-                            leadStatus.salesPerson?.name ??
-                            lead.salesPerson?.[0]?.name;
-                          return byName ? (
-                            <span className="text-[11px] text-[#9e9e9e] dark:text-[#777]">
-                              {byName}
-                            </span>
-                          ) : null;
-                        })()}
                       </div>
                     ) : (
                       <span className="text-[#616161] dark:text-[#b0b0b0]">

@@ -16,6 +16,7 @@ import {
   FlashIcon,
   SparklesIcon,
   WhatsappIcon,
+  Analytics01Icon,
   SidebarLeftIcon,
   SidebarRightIcon,
 } from "@hugeicons/core-free-icons";
@@ -53,6 +54,12 @@ const navItems = [
     label: "Vendedores",
     icon: UserGroupIcon,
     featureKey: PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT,
+  },
+  {
+    key: "analitica" as const,
+    label: "Analítica",
+    icon: Analytics01Icon,
+    featureKey: PLAN_FEATURE_KEYS.ANALYTICS,
   },
   {
     key: "archivos" as const,

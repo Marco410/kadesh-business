@@ -4,20 +4,16 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { getCategoryLabel } from "kadesh/components/blog/constants";
 import { formatDateShort } from "kadesh/utils/format-date";
-import AdminBlogCategoriesPanel from "./AdminBlogCategoriesPanel";
 import AdminBlogPostForm from "./AdminBlogPostForm";
-import AdminBlogTagsPanel from "./AdminBlogTagsPanel";
 import {
   ADMIN_BLOG_POSTS_QUERY,
   type AdminBlogPostsResponse,
 } from "./blog-queries";
 import {
   ADMIN_PAGE_SIZE,
-  BLOG_VISTAS,
   POST_PRODUCT_BADGE,
   POST_PRODUCT_LABELS,
   POST_STATUS_FILTERS,
-  type BlogVista,
 } from "./constants";
 import { useDebouncedValue } from "./hooks/useDebouncedValue";
 import {
@@ -27,7 +23,6 @@ import {
   AdminLoadingRows,
   AdminPagination,
   AdminSearchInput,
-  AdminSegmented,
   AdminStatusBadge,
   surfaceClass,
 } from "./ui";
@@ -39,33 +34,8 @@ const PRODUCT_FILTERS = [
   { value: "all-products", label: "Ambos" },
 ];
 
-export default function AdminBlogPanel({
-  vista = BLOG_VISTAS.ARTICLES,
-  onVistaChange,
-}: {
-  vista?: BlogVista;
-  onVistaChange?: (vista: BlogVista) => void;
-}) {
-  return (
-    <div className="flex flex-col gap-4">
-      <AdminSegmented
-        ariaLabel="Vista del blog"
-        items={[
-          { id: BLOG_VISTAS.ARTICLES, label: "Artículos" },
-          { id: BLOG_VISTAS.CATEGORIES, label: "Categorías" },
-          { id: BLOG_VISTAS.TAGS, label: "Etiquetas" },
-        ]}
-        value={vista}
-        onChange={(next) => onVistaChange?.(next)}
-      />
-      {vista === BLOG_VISTAS.CATEGORIES ? <AdminBlogCategoriesPanel /> : null}
-      {vista === BLOG_VISTAS.TAGS ? <AdminBlogTagsPanel /> : null}
-      {vista === BLOG_VISTAS.ARTICLES ? <AdminBlogPostsPanel /> : null}
-    </div>
-  );
-}
-
-function AdminBlogPostsPanel() {
+/** Lista y editor de artículos del blog (Contenido → Artículos). */
+export function AdminBlogPostsPanel() {
   const [search, setSearch] = useState("");
   const [product, setProduct] = useState("all");
   const [status, setStatus] = useState<(typeof POST_STATUS_FILTERS)[number]["value"]>(

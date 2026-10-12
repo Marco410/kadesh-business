@@ -3,12 +3,6 @@ import type { TechBusinessLeadsVariables } from "kadesh/components/profile/sales
 type BuildClientLeadsQueryVariablesArgs = {
   where: TechBusinessLeadsVariables["where"];
   companyId: string | null;
-  /**
-   * Admin empresa o usuario empresa (`user_company`): ven todos los leads de la company
-   * en el mismo alcance que la lista principal de ventas.
-   */
-  hasCompanyWideLeadScope: boolean;
-  userId: string;
   take?: number;
   skip?: number;
   orderBy?: TechBusinessLeadsVariables["orderBy"];
@@ -21,23 +15,12 @@ type BuildClientLeadsQueryVariablesArgs = {
 export function buildClientLeadsQueryVariables({
   where,
   companyId,
-  hasCompanyWideLeadScope,
-  userId,
   take,
   skip,
   orderBy,
 }: BuildClientLeadsQueryVariablesArgs): TechBusinessLeadsVariables {
-  const statusWhere =
-    companyId != null
-      ? hasCompanyWideLeadScope
-        ? { saasCompany: { id: { equals: companyId } } }
-        : {
-            AND: [
-              { saasCompany: { id: { equals: companyId } } },
-              { salesPerson: { id: { equals: userId } } },
-            ],
-          }
-      : {};
+  // El estatus es uno por empresa: no depende de quién lo ve (la visibilidad va en `where`).
+  const statusWhere = companyId != null ? { saasCompany: { id: { equals: companyId } } } : {};
 
   const salesPersonWhere2 = companyId != null ? { company: { id: { equals: companyId } } } : {};
 

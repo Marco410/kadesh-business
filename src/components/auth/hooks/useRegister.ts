@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMutation } from '@apollo/client';
 import {
   AUTHENTICATE_USER_MUTATION,
+  REGISTER_USER_LEGACY_MUTATION,
   REGISTER_USER_MUTATION,
   type RegisterUserVariables,
   type RegisterUserResponse,
@@ -12,6 +13,7 @@ import {
   type AuthenticateUserResponse,
 } from 'kadesh/utils/queries';
 import { useUser } from 'kadesh/utils/UserContext';
+import { isAttributionArgumentError, readAttribution } from 'kadesh/utils/attribution';
 import type { AuthenticatedItem } from 'kadesh/utils/types';
 import {
   setRegisterSuccessUrl,
@@ -20,7 +22,6 @@ import {
 } from 'kadesh/utils/facebook-pixel';
 import { Routes } from 'kadesh/core/routes';
 import { sileo } from 'sileo';
-import { useTouchUserLastLogin } from './useTouchUserLastLogin';
 import { persistSessionToken } from './session';
 
 /** Texto crudo de error (GraphQL + mensaje) para detectar patrones sin filtrar al usuario. */
@@ -68,7 +69,6 @@ interface UseRegisterOptions {
 
 export function useRegister(options?: UseRegisterOptions) {
   const router = useRouter();
-  const touchUserLastLoginAt = useTouchUserLastLogin();
   const { refreshUser, setUser } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState('');
@@ -90,6 +90,11 @@ export function useRegister(options?: UseRegisterOptions) {
     RegisterUserResponse,
     RegisterUserVariables
   >(REGISTER_USER_MUTATION);
+
+  const [registerUserLegacy, { loading: legacyLoading }] = useMutation<
+    RegisterUserResponse,
+    RegisterUserVariables
+  >(REGISTER_USER_LEGACY_MUTATION);
 
   const clearForm = () => {
     setName('');
@@ -122,7 +127,6 @@ export function useRegister(options?: UseRegisterOptions) {
 
     const loggedInUser = auth.item;
     if (loggedInUser?.id) {
-      await touchUserLastLoginAt(loggedInUser.id);
       const userFromLogin: AuthenticatedItem = {
         ...loggedInUser,
         roles: loggedInUser.roles ?? null,
@@ -161,20 +165,25 @@ export function useRegister(options?: UseRegisterOptions) {
 
     setIsSubmitting(true);
     try {
-      await registerUser({
-        variables: {
-          data: {
-            name,
-            lastName,
-            email,
-            password,
-            phone: phone || undefined,
-            product: 'saas',
-          },
-          referrerCode: referralCode || null,
-          companyName: companyName.trim(),
+      const variables: RegisterUserVariables = {
+        data: {
+          name,
+          lastName,
+          email,
+          password,
+          phone: phone || undefined,
+          product: 'saas',
         },
-      });
+        referrerCode: referralCode || null,
+        companyName: companyName.trim(),
+      };
+      try {
+        await registerUser({ variables: { ...variables, attribution: readAttribution() } });
+      } catch (attributionErr) {
+        // Back sin `attribution` todavía: se registra igual, sin el dato de origen.
+        if (!isAttributionArgumentError(attributionErr)) throw attributionErr;
+        await registerUserLegacy({ variables });
+      }
 
       setRegisterSuccessUrl(router);
       trackCompleteRegistration();
@@ -223,7 +232,7 @@ export function useRegister(options?: UseRegisterOptions) {
     setReferralCode,
     error,
     setError,
-    loading: loading || isSubmitting,
+    loading: loading || legacyLoading || isSubmitting,
     handleSubmit,
   };
 }
