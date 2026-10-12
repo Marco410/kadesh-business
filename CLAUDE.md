@@ -44,21 +44,27 @@ import { AnimalCard } from "kadesh/components/animals";
 
 ### Auth
 
-Auth is KeystoneJS session-based: a `keystonejs-session-token` is stored in `localStorage` and attached as a `Bearer` header by the Apollo auth link (`src/providers/apollo-client.ts`). `UserProvider`/`useUser()` (`src/utils/UserContext.tsx`) holds the client-side authenticated user, fetched via the `authenticatedItem` GraphQL query. Role checks go through `kadesh/utils/user-roles.ts` (e.g. `isAdminCompanyUser`), checking against `Role` in `constants/constans.ts`.
+Auth is KeystoneJS session-based: a `keystonejs-session-token` is stored in `localStorage` and attached as a `Bearer` header by the Apollo auth link (`src/providers/apollo-client.ts`). `UserProvider`/`useUser()` (`src/utils/UserContext.tsx`) holds the client-side authenticated user, fetched via the `authenticatedItem` GraphQL query. Role checks go through `kadesh/utils/user-roles.ts` (e.g. `isAdminCompanyUser`), checking against `Role` in `constants/constans.ts`. Platform admins can "entrar como" another user from Operaciones: `kadesh/components/impersonation` swaps the session token for a read-only one (the backend blocks every mutation) and keeps the admin token in `kadesh-admin-session-token`. When the backend rejects a token (sessions closed, suspended, expired) it returns `extensions.session`; `SessionEndedListener` (`src/components/auth/`) then clears the token and sends the person to the login with the reason.
 
 ### The panel is a client-rendered SPA, not folder-routed
 
 Most of `/panel/*` is NOT separate App Router pages per view — `src/app/panel/page.tsx` renders a single `PanelPageSection`, which is a `"use client"` component that switches between sub-sections based on the `?tab=` query param (see `PanelPageSection.tsx`). CRM sub-views (leads, workspaces, quotations, credits, etc.) are swapped client-side inside that shell, driven by `usePathname`/`useSearchParams` + local state, not by navigating to new routes. When adding a new panel view, follow this tab-based pattern rather than assuming a new file under `src/app/panel/` is needed.
 
-`WorkspaceProvider` (`src/components/profile/sales/workspaces/WorkspaceContext.tsx`) tracks the currently selected CRM workspace (persisted client-side) and wraps the whole app in `ClientProviders`.
+`WorkspaceProvider` (`src/components/profile/sales/workspaces/WorkspaceContext.tsx`) tracks the currently selected CRM workspace (persisted client-side). It only wraps `/panel*` and `/admin*`, via `PanelAppProviders`.
 
 ### Provider stack
 
-`src/app/ClientProviders.tsx` composes, in order: `ThemeProvider` → `HeroUIProvider` → `ApolloProviderWrapper` → `UserProvider` → `WorkspaceProvider`. Anything needing user/auth/workspace context must render underneath this tree (it already wraps the whole app via `RootLayout`).
+`src/app/ClientProviders.tsx` composes, in order: `CookieConsentProvider` → `ThemeProvider` → `ApolloProviderWrapper` → `UserProvider`, and wraps the whole app via `RootLayout`. Inside it, `/panel*` and `/admin*` also get `PanelAppProviders` (`HeroUIProvider` → `WorkspaceProvider` → `OnboardingProvider`), and `/auth*` gets `AuthAppProviders`. This keeps driver.js and workspace state out of the marketing bundle. Anything needing workspace or onboarding context must render under a panel route.
 
 ### Plan-gated features
 
-Subscription plans gate CRM functionality via `PLAN_FEATURE_KEYS`/`PLAN_FEATURES_MAP` in `constants/constans.ts`, checked with helpers in `src/components/profile/sales/helpers/plan-features.ts` and surfaced via `FeatureLockedSection`/`RoleAccessDeniedSection`. When adding a gated CRM feature, register its key there first.
+Subscription plans gate CRM functionality via `PLAN_FEATURE_KEYS`/`PLAN_FEATURES_MAP` in `constants/constans.ts`, checked with helpers in `src/components/profile/sales/helpers/plan-features.ts` and surfaced via `FeatureLockedSection`/`RoleAccessDeniedSection`. When adding a gated CRM feature, register its key there first. Example: the customer **Analítica** section (`kadesh/components/analytics`, tab `analitica`) is gated by `analytics` and by the `analitica.ver` / `analitica.ver_equipo` permissions; the backend `companyAnalytics` always uses the session's company.
+
+### Activity tracking
+
+`kadesh/utils/activity` sends browser-only usage events (sections viewed, heartbeat, locked features, tours, exports, logout, and admin views in Operaciones) to the backend `trackEvents` mutation. Panel sections are tracked automatically from `?tab=`/path by `src/app/PanelActivityTracker.tsx`. A new client event type must be added both to `TRACK_EVENT` here and to `CLIENT_EVENT_TYPES` in kadesh-back, or the backend drops it. Never put personal data (lead names, phones, free text) in event metadata. See `src/utils/activity/README.md`.
+
+Signup attribution is separate: `AttributionTracker` (`kadesh/components/consent`, mounted in `ClientProviders`) stores the first-touch `utm_*`, referrer domain and landing path via `kadesh/utils/attribution` (skipped if cookies were rejected), and the signup hooks send it as `attribution` to `registerUser` / `authenticateUserWithGoogle`. It feeds Operaciones → Analítica → Adquisición.
 
 ### Onboarding tour
 

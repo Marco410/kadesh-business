@@ -9,7 +9,6 @@ import type {
   AdminPetPlaceTypeOption,
   AdminPlanRow,
   AdminRoleOption,
-  AdminSubscriptionRow,
   AdminUserDetail,
   AdminUserRow,
   StripePlanCheckResult,
@@ -107,13 +106,10 @@ export const ADMIN_OVERVIEW_QUERY = gql`
   ${PET_PLACE_FIELDS}
   ${PET_PLACE_SERVICE_FIELDS}
   query AdminOverview(
-    $activeWhere: SaasCompanySubscriptionWhereInput!
     $pendingWhere: PetPlaceWhereInput!
     $verifiedWhere: PetPlaceWhereInput!
     $pendingServiceWhere: PetPlaceServiceWhereInput!
   ) {
-    usersCount
-    activeSubscriptions: saasCompanySubscriptionsCount(where: $activeWhere)
     pendingPlaces: petPlacesCount(where: $pendingWhere)
     verifiedPlaces: petPlacesCount(where: $verifiedWhere)
     pendingServices: petPlaceServicesCount(where: $pendingServiceWhere)
@@ -247,63 +243,6 @@ export const UPDATE_BLOG_SUBSCRIPTION_MUTATION = gql`
     }
   }
 `;
-
-export const ADMIN_SUBSCRIPTIONS_QUERY = gql`
-  query AdminSubscriptions(
-    $where: SaasCompanySubscriptionWhereInput!
-    $take: Int
-    $skip: Int!
-    $year: Int!
-    $month: Int!
-  ) {
-    saasCompanySubscriptions(
-      where: $where
-      orderBy: [{ createdAt: desc }]
-      take: $take
-      skip: $skip
-    ) {
-      id
-      planName
-      planCost
-      planCurrency
-      planFrequency
-      planLeadLimit
-      planFeatures
-      status
-      activatedAt
-      currentPeriodEnd
-      stripeCustomerId
-      stripeSubscriptionId
-      createdAt
-      company {
-        id
-        name
-        purchasedBonusCredits
-        creditPeriods(
-          where: { year: { equals: $year }, month: { equals: $month } }
-          take: 1
-        ) {
-          id
-          planAllowance
-          bonusAllowance
-          used
-        }
-        users(take: 4, orderBy: [{ createdAt: asc }]) {
-          id
-          name
-          lastName
-          email
-        }
-      }
-    }
-    saasCompanySubscriptionsCount(where: $where)
-  }
-`;
-
-export type AdminSubscriptionsResponse = {
-  saasCompanySubscriptions: AdminSubscriptionRow[];
-  saasCompanySubscriptionsCount: number;
-};
 
 export const ADMIN_PLANS_QUERY = gql`
   query AdminPlans($where: SaasPlanWhereInput!) {

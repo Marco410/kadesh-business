@@ -261,6 +261,7 @@ function getWiderRadius(
 
 function formatSecondarySearchStats(
   stats: {
+    created: number;
     alreadyInDb: number;
     skippedLowRating: number;
     source: LeadSyncSource;
@@ -268,8 +269,10 @@ function formatSecondarySearchStats(
 ): string | null {
   if (!stats) return null;
   const parts: string[] = [];
+  // alreadyInDb = negocios que Kadesh ya tenía (de otras búsquedas) y ahora son tuyos.
   if (stats.alreadyInDb > 0) {
-    parts.push(`${stats.alreadyInDb} ya en base`);
+    if (stats.created > 0) parts.push(`${stats.created} nuevos`);
+    parts.push(`${stats.alreadyInDb} ya estaban en Kadesh`);
   }
   if (stats.source === "google" && stats.skippedLowRating > 0) {
     parts.push(`${stats.skippedLowRating} omitidos por rating`);
@@ -459,6 +462,8 @@ export default function ObtenerClientesSection({
     created: number;
     alreadyInDb: number;
     skippedLowRating: number;
+    /** Leads que quedaron en la lista de la empresa (nuevos + los que Kadesh ya tenía). */
+    synced: number;
     source: LeadSyncSource;
   } | null>(null);
   const [showZeroResultsHint, setShowZeroResultsHint] = useState(false);
@@ -1012,7 +1017,8 @@ export default function ObtenerClientesSection({
     !resultDismissed &&
     Boolean(stats || showZeroResultsHint || message);
   const secondarySearchStats = formatSecondarySearchStats(stats);
-  const createdCount = stats?.created ?? 0;
+  // Mismo número que el aviso: lo que se agregó a la lista, no solo lo recién creado en Kadesh.
+  const addedCount = stats?.synced ?? 0;
 
   const selectLeadSource = (next: LeadSyncSource) => {
     setLeadSource(next);
@@ -1107,6 +1113,7 @@ export default function ObtenerClientesSection({
         created,
         alreadyInDb,
         skippedLowRating: skipped,
+        synced: syncedLeadsCount,
         source: leadSource,
       });
       setHasSearched(true);
@@ -1676,8 +1683,8 @@ export default function ObtenerClientesSection({
                       <h3 className="text-sm font-semibold tracking-tight text-[#212121] dark:text-white">
                         {showZeroResultsHint
                           ? "No se encontraron negocios nuevos en esta zona"
-                          : createdCount > 0
-                            ? `${createdCount === 1 ? "1 lead" : `${createdCount} leads`} de ${activeSearchLabel} ${createdCount === 1 ? "agregado" : "agregados"}`
+                          : addedCount > 0
+                            ? `${addedCount === 1 ? "1 lead" : `${addedCount} leads`} de ${activeSearchLabel} ${addedCount === 1 ? "agregado" : "agregados"}`
                             : "No hay leads nuevos en esta búsqueda"}
                       </h3>
                       <button
@@ -1708,7 +1715,7 @@ export default function ObtenerClientesSection({
 
                     {(showZeroResultsHint &&
                       (widerRadiusKm != null || filtersActive)) ||
-                    createdCount > 0 ? (
+                    addedCount > 0 ? (
                       <div className="mt-3 flex flex-wrap gap-2">
                         {showZeroResultsHint && widerRadiusKm != null && (
                           <button
@@ -1731,7 +1738,7 @@ export default function ObtenerClientesSection({
                             Quitar filtros
                           </button>
                         )}
-                        {createdCount > 0 && (
+                        {addedCount > 0 && (
                           <motion.button
                             type="button"
                             onClick={() =>

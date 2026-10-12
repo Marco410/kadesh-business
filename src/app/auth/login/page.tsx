@@ -12,6 +12,8 @@ import {
 } from "@hugeicons/core-free-icons";
 import AuthPageVisual from "kadesh/components/auth/AuthPageVisual";
 import {
+  SESSION_ENDED_PARAM,
+  sessionEndedMessage,
   useLogin,
   useRegister,
   useGoogleLogin,
@@ -36,6 +38,7 @@ function LoginPageContent() {
   const redirectPath = searchParams.get("redirect") || null;
   const referralCodeFromUrl = searchParams.get("referral") || null;
   const tabParam = searchParams.get("tab");
+  const sessionEndedNotice = sessionEndedMessage(searchParams.get(SESSION_ENDED_PARAM));
   const initialTab = tabParam === "register" ? "register" : "login";
 
   const [selectedTab, setSelectedTab] = useState(initialTab);
@@ -178,6 +181,14 @@ function LoginPageContent() {
                   {successMessage && (
                     <div className="p-4 rounded-xl bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 text-sm font-medium">
                       {successMessage}
+                    </div>
+                  )}
+                  {sessionEndedNotice && !loginError && (
+                    <div
+                      role="status"
+                      className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-sm font-medium"
+                    >
+                      {sessionEndedNotice}
                     </div>
                   )}
                   {loginError && (

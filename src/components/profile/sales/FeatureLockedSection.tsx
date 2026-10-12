@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -8,6 +9,7 @@ import {
   SparklesIcon,
 } from "@hugeicons/core-free-icons";
 import { Routes } from "kadesh/core/routes";
+import { TRACK_EVENT, trackActivity } from "kadesh/utils/activity";
 import { useSubscription } from "./SubscriptionContext";
 
 interface FeatureLockedSectionProps {
@@ -18,6 +20,16 @@ const SECTION_COPY: Record<
   string,
   { headline: string; description: string; benefits: string[] }
 > = {
+  "Analítica": {
+    headline: "Sabe qué tan rápido vende tu equipo",
+    description:
+      "Mide en cuántos días cierras, cuánto tardan en contestar a un cliente y qué tratos se están enfriando, con los números de cada vendedor.",
+    benefits: [
+      "Tasa de cierre y ciclo de venta",
+      "Tratos estancados para atenderlos a tiempo",
+      "Desempeño de cada vendedor",
+    ],
+  },
   Vendedores: {
     headline: "Escala tu equipo de ventas",
     description:
@@ -25,7 +37,7 @@ const SECTION_COPY: Record<
     benefits: [
       "Gestión de vendedores y permisos",
       "Asignación de leads por cartera",
-      "Visibilidad del pipeline por persona",
+      "Un solo pipeline compartido por todo el equipo",
     ],
   },
   Archivos: {
@@ -122,6 +134,18 @@ export default function FeatureLockedSection({
   const copy = getSectionCopy(sectionName);
   const planName = subscription?.planName?.trim();
 
+  // Intención de compra: qué módulos bloqueados ven y desde cuál hacen clic en mejorar.
+  // Sin el plan en las dependencias: carga después y contaría la misma vista dos veces.
+  useEffect(() => {
+    trackActivity(TRACK_EVENT.FEATURE_LOCKED_VIEWED, { metadata: { feature: sectionName } });
+  }, [sectionName]);
+
+  const trackUpgrade = (cta: "planes" | "comparar") => {
+    trackActivity(TRACK_EVENT.UPGRADE_CLICKED, {
+      metadata: { feature: sectionName, cta, plan: planName ?? null },
+    });
+  };
+
   return (
     <div className="overflow-hidden rounded-2xl border border-orange-500/25 bg-white shadow-sm dark:border-orange-500/30 dark:bg-[#1e1e1e]">
       <div
@@ -187,6 +211,7 @@ export default function FeatureLockedSection({
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
           <Link
             href={Routes.panelPlans}
+            onClick={() => trackUpgrade("planes")}
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-orange-500/20 transition-colors hover:bg-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e]"
           >
             Ver planes y actualizar
@@ -194,6 +219,7 @@ export default function FeatureLockedSection({
           </Link>
           <Link
             href={Routes.precios}
+            onClick={() => trackUpgrade("comparar")}
             className="inline-flex items-center justify-center rounded-xl border border-[#e0e0e0] px-5 py-3 text-sm font-semibold text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
           >
             Comparar funciones

@@ -8,30 +8,23 @@ import { Routes } from "kadesh/core/routes";
 import { useUser } from "kadesh/utils/UserContext";
 import { isPlatformAdminUser } from "kadesh/utils/user-roles";
 import {
+  ADMIN_SCOPED_PARAMS,
   ADMIN_TAB_ITEMS,
   ADMIN_TABS,
-  BLOG_VISTAS,
-  COMPANIES_VISTAS,
+  normalizeLegacyAdminParams,
   parseAdminTab,
-  parseBlogVista,
-  parseCompaniesVista,
   parsePlansVista,
-  parseUsersVista,
   PLANS_VISTAS,
-  USERS_VISTAS,
   type AdminTab,
-  type BlogVista,
-  type CompaniesVista,
   type PlansVista,
-  type UsersVista,
 } from "./constants";
 import AdminOverview from "./AdminOverview";
 import { AdminTabBar } from "./ui";
-import AdminUsersSection from "./AdminUsersSection";
-import AdminCompaniesSection from "./AdminCompaniesSection";
+import AdminClientsSection from "./clients/AdminClientsSection";
+import AdminActivityPanel from "./activity/AdminActivityPanel";
+import AdminAnalyticsSection from "./analytics/AdminAnalyticsSection";
 import AdminPlansPanel from "./AdminPlansPanel";
-import AdminBlogPanel from "./AdminBlogPanel";
-import AdminEmailsPanel from "./AdminEmailsPanel";
+import AdminContentSection from "./AdminContentSection";
 import AdminPetPlacesPanel, {
   type PetPlacesVista,
 } from "./AdminPetPlacesPanel";
@@ -56,13 +49,7 @@ function AdminDashboardContent() {
   const tab = parseAdminTab(searchParams.get("tab"));
   const vista: PetPlacesVista =
     searchParams.get("vista") === "servicios" ? "servicios" : "fichas";
-  const usersVista = parseUsersVista(
-    searchParams.get("tab"),
-    searchParams.get("vista"),
-  );
-  const companiesVista = parseCompaniesVista(searchParams.get("vista"));
   const plansVista = parsePlansVista(searchParams.get("vista"));
-  const blogVista = parseBlogVista(searchParams.get("vista"));
   const [reviewPlaceId, setReviewPlaceId] = useState<string | null>(null);
   const [reviewServiceId, setReviewServiceId] = useState<string | null>(null);
 
@@ -72,24 +59,26 @@ function AdminDashboardContent() {
     }
   }, [loading, user, router]);
 
-  /** `vista` en Usuarios/Empresas/Planes/Veterinarias/Blog; `empresa`/`detalle` solo en Empresas. */
+  // Enlaces viejos (?tab=usuarios, empresas, suscripciones, blog, correos) → sección nueva.
+  useEffect(() => {
+    const next = normalizeLegacyAdminParams(new URLSearchParams(searchParams.toString()));
+    if (!next) return;
+    const qs = next.toString();
+    router.replace(qs ? `${Routes.panelAdmin}?${qs}` : Routes.panelAdmin, {
+      scroll: false,
+    });
+  }, [router, searchParams]);
+
+  /** Cambiar de sección limpia los params de la anterior (filtros, detalle, vista). */
   const setTab = useCallback(
     (next: AdminTab, nextVista?: string) => {
       const params = new URLSearchParams(searchParams.toString());
-      params.delete("vista");
-      params.delete("empresa");
-      params.delete("detalle");
+      for (const key of ADMIN_SCOPED_PARAMS) params.delete(key);
       if (next === ADMIN_TABS.OVERVIEW) {
         params.delete("tab");
       } else {
         params.set("tab", next);
-        const supportsVista =
-          next === ADMIN_TABS.PET_PLACES ||
-          next === ADMIN_TABS.USERS ||
-          next === ADMIN_TABS.COMPANIES ||
-          next === ADMIN_TABS.PLANS ||
-          next === ADMIN_TABS.BLOG;
-        if (supportsVista && nextVista) params.set("vista", nextVista);
+        if (nextVista) params.set("vista", nextVista);
       }
       const qs = params.toString();
       router.replace(qs ? `${Routes.panelAdmin}?${qs}` : Routes.panelAdmin, {
@@ -106,41 +95,11 @@ function AdminDashboardContent() {
     [setTab],
   );
 
-  const setUsersVista = useCallback(
-    (next: UsersVista) => {
-      setTab(
-        ADMIN_TABS.USERS,
-        next === USERS_VISTAS.SUBSCRIPTIONS ? next : undefined,
-      );
-    },
-    [setTab],
-  );
-
-  const setCompaniesVista = useCallback(
-    (next: CompaniesVista) => {
-      setTab(
-        ADMIN_TABS.COMPANIES,
-        next === COMPANIES_VISTAS.SYNC_LOGS ? next : undefined,
-      );
-    },
-    [setTab],
-  );
-
   const setPlansVista = useCallback(
     (next: PlansVista) => {
       setTab(
         ADMIN_TABS.PLANS,
         next === PLANS_VISTAS.MODULES ? next : undefined,
-      );
-    },
-    [setTab],
-  );
-
-  const setBlogVista = useCallback(
-    (next: BlogVista) => {
-      setTab(
-        ADMIN_TABS.BLOG,
-        next === BLOG_VISTAS.ARTICLES ? undefined : next,
       );
     },
     [setTab],
@@ -172,12 +131,15 @@ function AdminDashboardContent() {
 
   if (loading) return <AdminFallback />;
   if (!user?.id) return null;
+  if (normalizeLegacyAdminParams(new URLSearchParams(searchParams.toString()))) {
+    return <AdminFallback />;
+  }
 
   if (!isPlatformAdminUser(user)) {
     return (
       <RoleAccessDeniedSection
         title="Solo para administradores de Kadesh"
-        description="Esta pantalla controla usuarios, empresas, planes, el blog, correos y el directorio de veterinarias. Si necesitas acceso, habla con el equipo de plataforma."
+        description="Esta pantalla controla clientes, su actividad, planes, el contenido y el directorio de veterinarias. Si necesitas acceso, habla con el equipo de plataforma."
         backHref={Routes.panel}
         backLabel="Volver al panel"
       />
@@ -191,8 +153,9 @@ function AdminDashboardContent() {
           Operaciones
         </h1>
         <p className="text-[#616161] dark:text-[#b0b0b0] mt-1 max-w-2xl">
-          Usuarios, empresas (créditos y sync), planes, el blog, correos y
-          fichas del directorio. Lo que cambies aquí aplica de inmediato.
+          Clientes y lo que hacen en Kadesh, cómo va el negocio, planes,
+          contenido y fichas del directorio. Lo que cambies aquí aplica de
+          inmediato.
         </p>
       </header>
 
@@ -210,21 +173,13 @@ function AdminDashboardContent() {
           onReviewService={openServiceReview}
         />
       ) : null}
-      {tab === ADMIN_TABS.USERS ? (
-        <AdminUsersSection vista={usersVista} onVistaChange={setUsersVista} />
-      ) : null}
-      {tab === ADMIN_TABS.COMPANIES ? (
-        <AdminCompaniesSection
-          vista={companiesVista}
-          onVistaChange={setCompaniesVista}
-        />
-      ) : null}
+      {tab === ADMIN_TABS.CLIENTS ? <AdminClientsSection /> : null}
+      {tab === ADMIN_TABS.ACTIVITY ? <AdminActivityPanel /> : null}
+      {tab === ADMIN_TABS.ANALYTICS ? <AdminAnalyticsSection /> : null}
       {tab === ADMIN_TABS.PLANS ? (
         <AdminPlansPanel vista={plansVista} onVistaChange={setPlansVista} />
       ) : null}
-      {tab === ADMIN_TABS.BLOG ? (
-        <AdminBlogPanel vista={blogVista} onVistaChange={setBlogVista} />
-      ) : null}
+      {tab === ADMIN_TABS.CONTENT ? <AdminContentSection /> : null}
       {tab === ADMIN_TABS.PET_PLACES ? (
         <AdminPetPlacesPanel
           vista={vista}
@@ -235,7 +190,6 @@ function AdminDashboardContent() {
           onConsumedInitialService={clearReviewService}
         />
       ) : null}
-      {tab === ADMIN_TABS.EMAILS ? <AdminEmailsPanel /> : null}
     </div>
   );
 }

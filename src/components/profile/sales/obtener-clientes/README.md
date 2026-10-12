@@ -8,7 +8,7 @@ El mapa ocupa solo el alto que queda debajo del menú y de las pestañas, para q
 
 Vacío: tarjeta de panel (blanco / carbón, acento naranja), nunca púrpura de Kadesh AI. Acciones de recuperación reales: ampliar radio, quitar filtros, y copy para cambiar de giro o de punto.
 
-Éxito: recuento + **Ver en Clientes**. No mostrar “0 ya en base” ni “0 omitidos”: esos renglones solo aparecen si el número es mayor a cero. Escape cierra filtros o el panel de resultado.
+Éxito: recuento + **Ver en Clientes**. El recuento es lo que quedó en la lista de la empresa (`syncedLeadsCount`), el mismo número del aviso de arriba: incluye los negocios nuevos y los que Kadesh ya tenía de otras búsquedas. Si hubo de los dos, el renglón dice “N nuevos · M ya estaban en Kadesh”. No mostrar “0 ya estaban” ni “0 omitidos”: esos renglones solo aparecen si el número es mayor a cero. Escape cierra filtros o el panel de resultado.
 
 El toggle de fuente lleva isotipos: pin de Google Maps y marca INEGI (azul institucional `#003057` / cian). El motion es de producto (Corporate): 280ms, `cubic-bezier(0.2, 0, 0, 1)`, respeta `prefers-reduced-motion`. El momento principal es el panel de resultado deslizándose desde la izquierda; el resto es feedback (pastilla del toggle, CTA, FABs). Mientras **Buscar leads** está en curso, el pin palpita y del centro salen anillos hasta el borde del radio: el círculo punteado avanza y su relleno respira. Con movimiento reducido el mapa se queda quieto.
 
@@ -38,3 +38,9 @@ No hay loop de `promoteInegiEstablishmentToLead`. No llama `syncEstablishmentsFr
 ## Lista de clientes
 
 En Clientes hay un filtro **Fuente** (`Google Maps` | `INEGI`) alineado con `TechBusinessLead.source`. Al agregar un lead a mano, INEGI también está en el select de fuente. En la ficha, INEGI no muestra **Info de Google**: muestra **Registro INEGI** (razón social, actividad, empleados, dirección, mapa). Rating y reseñas solo en fuente Google Maps.
+
+## Decisiones
+
+### 2026-10-10 — El panel cuenta lo agregado, no solo lo creado
+
+El aviso de arriba usaba `syncedLeadsCount` y el panel de la izquierda `created`. Cuando la búsqueda traía negocios que Kadesh ya tenía (de otra empresa), `created` era 0. El aviso decía “60 agregados” y el panel “No hay leads nuevos”, sin **Ver en Clientes**. Ahora el panel usa el mismo número que el aviso.

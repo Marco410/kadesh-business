@@ -10,6 +10,7 @@ export { default as ClientProjectAutocomplete } from './ClientProjectAutocomplet
 export type { ClientProjectAutocompleteProps } from './ClientProjectAutocomplete';
 export { default as ConfirmModal } from './ConfirmModal';
 export { default as ModalPortal } from './ModalPortal';
+export { default as InfoTip } from './InfoTip';
 export { default as BodyScrollLock } from './BodyScrollLock';
 export { BODY_SCROLL_LOCK_ATTR } from './BodyScrollLock';
 export { default as PaletteColorPicker } from './PaletteColorPicker';

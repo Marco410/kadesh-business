@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   USER_VENDEDOR_DETAIL_QUERY,
+  vendedorDetailVariables,
   type UserVendedorDetailVariables,
   type UserVendedorDetailResponse,
 } from "./queries";
@@ -13,9 +14,6 @@ import {
   UPDATE_TECH_PROPOSAL_MUTATION,
   type UpdateTechProposalVariables,
   type UpdateTechProposalMutation,
-  DELETE_TECH_STATUS_BUSINESS_LEAD_MUTATION,
-  type DeleteTechStatusBusinessLeadVariables,
-  type DeleteTechStatusBusinessLeadMutation,
   UPDATE_TECH_BUSINESS_LEAD_MUTATION,
   type UpdateTechBusinessLeadVariables,
   type UpdateTechBusinessLeadMutation,
@@ -100,7 +98,7 @@ export default function VendedorDetailModal({
     UserVendedorDetailResponse,
     UserVendedorDetailVariables
   >(USER_VENDEDOR_DETAIL_QUERY, {
-    variables: { where: { id: vendedorId ?? "" } },
+    variables: vendedorDetailVariables(vendedorId ?? ""),
     skip: !isOpen || !vendedorId,
   });
 
@@ -111,25 +109,20 @@ export default function VendedorDetailModal({
     refetchQueries: [
       {
         query: USER_VENDEDOR_DETAIL_QUERY,
-        variables: { where: { id: vendedorId ?? "" } },
+        variables: vendedorDetailVariables(vendedorId ?? ""),
       },
     ],
   });
 
   const refetchVendedorDetail = {
     query: USER_VENDEDOR_DETAIL_QUERY,
-    variables: { where: { id: vendedorId ?? "" } },
+    variables: vendedorDetailVariables(vendedorId ?? ""),
   } as const;
 
   const [updateTechBusinessLead] = useMutation<
     UpdateTechBusinessLeadMutation,
     UpdateTechBusinessLeadVariables
-  >(UPDATE_TECH_BUSINESS_LEAD_MUTATION);
-
-  const [deleteTechStatusBusinessLead] = useMutation<
-    DeleteTechStatusBusinessLeadMutation,
-    DeleteTechStatusBusinessLeadVariables
-  >(DELETE_TECH_STATUS_BUSINESS_LEAD_MUTATION, {
+  >(UPDATE_TECH_BUSINESS_LEAD_MUTATION, {
     awaitRefetchQueries: true,
     refetchQueries: [refetchVendedorDetail],
   });
@@ -165,29 +158,16 @@ export default function VendedorDetailModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, onClose]);
 
-  const handleUnassignLead = async (
-    techStatusId: string,
-    salesPersons: Array<{ id: string }> | { id: string } | null,
-    techBusinessLeadId: string | undefined,
-  ) => {
-    const spArray = Array.isArray(salesPersons)
-      ? salesPersons
-      : salesPersons
-        ? [salesPersons]
-        : [];
-    if (!vendedorId || !spArray.some((sp) => sp.id === vendedorId)) return;
-    setUnassigningLeadId(techStatusId);
+  // Desasignar solo quita al vendedor del lead: el estatus es de la empresa y no se borra.
+  const handleUnassignLead = async (leadId: string) => {
+    if (!vendedorId) return;
+    setUnassigningLeadId(leadId);
     try {
-      if (techBusinessLeadId) {
-        await updateTechBusinessLead({
-          variables: {
-            where: { id: techBusinessLeadId },
-            data: { salesPerson: { disconnect: [{ id: vendedorId }] } },
-          },
-        });
-      }
-      await deleteTechStatusBusinessLead({
-        variables: { where: { id: techStatusId } },
+      await updateTechBusinessLead({
+        variables: {
+          where: { id: leadId },
+          data: { salesPerson: { disconnect: [{ id: vendedorId }] } },
+        },
       });
     } finally {
       setUnassigningLeadId(null);
@@ -226,7 +206,7 @@ export default function VendedorDetailModal({
 
   const counts = useMemo(
     () => ({
-      clientes: user?.techStatusBusinessLeads.length ?? 0,
+      clientes: user?.businessLeadsAssigned.length ?? 0,
       actividad: user?.salesActivities.length ?? 0,
       propuestas: user?.proposals.length ?? 0,
       seguimientos: user?.followUpTasks.length ?? 0,
@@ -593,17 +573,17 @@ export default function VendedorDetailModal({
                         <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
                           Clientes asignados a este vendedor.
                         </p>
-                        {user.techStatusBusinessLeads.length === 0 ? (
+                        {user.businessLeadsAssigned.length === 0 ? (
                           <EmptyBlock message="Sin clientes asignados." />
                         ) : (
                           <ul className="space-y-2">
-                            {user.techStatusBusinessLeads.map((s) => {
-                              const leadId = s.businessLead?.id;
-                              const name =
-                                s.businessLead?.businessName ?? "Cliente";
+                            {user.businessLeadsAssigned.map((lead) => {
+                              const leadId = lead.id;
+                              const name = lead.businessName || "Cliente";
+                              const s = lead.status?.[0] ?? null;
                               return (
                                 <li
-                                  key={s.id}
+                                  key={lead.id}
                                   className="flex flex-col gap-2 rounded-xl border border-[#e8e8e8] p-3 dark:border-[#333] sm:flex-row sm:items-center"
                                 >
                                   <div className="min-w-0 flex-1 space-y-1.5">
@@ -621,7 +601,7 @@ export default function VendedorDetailModal({
                                       </p>
                                     )}
                                     <div className="flex flex-wrap gap-1.5">
-                                      {s.pipelineStatus && (
+                                      {s?.pipelineStatus && (
                                         <span
                                           className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                                             PIPELINE_STATUS_COLORS[
@@ -633,7 +613,7 @@ export default function VendedorDetailModal({
                                           {s.pipelineStatus}
                                         </span>
                                       )}
-                                      {s.opportunityLevel && (
+                                      {s?.opportunityLevel && (
                                         <MetaChip>{s.opportunityLevel}</MetaChip>
                                       )}
                                     </div>
@@ -641,17 +621,11 @@ export default function VendedorDetailModal({
                                   {canUnassign && (
                                     <button
                                       type="button"
-                                      onClick={() =>
-                                        handleUnassignLead(
-                                          s.id,
-                                          s.salesPerson,
-                                          s.businessLead?.id,
-                                        )
-                                      }
-                                      disabled={unassigningLeadId === s.id}
+                                      onClick={() => handleUnassignLead(lead.id)}
+                                      disabled={unassigningLeadId === lead.id}
                                       className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] px-3 text-sm font-medium text-[#616161] transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40 dark:border-[#3a3a3a] dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-red-400"
                                     >
-                                      {unassigningLeadId === s.id ? (
+                                      {unassigningLeadId === lead.id ? (
                                         <span className="size-4 animate-spin rounded-full border-2 border-red-400 border-t-transparent" />
                                       ) : (
                                         <HugeiconsIcon

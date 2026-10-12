@@ -12,6 +12,7 @@ import { Routes } from "kadesh/core/routes";
 import { useUser } from "kadesh/utils/UserContext";
 import { isPlatformAdminUser } from "kadesh/utils/user-roles";
 import { NICHE_TARGET_MAPPING } from "kadesh/constants/constans";
+import { trackLogout } from "kadesh/utils/activity";
 import FontSizeSlider from "./FontSizeSlider";
 
 interface DropdownLink {
@@ -137,6 +138,9 @@ export default function Navigation() {
 
   const handleLogout = async () => {
     try {
+      // Registrar la salida antes de borrar el token (la petición lo necesita).
+      trackLogout();
+
       // Limpiar token del localStorage
       localStorage.removeItem("keystonejs-session-token");
 

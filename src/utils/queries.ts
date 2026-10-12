@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import type { SignupAttribution } from "kadesh/utils/attribution";
 
 export const AUTHENTICATED_ITEM_QUERY = gql(`
   query AuthenticatedItem {
@@ -205,17 +206,22 @@ export const AUTHENTICATE_USER_MUTATION = gql`
   }
 `;
 
-/** Backend must implement this mutation (e.g. custom resolver or Keystone auth plugin). */
-export const AUTHENTICATE_USER_WITH_GOOGLE_MUTATION = gql`
+/**
+ * `withAttribution: false` es la versión sin el argumento `attribution`, para un back que todavía
+ * no lo acepta (ver `isAttributionArgumentError` en `kadesh/utils/attribution`).
+ */
+const authenticateUserWithGoogleDocument = (withAttribution: boolean) => gql`
   mutation AuthenticateUserWithGoogle(
     $idToken: String!
     $referrerCode: String
     $product: String
+    ${withAttribution ? "$attribution: JSON" : ""}
   ) {
     authenticateUserWithGoogle(
       idToken: $idToken
       referrerCode: $referrerCode
       product: $product
+      ${withAttribution ? "attribution: $attribution" : ""}
     ) {
       ... on UserAuthenticationWithGoogleSuccess {
         sessionToken
@@ -244,16 +250,22 @@ export const AUTHENTICATE_USER_WITH_GOOGLE_MUTATION = gql`
   }
 `;
 
-export const REGISTER_USER_MUTATION = gql`
+export const AUTHENTICATE_USER_WITH_GOOGLE_MUTATION = authenticateUserWithGoogleDocument(true);
+export const AUTHENTICATE_USER_WITH_GOOGLE_LEGACY_MUTATION = authenticateUserWithGoogleDocument(false);
+
+/** Igual que Google: la versión sin `attribution` es para un back que todavía no la acepta. */
+const registerUserDocument = (withAttribution: boolean) => gql`
   mutation RegisterUser(
     $data: UserCreateInput!
     $referrerCode: String
     $companyName: String
+    ${withAttribution ? "$attribution: JSON" : ""}
   ) {
     registerUser(
       data: $data
       referrerCode: $referrerCode
       companyName: $companyName
+      ${withAttribution ? "attribution: $attribution" : ""}
     ) {
       name
       lastName
@@ -263,6 +275,9 @@ export const REGISTER_USER_MUTATION = gql`
     }
   }
 `;
+
+export const REGISTER_USER_MUTATION = registerUserDocument(true);
+export const REGISTER_USER_LEGACY_MUTATION = registerUserDocument(false);
 
 export const CREATE_SAAS_COMPANY_MUTATION = gql`
   mutation CreateSaasCompany($data: SaasCompanyCreateInput!) {
@@ -346,34 +361,6 @@ export interface AuthenticateUserVariables {
   password: string;
 }
 
-export const CREATE_USER_AUTH_LOG_MUTATION = gql`
-  mutation CreateUserAuthLog($data: UserAuthLogCreateInput!) {
-    createUserAuthLog(data: $data) {
-      id
-    }
-  }
-`;
-
-/** Campos alineados con Keystone `UserAuthLog`. */
-export interface UserAuthLogCreateInput {
-  user?: { connect: { id: string } };
-  source: string;
-  step: string;
-  success: boolean;
-  message?: string | null;
-  emailMasked?: string | null;
-  responseSnapshot?: Record<string, unknown> | null;
-  durationMs?: number | null;
-}
-
-export interface CreateUserAuthLogVariables {
-  data: UserAuthLogCreateInput;
-}
-
-export interface CreateUserAuthLogResponse {
-  createUserAuthLog: { id: string } | null;
-}
-
 export interface AuthenticateUserResponse {
   authenticateUserWithPassword:
     | {
@@ -407,6 +394,8 @@ export interface AuthenticateUserWithGoogleVariables {
   idToken: string;
   referrerCode?: string | null;
   product?: "pet" | "saas";
+  /** De dónde llegó (solo cuenta si es alta nueva). */
+  attribution?: SignupAttribution | null;
 }
 
 export interface AuthenticateUserWithGoogleResponse {
@@ -453,6 +442,8 @@ export interface RegisterUserVariables {
   };
   referrerCode?: string | null;
   companyName?: string | null;
+  /** De dónde llegó antes de registrarse (`kadesh/utils/attribution`). */
+  attribution?: SignupAttribution | null;
 }
 
 export interface RegisterUserResponse {

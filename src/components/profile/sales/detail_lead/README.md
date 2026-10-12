@@ -29,4 +29,4 @@ Un mismo negocio puede existir como Google y como INEGI; esta ficha muestra la f
 
 ## Acceso
 
-Con alcance empresa (`clientes.ver_empresa`) se cargan todos los estatus de la company y se muestra/edita el **canónico** (vendedor asignado; si no hay, el de empresa). Sin alcance empresa, solo el estatus del vendedor en sesión. Editar ficha / pipeline: `clientes.editar`. Acciones de CRM y calendario siguen las features de plan (`sales_activities`, `proposals`, `follow_up_tasks`, `CALENDAR_CRM`) más los permisos del catálogo. Ver `usuarios/README.md` y `sales/README.md`.
+Se carga y edita el estatus de la empresa: uno por lead, compartido por todo el equipo. Lo que cambia un vendedor lo ve el admin y viceversa. Sin `clientes.ver_empresa` solo se abren los leads asignados. Editar ficha / pipeline: `clientes.editar`. Acciones de CRM y calendario siguen las features de plan (`sales_activities`, `proposals`, `follow_up_tasks`, `CALENDAR_CRM`) más los permisos del catálogo. Ver `usuarios/README.md` y `sales/README.md`.

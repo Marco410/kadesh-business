@@ -20,6 +20,7 @@ Los pasos se omiten solos si el elemento no existe (rol, plan o feature sin acce
 - `OnboardingProvider` (dentro de `ClientProviders`): corre el tour con driver.js y navega entre secciones con `router.push` (el panel es un SPA por `?tab=`).
 - Progreso: `User.onboardingState` (JSON en kadesh-back, solo lo lee/edita el propio usuario) + `localStorage` como respaldo. Se unen ambos para no repetir el tour si una falla.
 - Estilos: `tour.css` (claro/oscuro, ancho completo en móvil).
+- Registro de uso: al terminar o saltar un tour se manda `ui.tour_completed` / `ui.tour_skipped` con el id del tour y el paso (`kadesh/utils/activity`). `onboardingState` guarda solo el último estado; el evento guarda cuándo y en qué paso lo dejaron (se ve en Operaciones → Actividad → Navegación).
 
 ## Cómo agregar o mantener un paso (obligatorio al crear features)
 1. Pon `data-tour="<seccion>-<elemento>"` en el elemento (o reutiliza un `#id` estable).

@@ -78,10 +78,23 @@ function defaultBrandForAudience(audience: AdminEmailAudience): EmailBrandId {
   return "saas";
 }
 
-export default function AdminEmailsPanel() {
-  const [audience, setAudience] = useState<AdminEmailAudience>("saas");
+/**
+ * `initialEmails` (desde `&para=` en la URL) abre en "Específicos" con esos destinatarios:
+ * lo usa **Enviar correo** del 360 de una empresa.
+ */
+export default function AdminEmailsPanel({
+  initialEmails,
+}: {
+  initialEmails?: string[];
+} = {}) {
+  const hasInitial = Boolean(initialEmails?.length);
+  const [audience, setAudience] = useState<AdminEmailAudience>(
+    hasInitial ? "custom" : "saas",
+  );
   const [brand, setBrand] = useState<EmailBrandId>("saas");
-  const [emailsRaw, setEmailsRaw] = useState("");
+  const [emailsRaw, setEmailsRaw] = useState(
+    hasInitial ? (initialEmails ?? []).join("\n") : "",
+  );
   const [subject, setSubject] = useState("");
   const [title, setTitle] = useState("");
   const [eyebrow, setEyebrow] = useState("");

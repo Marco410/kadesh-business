@@ -45,11 +45,6 @@ export const COMPANY_DASHBOARD_QUERY = gql`
         estimatedValue
         opportunityLevel
         firstContactDate
-        salesPerson {
-          id
-          name
-          lastName
-        }
         businessLead {
           id
           businessName
@@ -145,7 +140,6 @@ export interface DashboardPipelineRow {
   estimatedValue: number | null;
   opportunityLevel: string | null;
   firstContactDate: string | null;
-  salesPerson: { id: string; name: string; lastName: string | null } | null;
   businessLead: {
     id: string;
     businessName: string;

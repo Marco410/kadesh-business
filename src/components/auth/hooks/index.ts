@@ -1,4 +1,4 @@
 export { useLogin } from "./useLogin";
 export { useRegister } from "./useRegister";
 export { useGoogleLogin } from "./useGoogleLogin";
-export { useTouchUserLastLogin } from "./useTouchUserLastLogin";
+export { SESSION_ENDED_PARAM, sessionEndedMessage } from "./session";

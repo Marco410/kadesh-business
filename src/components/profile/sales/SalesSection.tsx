@@ -18,7 +18,7 @@ import {
   UPDATE_TECH_BUSINESS_LEAD_MUTATION,
   UPDATE_TECH_STATUS_BUSINESS_LEAD_MUTATION,
   CREATE_TECH_STATUS_BUSINESS_LEAD_MUTATION,
-  TECH_STATUS_BUSINESS_LEADS_BY_LEADS_AND_SALES_PERSON_QUERY,
+  TECH_STATUS_BUSINESS_LEADS_BY_LEADS_AND_COMPANY_QUERY,
   type TechBusinessLeadsResponse,
   type TechBusinessLeadsVariables,
   type TechBusinessLeadsCountResponse,
@@ -33,8 +33,8 @@ import {
   type UpdateTechStatusBusinessLeadMutation,
   type CreateTechStatusBusinessLeadVariables,
   type CreateTechStatusBusinessLeadMutation,
-  type TechStatusBusinessLeadsByLeadsAndSalesPersonResponse,
-  type TechStatusBusinessLeadsByLeadsAndSalesPersonVariables,
+  type TechStatusBusinessLeadsByLeadsAndCompanyResponse,
+  type TechStatusBusinessLeadsByLeadsAndCompanyVariables,
 } from "kadesh/components/profile/sales/queries";
 import SalesLeadsTable from "kadesh/components/profile/sales/SalesLeadsTable";
 import EmptyCompanySection from "kadesh/components/profile/sales/EmptyCompanySection";
@@ -57,10 +57,7 @@ import {
 import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 import { downloadLeadsExcel } from "./exportLeadsExcel";
 import { buildClientLeadsQueryVariables } from "./helpers/client-leads-query";
-import {
-  pickCanonicalLeadStatus,
-  primaryAssignedSalesPersonId,
-} from "./helpers/canonical-lead-status";
+import { companyLeadStatus } from "./helpers/company-lead-status";
 import { expandCategoryFilterValues } from "./helpers/category";
 import LeadsViewToggle, { type LeadsView } from "./LeadsViewToggle";
 import LeadsKanbanBoard from "./LeadsKanbanBoard";
@@ -349,12 +346,10 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const filterByUnassigned = filterByVendedorId === "sin_asignar";
 
   /**
-   * Alcance empresa: el canónico y “Asignado a” se afinan en cliente
-   * (la query anida salesPerson por company; el status puede tener vendedor huérfano).
+   * Alcance empresa: “Asignado a” se afina en cliente (la query anida salesPerson por company).
    * Texto (empresa/ciudad/estado/país): en cliente, sin acentos (el API no hace unaccent).
+   * El pipeline se filtra en el servidor: hay un solo estatus por (lead, empresa).
    */
-  const applyCanonicalPipelineClientFilter =
-    hasCompanyWideLeadScope && selectedPipeline != null;
   const applyAssignmentClientFilter =
     hasCompanyWideLeadScope &&
     (filterBySpecificVendedor || filterByUnassigned);
@@ -364,23 +359,18 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     debouncedState.length > 0 ||
     debouncedCountry.length > 0;
   const applyClientListFilter =
-    applyCanonicalPipelineClientFilter ||
     applyAssignmentClientFilter ||
     applyTextClientFilter;
 
+  // Estatus compartido de la empresa (uno por lead); no depende de quién lo ve.
   const statusSomeConditions: Array<{
-    salesPerson?: { id: { equals: string } } | null;
     saasCompany?: { id: { equals: string } };
     pipelineStatus?: { equals: string };
   }> = [];
 
-  if (!hasCompanyWideLeadScope) {
-    statusSomeConditions.push({ salesPerson: { id: { equals: userId } } });
-  }
   if (companyId != null) {
     statusSomeConditions.push({ saasCompany: { id: { equals: companyId } } });
   }
-  // Filtro de pipeline en servidor (simple y fiable). El canónico se afina en cliente.
   if (selectedPipeline != null) {
     statusSomeConditions.push({ pipelineStatus: { equals: selectedPipeline } });
   }
@@ -391,7 +381,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       : [];
 
   const where = {
-    // Asignación = relación del lead (columna “Asignado a”), no status.salesPerson.
+    // Asignación = relación del lead (columna “Asignado a”); el estatus es de la empresa.
     ...(filterBySpecificVendedor
       ? { salesPerson: { some: { id: { equals: filterByVendedorId } } } }
       : !hasCompanyWideLeadScope
@@ -515,7 +505,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     serverCount > 0 ? Math.min(page, serverTotalPages) : page;
 
   /**
-   * Con filtros que se afinan en cliente (pipeline canónico / asignación):
+   * Con filtros que se afinan en cliente (asignación / texto):
    * traemos todos los candidatos del API y paginamos/contamos tras filtrar.
    */
   const clientListFetchTake = applyClientListFilter
@@ -525,8 +515,6 @@ export default function SalesSection({ userId }: SalesSectionProps) {
   const leadsQueryVariables = buildClientLeadsQueryVariables({
     where,
     companyId,
-    hasCompanyWideLeadScope,
-    userId,
     take: clientListFetchTake,
     skip: applyClientListFilter ? 0 : (serverEffectivePage - 1) * pageSize,
     orderBy: [{ createdAt: "desc" }],
@@ -568,13 +556,6 @@ export default function SalesSection({ userId }: SalesSectionProps) {
         );
       }
     }
-    if (applyCanonicalPipelineClientFilter && selectedPipeline) {
-      next = next.filter(
-        (lead) =>
-          pickCanonicalLeadStatus(lead.status, lead.salesPerson)
-            ?.pipelineStatus === selectedPipeline,
-      );
-    }
     if (applyTextClientFilter) {
       next = next.filter(
         (lead) =>
@@ -587,7 +568,6 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     return next;
   }, [
     applyAssignmentClientFilter,
-    applyCanonicalPipelineClientFilter,
     applyTextClientFilter,
     debouncedCity,
     debouncedCountry,
@@ -597,7 +577,6 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     filterByUnassigned,
     filterByVendedorId,
     leadsRaw,
-    selectedPipeline,
   ]);
 
   const totalCount = applyClientListFilter
@@ -641,13 +620,11 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     totalCount,
     serverCount,
     applyClientListFilter,
-    applyCanonicalPipelineClientFilter,
     applyAssignmentClientFilter,
     applyTextClientFilter,
     filterByUnassigned,
     filterBySpecificVendedor,
     filterByVendedorId,
-    selectedPipeline,
     debouncedSearch,
     debouncedCity,
     debouncedState,
@@ -661,13 +638,11 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       totalCount,
       serverCount,
       applyClientListFilter,
-      applyCanonicalPipelineClientFilter,
       applyAssignmentClientFilter,
       applyTextClientFilter,
       filterByUnassigned,
       filterBySpecificVendedor,
       filterByVendedorId,
-      selectedPipeline,
       debouncedSearch,
       debouncedCity,
       debouncedState,
@@ -721,13 +696,6 @@ export default function SalesSection({ userId }: SalesSectionProps) {
           );
         }
       }
-      if (ctx.applyCanonicalPipelineClientFilter && ctx.selectedPipeline) {
-        allLeads = allLeads.filter(
-          (lead) =>
-            pickCanonicalLeadStatus(lead.status, lead.salesPerson)
-              ?.pipelineStatus === ctx.selectedPipeline,
-        );
-      }
       if (ctx.applyTextClientFilter) {
         allLeads = allLeads.filter(
           (lead) =>
@@ -737,7 +705,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
             matchesNormalized(lead.country, ctx.debouncedCountry),
         );
       }
-      downloadLeadsExcel(allLeads, hasCompanyWideLeadScope);
+      downloadLeadsExcel(allLeads);
       if (fetchCount > MAX_LEADS_EXPORT) {
         sileo.warning({
           title: "Exportación parcial",
@@ -758,7 +726,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     } finally {
       setExportingExcel(false);
     }
-  }, [client, hasCompanyWideLeadScope, userId]);
+  }, [client, userId]);
 
   const [updateLead] = useMutation<
     UpdateTechBusinessLeadMutation,
@@ -781,13 +749,9 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       if (pendingPipelines[leadId]) return;
       const lead = leads.find((item) => item.id === leadId);
       if (!lead) return;
-      const status = pickCanonicalLeadStatus(lead.status, lead.salesPerson);
+      // Estatus compartido de la empresa: lo mueve quien sea y lo ve todo el equipo.
+      const status = companyLeadStatus(lead.status);
       if (status?.pipelineStatus === pipelineStatus) return;
-
-      const assignedSellerId = primaryAssignedSalesPersonId(lead.salesPerson);
-      const statusSalesPersonId = hasCompanyWideLeadScope
-        ? assignedSellerId
-        : userId;
 
       setPendingPipelines((prev) => ({ ...prev, [leadId]: pipelineStatus }));
       try {
@@ -795,15 +759,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
           await updateLeadStatus({
             variables: {
               where: { id: status.id },
-              data: {
-                pipelineStatus,
-                ...(statusSalesPersonId
-                  ? { salesPerson: { connect: { id: statusSalesPersonId } } }
-                  : {}),
-                ...(companyId
-                  ? { saasCompany: { connect: { id: companyId } } }
-                  : {}),
-              },
+              data: { pipelineStatus },
             },
           });
         } else {
@@ -812,9 +768,6 @@ export default function SalesSection({ userId }: SalesSectionProps) {
               data: {
                 businessLead: { connect: { id: leadId } },
                 pipelineStatus,
-                ...(statusSalesPersonId
-                  ? { salesPerson: { connect: { id: statusSalesPersonId } } }
-                  : {}),
                 ...(companyId
                   ? { saasCompany: { connect: { id: companyId } } }
                   : {}),
@@ -847,12 +800,10 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       canEditLeads,
       companyId,
       createLeadStatus,
-      hasCompanyWideLeadScope,
       leads,
       pendingPipelines,
       refetchLeads,
       updateLeadStatus,
-      userId,
     ],
   );
 
@@ -878,17 +829,19 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     if (!assignToVendedorId || selectedLeadIds.size === 0) return;
     try {
       const leadIdsArray = Array.from(selectedLeadIds);
+      // Asignar no toca la etapa: solo se crea el estatus si el lead aún no tiene en la empresa.
       const { data: existingStatusData } = await client.query<
-        TechStatusBusinessLeadsByLeadsAndSalesPersonResponse,
-        TechStatusBusinessLeadsByLeadsAndSalesPersonVariables
+        TechStatusBusinessLeadsByLeadsAndCompanyResponse,
+        TechStatusBusinessLeadsByLeadsAndCompanyVariables
       >({
-        query: TECH_STATUS_BUSINESS_LEADS_BY_LEADS_AND_SALES_PERSON_QUERY,
+        query: TECH_STATUS_BUSINESS_LEADS_BY_LEADS_AND_COMPANY_QUERY,
         variables: {
           where: {
             businessLead: { id: { in: leadIdsArray } },
-            salesPerson: { id: { equals: assignToVendedorId } },
+            ...(companyId ? { saasCompany: { id: { equals: companyId } } } : {}),
           },
         },
+        fetchPolicy: "network-only",
       });
       const leadIdsWithExistingStatus = new Set(
         (existingStatusData?.techStatusBusinessLeads ?? []).map(
@@ -908,7 +861,6 @@ export default function SalesSection({ userId }: SalesSectionProps) {
             variables: {
               data: {
                 businessLead: { connect: { id: leadId } },
-                salesPerson: { connect: { id: assignToVendedorId } },
                 saasCompany: companyId
                   ? { connect: { id: companyId } }
                   : undefined,

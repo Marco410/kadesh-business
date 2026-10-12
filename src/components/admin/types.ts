@@ -225,8 +225,6 @@ export type AdminPetPlaceServiceRow = {
 };
 
 export type AdminOverviewData = {
-  usersCount: number;
-  activeSubscriptions: number;
   pendingPlaces: number;
   verifiedPlaces: number;
   pendingServices: number;
