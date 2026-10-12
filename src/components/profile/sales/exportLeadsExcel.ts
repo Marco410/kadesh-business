@@ -1,6 +1,6 @@
 import type { TechBusinessLeadsResponse } from "kadesh/components/profile/sales/queries";
 import { getCategoryLabel } from "kadesh/components/profile/sales/helpers/category";
-import { pickCanonicalLeadStatus } from "kadesh/components/profile/sales/helpers/canonical-lead-status";
+import { companyLeadStatus } from "kadesh/components/profile/sales/helpers/company-lead-status";
 import { TRACK_EVENT, trackActivity } from "kadesh/utils/activity";
 
 type LeadItem = TechBusinessLeadsResponse["techBusinessLeads"][number];
@@ -13,40 +13,20 @@ function escapeCsvCell(value: string): string {
   return value;
 }
 
-function formatAssigned(lead: LeadItem, isAdminCompany: boolean): string {
-  const persons = lead.salesPerson ?? [];
-  const count = persons.length;
-  if (isAdminCompany && count > 1) {
-    return persons
-      .map((sp) => {
-        const full = [sp?.name, sp?.lastName].filter(Boolean).join(" ").trim();
-        return full || "Sin nombre";
-      })
-      .join(", ");
-  }
-  if (isAdminCompany && count === 1) {
-    const sp = persons[0];
-    return [sp?.name, sp?.lastName].filter(Boolean).join(" ").trim() || "—";
-  }
-  if (isAdminCompany && count === 0) return "—";
-  return `${lead.salesPerson?.[0]?.name ?? ""} ${lead.salesPerson?.[0]?.lastName ?? ""}`.trim() || "—";
+function formatAssigned(lead: LeadItem): string {
+  const names = (lead.salesPerson ?? [])
+    .map((sp) => [sp?.name, sp?.lastName].filter(Boolean).join(" ").trim() || "Sin nombre");
+  return names.length ? names.join(", ") : "—";
 }
 
-function leadToRow(lead: LeadItem, isAdminCompany: boolean): string[] {
-  const leadStatus = pickCanonicalLeadStatus(lead.status, lead.salesPerson);
-  const pipelineAppliedBy =
-    leadStatus?.salesPerson != null
-      ? [leadStatus.salesPerson.name, leadStatus.salesPerson.lastName]
-          .filter(Boolean)
-          .join(" ")
-          .trim() || "—"
-      : "—";
+function leadToRow(lead: LeadItem): string[] {
+  // Estatus compartido de la empresa: ya no hay "quién lo aplicó" (eso queda en la actividad).
+  const leadStatus = companyLeadStatus(lead.status);
 
   return [
     lead.businessName || "—",
     getCategoryLabel(lead.category),
     leadStatus?.pipelineStatus ?? "—",
-    pipelineAppliedBy,
     lead.phone ?? "—",
     lead.city ?? "—",
     lead.state ?? "—",
@@ -54,7 +34,7 @@ function leadToRow(lead: LeadItem, isAdminCompany: boolean): string[] {
     leadStatus?.opportunityLevel ?? "—",
     lead.rating != null ? String(lead.rating) : "—",
     lead.source ?? "—",
-    formatAssigned(lead, isAdminCompany),
+    formatAssigned(lead),
   ];
 }
 
@@ -62,7 +42,6 @@ const HEADERS = [
   "Empresa",
   "Categoría",
   "Pipeline",
-  "Pipeline aplicado por",
   "Teléfono",
   "Ciudad",
   "Estado",
@@ -75,12 +54,11 @@ const HEADERS = [
 
 export function downloadLeadsExcel(
   leads: LeadItem[],
-  isAdminCompany: boolean,
   filenameBase = "clientes"
 ): void {
   const rows: string[][] = [
     [...HEADERS],
-    ...leads.map((lead) => leadToRow(lead, isAdminCompany)),
+    ...leads.map((lead) => leadToRow(lead)),
   ];
   const body = rows.map((row) => row.map(escapeCsvCell).join(",")).join("\r\n");
   const csv = `\ufeff${body}`;

@@ -56,6 +56,10 @@ export default function StatsSection({
   });
 
   const leadsCount = leadsCountData?.techBusinessLeadsCount ?? 0;
+
+  // Estatus compartido de la empresa (uno por lead); los conteos de abajo son de mis leads asignados.
+  const companyStatus =
+    companyId != null ? { saasCompany: { id: { equals: companyId } } } : {};
   
   const proposalsWhere = mergeWorkspaceFilter(
     { assignedSeller: { id: { equals: userId } } },
@@ -79,7 +83,12 @@ export default function StatsSection({
     variables: {
       where: {
         salesPerson: { some: { id: { equals: userId } } },
-        status: { firstContactDate: { not: null } },
+        status: {
+          some: {
+            ...companyStatus,
+            firstContactDate: { not: null },
+          },
+        },
       },
     },
     skip: !userId,
@@ -92,7 +101,12 @@ export default function StatsSection({
     variables: {
       where: {
         salesPerson: { some: { id: { equals: userId } } },
-        status: { pipelineStatus: { equals: PIPELINE_STATUS.CERRADO_GANADO } },
+        status: {
+          some: {
+            ...companyStatus,
+            pipelineStatus: { equals: PIPELINE_STATUS.CERRADO_GANADO },
+          },
+        },
       },
     },
     skip: !userId,

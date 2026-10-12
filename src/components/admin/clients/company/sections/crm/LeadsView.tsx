@@ -63,6 +63,7 @@ export default function LeadsView({
     return {
       where: filters.length === 1 ? filters[0] : { AND: filters },
       statusWhere: { saasCompany: companyIs },
+      sellerWhere: { company: companyIs },
       take: ADMIN_PAGE_SIZE,
       skip: (page - 1) * ADMIN_PAGE_SIZE,
     };
@@ -173,8 +174,10 @@ export default function LeadsView({
                         ) : null}
                       </td>
                       <td className="px-4 py-3 align-top text-[#616161] dark:text-[#b0b0b0]">
-                        {status?.salesPerson
-                          ? formatPersonName(status.salesPerson.name, status.salesPerson.lastName)
+                        {lead.salesPerson.length
+                          ? lead.salesPerson
+                              .map((seller) => formatPersonName(seller.name, seller.lastName))
+                              .join(", ")
                           : "Sin asignar"}
                       </td>
                       <td className="px-4 py-3 align-top tabular-nums text-[#616161] dark:text-[#b0b0b0]">

@@ -37,7 +37,7 @@ const SECTION_COPY: Record<
     benefits: [
       "Gestión de vendedores y permisos",
       "Asignación de leads por cartera",
-      "Visibilidad del pipeline por persona",
+      "Un solo pipeline compartido por todo el equipo",
     ],
   },
   Archivos: {

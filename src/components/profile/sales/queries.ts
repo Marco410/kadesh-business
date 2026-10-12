@@ -140,11 +140,6 @@ export const TECH_BUSINESS_LEADS_QUERY = gql`
         nextFollowUpDate
         opportunityLevel
         pipelineStatus
-        salesPerson {
-          id
-          name
-          lastName
-        }
         saasCompany {
           id
           name
@@ -154,26 +149,19 @@ export const TECH_BUSINESS_LEADS_QUERY = gql`
   }
 `;
 
-/** Filtro para la relación status (solo devolver el status de esta company/vendedor). */
+/** Filtro de la relación status: el de esta company (hay uno por lead y empresa). */
 export interface TechStatusBusinessLeadWhereInputFilter {
-  AND?: Array<{
-    salesPerson?: { id: { equals: string } } | null;
-    saasCompany?: { id: { equals: string } };
-  }>;
-  salesPerson?: { id: { equals: string } } | null;
   saasCompany?: { id: { equals: string } };
 }
 
 type TechBusinessLeadStatusRelFilter = {
   AND?: Array<{
-    /** `null` = sin vendedor en el status (Keystone/Prisma). */
-    salesPerson?: { id: { equals: string } } | null;
     saasCompany?: { id: { equals: string } };
     pipelineStatus?: { equals: string | null };
   }>;
-  salesPerson?: { id: { equals: string } } | null;
   saasCompany?: { id: { equals: string } };
   pipelineStatus?: { equals: string | null };
+  firstContactDate?: { not: null };
 };
 
 type TechBusinessLeadWhereFilter = {
@@ -185,24 +173,9 @@ type TechBusinessLeadWhereFilter = {
     | { none: Record<string, never> };
   saasCompany?: { some: { id: { equals: string } } };
   status?: {
-    pipelineStatus?: { equals: string | null };
-    firstContactDate?: { not: null } | null;
     some?: TechBusinessLeadStatusRelFilter;
     none?: TechBusinessLeadStatusRelFilter;
   };
-  /** Filtro canónico: sin asignar O estatus del vendedor asignado (o fallback empresa). */
-  OR?: Array<{
-    AND?: Array<{
-      salesPerson?:
-        | { some: { id: { equals: string } } }
-        | { some: Record<string, never> }
-        | { none: Record<string, never> };
-      status?: {
-        some?: TechBusinessLeadStatusRelFilter;
-        none?: TechBusinessLeadStatusRelFilter;
-      };
-    }>;
-  }>;
   category?: { equals: string } | { in: string[] };
   source?: { equals: string };
   businessName?: { contains: string; mode?: "insensitive" };
@@ -213,7 +186,7 @@ type TechBusinessLeadWhereFilter = {
 
 export interface TechBusinessLeadsVariables {
   where: TechBusinessLeadWhereFilter;
-  /** Filtro aplicado a la relación status: solo se devuelven status que coincidan (company + opcionalmente salesPerson). */
+  /** Filtro de la relación status: solo el de la company. */
   statusWhere?: TechStatusBusinessLeadWhereInputFilter | null;
   salesPersonWhere2?: UserWhereInput | null;
   take?: number;
@@ -250,117 +223,11 @@ export interface TechBusinessLeadsResponse {
       nextFollowUpDate: string | null;
       opportunityLevel: string | null;
       pipelineStatus: string | null;
-      salesPerson: {
-        id: string;
-        name: string;
-        lastName: string;
-      } | null;
       saasCompany: {
         id: string;
         name: string;
       } | null;
     }> | null;
-  }>;
-}
-
-/** Query para obtener un lead por id filtrando por acceso (salesPerson + saasCompany en status). Usar take: 1. */
-export const TECH_BUSINESS_LEAD_ACCESSIBLE_QUERY = gql`
-  query TechBusinessLeadAccessible(
-    $where: TechBusinessLeadWhereInput!
-    $take: Int
-  ) {
-    techBusinessLeads(where: $where, take: $take) {
-      id
-      address
-      businessName
-      category
-      city
-      state
-      country
-      createdAt
-      facebook
-      googleMapsUrl
-      hasWebsite
-      instagram
-      websiteUrl
-      phone
-      rating
-      reviewCount
-      source
-      tiktok
-      topReview1
-      topReview2
-      topReview3
-      topReview4
-      topReview5
-      updatedAt
-      xTwitter
-      status {
-        id
-        estimatedValue
-        firstContactDate
-        nextFollowUpDate
-        notes
-        opportunityLevel
-        pipelineStatus
-        productOffered
-        salesPerson {
-          id
-          name
-        }
-        saasCompany {
-          id
-          name
-        }
-      }
-    }
-  }
-`;
-
-export interface TechBusinessLeadAccessibleVariables {
-  where: TechBusinessLeadsVariables["where"];
-  take?: number;
-}
-
-export interface TechBusinessLeadAccessibleResponse {
-  techBusinessLeads: Array<{
-    id: string;
-    address: string | null;
-    businessName: string;
-    category: string | null;
-    city: string | null;
-    state: string | null;
-    country: string | null;
-    createdAt: string;
-    facebook: string | null;
-    googleMapsUrl: string | null;
-    hasWebsite: boolean | null;
-    instagram: string | null;
-    websiteUrl: string | null;
-    phone: string | null;
-    rating: number | null;
-    reviewCount: number | null;
-    source: string | null;
-    tiktok: string | null;
-    topReview1: string | null;
-    topReview2: string | null;
-    topReview3: string | null;
-    topReview4: string | null;
-    topReview5: string | null;
-    updatedAt: string | null;
-    xTwitter: string | null;
-    status: {
-      id: string;
-      estimatedValue: number | null;
-      firstContactDate: string | null;
-      nextFollowUpDate: string | null;
-      notes: string | null;
-      opportunityLevel: string | null;
-      pipelineStatus: string | null;
-      productOffered: string | null;
-      salesPerson: { id: string; name: string } | null;
-      saasCompany: { id: string; name: string } | null;
-    } | null;
   }>;
 }
 
@@ -446,10 +313,6 @@ export const TECH_BUSINESS_LEAD_QUERY = gql`
         opportunityLevel
         pipelineStatus
         productOffered
-        salesPerson {
-          id
-          name
-        }
         saasCompany {
           id
           name
@@ -468,7 +331,7 @@ export const TECH_BUSINESS_LEAD_QUERY = gql`
 
 export interface TechBusinessLeadVariables {
   where: { id: string };
-  /** Filtro para la relación status: solo devolver el de esta company (y vendedor si no es admin). */
+  /** Filtro de la relación status: solo el de esta company. */
   statusWhere?: TechStatusBusinessLeadWhereInputFilter | null;
   /** Filtro de asignados (p. ej. misma company). */
   salesPersonWhere2?: { company?: { id?: { equals: string } } } | null;
@@ -537,10 +400,6 @@ export interface TechBusinessLeadResponse {
       opportunityLevel: string | null;
       pipelineStatus: string | null;
       productOffered: string | null;
-      salesPerson: {
-        id: string;
-        name: string;
-      } | null;
       saasCompany: {
         id: string;
         name: string;
@@ -600,7 +459,7 @@ export interface UpdateTechBusinessLeadMutation {
   };
 }
 
-/** Campos que viven en TechStatusBusinessLead (relación 1:1 con TechBusinessLead). */
+/** Campos que viven en TechStatusBusinessLead: uno por (lead, empresa), compartido por el equipo. */
 export const UPDATE_TECH_STATUS_BUSINESS_LEAD_MUTATION = gql`
   mutation UpdateTechStatusBusinessLead(
     $where: TechStatusBusinessLeadWhereUniqueInput!
@@ -619,11 +478,6 @@ export const UPDATE_TECH_STATUS_BUSINESS_LEAD_MUTATION = gql`
   }
 `;
 
-type TechStatusSalesPersonRelInput = {
-  connect?: { id: string };
-  disconnect?: boolean;
-};
-
 export interface UpdateTechStatusBusinessLeadVariables {
   where: { id: string };
   data: {
@@ -634,8 +488,6 @@ export interface UpdateTechStatusBusinessLeadVariables {
     opportunityLevel?: string | null;
     pipelineStatus?: string | null;
     productOffered?: string | null;
-    salesPerson?: TechStatusSalesPersonRelInput;
-    saasCompany?: { connect: { id: string } };
   };
 }
 
@@ -695,7 +547,6 @@ export interface CreateTechStatusBusinessLeadVariables {
     opportunityLevel?: string | null;
     pipelineStatus?: string | null;
     productOffered?: string | null;
-    salesPerson?: TechStatusSalesPersonRelInput;
     saasCompany?: { connect: { id: string } };
   };
 }
@@ -713,9 +564,9 @@ export interface CreateTechStatusBusinessLeadMutation {
   };
 }
 
-/** Lista status por lead ids y vendedor para saber cuáles ya tienen status (evitar duplicados al asignar). */
-export const TECH_STATUS_BUSINESS_LEADS_BY_LEADS_AND_SALES_PERSON_QUERY = gql`
-  query TechStatusBusinessLeadsByLeadsAndSalesPerson(
+/** Status de la empresa para esos leads: al asignar solo se crea el que falta (uno por lead y empresa). */
+export const TECH_STATUS_BUSINESS_LEADS_BY_LEADS_AND_COMPANY_QUERY = gql`
+  query TechStatusBusinessLeadsByLeadsAndCompany(
     $where: TechStatusBusinessLeadWhereInput!
   ) {
     techStatusBusinessLeads(where: $where, take: 500) {
@@ -726,14 +577,14 @@ export const TECH_STATUS_BUSINESS_LEADS_BY_LEADS_AND_SALES_PERSON_QUERY = gql`
   }
 `;
 
-export interface TechStatusBusinessLeadsByLeadsAndSalesPersonVariables {
+export interface TechStatusBusinessLeadsByLeadsAndCompanyVariables {
   where: {
     businessLead: { id: { in: string[] } };
-    salesPerson: { id: { equals: string } };
+    saasCompany?: { id: { equals: string } };
   };
 }
 
-export interface TechStatusBusinessLeadsByLeadsAndSalesPersonResponse {
+export interface TechStatusBusinessLeadsByLeadsAndCompanyResponse {
   techStatusBusinessLeads: Array<{
     businessLead: { id: string };
   }>;

@@ -81,8 +81,10 @@ export default function LeadQuickView({
               items={[
                 {
                   label: "Vendedor",
-                  value: status?.salesPerson
-                    ? formatPersonName(status.salesPerson.name, status.salesPerson.lastName)
+                  value: lead.salesPerson.length
+                    ? lead.salesPerson
+                        .map((seller) => formatPersonName(seller.name, seller.lastName))
+                        .join(", ")
                     : "Sin asignar",
                 },
                 {

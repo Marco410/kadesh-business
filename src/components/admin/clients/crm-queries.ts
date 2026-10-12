@@ -29,6 +29,7 @@ export const ADMIN_COMPANY_LEADS_QUERY = gql`
   query AdminCompanyLeads(
     $where: TechBusinessLeadWhereInput!
     $statusWhere: TechStatusBusinessLeadWhereInput!
+    $sellerWhere: UserWhereInput!
     $take: Int
     $skip: Int!
   ) {
@@ -48,29 +49,32 @@ export const ADMIN_COMPANY_LEADS_QUERY = gql`
       source
       rating
       createdAt
+      salesPerson(where: $sellerWhere) {
+        id
+        name
+        lastName
+      }
       status(where: $statusWhere, take: 1) {
         id
         pipelineStatus
         opportunityLevel
         estimatedValue
-        salesPerson {
-          id
-          name
-          lastName
-        }
       }
     }
     techBusinessLeadsCount(where: $where)
   }
 `;
 
+/** Estatus de la empresa (uno por lead y empresa, compartido por el equipo). */
 export type AdminLeadStatus = {
   id: string;
   pipelineStatus: string | null;
   opportunityLevel: string | null;
   estimatedValue: number | null;
-  salesPerson: { id: string; name: string; lastName: string | null } | null;
 };
+
+/** Vendedores asignados al lead dentro de la empresa (`TechBusinessLead.salesPerson`). */
+export type AdminLeadSeller = { id: string; name: string; lastName: string | null };
 
 export type AdminCompanyLeadRow = {
   id: string;
@@ -83,6 +87,7 @@ export type AdminCompanyLeadRow = {
   source: string | null;
   rating: number | null;
   createdAt: string;
+  salesPerson: AdminLeadSeller[];
   status: AdminLeadStatus[];
 };
 
@@ -97,6 +102,7 @@ export const ADMIN_LEAD_QUICK_VIEW_QUERY = gql`
   query AdminLeadQuickView(
     $id: ID!
     $statusWhere: TechStatusBusinessLeadWhereInput!
+    $sellerWhere: UserWhereInput!
     $crmWhere: TechSalesActivityWhereInput!
     $followUpWhere: TechFollowUpTaskWhereInput!
     $proposalWhere: TechProposalWhereInput!
@@ -118,6 +124,11 @@ export const ADMIN_LEAD_QUICK_VIEW_QUERY = gql`
       source
       googleMapsUrl
       createdAt
+      salesPerson(where: $sellerWhere) {
+        id
+        name
+        lastName
+      }
       status(where: $statusWhere, take: 1) {
         id
         pipelineStatus
@@ -126,11 +137,6 @@ export const ADMIN_LEAD_QUICK_VIEW_QUERY = gql`
         productOffered
         firstContactDate
         notes
-        salesPerson {
-          id
-          name
-          lastName
-        }
       }
       activities(where: $crmWhere, orderBy: [{ activityDate: desc }], take: 15) {
         id
@@ -186,6 +192,7 @@ export type AdminLeadQuickView = {
   source: string | null;
   googleMapsUrl: string | null;
   createdAt: string | null;
+  salesPerson: AdminLeadSeller[];
   status: Array<
     AdminLeadStatus & {
       productOffered: string | null;
@@ -233,6 +240,7 @@ export function leadQuickViewVariables(leadId: string, companyId: string) {
   return {
     id: leadId,
     statusWhere: { saasCompany: { id: { equals: companyId } } },
+    sellerWhere: { company: { id: { equals: companyId } } },
     crmWhere: crmScopeWhere(companyId),
     followUpWhere: crmScopeWhere(companyId),
     proposalWhere: crmScopeWhere(companyId),

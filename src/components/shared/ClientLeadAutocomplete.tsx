@@ -73,12 +73,10 @@ export default function ClientLeadAutocomplete({
       buildClientLeadsQueryVariables({
         where: clientsWhere,
         companyId,
-        hasCompanyWideLeadScope,
-        userId,
         take: 500,
         orderBy: [{ createdAt: "desc" }],
       }),
-    [clientsWhere, companyId, hasCompanyWideLeadScope, userId],
+    [clientsWhere, companyId],
   );
 
   const { data: clientsData, loading: loadingClients } = useQuery<

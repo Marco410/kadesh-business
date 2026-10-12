@@ -48,7 +48,11 @@ export type VendedorWithStats = CompanyVendedoresWithStatsResponse["users"][numb
 
 /** Detalle completo de un vendedor (para modal de detalles). */
 export const USER_VENDEDOR_DETAIL_QUERY = gql`
-  query UserVendedorDetail($where: UserWhereUniqueInput!) {
+  query UserVendedorDetail(
+    $where: UserWhereUniqueInput!
+    $leadsWhere: TechBusinessLeadWhereInput!
+    $statusWhere: TechStatusBusinessLeadWhereInput!
+  ) {
     user(where: $where) {
       id
       name
@@ -106,22 +110,13 @@ export const USER_VENDEDOR_DETAIL_QUERY = gql`
           businessName
         }
       }
-      techStatusBusinessLeads {
+      businessLeadsAssigned(where: $leadsWhere) {
         id
-        pipelineStatus
-        opportunityLevel
-        estimatedValue
-        firstContactDate
-        nextFollowUpDate
-        notes
-        productOffered
-        salesPerson {
+        businessName
+        status(where: $statusWhere) {
           id
-          name
-        }
-        businessLead {
-          id
-          businessName
+          pipelineStatus
+          opportunityLevel
         }
       }
     }
@@ -130,6 +125,20 @@ export const USER_VENDEDOR_DETAIL_QUERY = gql`
 
 export interface UserVendedorDetailVariables {
   where: { id: string };
+  /** Leads asignados de la empresa del vendedor (un lead puede estar en varias empresas). */
+  leadsWhere: Record<string, unknown>;
+  /** Estatus compartido de la empresa del vendedor (uno por lead). */
+  statusWhere: Record<string, unknown>;
+}
+
+/** Variables del detalle: clientes asignados y su estatus, acotados a la empresa del vendedor. */
+export function vendedorDetailVariables(vendedorId: string): UserVendedorDetailVariables {
+  const vendedorCompany = { users: { some: { id: { equals: vendedorId } } } };
+  return {
+    where: { id: vendedorId },
+    leadsWhere: { saasCompany: { some: vendedorCompany } },
+    statusWhere: { saasCompany: vendedorCompany },
+  };
 }
 
 export interface UserVendedorDetailResponse {
@@ -178,17 +187,14 @@ export interface UserVendedorDetailResponse {
       createdAt: string;
       businessLead: { id: string; businessName: string } | null;
     }>;
-    techStatusBusinessLeads: Array<{
+    businessLeadsAssigned: Array<{
       id: string;
-      pipelineStatus: string | null;
-      opportunityLevel: string | null;
-      estimatedValue: number | null;
-      firstContactDate: string | null;
-      nextFollowUpDate: string | null;
-      notes: string | null;
-      productOffered: string | null;
-      salesPerson: Array<{ id: string; name: string }> | { id: string; name: string } | null;
-      businessLead: { id: string; businessName: string } | null;
+      businessName: string;
+      status: Array<{
+        id: string;
+        pipelineStatus: string | null;
+        opportunityLevel: string | null;
+      }> | null;
     }>;
   } | null;
 }
