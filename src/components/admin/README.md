@@ -107,6 +107,7 @@ Nunca muestra prompts de IA, cuerpos de WhatsApp ni contraseñas.
 `?tab=analitica`: cómo va el negocio, no una empresa. Seis vistas (`AdminSegmented`, `&vista=`); cambiar de vista limpia sus filtros.
 
 - **Salud** (default, `adminHealth`): puntaje de 0 a 100 de cada cuenta viva con las últimas 4 semanas. Tarjetas con conteo de **Sana / Por observar / En riesgo** y de las señales **Riesgo de baja / Oportunidad de venta** (clic = filtro). Buscador, filtros **Nivel**, **Señal**, **Orden** (peor salud, mayor caída, mejor salud, nombre) y **Cuentas** (mis cuentas). Cada fila muestra puntaje, tendencia, señales con su motivo, las 5 partes en barras y cuántos del equipo entraron. Abajo, **¿Cómo se calcula la salud?** con la regla en palabras.
+- **Ventas** (`adminSalesVelocity`, fase 5): velocidad comercial. Tasa de cierre, ciclo de venta, valor ganado, estancados, tiempo al primer contacto, contactados en 48 h y WhatsApp (tiempo de respuesta, contestados en 1 h, si los leads contestan); tabla por etapa del pipeline y por empresa (más estancados primero; clic → 360). Si todavía no hay historial de etapas, lo dice y explica cómo recuperarlo. El 360 tiene la misma información en la tarjeta **Velocidad comercial**.
 - **Activación** (`adminActivationFunnel`): de las registradas en el periodo (`&dias=`), qué parte llegó a cada paso y la mediana de días; tabla por mes de registro. Cada paso se cuenta por separado (hay quien paga sin cotizar).
 - **Retención** (`adminCohorts`): tabla por mes de registro con el % que usó Kadesh cada mes después (más uso, más intenso el naranja). `&meses=6|12`.
 - **Uso** (`adminEngagement`): activas al día (promedio), en la semana, en el mes, qué tanto vuelven (DAU ÷ MAU), empresas activas, barras por día, módulos que usa cada plan y secciones más abiertas. Hasta ayer: hoy va a medias.
@@ -184,6 +185,12 @@ Asunto, título de cabecera, etiqueta superior, vista previa de bandeja, cuerpo,
 La columna derecha es vista previa en vivo. **Revisar y enviar** primero cuenta destinatarios (`dryRun`) y pide confirmación antes del envío real. Mutación `sendAdminBroadcastEmail` (solo admin de plataforma).
 
 ## Decisiones
+
+### 2026-10-12 — Ayudas ⓘ e instrucciones en cada vista (Fase 5)
+
+Pedido explícito: que cualquiera del equipo sepa qué es cada número. Cada vista de Analítica empieza con **Cómo leer esta vista** (`analytics/ViewGuide.tsx`) y cada número, tarjeta y columna tiene un ícono ⓘ (`InfoTip` en `ui.tsx`; `help` en `AdminStatTile` y `AdminSectionCard`). Inicio también. Los textos viven todos en `analytics/help.ts`, en español sencillo (se explica "mediana" en vez de nombrarla). La burbuja se abre al tocar (sirve en teléfono, un `title` no), se cierra al tocar fuera, con Escape o al hacer scroll, y va en un portal con posición fija para que no la corte una tabla con scroll. En tarjetas que son botón, el ⓘ va fuera del botón para no anidar botones.
+
+Actividad tiene el tipo **Errores** (lo que le falló a alguien en el panel) y "Requiere atención" el motivo **Errores en el panel**.
 
 ### 2026-10-11 — Analítica (Fase 4)
 

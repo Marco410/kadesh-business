@@ -18,6 +18,7 @@ import {
 import type { AdminCompanyInsights, AdminCompanyProfile } from "../../clients-queries";
 import TrendsCard from "./TrendsCard";
 import CompanyHealthCard from "../../../analytics/CompanyHealthCard";
+import CompanyVelocityCard from "../../../analytics/CompanyVelocityCard";
 import {
   daysSince,
   daysUntil,
@@ -76,6 +77,12 @@ function buildAlerts(company: AdminCompanyProfile, insights: AdminCompanyInsight
       alerts.push({
         tone: "warning",
         text: `${insights.whatsapp.failed} WhatsApp no enviado${insights.whatsapp.failed === 1 ? "" : "s"}.`,
+      });
+    }
+    if (insights.appErrors > 0) {
+      alerts.push({
+        tone: "warning",
+        text: `${insights.appErrors} error${insights.appErrors === 1 ? "" : "es"} en el panel en ${insights.days} días (ver Actividad → Errores).`,
       });
     }
     if (insights.calendarLastError) {
@@ -305,6 +312,8 @@ export default function CompanySummary({
       {insights?.usage.ready ? <PanelUsageCard insights={insights} /> : null}
 
       <TrendsCard companyId={company.id} />
+
+      <CompanyVelocityCard companyId={company.id} />
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <AdminSectionCard title="Pipeline" description="Leads de esta empresa por etapa.">

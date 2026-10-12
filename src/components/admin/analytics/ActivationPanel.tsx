@@ -12,6 +12,8 @@ import {
   AdminSectionCard,
 } from "../ui";
 import { monthLabel } from "../clients/company/format";
+import { HELP } from "./help";
+import ViewGuide from "./ViewGuide";
 import {
   ADMIN_ACTIVATION_FUNNEL_QUERY,
   type AdminActivationFunnelResponse,
@@ -41,10 +43,11 @@ export default function ActivationPanel() {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+      <ViewGuide>
         De las empresas que se registraron en el periodo, qué parte llegó a cada paso y cuánto
-        tardó. Las más recientes han tenido menos tiempo: compáralas por mes abajo.
-      </p>
+        tardó. Un paso con porcentaje bajo es donde se atoran: ahí conviene ayudarles (tutorial,
+        llamada, correo). Las más recientes han tenido menos tiempo: compáralas por mes abajo.
+      </ViewGuide>
       <AdminFilterChips
         label="Registradas en"
         options={[...ANALYTICS_DAY_OPTIONS]}
@@ -65,6 +68,7 @@ export default function ActivationPanel() {
         <>
           <AdminSectionCard
             title="Pasos de activación"
+            help={HELP.activation}
             description={`${funnel.cohortSize} empresa${funnel.cohortSize === 1 ? "" : "s"} registrada${funnel.cohortSize === 1 ? "" : "s"}.`}
           >
             <ol className="flex flex-col gap-3">
@@ -96,7 +100,11 @@ export default function ActivationPanel() {
             </p>
           </AdminSectionCard>
 
-          <AdminSectionCard title="Por mes de registro" description="Cuántas de cada mes llegaron a cada paso.">
+          <AdminSectionCard
+            title="Por mes de registro"
+            description="Cuántas de cada mes llegaron a cada paso."
+            help={HELP.activationByMonth}
+          >
             <div className="relative -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
               <table className="w-full min-w-[560px] text-left text-sm">
                 <thead className="text-xs text-[#616161] dark:text-[#b0b0b0]">

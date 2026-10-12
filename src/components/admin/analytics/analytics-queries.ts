@@ -320,3 +320,91 @@ export type AdminAcquisitionResponse = {
     campaigns: AdminAcquisitionRow[];
   };
 };
+
+export const ADMIN_SALES_VELOCITY_QUERY = gql`
+  query AdminSalesVelocity($input: AdminSalesVelocityInput) {
+    adminSalesVelocity(input: $input) {
+      days
+      dataSince
+      stages {
+        stage
+        entered
+        advanced
+        lost
+        medianDays
+        stalled
+      }
+      won
+      lost
+      winRate
+      wonValue
+      medianCycleDays
+      cycleSample
+      newLeads
+      contacted
+      contactedWithin2Days
+      medianFirstContactHours
+      stalled
+      whatsappInbound
+      whatsappAnswered
+      whatsappAnsweredWithin1h
+      whatsappMedianResponseMinutes
+      whatsappConversations
+      whatsappReplied
+      companies {
+        companyId
+        companyName
+        entered
+        won
+        lost
+        winRate
+        medianCycleDays
+        medianFirstContactHours
+        stalled
+      }
+    }
+  }
+`;
+
+export type AdminSalesVelocity = {
+  days: number;
+  dataSince: string | null;
+  stages: Array<{
+    stage: string;
+    entered: number;
+    advanced: number;
+    lost: number;
+    medianDays: number | null;
+    stalled: number;
+  }>;
+  won: number;
+  lost: number;
+  winRate: number | null;
+  wonValue: number;
+  medianCycleDays: number | null;
+  cycleSample: number;
+  newLeads: number;
+  contacted: number;
+  contactedWithin2Days: number;
+  medianFirstContactHours: number | null;
+  stalled: number;
+  whatsappInbound: number;
+  whatsappAnswered: number;
+  whatsappAnsweredWithin1h: number;
+  whatsappMedianResponseMinutes: number | null;
+  whatsappConversations: number;
+  whatsappReplied: number;
+  companies: Array<{
+    companyId: string;
+    companyName: string;
+    entered: number;
+    won: number;
+    lost: number;
+    winRate: number | null;
+    medianCycleDays: number | null;
+    medianFirstContactHours: number | null;
+    stalled: number;
+  }>;
+};
+
+export type AdminSalesVelocityResponse = { adminSalesVelocity: AdminSalesVelocity };

@@ -210,6 +210,8 @@ export const ACTIVITY_TYPES = [
   { slug: "admin", type: "admin", label: "Kadesh" },
   // Secciones que abren: mucho volumen, por eso "Todo" no la incluye (el back la excluye).
   { slug: "navegacion", type: "product", label: "Navegación" },
+  // Lo que le falló a alguien en el panel (fase 5).
+  { slug: "errores", type: "errors", label: "Errores" },
 ] as const;
 
 export type ActivityTypeSlug = (typeof ACTIVITY_TYPES)[number]["slug"];
@@ -273,6 +275,7 @@ export const ATTENTION_REASON_LABELS: Record<string, string> = {
   inactive: "Sin actividad",
   churn_risk: "Riesgo de baja",
   upsell: "Oportunidad de venta",
+  app_errors: "Errores en el panel",
 };
 
 /** Vistas de Analítica (`&vista=`). */
@@ -283,12 +286,14 @@ export const ANALYTICS_VISTAS = {
   ENGAGEMENT: "uso",
   DEMAND: "demanda",
   ACQUISITION: "adquisicion",
+  SALES: "ventas",
 } as const;
 
 export type AnalyticsVista = (typeof ANALYTICS_VISTAS)[keyof typeof ANALYTICS_VISTAS];
 
 export const ANALYTICS_VISTA_ITEMS: Array<{ id: AnalyticsVista; label: string }> = [
   { id: ANALYTICS_VISTAS.HEALTH, label: "Salud" },
+  { id: ANALYTICS_VISTAS.SALES, label: "Ventas" },
   { id: ANALYTICS_VISTAS.ACTIVATION, label: "Activación" },
   { id: ANALYTICS_VISTAS.RETENTION, label: "Retención" },
   { id: ANALYTICS_VISTAS.ENGAGEMENT, label: "Uso" },

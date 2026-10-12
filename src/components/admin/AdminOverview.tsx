@@ -22,6 +22,7 @@ import {
   type AdminTab,
 } from "./constants";
 import ActivityTimeline from "./activity/ActivityTimeline";
+import { HELP } from "./analytics/help";
 import {
   ADMIN_OPS_SUMMARY_QUERY,
   type AdminAttentionItem,
@@ -129,6 +130,7 @@ function OpsSummary() {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <AdminStatTile
           label="Empresas activas"
+          help={HELP.activeCompanies}
           value={value(statusCount(SUBSCRIPTION_STATUS.ACTIVE))}
           hint={
             summary
@@ -139,6 +141,7 @@ function OpsSummary() {
         />
         <AdminStatTile
           label="En prueba"
+          help={HELP.trialCompanies}
           value={value(statusCount(SUBSCRIPTION_STATUS.TRIALING))}
           hint={
             summary?.trialsEndingSoon
@@ -150,6 +153,7 @@ function OpsSummary() {
         />
         <AdminStatTile
           label="Pagos con problema"
+          help={HELP.paymentIssues}
           value={value(summary?.paymentIssues)}
           hint="Vencidas o no pagadas"
           tone={summary?.paymentIssues ? "danger" : "default"}
@@ -157,6 +161,7 @@ function OpsSummary() {
         />
         <AdminStatTile
           label="MRR estimado"
+          help={HELP.mrr}
           value={
             mrr.length === 0
               ? loading && !summary
@@ -168,6 +173,7 @@ function OpsSummary() {
         />
         <AdminStatTile
           label="Registros (7 días)"
+          help={HELP.signups}
           value={value(summary?.newUsers7d)}
           hint={
             summary
@@ -178,12 +184,14 @@ function OpsSummary() {
         />
         <AdminStatTile
           label="Con acceso (7 días)"
+          help={HELP.activeUsers7d}
           value={value(summary?.activeUsers7d)}
           hint="Personas que entraron"
           onClick={() => goTo(ADMIN_TABS.CLIENTS, { vista: CLIENTS_VISTAS.PEOPLE })}
         />
         <AdminStatTile
           label="Extracciones (24 h)"
+          help={HELP.extractions24h}
           value={value(summary?.syncs24h)}
           hint={summary?.failedSyncs24h ? `${summary.failedSyncs24h} con error` : "Sin errores"}
           tone={summary?.failedSyncs24h ? "warning" : "default"}
@@ -196,6 +204,7 @@ function OpsSummary() {
         />
         <AdminStatTile
           label="Créditos del mes"
+          help={HELP.creditsMonth}
           value={value(summary?.creditsConsumedMonth)}
           hint={
             summary
@@ -216,6 +225,7 @@ function OpsSummary() {
         <AdminSectionCard
           title="Requiere atención"
           description="Empresas con pagos, pruebas, créditos o errores que revisar."
+          help={HELP.attention}
         >
           {loading && !summary ? (
             <div className="space-y-2" aria-hidden>

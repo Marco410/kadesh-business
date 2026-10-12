@@ -12,6 +12,8 @@ import {
 } from "../ui";
 import { monthLabel } from "../clients/company/format";
 import { ADMIN_COHORTS_QUERY, type AdminCohortsResponse } from "./analytics-queries";
+import { HELP } from "./help";
+import ViewGuide from "./ViewGuide";
 
 const MONTH_OPTIONS = [
   { value: "6", label: "6 meses" },
@@ -44,10 +46,11 @@ export default function RetentionPanel() {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+      <ViewGuide>
         Cada fila es un mes de registro. Cada columna, qué parte de esas empresas usó Kadesh ese
-        mes: entró al panel, extrajo, movió algo del CRM o cotizó.
-      </p>
+        mes: entró al panel, extrajo, movió algo del CRM o cotizó. Léela de izquierda a derecha: si
+        el naranja se apaga rápido, las empresas se van pronto.
+      </ViewGuide>
       <AdminFilterChips
         label="Meses"
         options={[...MONTH_OPTIONS]}
@@ -62,7 +65,11 @@ export default function RetentionPanel() {
       ) : rows.every((row) => row.size === 0) ? (
         <AdminEmptyState title="No hay registros en estos meses" description="Prueba con 12 meses." />
       ) : (
-        <AdminSectionCard title="Retención por mes de registro" description="Mes 0 = el mes en que se registraron.">
+        <AdminSectionCard
+          title="Retención por mes de registro"
+          description="Mes 0 = el mes en que se registraron."
+          help={HELP.retention}
+        >
           <div className="relative -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
             <table className="w-full min-w-[560px] border-separate border-spacing-1 text-left text-sm">
               <thead className="text-xs text-[#616161] dark:text-[#b0b0b0]">

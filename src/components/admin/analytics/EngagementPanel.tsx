@@ -16,6 +16,8 @@ import {
   formatCredits,
 } from "../ui";
 import { ADMIN_ENGAGEMENT_QUERY, type AdminEngagementResponse } from "./analytics-queries";
+import { HELP } from "./help";
+import ViewGuide from "./ViewGuide";
 
 const DAY_OPTIONS = [
   { value: "30", label: "30 días" },
@@ -87,26 +89,28 @@ export default function EngagementPanel() {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
-        Personas con el panel abierto (sin cuentas de prueba ni el equipo de Kadesh), hasta el{" "}
-        {dayLabel(engagement.through)}. Hoy no cuenta porque va a medias.
-      </p>
+      <ViewGuide note={`Datos hasta el ${dayLabel(engagement.through)}; hoy no cuenta porque va a medias.`}>
+        Cuánta gente usa Kadesh y qué usa. Cuenta personas con el panel abierto, sin cuentas de prueba
+        ni el equipo de Kadesh. Abajo, qué módulos aprovecha cada plan y qué secciones se abren más.
+      </ViewGuide>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-        <AdminStatTile label="Activas al día" value={engagement.dau.toLocaleString("es-MX")} hint="Promedio de 30 días" />
-        <AdminStatTile label="En la semana" value={formatCredits(engagement.wau)} hint="Últimos 7 días" />
-        <AdminStatTile label="En el mes" value={formatCredits(engagement.mau)} hint="Últimos 30 días" />
+        <AdminStatTile label="Activas al día" value={engagement.dau.toLocaleString("es-MX")} hint="Promedio de 30 días" help={HELP.dau} />
+        <AdminStatTile label="En la semana" value={formatCredits(engagement.wau)} hint="Últimos 7 días" help={HELP.wau} />
+        <AdminStatTile label="En el mes" value={formatCredits(engagement.mau)} hint="Últimos 30 días" help={HELP.mau} />
         <AdminStatTile
           label="Qué tanto vuelven"
+          help={HELP.stickiness}
           value={`${Math.round(engagement.stickiness * 100)}%`}
           hint="Activas al día ÷ en el mes"
         />
-        <AdminStatTile label="Empresas (7 días)" value={formatCredits(engagement.activeCompanies7d)} />
-        <AdminStatTile label="Empresas (30 días)" value={formatCredits(engagement.activeCompanies30d)} />
+        <AdminStatTile label="Empresas (7 días)" value={formatCredits(engagement.activeCompanies7d)} help={HELP.activeCompanies7d} />
+        <AdminStatTile label="Empresas (30 días)" value={formatCredits(engagement.activeCompanies30d)} help={HELP.activeCompanies30d} />
       </div>
 
       <AdminSectionCard
         title="Personas activas por día"
+        help={HELP.dailyActive}
         action={
           <AdminFilterChips
             options={[...DAY_OPTIONS]}
@@ -121,6 +125,7 @@ export default function EngagementPanel() {
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 xl:items-start">
         <AdminSectionCard
           title="Módulos que usa cada plan"
+          help={HELP.modules}
           description="Empresas activas o en prueba que usaron cada módulo en los últimos 30 días."
         >
           {engagement.plans.length === 0 ? (
@@ -165,7 +170,11 @@ export default function EngagementPanel() {
           )}
         </AdminSectionCard>
 
-        <AdminSectionCard title="Secciones más abiertas" description="Veces que se abrió cada sección en los últimos 30 días.">
+        <AdminSectionCard
+          title="Secciones más abiertas"
+          description="Veces que se abrió cada sección en los últimos 30 días."
+          help={HELP.sections}
+        >
           <ShareBars items={sections} emptyLabel="Todavía no hay visitas registradas." />
         </AdminSectionCard>
       </div>

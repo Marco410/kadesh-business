@@ -323,6 +323,7 @@ export const ADMIN_COMPANY_INSIGHTS_QUERY = gql`
       calendarLastSyncedAt
       calendarLastError
       checkoutFailures
+      appErrors
       usage {
         ready
         activeUsers
@@ -417,6 +418,8 @@ export type AdminCompanyInsights = {
   calendarLastSyncedAt: string | null;
   calendarLastError: string | null;
   checkoutFailures: number;
+  /** Errores que vio alguien de la empresa en el panel en la ventana. */
+  appErrors: number;
   usage: AdminUsageStats;
 };
 

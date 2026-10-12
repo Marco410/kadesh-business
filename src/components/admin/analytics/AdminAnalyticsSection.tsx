@@ -14,11 +14,12 @@ import DemandPanel from "./DemandPanel";
 import EngagementPanel from "./EngagementPanel";
 import HealthPanel from "./HealthPanel";
 import RetentionPanel from "./RetentionPanel";
+import SalesVelocityPanel from "./SalesVelocityPanel";
 
 /** Filtros propios de cada vista: se limpian al cambiar de vista. */
 const VIEW_PARAMS = ["nivel", "senal", "dias", "meses", "umbral", "q", "pagina", "orden", "cuentas"];
 
-/** Métricas para operar el negocio: salud de cada cuenta, activación, retención, uso, demanda y adquisición. */
+/** Métricas para operar el negocio: salud de cada cuenta, ventas, activación, retención, uso, demanda y adquisición. */
 export default function AdminAnalyticsSection() {
   const { searchParams, setParams } = useAdminNavigation();
   const vista = parseAnalyticsVista(searchParams.get("vista"));
@@ -38,6 +39,7 @@ export default function AdminAnalyticsSection() {
         onChange={changeVista}
       />
       {vista === ANALYTICS_VISTAS.HEALTH ? <HealthPanel /> : null}
+      {vista === ANALYTICS_VISTAS.SALES ? <SalesVelocityPanel /> : null}
       {vista === ANALYTICS_VISTAS.ACTIVATION ? <ActivationPanel /> : null}
       {vista === ANALYTICS_VISTAS.RETENTION ? <RetentionPanel /> : null}
       {vista === ANALYTICS_VISTAS.ENGAGEMENT ? <EngagementPanel /> : null}

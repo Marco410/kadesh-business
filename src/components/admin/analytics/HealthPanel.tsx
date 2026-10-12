@@ -27,6 +27,7 @@ import {
   AdminPagination,
   AdminSearchInput,
   AdminStatTile,
+  InfoTip,
   formatPersonName,
   surfaceClass,
 } from "../ui";
@@ -38,6 +39,8 @@ import {
 } from "./analytics-queries";
 import { HealthBadge, HealthSignals, HealthTrend } from "./HealthBadge";
 import HowHealthWorks from "./HowHealthWorks";
+import { HELP } from "./help";
+import ViewGuide from "./ViewGuide";
 
 /** Cada parte ocupa un ancho según sus puntos máximos: la fila completa son los 100 puntos. */
 const PARTS_GRID = { gridTemplateColumns: HEALTH_COMPONENTS.map((part) => `${part.max}fr`).join(" ") };
@@ -136,14 +139,17 @@ export default function HealthPanel() {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+      <ViewGuide
+        note={
+          result?.computedThrough
+            ? `Datos hasta el ${formatDateShort(`${result.computedThrough}T12:00:00`, false)}.`
+            : undefined
+        }
+      >
         Salud de 0 a 100 de cada cuenta viva (activa, en prueba o con pago pendiente), con lo que
-        hizo en las últimas 4 semanas
-        {result?.computedThrough
-          ? `, hasta el ${formatDateShort(`${result.computedThrough}T12:00:00`, false)}`
-          : ""}
-        . Sirve para decidir a quién llamar primero.
-      </p>
+        hizo en las últimas 4 semanas. Empieza por las de arriba (peor salud) y por las señales de
+        riesgo de baja: son a quién llamar primero. Toca una empresa para abrir su 360.
+      </ViewGuide>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         {HEALTH_LEVELS.map((item) => (
@@ -161,6 +167,7 @@ export default function HealthPanel() {
                 : "default"
             }
             onClick={() => toggle("nivel", item.slug, level?.slug === item.slug)}
+            help={item.value === "healthy" ? HELP.healthy : item.value === "watch" ? HELP.watch : HELP.risk}
           />
         ))}
         {HEALTH_SIGNALS.map((item) => (
@@ -169,6 +176,7 @@ export default function HealthPanel() {
             label={item.label}
             value={count(item.value)}
             hint={item.value === "churn_risk" ? "Pueden irse" : "Pueden comprar más"}
+            help={item.value === "churn_risk" ? HELP.churnRisk : HELP.upsell}
             tone={signal?.slug === item.slug ? (item.value === "churn_risk" ? "danger" : "success") : "default"}
             onClick={() => toggle("senal", item.slug, signal?.slug === item.slug)}
           />
@@ -260,10 +268,21 @@ export default function HealthPanel() {
               <thead className="border-b border-[#e8e8e8] text-xs uppercase tracking-wide text-[#616161] dark:border-[#333] dark:text-[#b0b0b0]">
                 <tr>
                   <th className="px-4 py-3">Empresa</th>
-                  <th className="px-4 py-3">Salud</th>
-                  <th className="px-4 py-3">Señales</th>
+                  <th className="px-4 py-3">
+                    <span className="inline-flex items-center gap-1">
+                      Salud <InfoTip label="Salud">{HELP.healthScore}</InfoTip>
+                    </span>
+                  </th>
+                  <th className="px-4 py-3">
+                    <span className="inline-flex items-center gap-1">
+                      Señales <InfoTip label="Señales">{HELP.healthSignals}</InfoTip>
+                    </span>
+                  </th>
                   <th className="w-80 px-4 py-3">
                     <span className="sr-only">Partes de la salud</span>
+                    <span className="mb-1 inline-flex items-center gap-1">
+                      Partes <InfoTip label="Partes de la salud">{HELP.healthParts}</InfoTip>
+                    </span>
                     <span aria-hidden className="grid gap-1 text-[10px] normal-case tracking-normal" style={PARTS_GRID}>
                       {HEALTH_COMPONENTS.map((part) => (
                         <span key={part.key} className="truncate" title={part.hint}>
@@ -272,7 +291,11 @@ export default function HealthPanel() {
                       ))}
                     </span>
                   </th>
-                  <th className="px-4 py-3">Equipo</th>
+                  <th className="px-4 py-3">
+                    <span className="inline-flex items-center gap-1">
+                      Equipo <InfoTip label="Equipo">{HELP.healthTeam}</InfoTip>
+                    </span>
+                  </th>
                   <th className="w-10 px-2 py-3">
                     <span className="sr-only">Abrir</span>
                   </th>

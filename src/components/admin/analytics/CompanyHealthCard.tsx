@@ -6,6 +6,7 @@ import { HEALTH_COMPONENTS } from "../constants";
 import { AdminSectionCard } from "../ui";
 import { ADMIN_HEALTH_QUERY, type AdminHealthResponse } from "./analytics-queries";
 import { HealthBadge, HealthSignals, HealthTrend } from "./HealthBadge";
+import { HELP } from "./help";
 
 /** Salud de la empresa en el 360: puntaje, tendencia, señales y de dónde sale cada punto. */
 export default function CompanyHealthCard({ companyId }: { companyId: string }) {
@@ -23,6 +24,7 @@ export default function CompanyHealthCard({ companyId }: { companyId: string }) 
     <AdminSectionCard
       title="Salud"
       description={`Últimas ${result.windowDays / 7} semanas. Riesgo de baja y oportunidad de venta salen de aquí.`}
+      help={HELP.healthScore}
       action={<HealthBadge score={health.score} label={health.label} showLabel />}
     >
       <div className="flex flex-col gap-3">

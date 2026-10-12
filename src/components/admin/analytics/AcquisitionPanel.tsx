@@ -17,6 +17,8 @@ import {
   type AdminAcquisitionResponse,
   type AdminAcquisitionRow,
 } from "./analytics-queries";
+import { HELP } from "./help";
+import ViewGuide from "./ViewGuide";
 
 const pct = (part: number, total: number) => (total ? `${Math.round((part / total) * 100)}%` : "—");
 
@@ -78,10 +80,11 @@ export default function AcquisitionPanel() {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
-        Canal = la campaña (utm_source) si llegó por un enlace con UTM, si no el sitio que la mandó,
-        si no &quot;Directo&quot;. Con código de referido el canal es &quot;Referido&quot;.
-      </p>
+      <ViewGuide>
+        De dónde llegan las empresas que se registran y cuáles terminan usando y pagando. Compara
+        canales por &quot;Pagaron&quot;, no solo por cuántas empresas traen: un canal con muchos
+        registros que no pagan cuesta más de lo que deja.
+      </ViewGuide>
       <AdminFilterChips
         label="Registradas en"
         options={[...ANALYTICS_DAY_OPTIONS]}
@@ -101,11 +104,13 @@ export default function AcquisitionPanel() {
             <AdminStatTile label="Empresas registradas" value={formatCredits(acquisition.companies)} />
             <AdminStatTile
               label="Con origen guardado"
+              help={HELP.acquisitionWithData}
               value={pct(acquisition.withData, acquisition.companies)}
               hint={`${acquisition.withData} de ${acquisition.companies}`}
             />
             <AdminStatTile
               label="Pagaron"
+              help={HELP.acquisitionPaid}
               value={pct(
                 acquisition.channels.reduce((sum, row) => sum + row.paid, 0),
                 acquisition.companies,
@@ -113,19 +118,19 @@ export default function AcquisitionPanel() {
             />
           </div>
 
-          <AdminSectionCard title="Por canal">
+          <AdminSectionCard title="Por canal" help={HELP.acquisitionChannels}>
             <AcquisitionTable rows={acquisition.channels} keyLabel="Canal" empty="Sin registros." />
           </AdminSectionCard>
 
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 xl:items-start">
-            <AdminSectionCard title="Página de entrada" description="Primera página que vieron (sin parámetros).">
+            <AdminSectionCard title="Página de entrada" description="Primera página que vieron (sin parámetros)." help={HELP.acquisitionLandings}>
               <AcquisitionTable
                 rows={acquisition.landings}
                 keyLabel="Página"
                 empty="Todavía no hay registros con página de entrada."
               />
             </AdminSectionCard>
-            <AdminSectionCard title="Campañas" description="utm_campaign de los enlaces.">
+            <AdminSectionCard title="Campañas" description="utm_campaign de los enlaces." help={HELP.acquisitionCampaigns}>
               <AcquisitionTable
                 rows={acquisition.campaigns}
                 keyLabel="Campaña"

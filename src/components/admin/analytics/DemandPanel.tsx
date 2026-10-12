@@ -17,6 +17,8 @@ import {
   formatCredits,
 } from "../ui";
 import { ADMIN_DEMAND_GAPS_QUERY, type AdminDemandGapsResponse } from "./analytics-queries";
+import { HELP } from "./help";
+import ViewGuide from "./ViewGuide";
 
 const THRESHOLD_OPTIONS = [
   { value: "0", label: "Sin resultados" },
@@ -61,10 +63,11 @@ export default function DemandPanel() {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
-        Extracciones exitosas que trajeron pocos negocios (nuevos + los que ya estaban en Kadesh).
-        Las corridas con error y las de cuentas de prueba no cuentan. Zona = cuadro de unos 11 km.
-      </p>
+      <ViewGuide>
+        Qué buscan los clientes sin encontrar: extracciones que terminaron bien pero trajeron pocos
+        negocios. Empieza por &quot;Huecos&quot;: el mismo giro buscado varias veces en la misma zona.
+        Las extracciones con error y las de cuentas de prueba no cuentan.
+      </ViewGuide>
       <div className="flex flex-col gap-3">
         <AdminFilterChips
           label="Periodo"
@@ -89,13 +92,14 @@ export default function DemandPanel() {
       ) : (
         <>
           <div className="grid grid-cols-3 gap-2">
-            <AdminStatTile label="Extracciones" value={formatCredits(demand.runs)} />
-            <AdminStatTile label="Con pocos resultados" value={formatCredits(demand.lowRuns)} tone={demand.lowRuns ? "warning" : "default"} />
+            <AdminStatTile label="Extracciones" value={formatCredits(demand.runs)} help={HELP.demandRuns} />
+            <AdminStatTile label="Con pocos resultados" value={formatCredits(demand.lowRuns)} tone={demand.lowRuns ? "warning" : "default"} help={HELP.demandLow} />
             <AdminStatTile label="Porcentaje" value={`${lowPct}%`} />
           </div>
 
           <AdminSectionCard
             title="Huecos: giro + zona"
+            help={HELP.demandGaps}
             description="Lo que se buscó 2 veces o más en la misma zona y salió con pocos resultados."
           >
             {demand.gaps.length === 0 ? (
@@ -120,7 +124,7 @@ export default function DemandPanel() {
           </AdminSectionCard>
 
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 xl:items-start">
-            <AdminSectionCard title="Por giro" description="Giros con más extracciones flojas.">
+            <AdminSectionCard title="Por giro" description="Giros con más extracciones flojas." help={HELP.demandCategories}>
               <div className="relative -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
                 <table className="w-full min-w-[420px] text-left text-sm">
                   <thead className="text-xs text-[#616161] dark:text-[#b0b0b0]">
@@ -147,7 +151,7 @@ export default function DemandPanel() {
               </div>
             </AdminSectionCard>
 
-            <AdminSectionCard title="Por zona" description="Zonas con más extracciones flojas y qué se buscó ahí.">
+            <AdminSectionCard title="Por zona" description="Zonas con más extracciones flojas y qué se buscó ahí." help={HELP.demandZones}>
               <ul className="flex flex-col divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
                 {demand.zones.map((zone) => (
                   <li key={`${zone.lat}-${zone.lng}`} className="flex flex-col gap-1 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">

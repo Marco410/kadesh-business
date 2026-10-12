@@ -59,6 +59,7 @@ const TYPE_STYLE: Record<string, { icon: IconType; tone: string }> = {
     icon: CursorPointer01Icon,
     tone: "bg-slate-500/15 text-slate-700 dark:text-slate-300",
   },
+  errors: { icon: Alert02Icon, tone: "bg-red-500/15 text-red-700 dark:text-red-300" },
 };
 
 /** Etiquetas de `meta` que vale la pena mostrar al expandir un evento. */
