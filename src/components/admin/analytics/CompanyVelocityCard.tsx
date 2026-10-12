@@ -5,7 +5,7 @@ import { formatDateShort } from "kadesh/utils/format-date";
 import { AdminSectionCard, AdminStatTile } from "../ui";
 import { ADMIN_SALES_VELOCITY_QUERY, type AdminSalesVelocityResponse } from "./analytics-queries";
 import { HELP } from "./help";
-import { formatDays, formatHours, formatMinutes, formatRate } from "./velocity-format";
+import { formatDays, formatHours, formatMinutes, formatRate } from "kadesh/utils/sales-velocity-format";
 
 const DAYS = 90;
 

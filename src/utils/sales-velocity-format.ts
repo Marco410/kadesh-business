@@ -1,4 +1,4 @@
-/** Formatos de velocidad comercial (Analítica → Ventas y tarjeta del 360). */
+/** Formatos de velocidad comercial: Operaciones (Analítica → Ventas, 360) y la Analítica del cliente. */
 
 export const formatRate = (rate: number | null | undefined) =>
   rate == null ? "—" : `${Math.round(rate * 100)}%`;

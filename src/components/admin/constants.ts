@@ -251,6 +251,7 @@ export const PANEL_SECTION_LABELS: Record<string, string> = {
   calendar: "Calendario",
   workspaces: "Espacios de trabajo",
   whatsapp: "WhatsApp",
+  analitica: "Analítica",
   referidos: "Referidos",
   novedades: "Novedades",
   creditos: "Créditos",

@@ -21,7 +21,7 @@ import {
 import { pipelineLabel } from "../clients/company/format";
 import { ADMIN_SALES_VELOCITY_QUERY, type AdminSalesVelocityResponse } from "./analytics-queries";
 import { HELP } from "./help";
-import { formatDays, formatHours, formatMinutes, formatRate, formatShare } from "./velocity-format";
+import { formatDays, formatHours, formatMinutes, formatRate, formatShare } from "kadesh/utils/sales-velocity-format";
 import ViewGuide from "./ViewGuide";
 
 /** Etapas de cierre: de ahí ya no se avanza ni se pierde. */

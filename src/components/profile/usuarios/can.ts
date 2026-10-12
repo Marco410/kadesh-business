@@ -80,6 +80,8 @@ export function canAccessNavTab(
       return can(user, PERMISSION_KEYS.ESPACIOS_VER, () => true);
     case "whatsapp":
       return can(user, PERMISSION_KEYS.WHATSAPP_VER, () => ctx.isAdminCompany);
+    case "analitica":
+      return can(user, PERMISSION_KEYS.ANALITICA_VER, () => true);
     case "referidos":
     case "novedades":
       return true;

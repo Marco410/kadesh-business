@@ -58,7 +58,7 @@ Most of `/panel/*` is NOT separate App Router pages per view — `src/app/panel/
 
 ### Plan-gated features
 
-Subscription plans gate CRM functionality via `PLAN_FEATURE_KEYS`/`PLAN_FEATURES_MAP` in `constants/constans.ts`, checked with helpers in `src/components/profile/sales/helpers/plan-features.ts` and surfaced via `FeatureLockedSection`/`RoleAccessDeniedSection`. When adding a gated CRM feature, register its key there first.
+Subscription plans gate CRM functionality via `PLAN_FEATURE_KEYS`/`PLAN_FEATURES_MAP` in `constants/constans.ts`, checked with helpers in `src/components/profile/sales/helpers/plan-features.ts` and surfaced via `FeatureLockedSection`/`RoleAccessDeniedSection`. When adding a gated CRM feature, register its key there first. Example: the customer **Analítica** section (`kadesh/components/analytics`, tab `analitica`) is gated by `analytics` and by the `analitica.ver` / `analitica.ver_equipo` permissions; the backend `companyAnalytics` always uses the session's company.
 
 ### Activity tracking
 

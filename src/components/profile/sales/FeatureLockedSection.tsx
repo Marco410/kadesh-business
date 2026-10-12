@@ -20,6 +20,16 @@ const SECTION_COPY: Record<
   string,
   { headline: string; description: string; benefits: string[] }
 > = {
+  "Analítica": {
+    headline: "Sabe qué tan rápido vende tu equipo",
+    description:
+      "Mide en cuántos días cierras, cuánto tardan en contestar a un cliente y qué tratos se están enfriando, con los números de cada vendedor.",
+    benefits: [
+      "Tasa de cierre y ciclo de venta",
+      "Tratos estancados para atenderlos a tiempo",
+      "Desempeño de cada vendedor",
+    ],
+  },
   Vendedores: {
     headline: "Escala tu equipo de ventas",
     description:

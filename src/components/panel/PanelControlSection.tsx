@@ -54,6 +54,7 @@ import { useCompanyAiLive } from "kadesh/components/profile/ai/useCompanyAiLive"
 import { WhatsAppSettingsSection } from "kadesh/components/profile/whatsapp/WhatsAppSettingsSection";
 import PanelControlSkeleton from "./PanelControlSkeleton";
 import DashboardSidebar from "./DashboardSidebar";
+import { CompanyAnalyticsSection } from "kadesh/components/analytics";
 
 const VALID_TABS = [
   "inicio",
@@ -68,6 +69,7 @@ const VALID_TABS = [
   "calendar",
   "workspaces",
   "whatsapp",
+  "analitica",
   "referidos",
   "novedades",
 ] as const;
@@ -144,6 +146,7 @@ function PanelControlSectionContent({
   const canSeeCalendar = canAccessNavTab(user, "calendar", navAccessCtx);
   const canSeeWorkspaces = canAccessNavTab(user, "workspaces", navAccessCtx);
   const canSeeWhatsapp = canAccessNavTab(user, "whatsapp", navAccessCtx);
+  const canSeeAnalytics = canAccessNavTab(user, "analitica", navAccessCtx);
   const canSeeInicio = canAccessNavTab(user, "inicio", navAccessCtx);
   const canSeeProfile = canAccessNavTab(user, "profile", navAccessCtx);
   const canConfigureWhatsapp = can(
@@ -212,6 +215,10 @@ function PanelControlSectionContent({
   const hasWhatsappFeature = hasPlanFeature(
     subscription?.planFeatures ?? null,
     PLAN_FEATURE_KEYS.WHATSAPP,
+  );
+  const hasAnalyticsFeature = hasPlanFeature(
+    subscription?.planFeatures ?? null,
+    PLAN_FEATURE_KEYS.ANALYTICS,
   );
   const selectedTab = getValidTab(
     tabFromUrl,
@@ -489,6 +496,20 @@ function PanelControlSectionContent({
                   />
                 ) : (
                   <FeatureLockedSection sectionName="WhatsApp Business" />
+                ))}
+
+              {selectedTab === "analitica" &&
+                (!canSeeAnalytics ? (
+                  <RoleAccessDeniedSection
+                    title="No tienes acceso a Analítica"
+                    description="Pide a Gerencia o al administrador que te active el permiso de ver la analítica."
+                    backHref={`${Routes.panel}?tab=inicio`}
+                    backLabel="Volver al inicio"
+                  />
+                ) : hasAnalyticsFeature ? (
+                  <CompanyAnalyticsSection />
+                ) : (
+                  <FeatureLockedSection sectionName="Analítica" />
                 ))}
 
               {selectedTab === "referidos" && (

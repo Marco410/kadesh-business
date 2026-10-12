@@ -188,6 +188,44 @@ export const TOURS: TourDefinition[] = [
     ],
   },
   {
+    id: "analitica",
+    title: "Analítica",
+    version: 1,
+    match: (pathname, tab) => pathname === Routes.panel && tab === "analitica",
+    steps: [
+      {
+        target: '[data-tour="nav-analitica"]',
+        title: "Tu analítica de ventas",
+        description:
+          "Aquí ves qué tan rápido vende tu equipo: cuántos cierras, en cuántos días y qué tratos se están quedando atrás.",
+        side: "right",
+      },
+      {
+        target: '[data-tour="analytics-guide"]',
+        title: "Cómo leerla",
+        description:
+          "Empieza por aquí. Y si no sabes qué es un número, toca su ícono ⓘ: te lo explica.",
+      },
+      {
+        target: '[data-tour="analytics-period"]',
+        title: "Elige el periodo",
+        description: "Compara los últimos 30 días, 3 meses, 6 meses o el año.",
+      },
+      {
+        target: '[data-tour="analytics-kpis"]',
+        title: "Tus números clave",
+        description:
+          "Tasa de cierre, días para cerrar, qué tan rápido contactas y contestas por WhatsApp.",
+      },
+      {
+        target: '[data-tour="analytics-stalled"]',
+        title: "Tratos estancados",
+        description:
+          "Los que llevan 14 días o más sin moverse. Ábrelos y dales seguimiento antes de que se enfríen.",
+      },
+    ],
+  },
+  {
     id: "calendar",
     title: "Mi Calendario",
     version: 3,
