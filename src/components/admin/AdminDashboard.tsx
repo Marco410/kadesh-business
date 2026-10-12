@@ -25,6 +25,7 @@ import AdminActivityPanel from "./activity/AdminActivityPanel";
 import AdminAnalyticsSection from "./analytics/AdminAnalyticsSection";
 import AdminPlansPanel from "./AdminPlansPanel";
 import AdminContentSection from "./AdminContentSection";
+import AdminReleasesPanel from "./releases/AdminReleasesPanel";
 import AdminPetPlacesPanel, {
   type PetPlacesVista,
 } from "./AdminPetPlacesPanel";
@@ -180,6 +181,7 @@ function AdminDashboardContent() {
         <AdminPlansPanel vista={plansVista} onVistaChange={setPlansVista} />
       ) : null}
       {tab === ADMIN_TABS.CONTENT ? <AdminContentSection /> : null}
+      {tab === ADMIN_TABS.RELEASES ? <AdminReleasesPanel /> : null}
       {tab === ADMIN_TABS.PET_PLACES ? (
         <AdminPetPlacesPanel
           vista={vista}

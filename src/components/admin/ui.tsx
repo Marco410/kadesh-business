@@ -610,7 +610,7 @@ export function AdminDrawer({
                     {title}
                   </div>
                   {subtitle ? (
-                    <div className="mt-0.5 break-all text-sm text-[#616161] dark:text-[#b0b0b0]">
+                    <div className="mt-0.5 text-sm text-[#616161] [overflow-wrap:anywhere] dark:text-[#b0b0b0]">
                       {subtitle}
                     </div>
                   ) : null}
