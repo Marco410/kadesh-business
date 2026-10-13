@@ -1,0 +1,122 @@
+/*
+ * Fondo animado del hero: mapa que deriva; detrás de la demo, radar que barre y leads que aparecen.
+ * Solo transform/opacity (compositor). Con prefers-reduced-motion queda una foto fija.
+ */
+
+.drift {
+  animation: drift 40s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.04);
+  }
+  to {
+    transform: translate3d(-2.5%, -2%, 0) scale(1.1);
+  }
+}
+
+/* Ondas del radar. */
+.ring {
+  animation: ring 4.5s cubic-bezier(0.2, 0, 0, 1) infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+}
+
+@keyframes ring {
+  0% {
+    transform: scale(0.45);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* Barrido del radar. */
+.sweep {
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 255, 255, 0) 0deg,
+    rgba(255, 255, 255, 0) 300deg,
+    rgba(255, 255, 255, 0.22) 360deg
+  );
+  animation: sweep 6s linear infinite;
+}
+
+@keyframes sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Leads que aparecen dentro del radar. */
+.lead {
+  animation: lead-pop 12s cubic-bezier(0.2, 0, 0, 1) infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+}
+
+@keyframes lead-pop {
+  0% {
+    transform: translate3d(0, 6px, 0) scale(0);
+    opacity: 0;
+  }
+  4% {
+    transform: translate3d(0, 0, 0) scale(1.15);
+    opacity: 1;
+  }
+  6%,
+  70% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+  78%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(0.9);
+    opacity: 0;
+  }
+}
+
+.leadPing {
+  animation: lead-ping 12s cubic-bezier(0.2, 0, 0, 1) infinite;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+}
+
+@keyframes lead-ping {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  3% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  14%,
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift,
+  .sweep,
+  .leadPing {
+    animation: none;
+  }
+
+  .ring {
+    animation: none;
+    opacity: 0.35;
+    transform: scale(var(--still-scale, 0.6));
+  }
+
+  .lead {
+    animation: none;
+    opacity: 1;
+  }
+}

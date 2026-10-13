@@ -27,7 +27,7 @@ import {
 
 const REGISTER_TRUST_POINTS = [
   "Sin tarjeta de crédito",
-  "50 leads gratis",
+  "70 leads gratis",
   "Cancela cuando quieras",
 ] as const;
 
