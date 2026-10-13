@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Routes } from "kadesh/core/routes";
 import HeroVisual from "kadesh/components/home/HeroVisual";
+import HeroMapBackdrop from "kadesh/components/home/HeroMapBackdrop";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Shield01Icon,
@@ -27,6 +28,7 @@ export default function HeroSection() {
       id="inicio"
       className="relative overflow-hidden bg-gradient-to-br from-orange-700 via-orange-800 to-orange-900 dark:from-orange-800 dark:via-orange-900 dark:to-[#5c2c0a]"
     >
+      <HeroMapBackdrop />
       <div
         className="hero-orb pointer-events-none absolute -left-16 top-10 h-48 w-48 rounded-full bg-white/20 blur-3xl motion-safe:animate-[kadesh-float_7s_ease-in-out_infinite]"
         aria-hidden
@@ -40,7 +42,7 @@ export default function HeroSection() {
         aria-hidden
       />
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-28 sm:pb-16 lg:pt-28 lg:pb-20">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-14">
           <div className="hero-copy flex-1 text-center lg:text-left max-w-xl lg:max-w-2xl">
             <h1 className="hero-headline text-[2rem] sm:text-4xl lg:text-5xl xl:text-[3.35rem] font-bold text-white mb-5 leading-[1.12] tracking-tight">
@@ -58,7 +60,7 @@ export default function HeroSection() {
                 {KADESH_URIM_AI_NAME}
               </Link>{" "}
               revisa tu pipeline y te propone qué hacer hoy: está en todos los
-              planes. Prueba 7 días con 50 leads gratis, sin tarjeta.
+              planes. Prueba 7 días con 70 leads gratis, sin tarjeta.
             </p>
 
             <Link
@@ -94,7 +96,7 @@ export default function HeroSection() {
                 >
                   Probar gratis
                   <span className="ml-1.5 font-normal text-gray-700 hidden sm:inline">
-                    (50 leads)
+                    (70 leads)
                   </span>
                 </Link>
                 <Link

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     template: '%s | KADESH',
   },
   description:
-    'Kadesh extrae leads B2B de Google Maps e INEGI con teléfono y dirección, y los gestiona en un CRM integrado. Prueba 7 días con 50 leads gratis, sin tarjeta.',
+    'Kadesh extrae leads B2B de Google Maps e INEGI con teléfono y dirección, y los gestiona en un CRM integrado. Prueba 7 días con 70 leads gratis, sin tarjeta.',
   keywords: [
     'KADESH',
     'KADESH Negocios',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Leads B2B de Google Maps e INEGI con teléfono y CRM | KADESH',
     description:
-      'Kadesh extrae leads B2B de Google Maps e INEGI con teléfono y dirección, y los gestiona en un CRM. Prueba 7 días con 50 leads gratis, sin tarjeta.',
+      'Kadesh extrae leads B2B de Google Maps e INEGI con teléfono y dirección, y los gestiona en un CRM. Prueba 7 días con 70 leads gratis, sin tarjeta.',
     url: 'https://kadesh.com.mx/',
     siteName: 'Kadesh',
     images: [
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Leads B2B de Google Maps e INEGI con teléfono y CRM | KADESH',
     description:
-      'Extrae leads B2B de Google Maps e INEGI con teléfono y CRM integrado. Prueba 7 días con 50 leads gratis, sin tarjeta.',
+      'Extrae leads B2B de Google Maps e INEGI con teléfono y CRM integrado. Prueba 7 días con 70 leads gratis, sin tarjeta.',
     images: ['/og-image.png'],
   },
   alternates: {

@@ -32,14 +32,14 @@ export default function WhatIsKadeshSection() {
           ¿Qué es Kadesh?
         </h2>
         <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mb-5">
-          <time dateTime="2026-09-15">Actualizado el 15 de septiembre de 2026</time>
+          <time dateTime="2026-10-12">Actualizado el 12 de octubre de 2026</time>
         </p>
         <p className="text-lg text-[#424242] dark:text-[#d6d6d6] leading-relaxed max-w-3xl mb-4">
           Kadesh es una plataforma SaaS B2B que extrae clientes potenciales
           reales de Google Maps e INEGI —con teléfono, dirección y categoría—
           y los guarda en un CRM integrado. Eliges un punto en el mapa, una
           categoría, un radio y la fuente; en minutos tienes negocios listos
-          para contactar, con prueba de 7 días y 50 leads gratis.
+          para contactar, con prueba de 7 días y 70 leads gratis.
         </p>
         <p className="text-[#616161] dark:text-[#b0b0b0] leading-relaxed max-w-3xl mb-12">
           Sirve a agencias, freelancers, equipos de ventas y consultores en
@@ -83,7 +83,7 @@ export default function WhatIsKadeshSection() {
           href={Routes.auth.register}
           className="inline-flex items-center justify-center px-6 py-3 bg-orange-800 hover:bg-orange-900 text-white hover:text-white font-semibold rounded-xl shadow-[0_10px_24px_rgba(168,86,31,0.28)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#121212] transition-all duration-150"
         >
-          Empezar con 50 leads gratis
+          Empezar con 70 leads gratis
         </Link>
       </div>
     </section>

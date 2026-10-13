@@ -132,14 +132,14 @@ const globalGeoJsonLd = {
         },
       ],
       description:
-        "Plataforma SaaS B2B para extraer clientes potenciales de Google Maps e INEGI con teléfono y CRM integrado. Kadesh ofrece prueba gratuita de 7 días con 50 leads gratis.",
+        "Plataforma SaaS B2B para extraer clientes potenciales de Google Maps e INEGI con teléfono y CRM integrado. Kadesh ofrece prueba gratuita de 7 días con 70 leads gratis.",
       featureList: [
         "Extracción de leads reales desde Google Maps e INEGI",
         "Teléfonos y datos de contacto",
         "CRM integrado para seguimiento comercial",
-        "Prueba gratuita de 7 días con 50 leads gratis",
+        "Prueba gratuita de 7 días con 70 leads gratis",
       ],
-      trialAvailability: "Prueba gratuita de 7 días con 50 leads gratis",
+      trialAvailability: "Prueba gratuita de 7 días con 70 leads gratis",
     },
   ],
 };
