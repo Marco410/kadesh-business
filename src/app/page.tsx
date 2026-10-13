@@ -1,13 +1,15 @@
 import dynamic from "next/dynamic";
-import {
-  HeroSection,
-  HeroDifferentiatorsBadges,
-  WhatIsKadeshSection,
-  HomeJsonLd,
-} from "kadesh/components/home";
+import { HeroSection, HomeJsonLd } from "kadesh/components/home";
+import LandingStatsBand from "kadesh/components/home/LandingStatsBand";
 import { Footer, Navigation } from "kadesh/components/layout";
 import { FloatingWhatsAppButton } from "kadesh/components/shared";
 
+const WhatIsKadeshSection = dynamic(
+  () => import("kadesh/components/home/WhatIsKadeshSection"),
+);
+const HeroDifferentiatorsBadges = dynamic(
+  () => import("kadesh/components/home/HeroDifferentiatorsBadges"),
+);
 const CategoriesMarqueeSection = dynamic(
   () => import("kadesh/components/home/CategoriesMarqueeSection"),
 );
@@ -69,16 +71,16 @@ export default function HomePage() {
       <main className="min-h-screen">
         <Navigation />
         <HeroSection />
-        <HeroDifferentiatorsBadges />
-        <WhatIsKadeshSection />
+        {/* Prueba y producto primero: cifras, giros, demo, costo por lead y plataforma. */}
+        <LandingStatsBand />
         <CategoriesMarqueeSection />
-        <WhyKadeshSection />
-        <LeadCostComparisonSection />
         <InteractiveDemoSection />
-        <RealDataSection />
-        <UniqueLeadsSection />
+        <LeadCostComparisonSection />
         <PlatformShowcaseSection />
         <KadeshAiSection />
+        <WhyKadeshSection />
+        <RealDataSection />
+        <UniqueLeadsSection />
         <PersonaBenefitsSection />
         <ScheduleDemoSection />
         <GrowthValueSection />
@@ -88,6 +90,9 @@ export default function HomePage() {
         <LandingPricingSection />
         <ReferralSection />
         <FinalCTASection />
+        {/* Definición y diferenciadores: siguen en la página para SEO / respuestas de IA. */}
+        <WhatIsKadeshSection />
+        <HeroDifferentiatorsBadges />
         <FAQSection />
         <Footer />
       </main>

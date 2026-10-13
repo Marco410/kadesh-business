@@ -6,7 +6,7 @@ Kadesh is a B2B SaaS product at https://kadesh.com.mx. It extracts real business
 
 - Public marketing site and authenticated app (`/panel`) live in this frontend. The GraphQL API is a separate KeystoneJS backend.
 - Primary language: Spanish (Mexico). Currency: MXN.
-- Trial: 7 days, 50 leads, no credit card.
+- Trial: 7 days, 70 leads, no credit card.
 - Plans: Starter 399 MXN, Pro 799 MXN, Agencia 1,999 MXN per month.
 - Do not invent prices, ratings, or case-study metrics. Visible product claims on the homepage are the source of truth.
 - Authenticated routes `/panel` and `/api` are private; do not treat them as public docs.

@@ -199,7 +199,7 @@ export default function KadeshAiSection() {
                 href={Routes.auth.register}
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 font-semibold text-white shadow-[0_10px_24px_rgba(231,124,58,0.28)] transition-all duration-150 hover:-translate-y-0.5 hover:bg-orange-600 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0c0a14]"
               >
-                Probar {KADESH_URIM_AI_NAME} con 50 leads gratis
+                Probar {KADESH_URIM_AI_NAME} con 70 leads gratis
                 <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
               </Link>
               <p className="mt-3 max-w-md text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
