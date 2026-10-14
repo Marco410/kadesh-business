@@ -9,8 +9,8 @@ const HOME_JSON_LD = {
       url: "https://kadesh.com.mx/",
       name: "Leads B2B de Google Maps e INEGI con teléfono y CRM | KADESH",
       description:
-        "Kadesh extrae leads B2B de Google Maps e INEGI con teléfono y dirección, y los gestiona en un CRM integrado. Prueba 7 días con 70 leads gratis, sin tarjeta.",
-      dateModified: "2026-09-15",
+        "Kadesh extrae leads B2B de Google Maps e INEGI con teléfono y dirección, y los gestiona en un CRM integrado. Prueba 7 días con 70 créditos gratis, sin tarjeta.",
+      dateModified: "2026-10-14",
       inLanguage: "es-MX",
       isPartOf: { "@id": "https://kadesh.com.mx/#website" },
       about: { "@id": "https://kadesh.com.mx/#software" },

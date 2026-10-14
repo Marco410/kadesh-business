@@ -15,6 +15,7 @@ import {
   Share01Icon,
 } from "@hugeicons/core-free-icons";
 import { LANDING_SECTION_IMAGES } from "kadesh/components/home/constants";
+import { SECTION_QUESTION_CLASS } from "kadesh/components/home/landing-cta";
 
 const FEATURES = [
   {
@@ -126,15 +127,15 @@ export default function PlatformShowcaseSection() {
           transition={{ duration: 0.5 }}
           className="text-center mb-10"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-800 dark:text-orange-400 mb-3">
-            Todo en un solo sistema
+          <p className={SECTION_QUESTION_CLASS}>
+            Más que extracción: tu operación comercial completa
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
-            Más que extracción: tu operación comercial completa
+            Del primer contacto al cobro de comisiones, sin pagar 5 herramientas
           </h2>
           <p className="text-[#616161] dark:text-[#b0b0b0] max-w-2xl mx-auto text-lg">
-            Desde encontrar el lead hasta cerrar la venta y cobrar comisiones.
-            Sin pagar 5 herramientas distintas.
+            Pipeline, calendario, cotizaciones, vendedores y archivos en el
+            mismo lugar donde caen tus prospectos.
           </p>
         </motion.div>
 

@@ -3,7 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Routes } from "kadesh/core/routes";
+import {
+  PRIMARY_CTA_CLASS,
+  TRIAL_CTA_HREF,
+  TRIAL_CTA_LABEL,
+} from "kadesh/components/home/landing-cta";
 
 const PERSONAS = [
   {
@@ -124,11 +128,8 @@ export default function PersonaBenefitsSection() {
                 </li>
               ))}
             </ul>
-            <Link
-              href={Routes.auth.register}
-              className="inline-flex items-center justify-center px-6 py-3 bg-orange-800 hover:bg-orange-900 text-white font-semibold rounded-xl transition-colors"
-            >
-              Regístrate gratis
+            <Link href={TRIAL_CTA_HREF} className={PRIMARY_CTA_CLASS}>
+              {TRIAL_CTA_LABEL}
             </Link>
           </motion.div>
         </AnimatePresence>

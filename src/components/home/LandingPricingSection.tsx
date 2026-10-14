@@ -28,15 +28,18 @@ export default function LandingPricingSection({
           <PlansSection
             hideBackLink
             sectionHeadingLevel={isPage ? "h1" : "h2"}
+            sectionEyebrow={
+              isPage ? undefined : "¿Cuánto cuesta extraer leads con Kadesh?"
+            }
             sectionTitle={
               isPage
                 ? "Planes y precios de KADESH Negocios"
-                : "¿Cuánto cuesta extraer leads con Kadesh?"
+                : "Planes desde $399 al mes. Empieza gratis"
             }
             sectionSubtitle={
               isPage
                 ? "Precios en MXN. Anual = 2 meses de descuento. Kadesh AI está en todos los planes: administrada usa créditos del plan; con tu API key no descuenta."
-                : "Planes en MXN: Free, Starter 399, Pro 799 y Agencia 1,999. Prueba 7 días con 70 leads, sin tarjeta."
+                : "Precios en MXN: Starter 399, Pro 799 y Agencia 1,999. Prueba 7 días con 70 créditos, sin tarjeta."
             }
             showBtnStart={false}
             sectionTitleId={isPage ? "comparar-planes-heading" : undefined}

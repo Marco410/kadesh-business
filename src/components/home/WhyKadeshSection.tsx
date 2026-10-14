@@ -6,6 +6,7 @@ import {
   Shield01Icon,
   KanbanIcon,
 } from "@hugeicons/core-free-icons";
+import { SECTION_QUESTION_CLASS } from "kadesh/components/home/landing-cta";
 
 const SECONDARY = [
   {
@@ -31,8 +32,11 @@ export default function WhyKadeshSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-start">
           <div className="lg:col-span-5">
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-5 tracking-tight">
+            <p className={SECTION_QUESTION_CLASS}>
               ¿Por qué usar Kadesh para conseguir clientes B2B?
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-5 tracking-tight">
+              Menos tiempo buscando, más tiempo vendiendo
             </h2>
             <p className="text-lg text-[#424242] dark:text-[#d6d6d6] leading-relaxed mb-8">
               Kadesh no es solo un extractor de Google Maps e INEGI: genera listas de

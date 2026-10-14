@@ -91,10 +91,10 @@ export default function NotFound() {
             <p className="text-white/70 text-sm mb-4">O visita estas páginas:</p>
             <div className="flex flex-wrap justify-center gap-4 text-white/80">
               <Link
-                href="/#que-es-kadesh"
+                href="/#demo"
                 className="hover:text-white hover:underline transition-colors text-sm"
               >
-                ¿Qué es KADESH?
+                Cómo funciona KADESH
               </Link>
               <span className="text-white/40">•</span>
             </div>

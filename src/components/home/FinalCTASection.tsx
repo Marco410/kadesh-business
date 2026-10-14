@@ -2,8 +2,13 @@
 
 import { useRef } from "react";
 import Link from "next/link";
-import { Routes } from "kadesh/core/routes";
 import { gsap, useGSAP } from "kadesh/components/home/register-gsap";
+import {
+  DEMO_CTA_HREF,
+  PRIMARY_CTA_ON_DARK_CLASS,
+  TRIAL_CTA_HREF,
+  TRIAL_CTA_LABEL,
+} from "kadesh/components/home/landing-cta";
 
 export default function FinalCTASection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -41,26 +46,27 @@ export default function FinalCTASection() {
 
       <div className="final-cta-copy relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 tracking-tight">
-          ¿Listo para extraer tu primera lista de leads B2B?
+          Tu próxima lista de clientes está a un minuto
         </h2>
         <p className="text-lg text-white mb-8 leading-relaxed">
-          Crea tu cuenta en menos de un minuto. 70 leads de Google Maps o INEGI
-          incluidos, 7 días de prueba y sin tarjeta de crédito.
+          Elige tu ciudad y tu giro. Te regalamos 7 días y 70 créditos para que
+          lo pruebes con prospectos reales antes de pagar un peso.
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <Link href={TRIAL_CTA_HREF} className={PRIMARY_CTA_ON_DARK_CLASS}>
+          {TRIAL_CTA_LABEL}
+        </Link>
+        <p className="mt-4 text-sm text-white/90">
+          70 créditos incluidos · Sin tarjeta · Sin compromiso
+        </p>
+        <p className="mt-6 text-sm text-white">
+          ¿Prefieres verlo con alguien?{" "}
           <Link
-            href={Routes.auth.register}
-            className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 hover:text-gray-900 font-bold text-lg rounded-2xl shadow-[0_12px_32px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-orange-800 transition-all duration-150"
+            href={DEMO_CTA_HREF}
+            className="font-semibold text-white underline underline-offset-4 hover:text-white hover:decoration-2"
           >
-            Acceder ahora a Kadesh
+            Agenda una demo de 15 min
           </Link>
-          <Link
-            href="/#agendar-demo"
-            className="inline-flex items-center justify-center px-8 py-4 text-white font-semibold text-lg rounded-2xl border border-white/60 hover:bg-white/10 transition-colors duration-150"
-          >
-            Agendar demo en vivo
-          </Link>
-        </div>
+        </p>
       </div>
     </section>
   );

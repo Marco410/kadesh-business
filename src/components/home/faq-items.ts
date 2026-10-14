@@ -2,7 +2,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Qué es Kadesh y para qué sirve?",
     answer:
-      "Kadesh es una plataforma SaaS B2B que extrae clientes potenciales reales de Google Maps e INEGI —con teléfono, dirección y categoría— y los guarda en un CRM integrado. Eliges un punto en el mapa, una categoría, un radio y la fuente; en minutos tienes negocios listos para contactar, con prueba de 7 días y 70 leads gratis.",
+      "Kadesh es una plataforma SaaS B2B que extrae clientes potenciales reales de Google Maps e INEGI —con teléfono, dirección y categoría— y los guarda en un CRM integrado. Eliges un punto en el mapa, una categoría, un radio y la fuente; en minutos tienes negocios listos para contactar, con prueba de 7 días y 70 créditos gratis.",
   },
   {
     question: "¿Cómo extraer leads de Google Maps e INEGI con Kadesh?",
@@ -72,7 +72,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Puedo cancelar mi suscripción en cualquier momento?",
     answer:
-      "Sí. Puedes cancelar cuando quieras contactando a soporte. No hay contratos forzosos ni penalizaciones por baja. La prueba de 7 días incluye 70 leads y no pide tarjeta, así evalúas el flujo de extracción y el CRM antes de elegir un plan de pago.",
+      "Sí. Puedes cancelar cuando quieras contactando a soporte. No hay contratos forzosos ni penalizaciones por baja. La prueba de 7 días incluye 70 créditos y no pide tarjeta, así evalúas el flujo de extracción y el CRM antes de elegir un plan de pago.",
   },
   {
     question: "¿Cuánto cuesta un lead con Kadesh frente a Meta Ads?",

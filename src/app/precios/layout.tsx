@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Planes y precios",
   description:
-    "Precios en MXN de KADESH Negocios: planes Free, Starter, Pro y Agencia para prospección B2B, leads desde Google Maps y CRM integrado en México.",
+    "Precios en MXN de KADESH Negocios: prueba Gratis y planes Starter, Pro y Agencia para prospección B2B, leads desde Google Maps y CRM integrado en México.",
   keywords: [
     "precios KADESH",
     "planes KADESH Negocios",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Planes y precios | KADESH Negocios",
     description:
-      "Compara planes Free, Starter, Pro y Agencia. Prospección B2B, leads de Google Maps y CRM en pesos mexicanos.",
+      "Compara la prueba Gratis y los planes Starter, Pro y Agencia. Prospección B2B, leads de Google Maps y CRM en pesos mexicanos.",
     url: "https://kadesh.com.mx/precios",
     siteName: "KADESH Negocios",
     locale: "es_MX",
