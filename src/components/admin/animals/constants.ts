@@ -23,6 +23,16 @@ export const ANIMAL_STATUS_CLASS: Record<string, string> = {
 export const ANIMAL_STATUS_DEFAULT_CLASS =
   "bg-[#eeeeee] text-[#424242] dark:bg-[#2a2a2a] dark:text-[#d6d6d6]";
 
+/** `AnimalType.name` guarda el valor ("dog"); mismas etiquetas que `ANIMAL_TYPE_OPTIONS` en kadesh-back. */
+export const ANIMAL_TYPE_LABELS: Record<string, string> = {
+  dog: "Perro",
+  cat: "Gato",
+  bird: "Ave",
+  fish: "Pez",
+  reptil: "Reptil",
+  mammal: "Mamífero",
+};
+
 export const REPORTED_BY_LABELS: Record<string, string> = {
   owner: "Dueño",
   volunteer: "Voluntario",

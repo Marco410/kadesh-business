@@ -36,6 +36,7 @@ import {
 } from "./queries";
 import {
   ADMIN_ANIMALS_PAGE_SIZE,
+  ANIMAL_TYPE_LABELS,
   ANIMAL_STATUS_CLASS,
   ANIMAL_STATUS_DEFAULT_CLASS,
   ANIMAL_STATUS_LABELS,
@@ -175,7 +176,7 @@ export default function AdminAnimalsPanel() {
           <option value="">Todos los tipos</option>
           {(typesData?.animalTypes ?? []).map((type) => (
             <option key={type.id} value={type.id}>
-              {type.name}
+              {ANIMAL_TYPE_LABELS[type.name] ?? type.name}
             </option>
           ))}
         </select>
