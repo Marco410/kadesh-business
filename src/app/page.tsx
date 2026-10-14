@@ -69,7 +69,7 @@ export default function HomePage() {
       <HomeJsonLd />
       <FloatingWhatsAppButton />
       <main className="min-h-screen">
-        <Navigation />
+        <Navigation overDarkHero />
         <HeroSection />
         {/* Prueba y producto primero: cifras, giros, demo, costo por lead y plataforma. */}
         <LandingStatsBand />
