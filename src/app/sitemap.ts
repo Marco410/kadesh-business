@@ -45,6 +45,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 0.9,
     },
+    {
+      url: `${baseUrl}${Routes.referidos}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
     /** Changelog / release notes — contenido que cambia con cada versión SaaS (SEO + AEO) */
     {
       url: NOVEDADES_CANONICAL,

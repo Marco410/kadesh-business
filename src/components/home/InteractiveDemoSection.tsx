@@ -9,6 +9,7 @@ import {
   DatabaseImportIcon,
 } from "@hugeicons/core-free-icons";
 import DemoPlayer from "kadesh/components/home/interactive-demo/DemoPlayer";
+import { SECTION_QUESTION_CLASS } from "kadesh/components/home/landing-cta";
 
 const STEPS = [
   { icon: Location01Icon, label: "Elige ubicación en el mapa" },
@@ -33,11 +34,11 @@ export default function InteractiveDemoSection() {
       />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="mb-3 text-center text-xs font-bold uppercase tracking-[0.18em] text-orange-800 dark:text-orange-400">
-          Demo en vivo
+        <p className={`${SECTION_QUESTION_CLASS} text-center`}>
+          ¿Cuánto tarda extraer una lista de prospectos?
         </p>
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center text-[#212121] dark:text-white mb-4 tracking-tight">
-          ¿Cuánto tarda extraer una lista de prospectos?
+          Tu primera lista en menos de un minuto, sin instalar nada
         </h2>
         <p className="text-center text-lg text-[#424242] dark:text-[#d6d6d6] max-w-2xl mx-auto mb-10 leading-relaxed">
           <strong className="font-semibold text-[#212121] dark:text-white">Menos de un minuto.</strong>{" "}

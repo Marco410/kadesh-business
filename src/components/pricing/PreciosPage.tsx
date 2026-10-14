@@ -16,7 +16,7 @@ const VALUE_PROPS = [
   {
     title: "CRM integrado",
     description:
-      "Gestiona pipeline, actividades y seguimiento sin exportar a otra herramienta. Escala de Free a Agencia según tu equipo.",
+      "Gestiona pipeline, actividades y seguimiento sin exportar a otra herramienta. Escala de la prueba Gratis a Agencia según tu equipo.",
   },
   {
     title: "Precios en MXN, sin sorpresas",

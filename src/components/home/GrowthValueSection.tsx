@@ -4,7 +4,12 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Chart01Icon, Calendar03Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
-import { Routes } from "kadesh/core/routes";
+import {
+  PRIMARY_CTA_CLASS,
+  SECTION_QUESTION_CLASS,
+  TRIAL_CTA_HREF,
+  TRIAL_CTA_LABEL,
+} from "kadesh/components/home/landing-cta";
 
 const GROWTH_STEPS = [
   { month: "Mes 1", count: "500 negocios nuevos", detail: "Tu cuota mensual se activa" },
@@ -32,8 +37,11 @@ export default function GrowthValueSection() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
+          <p className={SECTION_QUESTION_CLASS}>
             ¿Cuántos leads nuevos obtengo cada mes?
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
+            500 negocios nuevos cada mes con Pro, sin repetidos
           </h2>
           <p className="text-[#424242] dark:text-[#d6d6d6] max-w-2xl mx-auto text-lg">
             Con el plan Pro son 500 leads nuevos al mes. La cuota se renueva
@@ -128,11 +136,8 @@ export default function GrowthValueSection() {
           transition={{ duration: 0.4, delay: 0.15 }}
           className="text-center mt-12"
         >
-          <Link
-            href={Routes.auth.register}
-            className="inline-flex items-center justify-center px-8 py-4 bg-orange-800 hover:bg-orange-900 text-white font-bold text-lg rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
-          >
-            Comenzar a generar leads
+          <Link href={TRIAL_CTA_HREF} className={PRIMARY_CTA_CLASS}>
+            {TRIAL_CTA_LABEL}
           </Link>
         </motion.div>
       </div>

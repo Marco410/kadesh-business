@@ -1,8 +1,6 @@
 export { default as HeroSection } from './HeroSection';
-export { default as WhatIsKadeshSection } from './WhatIsKadeshSection';
 export { default as HomeJsonLd } from './HomeJsonLd';
 export { default as ScheduleDemoSection } from './ScheduleDemoSection';
-export { default as HeroDifferentiatorsBadges } from './HeroDifferentiatorsBadges';
 export { default as CategoriesMarqueeSection } from './CategoriesMarqueeSection';
 export { default as InteractiveDemoSection } from './InteractiveDemoSection';
 export { default as WhyKadeshSection } from './WhyKadeshSection';
@@ -14,12 +12,14 @@ export { default as KadeshAiSection } from './KadeshAiSection';
 export { default as PersonaBenefitsSection } from './PersonaBenefitsSection';
 export { default as GrowthValueSection } from './GrowthValueSection';
 export { default as SocialProofBanner } from './SocialProofBanner';
-export { default as AgencyTestimonialsSection } from './AgencyTestimonialsSection';
+export { default as TestimonialsSection } from './TestimonialsSection';
 export { default as LandingPricingSection } from './LandingPricingSection';
 export { default as FinalCTASection } from './FinalCTASection';
 export { default as FAQSection } from './FAQSection';
 export { default as ReferralSection } from './ReferralSection';
 export { default as ReferralLinkSection } from './ReferralLinkSection';
+export { default as ReferralTeaserBand } from './ReferralTeaserBand';
+export { default as PainSection } from './PainSection';
 
 // Legacy sections (kept for backwards compatibility, not used on homepage)
 export { default as ContactProspectsSection } from './ContactProspectsSection';

@@ -8,10 +8,10 @@ export const PRO_PLAN_PUBLIC = {
 
 export const PRICING_PLAN_OFFERS = [
   {
-    name: "Plan Free",
+    name: "Plan Gratis",
     price: 0,
     description:
-      "Prueba gratuita con leads limitados para evaluar la prospección B2B desde Google Maps e INEGI.",
+      "Prueba gratuita de 7 días con 70 créditos y todas las funciones para evaluar la prospección B2B desde Google Maps e INEGI.",
   },
   {
     name: "Plan Starter",
@@ -59,12 +59,12 @@ export const PRICING_FAQ_ITEMS = [
   {
     question: "¿Cuánto cuesta KADESH Negocios?",
     answer:
-      "KADESH ofrece un plan Free para empezar, además de planes de pago Starter, Pro y Agencia con precios en pesos mexicanos (MXN). Los montos exactos se muestran en esta página y puedes elegir facturación mensual o anual con descuento.",
+      "KADESH ofrece una prueba Gratis de 7 días para empezar, además de planes de pago Starter, Pro y Agencia con precios en pesos mexicanos (MXN). Los montos exactos se muestran en esta página y puedes elegir facturación mensual o anual con descuento.",
   },
   {
     question: "¿Hay prueba gratuita o plan gratis?",
     answer:
-      "Sí. Puedes registrarte y usar el plan Free o la prueba promocional (7 días con 70 leads, según la oferta vigente) para validar la extracción de leads desde Google Maps e INEGI y el CRM antes de contratar un plan de pago.",
+      "Sí. Puedes registrarte y usar la prueba Gratis (7 días con 70 créditos, sin tarjeta) para validar la extracción de leads desde Google Maps e INEGI y el CRM antes de contratar un plan de pago.",
   },
   {
     question: "¿Los precios están en pesos mexicanos?",
@@ -74,7 +74,7 @@ export const PRICING_FAQ_ITEMS = [
   {
     question: "¿Kadesh AI está en todos los planes?",
     answer:
-      "Sí. Kadesh AI está incluido en Free, Starter, Pro y Agencia. El administrador lo configura en el panel; el equipo ve el resumen del día en Inicio. Si usas la modalidad administrada, descuenta de los mismos créditos que extraer leads (un resumen del día suele ser 4). Pro y Agencia dan más créditos, así hay más margen para extraer y para la IA. Si conectas tu API key, la IA no descuenta créditos de Kadesh.",
+      "Sí. Kadesh AI está incluido en Gratis, Starter, Pro y Agencia. El administrador lo configura en el panel; el equipo ve el resumen del día en Inicio. Si usas la modalidad administrada, descuenta de los mismos créditos que extraer leads (un resumen del día suele ser 4). Pro y Agencia dan más créditos, así hay más margen para extraer y para la IA. Si conectas tu API key, la IA no descuenta créditos de Kadesh.",
   },
   {
     question: "¿Puedo cambiar de plan después?",

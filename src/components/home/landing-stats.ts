@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 /**
  * Cifras públicas de la landing (`landingStats` en kadesh-back): conteos agregados de la base.
  * Se piden en el servidor con ISR de 6 h (el back también cachea 6 h). Si el API falla, `null`
@@ -13,6 +15,9 @@ export type LandingStats = {
 
 const REVALIDATE_SECONDS = 6 * 60 * 60;
 
+/** Por debajo de esto la cifra de empresas resta más de lo que suma y no se muestra. */
+export const MIN_COMPANIES_TO_SHOW = 25;
+
 const LANDING_STATS_QUERY = `
   query LandingStats {
     landingStats {
@@ -25,7 +30,8 @@ const LANDING_STATS_QUERY = `
   }
 `;
 
-export async function fetchLandingStats(): Promise<LandingStats | null> {
+/** `cache`: el hero y la franja de cifras lo piden en el mismo render; una sola llamada. */
+export const fetchLandingStats = cache(async (): Promise<LandingStats | null> => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) return null;
 
@@ -46,7 +52,7 @@ export async function fetchLandingStats(): Promise<LandingStats | null> {
   } catch {
     return null;
   }
-}
+});
 
 /** Redondea hacia abajo para presumir sin exagerar: 48,321 → "48,000+", 734 → "700+". */
 export function roundDownForDisplay(value: number): number {
