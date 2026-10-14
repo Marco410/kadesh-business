@@ -19,7 +19,7 @@ export default function PrivacidadPage() {
             Kadesh — Plataforma de Prospección B2B
           </p>
           <p className="text-sm text-[#5c4033]/80 dark:text-[#d4c4b8]/80 text-center">
-            Última actualización: 8 de octubre de 2026
+            Última actualización: 14 de octubre de 2026
           </p>
 
           <h2 className="text-2xl text-orange-500 mt-4 font-semibold">
@@ -319,6 +319,44 @@ export default function PrivacidadPage() {
             mejorar la experiencia del usuario, analizar el tráfico del sitio y
             personalizar el contenido. Estas tecnologías no recaban datos
             sensibles.
+          </p>
+          <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
+            <strong className="font-semibold">Publicidad.</strong> En{" "}
+            {SITE_HOST} y en pet.kadesh.com.mx mostramos anuncios de Google
+            AdSense. Proveedores externos, incluido Google, usan cookies para
+            mostrar anuncios basados en las visitas anteriores del usuario a
+            este sitio web o a otros sitios web. Las cookies de publicidad de
+            Google permiten que Google y sus socios muestren anuncios basados en
+            esas visitas. Puede desactivar la publicidad personalizada en la{" "}
+            <a
+              href="https://adssettings.google.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-orange-600 dark:text-orange-400 underline"
+            >
+              Configuración de anuncios de Google
+            </a>
+            , o desactivar las cookies de otros proveedores de publicidad
+            personalizada en{" "}
+            <a
+              href="https://www.aboutads.info/choices/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-orange-600 dark:text-orange-400 underline"
+            >
+              www.aboutads.info
+            </a>
+            . Más información sobre{" "}
+            <a
+              href="https://policies.google.com/technologies/ads?hl=es-419"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-orange-600 dark:text-orange-400 underline"
+            >
+              cómo usa Google las cookies en la publicidad
+            </a>
+            . Esto es independiente de los datos de su cuenta de Google descritos
+            en la sección IX, que nunca se usan para publicidad.
           </p>
           <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
             Puede configurar su navegador para rechazar el uso de cookies; sin
