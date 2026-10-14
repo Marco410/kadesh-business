@@ -48,8 +48,9 @@ function AdminDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tab = parseAdminTab(searchParams.get("tab"));
+  const rawPetVista = searchParams.get("vista");
   const vista: PetPlacesVista =
-    searchParams.get("vista") === "servicios" ? "servicios" : "fichas";
+    rawPetVista === "servicios" || rawPetVista === "fichas" ? rawPetVista : "animales";
   const plansVista = parsePlansVista(searchParams.get("vista"));
   const [reviewPlaceId, setReviewPlaceId] = useState<string | null>(null);
   const [reviewServiceId, setReviewServiceId] = useState<string | null>(null);
@@ -91,7 +92,7 @@ function AdminDashboardContent() {
 
   const setPetPlacesVista = useCallback(
     (next: PetPlacesVista) => {
-      setTab(ADMIN_TABS.PET_PLACES, next === "servicios" ? next : undefined);
+      setTab(ADMIN_TABS.PET_PLACES, next === "animales" ? undefined : next);
     },
     [setTab],
   );
@@ -109,7 +110,7 @@ function AdminDashboardContent() {
   const openPlaceReview = useCallback(
     (placeId: string) => {
       setReviewPlaceId(placeId);
-      setTab(ADMIN_TABS.PET_PLACES);
+      setTab(ADMIN_TABS.PET_PLACES, "fichas");
     },
     [setTab],
   );
