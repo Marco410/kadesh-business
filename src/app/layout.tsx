@@ -13,6 +13,7 @@ import {
   getMetaPixelBaseSnippet,
 } from "kadesh/components/consent/meta-pixel";
 import { KADESH_LEGAL } from "kadesh/constants/legal";
+import { ADSENSE_SCRIPT_SRC } from "kadesh/core/ads";
 
 export { metadata, viewport } from "./metadata";
 
@@ -170,6 +171,8 @@ export default function RootLayout({
             __html: getMetaPixelBaseSnippet(META_PIXEL_ID),
           }}
         />
+        {/* AdSense: en el <head> de cada página para verificar kadesh.com.mx (cubre también pet.kadesh.com.mx). */}
+        <script async src={ADSENSE_SCRIPT_SRC} crossOrigin="anonymous" />
       </head>
       <body
         className={`${poppins.variable} ${inter.variable} font-sans bg-[#ffffff] dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] transition-colors duration-200`}
