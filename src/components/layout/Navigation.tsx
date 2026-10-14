@@ -38,7 +38,13 @@ const NICHE_DROPDOWN_LINKS: NicheDropdownLink[] = Object.entries(
   href: `/clientes-para-${slug}`,
 }));
 
-export default function Navigation() {
+/**
+ * `overDarkHero`: la página arranca con un hero oscuro (la home) y la barra va en blanco desde el
+ * primer render. Se pasa explícito porque `usePathname()` no es confiable cuando Vercel regenera
+ * la home en segundo plano (ISR): el servidor la pintaba como página clara (logo invertido,
+ * enlaces grises) y React no corrige esas clases al hidratar.
+ */
+export default function Navigation({ overDarkHero = false }: { overDarkHero?: boolean } = {}) {
   const [opened, setOpened] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [nicheDropdownOpen, setNicheDropdownOpen] = useState(false);
@@ -164,7 +170,7 @@ export default function Navigation() {
   };
 
   const isDark = mounted && resolvedTheme === "dark";
-  const isHomePage = pathname === Routes.home;
+  const isHomePage = overDarkHero || pathname === Routes.home;
   const atTopLight = !scrolled && !isDark && !isHomePage;
   const registerHref = `${Routes.auth.login}?tab=register`;
   const navLinkClass = atTopLight
