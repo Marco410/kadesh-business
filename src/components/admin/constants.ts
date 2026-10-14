@@ -55,8 +55,8 @@ export const ADMIN_TAB_ITEMS: Array<{
   },
   {
     id: ADMIN_TABS.PET_PLACES,
-    label: "Veterinarias",
-    description: "Reclamos y verificación",
+    label: "Kadesh Pet",
+    description: "Animales, veterinarias y servicios",
   },
 ];
 

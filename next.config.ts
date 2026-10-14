@@ -47,6 +47,8 @@ const nextConfig: NextConfig = {
     return config;
   },
   images: {
+    // Sin el optimizador de imágenes de Vercel: se sirven tal cual (sin cuota de optimización).
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "http",
