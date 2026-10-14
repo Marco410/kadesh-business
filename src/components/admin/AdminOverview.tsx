@@ -347,7 +347,7 @@ export default function AdminOverview({
           </div>
           <button
             type="button"
-            onClick={() => onOpenTab(ADMIN_TABS.PET_PLACES)}
+            onClick={() => onOpenTab(ADMIN_TABS.PET_PLACES, "fichas")}
             className="hidden sm:inline-flex h-11 items-center gap-1 rounded-xl px-3 text-sm font-semibold text-orange-600 dark:text-orange-400 hover:underline cursor-pointer"
           >
             Ver todas

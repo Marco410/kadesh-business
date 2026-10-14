@@ -34,6 +34,7 @@ import { useDebouncedValue } from "./hooks/useDebouncedValue";
 import AdminPetPlaceEditor from "./AdminPetPlaceEditor";
 import AdminPetPlaceReviewModal from "./AdminPetPlaceReviewModal";
 import AdminPetPlaceServicesPanel from "./AdminPetPlaceServicesPanel";
+import AdminAnimalsPanel from "./animals/AdminAnimalsPanel";
 import {
   AdminEmptyState,
   AdminErrorState,
@@ -186,12 +187,13 @@ function PipelineSelect({
   );
 }
 
-export type PetPlacesVista = "fichas" | "servicios";
+/** Subpestañas de Kadesh Pet. "animales" es la de entrada. */
+export type PetPlacesVista = "animales" | "fichas" | "servicios";
 
 export default function AdminPetPlacesPanel({
   initialPlaceId,
   onConsumedInitialPlace,
-  vista = "fichas",
+  vista = "animales",
   onVistaChange,
   initialServiceId,
   onConsumedInitialService,
@@ -384,16 +386,19 @@ export default function AdminPetPlacesPanel({
   return (
     <div className="flex flex-col gap-4">
       <AdminSegmented
-        ariaLabel="Vista de veterinarias"
+        ariaLabel="Secciones de Kadesh Pet"
         items={[
-          { id: "fichas" as const, label: "Fichas" },
+          { id: "animales" as const, label: "Animales" },
+          { id: "fichas" as const, label: "Veterinarias" },
           { id: "servicios" as const, label: "Servicios" },
         ]}
         value={vista}
         onChange={(next) => onVistaChange?.(next)}
       />
 
-      {vista === "servicios" ? (
+      {vista === "animales" ? (
+        <AdminAnimalsPanel />
+      ) : vista === "servicios" ? (
         <AdminPetPlaceServicesPanel
           initialServiceId={initialServiceId}
           onConsumedInitialService={onConsumedInitialService}

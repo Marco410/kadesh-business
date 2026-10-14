@@ -14,6 +14,7 @@ import { isPlatformAdminUser } from "kadesh/utils/user-roles";
 import { NICHE_TARGET_MAPPING } from "kadesh/constants/constans";
 import { trackLogout } from "kadesh/utils/activity";
 import FontSizeSlider from "./FontSizeSlider";
+import { NotificationBell } from "kadesh/components/notifications";
 
 interface DropdownLink {
   label: string;
@@ -328,6 +329,9 @@ export default function Navigation() {
             </button>
           )}
 
+          {/* Campana: solo admins de plataforma en esta fase (avisos de Kadesh Pet y Operaciones). */}
+          {user?.id && isPlatformAdminUser(user) ? <NotificationBell light={atTopLight} /> : null}
+
           {/* User Avatar or Login Button */}
           {user?.id ? (
             <div className="relative" ref={avatarDropdownRef}>
@@ -417,6 +421,12 @@ export default function Navigation() {
             </div>
           )}
         </div>
+
+        {user?.id && isPlatformAdminUser(user) ? (
+          <div className="ml-auto mr-3 lg:hidden">
+            <NotificationBell light={atTopLight} />
+          </div>
+        ) : null}
 
         {/* Mobile Burger Menu */}
         <button

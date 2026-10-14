@@ -4,7 +4,7 @@ Pantalla interna en `/panel/clientes/admin`. No es el panel de un cliente: es de
 
 ## Promesa
 
-Ver y controlar a cada **cliente** en 360° (empresa, plan y pagos, equipo, CRM, consumo, integraciones y lo que hace cada persona), seguir la **actividad** de toda la plataforma, y ajustar el **catálogo de planes**, el **contenido** (blog y correos) y las **fichas de veterinarias**. El default es Inicio. Las secciones viven en `?tab=clientes`, `?tab=actividad`, `?tab=analitica`, `?tab=planes`, `?tab=contenido` y `?tab=veterinarias`.
+Ver y controlar a cada **cliente** en 360° (empresa, plan y pagos, equipo, CRM, consumo, integraciones y lo que hace cada persona), seguir la **actividad** de toda la plataforma, y ajustar el **catálogo de planes**, el **contenido** (blog y correos) y **Kadesh Pet** (animales, fichas de veterinarias y servicios). El default es Inicio. Las secciones viven en `?tab=clientes`, `?tab=actividad`, `?tab=analitica`, `?tab=planes`, `?tab=contenido` y `?tab=veterinarias` (Kadesh Pet; la llave se conserva para no romper enlaces).
 
 Los enlaces viejos (`?tab=usuarios`, `suscripciones`, `empresas`, `blog`, `correos`) se redirigen solos a la sección nueva (`normalizeLegacyAdminParams` en `constants.ts`).
 
@@ -157,7 +157,9 @@ Un nombre, compartido por los dos blogs. No se renombran ni se borran desde aqu�
 
 ## Veterinarias
 
-Dos vistas dentro de `?tab=veterinarias`: **Fichas** (default) y **Servicios** (`&vista=servicios`).
+Pestaña **Kadesh Pet** (`?tab=veterinarias`), tres vistas: **Animales** (default), **Veterinarias** (`&vista=fichas`) y **Servicios** (`&vista=servicios`).
+
+**Animales** (`animals/`, 2026-10-14): todos los animales de Kadesh Pet, de usuarios y del admin, con búsqueda (nombre, ciudad, quién lo publicó), filtros (publicado por usuario o admin, en Facebook o no, tipo) y vistas / favoritos / comentarios por fila. Acciones: **Publicar en Facebook** (`adminPublishAnimalToFacebook`; si ya salió pide confirmar y vuelve a publicar), **Editar en Kadesh Pet** (abre el mismo formulario de kadesh-landing en otra pestaña: no se duplicó el formulario con mapa y fotos; requiere sesión de admin en Kadesh Pet) y **Ver ficha pública**. El detalle (`&animal={id}`, al que lleva la campana) muestra fotos, datos, etapas, vistas por día (30 días, con quién lo vio), comentarios y favoritos; el admin borra comentarios, quita favoritos y borra vistas (todas o solo sin sesión).
 
 En fichas:
 

@@ -50,6 +50,9 @@ export const Routes = {
   panelPlans: "/panel/clientes/planes",
   /** Operaciones internas. Solo rol `admin` de plataforma. */
   panelAdmin: "/panel/clientes/admin",
+  /** Una pestaña de Operaciones con sus parámetros (vista, detalle…). */
+  panelAdminTab: (tab: string, params: Record<string, string> = {}): string =>
+    `/panel/clientes/admin?${new URLSearchParams({ tab, ...params }).toString()}`,
   panelPlanSubscribe: (planId: string): string =>
     `/panel/clientes/planes/suscripcion/${planId}`,
   panelPlanSubscriptionSuccess: "/panel/clientes/planes/suscripcion/success",
