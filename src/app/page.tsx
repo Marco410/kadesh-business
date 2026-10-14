@@ -1,15 +1,10 @@
 import dynamic from "next/dynamic";
 import { HeroSection, HomeJsonLd } from "kadesh/components/home";
 import LandingStatsBand from "kadesh/components/home/LandingStatsBand";
+import PainSection from "kadesh/components/home/PainSection";
 import { Footer, Navigation } from "kadesh/components/layout";
 import { FloatingWhatsAppButton } from "kadesh/components/shared";
 
-const WhatIsKadeshSection = dynamic(
-  () => import("kadesh/components/home/WhatIsKadeshSection"),
-);
-const HeroDifferentiatorsBadges = dynamic(
-  () => import("kadesh/components/home/HeroDifferentiatorsBadges"),
-);
 const CategoriesMarqueeSection = dynamic(
   () => import("kadesh/components/home/CategoriesMarqueeSection"),
 );
@@ -46,22 +41,19 @@ const GrowthValueSection = dynamic(
 const SocialProofBanner = dynamic(
   () => import("kadesh/components/home/SocialProofBanner"),
 );
-const AlliesSection = dynamic(
-  () => import("kadesh/components/allies/AlliesSection"),
-);
-const AgencyTestimonialsSection = dynamic(
-  () => import("kadesh/components/home/AgencyTestimonialsSection"),
+const TestimonialsSection = dynamic(
+  () => import("kadesh/components/home/TestimonialsSection"),
 );
 const LandingPricingSection = dynamic(
   () => import("kadesh/components/home/LandingPricingSection"),
-);
-const ReferralSection = dynamic(
-  () => import("kadesh/components/home/ReferralSection"),
 );
 const FinalCTASection = dynamic(
   () => import("kadesh/components/home/FinalCTASection"),
 );
 const FAQSection = dynamic(() => import("kadesh/components/home/FAQSection"));
+const ReferralTeaserBand = dynamic(
+  () => import("kadesh/components/home/ReferralTeaserBand"),
+);
 
 export default function HomePage() {
   return (
@@ -69,10 +61,11 @@ export default function HomePage() {
       <HomeJsonLd />
       <FloatingWhatsAppButton />
       <main className="min-h-screen">
-        <Navigation />
+        <Navigation overDarkHero />
         <HeroSection />
-        {/* Prueba y producto primero: cifras, giros, demo, costo por lead y plataforma. */}
         <LandingStatsBand />
+        {/* Dolor antes que producto: nombra lo que el vendedor ya vive. */}
+        <PainSection />
         <CategoriesMarqueeSection />
         <InteractiveDemoSection />
         <LeadCostComparisonSection />
@@ -85,15 +78,12 @@ export default function HomePage() {
         <ScheduleDemoSection />
         <GrowthValueSection />
         <SocialProofBanner />
-        <AlliesSection />
-        <AgencyTestimonialsSection />
+        <TestimonialsSection />
         <LandingPricingSection />
-        <ReferralSection />
         <FinalCTASection />
-        {/* Definición y diferenciadores: siguen en la página para SEO / respuestas de IA. */}
-        <WhatIsKadeshSection />
-        <HeroDifferentiatorsBadges />
         <FAQSection />
+        {/* Referidos y aliados salen del flujo principal: franja aquí y aliados en el footer. */}
+        <ReferralTeaserBand />
         <Footer />
       </main>
     </>

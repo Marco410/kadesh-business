@@ -6,6 +6,7 @@ import {
   formatKadeshLegalAddress,
 } from 'kadesh/constants/legal';
 import { Routes } from 'kadesh/core/routes';
+import { ALLIES } from 'kadesh/components/allies';
 
 const FOOTER_LINKS = {
   producto: [
@@ -15,6 +16,7 @@ const FOOTER_LINKS = {
     { label: "Planes y precios", href: Routes.precios },
     { label: "Blog", href: Routes.blog.index },
     { label: "Novedades", href: Routes.novedades },
+    { label: "Programa de referidos", href: Routes.referidos },
     { label: "Contacto", href: "/contacto" },
     { label: "Iniciar sesión", href: Routes.auth.login },
     { label: "Registrarse", href: `${Routes.auth.login}?tab=register` },
@@ -37,7 +39,7 @@ export default function Footer() {
   return (
     <footer className="w-full bg-gray-900 dark:bg-black text-gray-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
           {/* Brand + identidad legal (NAP para verificación de marca) */}
           <div>
             <Logo className="mb-4" />
@@ -95,6 +97,25 @@ export default function Footer() {
                   >
                     {link.label}
                   </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Familia Kadesh y aliados: en medio de la home distraían a quien vino a probar el Radar. */}
+          <div>
+            <h4 className="text-white font-bold mb-4">Familia Kadesh y aliados</h4>
+            <ul className="space-y-2">
+              {ALLIES.map((ally) => (
+                <li key={ally.href}>
+                  <a
+                    href={ally.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors text-sm"
+                  >
+                    {ally.name}
+                  </a>
                 </li>
               ))}
             </ul>

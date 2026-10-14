@@ -8,6 +8,7 @@ import {
   Add01Icon,
   ArrowRight01Icon,
 } from "@hugeicons/core-free-icons";
+import { SECTION_QUESTION_CLASS } from "kadesh/components/home/landing-cta";
 
 const FLOW_STEPS = [
   {
@@ -32,8 +33,11 @@ export default function UniqueLeadsSection() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
+          <p className={SECTION_QUESTION_CLASS}>
             ¿Kadesh agrega el mismo negocio dos veces?
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
+            Nunca pagas dos veces por el mismo negocio
           </h2>
           <p className="text-[#424242] dark:text-[#d6d6d6] max-w-2xl mx-auto text-lg">
             No. Antes de guardar un negocio, Kadesh comprueba si ya está en tu

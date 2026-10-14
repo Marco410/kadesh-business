@@ -10,6 +10,7 @@ import {
   Tag01Icon,
 } from "@hugeicons/core-free-icons";
 import { LANDING_SECTION_IMAGES } from "kadesh/components/home/constants";
+import { SECTION_QUESTION_CLASS } from "kadesh/components/home/landing-cta";
 
 const DATA_POINTS = [
   {
@@ -48,8 +49,11 @@ export default function RealDataSection() {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
+            <p className={SECTION_QUESTION_CLASS}>
               ¿Qué datos incluye cada lead de Google Maps e INEGI?
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#212121] dark:text-white mb-4">
+              Teléfono, dirección, reseñas y giro, listos para llamar
             </h2>
             <p className="text-[#424242] dark:text-[#d6d6d6] text-lg mb-8 leading-relaxed">
               En Google Maps cada negocio incluye teléfono, dirección, categoría,

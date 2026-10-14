@@ -15,13 +15,13 @@ export const Routes = {
 
   // Navigation sections (anchors on home page)
   navigation: {
-    whatIsKadesh: "#que-es-kadesh",
     lostAnimals: "#animales",
     veterinarians: "#veterinarias",
     stories: "#historias",
     donations: "#donaciones",
     howItWorks: "#como-funciona",
     kadeshAi: "#kadesh-ai",
+    scheduleDemo: "#agendar-demo",
     roadmap: "#roadmap",
   },
 
@@ -64,6 +64,10 @@ export const Routes = {
   // About
   conocenos: "/conocenos",
   precios: "/precios",
+  /** Programa de referidos (antes era una sección de la home). */
+  referidos: "/referidos",
+  /** Landing solo para anuncios (sin menú). `?angulo=` cambia el titular según el anuncio. */
+  prueba: "/prueba",
   novedades: "/novedades",
 
   // Blog

@@ -1,28 +1,36 @@
 import Link from "next/link";
-import { Routes } from "kadesh/core/routes";
 import HeroVisual from "kadesh/components/home/HeroVisual";
 import HeroMapBackdrop from "kadesh/components/home/HeroMapBackdrop";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon, StarIcon } from "@hugeicons/core-free-icons";
 import {
-  Shield01Icon,
-  FlashIcon,
-  Tick02Icon,
-  SparklesIcon,
-  ArrowRight01Icon,
-} from "@hugeicons/core-free-icons";
-import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
-
-const TRUST_BADGES = [
-  { icon: Shield01Icon, label: "Datos públicos legales" },
-  { icon: Tick02Icon, label: "Sin tarjeta" },
-  { icon: FlashIcon, label: "Listo en 60 s" },
-] as const;
+  DEMO_CTA_HREF,
+  DEMO_CTA_LABEL,
+  PRIMARY_CTA_ON_DARK_CLASS,
+  SECONDARY_CTA_ON_DARK_CLASS,
+  TRIAL_CTA_HREF,
+  TRIAL_CTA_LABEL,
+  TRIAL_PERKS,
+} from "kadesh/components/home/landing-cta";
+import {
+  MIN_COMPANIES_TO_SHOW,
+  fetchLandingStats,
+  roundDownForDisplay,
+} from "kadesh/components/home/landing-stats";
+import { HERO_TESTIMONIAL } from "kadesh/components/home/testimonials";
 
 /**
  * Server Component hero — no GSAP on the critical path.
  * Entrance fades that start at opacity 0 delay LCP; keep copy visible immediately.
+ * Una sola promesa: titular → subtítulo → botón → quitamiedos → prueba social.
  */
-export default function HeroSection() {
+export default async function HeroSection() {
+  const stats = await fetchLandingStats();
+  const companies =
+    stats && stats.companies >= MIN_COMPANIES_TO_SHOW
+      ? roundDownForDisplay(stats.companies)
+      : null;
+
   return (
     <section
       id="inicio"
@@ -45,70 +53,62 @@ export default function HeroSection() {
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-28 sm:pb-16 lg:pt-28 lg:pb-20">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-14">
           <div className="hero-copy flex-1 text-center lg:text-left max-w-xl lg:max-w-2xl">
+            <p className="mb-4 text-sm font-semibold text-white/90">
+              Prospección para agencias y equipos de ventas en México
+            </p>
             <h1 className="hero-headline text-[2rem] sm:text-4xl lg:text-5xl xl:text-[3.35rem] font-bold text-white mb-5 leading-[1.12] tracking-tight">
-              Extrae leads B2B de Google Maps e INEGI y conviértelos en clientes
+              Encuentra cientos de clientes para tu negocio, en tu ciudad, en
+              menos de un minuto
             </h1>
 
-            <p className="hero-lead text-base sm:text-lg text-white mb-5 leading-relaxed max-w-lg mx-auto lg:mx-0">
-              Kadesh extrae negocios reales de Google Maps e INEGI con teléfono
-              y dirección, y los gestiona en un CRM integrado.{" "}
-              <Link
-                href={`${Routes.home}${Routes.navigation.kadeshAi}`}
-                className="ai-urim-fill mx-0.5 inline-flex translate-y-px items-center gap-1 rounded-full px-2 py-0.5 text-sm font-semibold text-white no-underline shadow-[0_6px_14px_rgba(139,92,246,0.35)] hover:text-white hover:opacity-90"
-              >
-                <HugeiconsIcon icon={SparklesIcon} size={14} />
-                {KADESH_URIM_AI_NAME}
-              </Link>{" "}
-              revisa tu pipeline y te propone qué hacer hoy: está en todos los
-              planes. Prueba 7 días con 70 leads gratis, sin tarjeta.
+            <p className="hero-lead text-base sm:text-lg text-white mb-7 leading-relaxed max-w-lg mx-auto lg:mx-0">
+              Kadesh saca negocios reales de Google Maps e INEGI con su teléfono
+              y los deja en un CRM listo para llamar o mandar WhatsApp. Sin
+              comprar bases de datos que ya no contestan.
             </p>
-
-            <Link
-              href={`${Routes.home}${Routes.navigation.kadeshAi}`}
-              className="hero-ai-chip ai-urim-fill mb-4 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold shadow-[0_8px_20px_rgba(139,92,246,0.4)] transition-opacity hover:opacity-90 hover:text-white"
-            >
-              <HugeiconsIcon icon={SparklesIcon} size={16} />
-              {KADESH_URIM_AI_NAME} · En todos los planes
-              <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
-            </Link>
-
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-7">
-              {TRUST_BADGES.map((badge) => (
-                <span
-                  key={badge.label}
-                  className="hero-badge inline-flex items-center gap-1.5 rounded-full bg-white/10 border border-white/20 px-3 py-1.5 text-xs font-medium text-white"
-                >
-                  <HugeiconsIcon
-                    icon={badge.icon}
-                    size={14}
-                    className="text-white"
-                  />
-                  {badge.label}
-                </span>
-              ))}
-            </div>
 
             <div className="hero-cta flex flex-col items-center lg:items-start gap-3">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 w-full sm:w-auto">
                 <Link
-                  href={Routes.auth.register}
-                  className="inline-flex h-12 items-center justify-center px-7 text-sm font-semibold rounded-xl bg-white text-gray-900 hover:text-gray-900 shadow-[0_10px_28px_rgba(0,0,0,0.18)] hover:bg-gray-50 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-orange-800 transition-all duration-150 w-full sm:w-auto"
+                  href={TRIAL_CTA_HREF}
+                  className={`${PRIMARY_CTA_ON_DARK_CLASS} w-full sm:w-auto`}
                 >
-                  Probar gratis
-                  <span className="ml-1.5 font-normal text-gray-700 hidden sm:inline">
-                    (70 leads)
-                  </span>
+                  {TRIAL_CTA_LABEL}
+                  <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
                 </Link>
                 <Link
-                  href="/#agendar-demo"
-                  className="inline-flex h-12 items-center justify-center px-7 text-sm font-semibold rounded-xl border border-white/70 text-white bg-white/15 hover:bg-white/25 shadow-sm transition-colors duration-150 w-full sm:w-auto dark:border-white/40 dark:bg-white/5 dark:hover:bg-white/10"
+                  href={DEMO_CTA_HREF}
+                  className={`${SECONDARY_CTA_ON_DARK_CLASS} w-full sm:w-auto`}
                 >
-                  Solicitar demo
+                  {DEMO_CTA_LABEL}
                 </Link>
               </div>
-              <p className="text-xs text-white/90 text-center lg:text-left">
-                7 días de prueba · Cancela cuando quieras
+              <p className="text-xs sm:text-sm text-white/90 text-center lg:text-left">
+                {TRIAL_PERKS.join(" · ")}
               </p>
+            </div>
+
+            <div className="mt-7 flex flex-col items-center gap-1.5 border-t border-white/20 pt-5 text-sm text-white lg:items-start">
+              <p className="flex items-start gap-2 text-center lg:text-left">
+                <HugeiconsIcon
+                  icon={StarIcon}
+                  size={16}
+                  className="mt-0.5 shrink-0 fill-amber-300 text-amber-300"
+                  aria-hidden
+                />
+                <span>
+                  «{HERO_TESTIMONIAL.quote}»{" "}
+                  <span className="text-white/80">— {HERO_TESTIMONIAL.name}</span>
+                </span>
+              </p>
+              {companies && (
+                <p className="text-white/80">
+                  <strong className="font-semibold text-white">
+                    {companies.toLocaleString("es-MX")}+
+                  </strong>{" "}
+                  empresas ya prospectan con Kadesh
+                </p>
+              )}
             </div>
           </div>
 

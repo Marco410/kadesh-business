@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useId } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@apollo/client";
@@ -9,23 +9,14 @@ import {
   SAAS_PLANS_QUERY,
   type SaasPlansResponse,
   type SaasPlanItem,
-  type PlanFeatureItem,
 } from "kadesh/components/profile/sales/queries";
 import { useSubscription } from "kadesh/components/profile/sales/SubscriptionContext";
 import { Routes } from "kadesh/core/routes";
 import { cn } from "kadesh/utils/cn";
-import FeatureBetaBadge from "kadesh/components/profile/sales/planes/FeatureBetaBadge";
+import PlanFeatureGroups from "kadesh/components/profile/sales/planes/PlanFeatureGroups";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  ArrowLeft01Icon,
-  CheckmarkCircle02Icon,
-  Cancel01Icon,
-  SparklesIcon,
-} from "@hugeicons/core-free-icons";
-import {
-  KADESH_URIM_AI_NAME,
-  KADESH_AI_CREDIT_HINT,
-} from "kadesh/components/profile/ai/constants";
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
+import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
 import { useUser } from "kadesh/utils/UserContext";
 
 function formatPrice(
@@ -241,169 +232,6 @@ function getPlanCta(name: string, isCurrentPlan: boolean): string {
   return PLAN_CTA[name.trim().toLowerCase()] ?? "Iniciar suscripción";
 }
 
-const KADESH_AI_FEATURE_KEY = "kadesh_ai";
-
-function isKadeshAiFeature(feature: PlanFeatureItem): boolean {
-  return feature.key === KADESH_AI_FEATURE_KEY;
-}
-
-function includedPlanFeatures(
-  features: PlanFeatureItem[] | null | undefined,
-): PlanFeatureItem[] {
-  return (features?.filter((f) => f.included) ?? []).sort((a, b) => {
-    if (isKadeshAiFeature(a)) return -1;
-    if (isKadeshAiFeature(b)) return 1;
-    return 0;
-  });
-}
-
-function FeatureChip({ feature }: { feature: PlanFeatureItem }) {
-  const isAi = isKadeshAiFeature(feature);
-  const hint = isAi ? KADESH_AI_CREDIT_HINT : feature.description;
-  return (
-    <li>
-      <span
-        title={hint}
-        className={
-          isAi
-            ? "ai-urim-fill inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold shadow-[0_6px_14px_rgba(139,92,246,0.28)]"
-            : "inline-flex items-center gap-1.5 rounded-full border border-[#e0e0e0] bg-[#f5f5f5] px-2.5 py-1 text-xs text-[#616161] dark:border-[#3a3a3a] dark:bg-[#2a2a2a] dark:text-[#b0b0b0]"
-        }
-      >
-        <HugeiconsIcon
-          icon={isAi ? SparklesIcon : CheckmarkCircle02Icon}
-          size={14}
-          className={
-            isAi
-              ? "shrink-0 text-white"
-              : "shrink-0 text-orange-800 dark:text-orange-400"
-          }
-          aria-hidden
-        />
-        {isAi ? KADESH_URIM_AI_NAME : feature.name}
-        {feature.beta ? <FeatureBetaBadge onFill={isAi} /> : null}
-      </span>
-    </li>
-  );
-}
-
-function FeatureRow({ feature }: { feature: PlanFeatureItem }) {
-  const [open, setOpen] = useState(false);
-  const wrapperRef = useRef<HTMLSpanElement>(null);
-  const tooltipId = useId();
-  const isAi = isKadeshAiFeature(feature);
-  const hint = isAi ? KADESH_AI_CREDIT_HINT : feature.description;
-
-  useEffect(() => {
-    if (!open) return;
-    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(e.target as Node)
-      ) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside, {
-      passive: true,
-    });
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, [open]);
-
-  return (
-    <li className={cn("flex items-start gap-3", open && "relative z-20")}>
-      {isAi ? (
-        <span ref={wrapperRef} className="relative inline-flex group/name">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setOpen((v) => !v);
-            }}
-            className="ai-urim-fill inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold shadow-[0_6px_14px_rgba(139,92,246,0.28)] transition-opacity hover:opacity-90 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ai-urim-purple)] focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#1e1e1e]"
-            title={hint}
-            aria-expanded={open}
-            aria-describedby={open ? tooltipId : undefined}
-          >
-            <HugeiconsIcon
-              icon={SparklesIcon}
-              size={16}
-              className="shrink-0 text-white"
-              aria-hidden
-            />
-            {KADESH_URIM_AI_NAME}
-            {feature.beta ? <FeatureBetaBadge onFill /> : null}
-          </button>
-          <span
-            id={tooltipId}
-            role="tooltip"
-            className={cn(
-              "absolute left-0 bottom-full z-10 mb-1.5 max-w-[240px] rounded-lg bg-[#212121] dark:bg-[#2a2a2a] px-3 py-2 text-xs font-normal text-white dark:text-[#e0e0e0] shadow-lg transition-opacity duration-150",
-              "opacity-0 group-hover/name:opacity-100",
-              open && "opacity-100 pointer-events-none",
-            )}
-          >
-            {hint}
-          </span>
-        </span>
-      ) : (
-        <>
-          <span className="mt-0.5 flex-shrink-0" aria-hidden>
-            {feature.included ? (
-              <HugeiconsIcon
-                icon={CheckmarkCircle02Icon}
-                size={20}
-                className="text-orange-700 dark:text-orange-400"
-              />
-            ) : (
-              <HugeiconsIcon
-                icon={Cancel01Icon}
-                size={20}
-                className="text-red-500 dark:text-red-400"
-              />
-            )}
-          </span>
-          <span ref={wrapperRef} className="relative inline-flex flex-wrap items-center gap-1.5 group/name">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setOpen((v) => !v);
-              }}
-              className="cursor-help text-left text-sm text-[#616161] dark:text-[#b0b0b0] border-b border-dotted border-[#616161] dark:border-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#e0e0e0] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#121212] rounded-sm"
-              title={feature.description}
-              aria-expanded={open}
-              aria-describedby={open ? tooltipId : undefined}
-            >
-              {feature.name}
-            </button>
-            {feature.beta ? (
-              <FeatureBetaBadge />
-            ) : null}
-            <span
-              id={tooltipId}
-              role="tooltip"
-              className={cn(
-                "absolute left-0 bottom-full z-10 mb-1.5 max-w-[240px] rounded-lg bg-[#212121] dark:bg-[#2a2a2a] px-3 py-2 text-xs text-white dark:text-[#e0e0e0] shadow-lg transition-opacity duration-150",
-                "opacity-0 group-hover/name:opacity-100",
-                open && "opacity-100 pointer-events-none",
-              )}
-            >
-              {feature.description}
-            </span>
-          </span>
-        </>
-      )}
-    </li>
-  );
-}
-
 function BillingToggle({
   value,
   onChange,
@@ -487,7 +315,6 @@ function PairedPlanCard({
 
   /** Features del periodo visible (antes siempre prefería annual y el mensual no se veía). */
   const includedSource = planToSubscribe ?? monthly ?? annual;
-  const includedFeatures = includedPlanFeatures(includedSource?.planFeatures);
 
   const savings = annualSavingsVsMonthly(monthly, annual);
 
@@ -644,13 +471,9 @@ function PairedPlanCard({
         )} */}
       </div>
 
-      {includedFeatures.length > 0 && (
-        <ul className="mt-8 space-y-3">
-          {includedFeatures.map((f) => (
-            <FeatureRow key={f.key} feature={f} />
-          ))}
-        </ul>
-      )}
+      <div className="mt-8">
+        <PlanFeatureGroups features={includedSource?.planFeatures} />
+      </div>
 
       {canSubscribe && onSubscribe && user?.id && showBtnStart && (
         <button
@@ -672,80 +495,87 @@ function PairedPlanCard({
   );
 }
 
+/**
+ * Tarjeta del plan Gratis: es una prueba de 7 días, no un plan gratis para siempre. Por eso
+ * «$0 · 7 días» y no «$0.00 MXN /mes», y se llama «Gratis» aunque en el backend sea «Free».
+ */
 function FreePlanLayout({
   plan,
-  includedFeatures,
   isActive,
   isCurrentPlan,
 }: {
   plan: SaasPlanItem;
-  includedFeatures: PlanFeatureItem[];
   isActive: boolean;
   isCurrentPlan: boolean;
 }) {
-  const persona = getPlanPersona(plan.name);
+  const { user } = useUser();
+  const credits = plan.leadLimit ?? 70;
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-3">
-          <div>
-            <h3 className="text-lg font-bold text-[#212121] dark:text-[#ffffff]">
-              {plan.name}
-            </h3>
-            {persona && (
-              <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
-                {persona}
-              </p>
-            )}
-            {!isActive && !isCurrentPlan && (
-              <span className="mt-1 block text-xs text-[#616161] dark:text-[#b0b0b0]">
-                No disponible
-              </span>
-            )}
-          </div>
-          <PlanPriceLine
-            price={plan.cost}
-            oldPrice={plan.costOld}
-            currency={plan.currency}
-            periodLabel={`/${formatPeriod(plan.frequency)}`}
-            ariaLabel={getPriceAriaLabel(plan)}
-            align="left"
-          />
-        </div>
-
-        <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-          <p className="inline-flex w-fit rounded-full bg-green-700 px-4 py-1 text-sm font-bold text-white">
-            Prueba gratuita de 7 días
-          </p>
-          {plan.leadLimit != null && (
-            <p className="text-xs font-semibold text-[#18653c] dark:text-green-400">
-              Incluye{" "}
-              <strong className="text-[#212121] dark:text-[#e0e0e0]">
-                {plan.leadLimit}
-              </strong>{" "}
-              créditos en el periodo de prueba
-            </p>
+    <div className="space-y-6">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h3 className="text-lg font-bold text-[#212121] dark:text-[#ffffff]">
+            Gratis
+          </h3>
+          {!isActive && !isCurrentPlan && (
+            <span className="mt-1 block text-xs text-[#616161] dark:text-[#b0b0b0]">
+              No disponible
+            </span>
           )}
+          <p
+            aria-label="Plan Gratis de Kadesh: 0 pesos durante 7 días de prueba"
+            className="mt-2 flex items-baseline gap-2"
+          >
+            <span className="text-4xl font-bold tabular-nums tracking-tight text-[#212121] dark:text-[#ffffff]">
+              $0
+            </span>
+            <span className="text-base font-medium text-[#616161] dark:text-[#b0b0b0]">
+              · 7 días
+            </span>
+          </p>
         </div>
+        {!isCurrentPlan && (
+          <span className="shrink-0 rounded-full bg-green-700 px-3 py-1 text-xs font-bold text-white">
+            Sin tarjeta
+          </span>
+        )}
       </div>
 
-      {includedFeatures.length > 0 && (
-        <div className="space-y-3 border-t border-[#e0e0e0] pt-5 dark:border-[#3a3a3a]">
-          <div className="rounded-xl border border-orange-500/25 bg-orange-500/5 px-4 py-3 dark:border-orange-500/30 dark:bg-orange-500/10">
-            <p className="text-sm font-semibold text-[#212121] dark:text-white">
-              Todas las funcionalidades incluidas
-            </p>
-            <p className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
-              Prueba el sistema completo sin restricciones de funciones durante
-              tu periodo de prueba
-            </p>
-          </div>
-          <ul className="flex flex-wrap gap-2" role="list">
-            {includedFeatures.map((f) => (
-              <FeatureChip key={f.key} feature={f} />
-            ))}
-          </ul>
+      <p className="text-base leading-relaxed text-[#424242] dark:text-[#d6d6d6]">
+        Prueba Kadesh completo durante 7 días, con {credits} créditos para
+        sacar prospectos y usar {KADESH_URIM_AI_NAME}.
+      </p>
+
+      <div className="rounded-xl border border-orange-500/25 bg-orange-500/5 px-4 py-3 dark:border-orange-500/30 dark:bg-orange-500/10">
+        <p className="text-sm font-semibold text-[#212121] dark:text-white">
+          Todo Kadesh, sin límites de funciones.
+        </p>
+        <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+          Usas lo mismo que en los planes de pago. Lo único que cuenta son tus{" "}
+          {credits} créditos: 1 por cada prospecto que extraes; el resumen
+          diario de {KADESH_URIM_AI_NAME} usa unos 4.
+        </p>
+      </div>
+
+      <PlanFeatureGroups
+        features={plan.planFeatures}
+        highlightLabel="Incluido en tu prueba"
+        layout="grid"
+      />
+
+      {/* Solo visitantes: quien ya tiene cuenta no necesita registrarse. Mismo texto que el botón principal de la landing. */}
+      {!user?.id && (
+        <div className="flex flex-col items-stretch gap-3 border-t border-[#e0e0e0] pt-5 dark:border-[#3a3a3a] sm:flex-row sm:items-center sm:gap-4">
+          <Link
+            href={Routes.auth.register}
+            className="inline-flex h-12 items-center justify-center rounded-xl bg-orange-800 px-7 font-semibold text-white transition-colors hover:bg-orange-900 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e]"
+          >
+            Probar gratis 7 días
+          </Link>
+          <p className="text-center text-sm text-[#616161] dark:text-[#b0b0b0] sm:text-left">
+            Sin tarjeta · Sin compromiso
+          </p>
         </div>
       )}
     </div>
@@ -771,7 +601,6 @@ function PlanCard({
 
   const persona = getPlanPersona(plan.name);
   const costPerLead = formatCostPerLead(plan.cost, plan.leadLimit);
-  const includedFeatures = includedPlanFeatures(plan.planFeatures);
 
   const headerBlock = (
     <>
@@ -815,13 +644,9 @@ function PlanCard({
         )} */}
       </div>
 
-      {includedFeatures.length > 0 && (
-        <ul className={isVertical ? "mt-8 space-y-3" : "space-y-3"}>
-          {includedFeatures.map((f) => (
-            <FeatureRow key={f.key} feature={f} />
-          ))}
-        </ul>
-      )}
+      <div className={isVertical ? "mt-8" : undefined}>
+        <PlanFeatureGroups features={plan.planFeatures} />
+      </div>
 
       {isActive &&
         onSubscribe &&
@@ -873,7 +698,6 @@ function PlanCard({
       ) : plan.cost === 0 ? (
         <FreePlanLayout
           plan={plan}
-          includedFeatures={includedFeatures}
           isActive={isActive}
           isCurrentPlan={isCurrentPlan ?? false}
         />
@@ -954,13 +778,9 @@ function PlanCard({
               </button>
             )}
           </div>
-          {includedFeatures.length > 0 && (
-            <ul className="flex-1 min-w-0 space-y-3">
-              {includedFeatures.map((f) => (
-                <FeatureRow key={f.key} feature={f} />
-              ))}
-            </ul>
-          )}
+          <div className="flex-1 min-w-0">
+            <PlanFeatureGroups features={plan.planFeatures} />
+          </div>
         </div>
       )}
     </div>
@@ -970,6 +790,8 @@ function PlanCard({
 export interface PlansSectionProps {
   /** Hide "Volver a Ventas" link (e.g. on landing page). */
   hideBackLink?: boolean;
+  /** Texto pequeño sobre el título (en la home: la pregunta que leen buscadores). */
+  sectionEyebrow?: string;
   /** Override section title. */
   sectionTitle?: string;
   /** Override section subtitle. */
@@ -983,6 +805,7 @@ export interface PlansSectionProps {
 
 export default function PlansSection({
   hideBackLink = false,
+  sectionEyebrow,
   sectionTitle = "Planes y precios",
   sectionSubtitle = "Planes a la medida de tu empresa",
   sectionHeadingLevel = "h1",
@@ -1027,6 +850,11 @@ export default function PlansSection({
         className="text-center"
         aria-labelledby={sectionTitleId}
       >
+        {sectionEyebrow && (
+          <p className="mb-3 text-sm font-semibold text-orange-800 dark:text-orange-400">
+            {sectionEyebrow}
+          </p>
+        )}
         {sectionHeadingLevel === "h2" ? (
           <h2
             id={sectionTitleId}

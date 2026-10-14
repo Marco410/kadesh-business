@@ -11,3 +11,7 @@ A la izquierda del toggle de tema hay un botón **Aa**. Abre un panel fijo (port
 Escala el texto de la app vía `html { font-size }` y `--kadesh-font-scale` (85%–130%, default 100%). Se guarda en `localStorage` (`kadesh-font-scale`). Un script en el `<head>` lo aplica antes del primer paint para no parpadear.
 
 No promete “accesibilidad certificada”: es un control de comodidad.
+
+## Barra sobre un hero oscuro (2026-10-14)
+
+La home renderiza `<Navigation overDarkHero />`. Con esa prop, la barra va en blanco desde el primer render: logo sin invertir y enlaces blancos. Antes se decidía con `usePathname() === "/"`, pero cuando Vercel regenera la home en segundo plano (ISR, desde que la home pide las cifras con `revalidate`) la ruta no llegaba como `/`. El servidor pintaba la barra como página clara y React no corrige clases distintas al hidratar, así que en modo oscuro el logo y los enlaces se perdían. Una página nueva con hero oscuro debe pasar la prop, no depender de la ruta.

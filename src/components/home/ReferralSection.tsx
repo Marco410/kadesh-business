@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import { useQuery } from "@apollo/client";
+import { Routes } from "kadesh/core/routes";
+import { PRICING_PLAN_OFFERS } from "kadesh/components/pricing/constants";
 import {
   SAAS_PLANS_QUERY,
   type SaasPlansResponse,
@@ -11,12 +14,26 @@ import {
 const MONTHS_RECURRING = 12;
 const ANNUAL_COMMISSION_PCT = 0.15;
 
+/** Centavos solo cuando los hay: $79.80 de comisión, pero $798 en los ejemplos. */
 function formatCurrency(amount: number, currency = "MXN"): string {
+  const hasCents = !Number.isInteger(Math.round(amount * 100) / 100);
   return new Intl.NumberFormat("es-MX", {
     style: "currency",
     currency,
-    maximumFractionDigits: 0,
+    minimumFractionDigits: hasCents ? 2 : 0,
+    maximumFractionDigits: 2,
   }).format(amount);
+}
+
+/**
+ * Precio de lista mensual mientras `saasPlans` no responde (SSR, carga o error).
+ * Sin esto la calculadora salía en $0 al cargar, sobre todo en celular.
+ */
+function listPriceMxn(slug: "starter" | "pro" | "agencia"): number {
+  return (
+    PRICING_PLAN_OFFERS.find((offer) => offer.name.toLowerCase() === `plan ${slug}`)
+      ?.price ?? 0
+  );
 }
 
 function isMonthlyFrequency(frequency: string): boolean {
@@ -49,7 +66,7 @@ function getPlanPairBySlug(
 }
 
 export default function ReferralSection() {
-  const { data, loading } = useQuery<SaasPlansResponse>(SAAS_PLANS_QUERY);
+  const { data } = useQuery<SaasPlansResponse>(SAAS_PLANS_QUERY);
   const plans = data?.saasPlans ?? [];
 
   const { starter, pro, agencia } = useMemo(() => {
@@ -71,16 +88,20 @@ export default function ReferralSection() {
   const agenciaUpfrontRate = (agencia.monthly?.referralUpfrontCommissionPct ?? 20) / 100;
   const agenciaRecurringRate = (agencia.monthly?.referralRecurringCommissionPct ?? 10) / 100;
 
-  const starterFirst = starter.monthly ? starter.monthly.cost * starterUpfrontRate : 0;
-  const starterRecurring = starter.monthly ? starter.monthly.cost * starterRecurringRate : 0;
+  const starterMonthlyCost = starter.monthly?.cost ?? listPriceMxn("starter");
+  const proMonthlyCost = pro.monthly?.cost ?? listPriceMxn("pro");
+  const agenciaMonthlyCost = agencia.monthly?.cost ?? listPriceMxn("agencia");
+
+  const starterFirst = starterMonthlyCost * starterUpfrontRate;
+  const starterRecurring = starterMonthlyCost * starterRecurringRate;
   const starterAnnualCommission = starter.annual ? starter.annual.cost * ANNUAL_COMMISSION_PCT : 0;
 
-  const proFirst = pro.monthly ? pro.monthly.cost * proUpfrontRate : 0;
-  const proRecurring = pro.monthly ? pro.monthly.cost * proRecurringRate : 0;
+  const proFirst = proMonthlyCost * proUpfrontRate;
+  const proRecurring = proMonthlyCost * proRecurringRate;
   const proAnnualCommission = pro.annual ? pro.annual.cost * ANNUAL_COMMISSION_PCT : 0;
 
-  const agenciaFirst = agencia.monthly ? agencia.monthly.cost * agenciaUpfrontRate : 0;
-  const agenciaRecurring = agencia.monthly ? agencia.monthly.cost * agenciaRecurringRate : 0;
+  const agenciaFirst = agenciaMonthlyCost * agenciaUpfrontRate;
+  const agenciaRecurring = agenciaMonthlyCost * agenciaRecurringRate;
   const agenciaAnnualCommission = agencia.annual ? agencia.annual.cost * ANNUAL_COMMISSION_PCT : 0;
 
   const starterExampleFirstMonth = starterFirst * 10;
@@ -101,21 +122,23 @@ export default function ReferralSection() {
     starterAnnualCommission * 4 + proAnnualCommission * 4 + agenciaAnnualCommission * 2;
 
   return (
-    <section id="referidos" className="bg-[#f8f8f8] text-[#212121] dark:bg-[#0b0b0f] dark:text-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8 scroll-mt-20">
+    <section id="referidos" className="bg-[#f8f8f8] text-[#212121] dark:bg-[#0b0b0f] dark:text-white pt-28 pb-16 sm:pt-32 sm:pb-20 px-4 sm:px-6 lg:px-8 scroll-mt-20">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-4">
           Programa de referidos KADESH
-        </h2>
-        <p className="text-sm sm:text-base text-[#616161] dark:text-white/70 mb-4 max-w-3xl">
+        </h1>
+        <p className="text-sm sm:text-base text-[#616161] dark:text-white/70 mb-6 max-w-3xl">
           Gana comisiones recurrentes por cada negocio que refieras a KADESH. Te
-          pagamos por el primer pago y también mes a mes mientras tus referidos
-          sigan activos.
+          pagamos el {Math.round(starterUpfrontRate * 100)}% del primer pago y el{" "}
+          {Math.round(starterRecurringRate * 100)}% mes a mes mientras tus
+          referidos sigan activos (hasta {MONTHS_RECURRING} meses).
         </p>
-        {loading && (
-          <p className="text-xs text-[#616161] dark:text-white/70 mb-6">
-            Calculando comisiones con los precios actuales de los planes...
-          </p>
-        )}
+        <Link
+          href={Routes.auth.register}
+          className="mb-10 inline-flex h-12 items-center justify-center rounded-xl bg-orange-800 px-7 font-semibold text-white transition-colors hover:bg-orange-900 hover:text-white"
+        >
+          Crear cuenta y obtener mi enlace
+        </Link>
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Starter */}
@@ -123,11 +146,9 @@ export default function ReferralSection() {
             <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300 flex items-center gap-1 mb-1">
               💰 Starter{" "}
               <span className="ml-1 inline-flex flex-wrap items-center gap-1.5 font-normal text-[#616161] dark:text-white/80">
-                {starter.monthly && (
-                  <span className="inline-flex items-center rounded-full bg-[#f5f5f5] px-2 py-0.5 text-[10px] font-semibold text-[#424242] dark:bg-white/10 dark:text-white/85">
-                    Mensual: {formatCurrency(starter.monthly.cost, starterCurrency)} / mes
-                  </span>
-                )}
+                <span className="inline-flex items-center rounded-full bg-[#f5f5f5] px-2 py-0.5 text-[10px] font-semibold text-[#424242] dark:bg-white/10 dark:text-white/85">
+                  Mensual: {formatCurrency(starterMonthlyCost, starterCurrency)} / mes
+                </span>
                 {starter.annual && (
                   <span className="inline-flex items-center rounded-full bg-emerald-600/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200">
                     Anual: {formatCurrency(starter.annual.cost, starterCurrency)} / año (pago único)
@@ -189,11 +210,9 @@ export default function ReferralSection() {
             <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300 flex items-center gap-1 mb-1">
               ⭐ Pro{" "}
               <span className="ml-1 inline-flex flex-wrap items-center gap-1.5 font-normal text-[#616161] dark:text-white/80">
-                {pro.monthly && (
-                  <span className="inline-flex items-center rounded-full bg-white/60 px-2 py-0.5 text-[10px] font-semibold text-[#424242] dark:bg-black/20 dark:text-white/85">
-                    Mensual: {formatCurrency(pro.monthly.cost, proCurrency)} / mes
-                  </span>
-                )}
+                <span className="inline-flex items-center rounded-full bg-white/60 px-2 py-0.5 text-[10px] font-semibold text-[#424242] dark:bg-black/20 dark:text-white/85">
+                  Mensual: {formatCurrency(proMonthlyCost, proCurrency)} / mes
+                </span>
                 {pro.annual && (
                   <span className="inline-flex items-center rounded-full bg-amber-600/10 px-2 py-0.5 text-[10px] font-semibold text-amber-800 dark:bg-amber-400/10 dark:text-amber-200">
                     Anual: {formatCurrency(pro.annual.cost, proCurrency)} / año (pago único)
@@ -258,11 +277,9 @@ export default function ReferralSection() {
             <p className="text-xs font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-300 flex items-center gap-1 mb-1">
               🚀 Agencia{" "}
               <span className="ml-1 inline-flex flex-wrap items-center gap-1.5 font-normal text-[#616161] dark:text-white/80">
-                {agencia.monthly && (
-                  <span className="inline-flex items-center rounded-full bg-[#e0f2fe] px-2 py-0.5 text-[10px] font-semibold text-sky-900 dark:bg-sky-500/10 dark:text-white/85">
-                    Mensual: {formatCurrency(agencia.monthly.cost, agenciaCurrency)} / mes
-                  </span>
-                )}
+                <span className="inline-flex items-center rounded-full bg-[#e0f2fe] px-2 py-0.5 text-[10px] font-semibold text-sky-900 dark:bg-sky-500/10 dark:text-white/85">
+                  Mensual: {formatCurrency(agenciaMonthlyCost, agenciaCurrency)} / mes
+                </span>
                 {agencia.annual && (
                   <span className="inline-flex items-center rounded-full bg-sky-600/10 px-2 py-0.5 text-[10px] font-semibold text-sky-800 dark:bg-sky-300/10 dark:text-sky-200">
                     Anual: {formatCurrency(agencia.annual.cost, agenciaCurrency)} / año (pago único)
