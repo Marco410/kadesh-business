@@ -1,28 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon, SparklesIcon } from "@hugeicons/core-free-icons";
-import { sileo } from "sileo";
+import {
+  ArrowRight01Icon,
+  RefreshIcon,
+  SparklesIcon,
+} from "@hugeicons/core-free-icons";
 import { Routes } from "kadesh/core/routes";
 import { formatDate } from "kadesh/utils/format-date";
-import { cn } from "kadesh/utils/cn";
-import { ExpandableCopy } from "kadesh/components/profile/ai/ExpandableCopy";
-import {
-  AI_BILLING_MODE,
-  KADESH_URIM_AI_NAME,
-  TYPICAL_DIGEST_CREDITS,
-} from "kadesh/components/profile/ai/constants";
-import { useCompanyAiLive } from "kadesh/components/profile/ai/useCompanyAiLive";
-import {
-  DAILY_DIGEST_QUERY,
-  GENERATE_DAILY_DIGEST_MUTATION,
-  type DailyDigestQueryResponse,
-  type DailyDigestQueryVariables,
-  type GenerateDailyDigestResponse,
-  type GenerateDailyDigestVariables,
-} from "kadesh/components/profile/ai/queries";
+import type { NavAccessContext } from "kadesh/components/profile/usuarios/can";
+import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
+import { useDailyDigest } from "kadesh/components/profile/ai/useDailyDigest";
+import { useAiActionLinks } from "kadesh/components/profile/ai/useAiActionLinks";
+import { AiStepTimeline } from "kadesh/components/profile/ai/AiActionList";
+import { AiThinking } from "kadesh/components/profile/ai/AiVisuals";
 
 type DailyDigestCardProps = {
   companyId: string;
@@ -31,6 +23,8 @@ type DailyDigestCardProps = {
   remainingQuota?: number | null;
   onGenerated?: () => void;
   onConfigure?: () => void;
+  /** Con él, cada paso enlaza a la pantalla que lo resuelve (si hay permiso). */
+  navCtx?: NavAccessContext;
 };
 
 const DIGEST_SOURCES = [
@@ -38,6 +32,14 @@ const DIGEST_SOURCES = [
   "Clientes sin primer contacto",
   "Seguimientos vencidos",
   "Leads que se enfriaron",
+] as const;
+
+const DIGEST_STEPS = [
+  "Revisando seguimientos vencidos",
+  "Revisando cotizaciones sin respuesta",
+  "Buscando clientes sin primer contacto",
+  "Detectando leads fríos",
+  "Eligiendo tus 3 pasos de hoy",
 ] as const;
 
 function DigestDescription({ isCompanyWide }: { isCompanyWide: boolean }) {
@@ -80,89 +82,17 @@ export function DailyDigestCard({
   remainingQuota,
   onGenerated,
   onConfigure,
+  navCtx,
 }: DailyDigestCardProps) {
-  const {
-    isAiLive,
-    configured,
-    billingMode,
-    loading: liveLoading,
-  } = useCompanyAiLive(companyId);
-
-  const digestQuery = useQuery<
-    DailyDigestQueryResponse,
-    DailyDigestQueryVariables
-  >(DAILY_DIGEST_QUERY, {
-    variables: { companyId },
-    skip: !companyId || !isAiLive,
-    fetchPolicy: "cache-and-network",
-    errorPolicy: "all",
-  });
-
-  const [generateDigest, { loading: generating }] = useMutation<
-    GenerateDailyDigestResponse,
-    GenerateDailyDigestVariables
-  >(GENERATE_DAILY_DIGEST_MUTATION, {
-    update(cache, { data }) {
-      const payload = data?.generateDailyDigest;
-      if (!payload?.success || !payload.insight) return;
-      cache.writeQuery<DailyDigestQueryResponse, DailyDigestQueryVariables>({
-        query: DAILY_DIGEST_QUERY,
-        variables: { companyId },
-        data: { dailyDigest: payload },
-      });
-    },
-  });
-
-  const result = digestQuery.data?.dailyDigest;
-  const insight = result?.insight ?? null;
-  const actions = insight?.actions ?? [];
-  const isManaged = billingMode === AI_BILLING_MODE.MANAGED;
+  const digest = useDailyDigest({ companyId, remainingQuota, onGenerated });
+  const linkFor = useAiActionLinks({ navCtx });
+  const { insight, actions, configured } = digest;
   const title = isCompanyWide ? "Resumen del día" : "Tu resumen del día";
   const generateLabel = isCompanyWide
     ? "Generar el resumen del día"
     : "Generar mi resumen del día";
 
-  const creditHint = isManaged
-    ? remainingQuota != null
-      ? `En modalidad administrada suele costar unos ${TYPICAL_DIGEST_CREDITS} créditos. Te quedan ${remainingQuota}.`
-      : `En modalidad administrada suele costar unos ${TYPICAL_DIGEST_CREDITS} créditos.`
-    : "Con tu API key no se descuentan créditos de Kadesh.";
-
-  async function runGenerate(force: boolean) {
-    try {
-      const response = await generateDigest({
-        variables: { companyId, force },
-      });
-      const payload = response.data?.generateDailyDigest;
-      if (!payload?.success || !payload.insight) {
-        sileo.error({
-          title: payload?.message || "No se pudo generar el resumen",
-        });
-        return;
-      }
-      onGenerated?.();
-      if (payload.cached) {
-        sileo.success({ title: payload.message });
-        return;
-      }
-      const charged = payload.creditsCharged ?? 0;
-      sileo.success({
-        title: payload.message,
-        ...(charged > 0
-          ? {
-              description: `${charged} crédito${charged === 1 ? "" : "s"} debitados.`,
-            }
-          : {}),
-      });
-    } catch (err) {
-      sileo.error({
-        title:
-          err instanceof Error ? err.message : "No se pudo generar el resumen",
-      });
-    }
-  }
-
-  if (liveLoading && !configured) {
+  if (digest.liveLoading && !configured) {
     return (
       <section
         className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm"
@@ -173,7 +103,7 @@ export function DailyDigestCard({
     );
   }
 
-  if (!isAiLive) {
+  if (!digest.isAiLive) {
     return (
       <section className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm">
         <div className="flex items-start gap-3">
@@ -248,70 +178,48 @@ export function DailyDigestCard({
         {insight ? (
           <button
             type="button"
-            onClick={() => void runGenerate(true)}
-            disabled={generating}
-            title={isManaged ? creditHint : undefined}
-            className="shrink-0 text-sm font-medium text-[#616161] dark:text-[#b0b0b0] hover:text-orange-600 dark:hover:text-orange-400 disabled:opacity-50"
+            onClick={() => void digest.generate(true)}
+            disabled={digest.generating}
+            title={digest.isManaged ? digest.creditHint : undefined}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#e0e0e0] px-2.5 py-1.5 text-xs font-medium text-[#616161] hover:border-violet-300 hover:text-violet-700 disabled:opacity-50 dark:border-[#3a3a3a] dark:text-[#b0b0b0] dark:hover:border-violet-500/50 dark:hover:text-violet-300"
           >
-            {generating ? "Regenerando…" : "Regenerar"}
+            <HugeiconsIcon
+              icon={RefreshIcon}
+              size={14}
+              className={digest.generating ? "animate-spin" : undefined}
+            />
+            {digest.generating ? "Regenerando…" : "Regenerar"}
           </button>
         ) : null}
       </div>
 
-      {digestQuery.error && !insight ? (
+      {digest.generating ? (
+        <AiThinking
+          title={`${KADESH_URIM_AI_NAME} está revisando tu pipeline`}
+          steps={DIGEST_STEPS}
+        />
+      ) : digest.error ? (
         <p className="text-sm text-red-700 dark:text-red-400">
           No se pudo cargar el resumen del día. Inténtalo de nuevo en un
           momento.
         </p>
-      ) : digestQuery.loading && !insight ? (
+      ) : digest.loading ? (
         <div className="h-24 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
       ) : actions.length > 0 ? (
-        <ol className="space-y-3">
-          {actions.map((action, index) => (
-            <li key={`${action.title}-${index}`} className="flex gap-2.5">
-              <span
-                className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-white"
-                style={{
-                  background:
-                    "linear-gradient(135deg, var(--ai-urim-purple), var(--ai-urim-blue))",
-                }}
-              >
-                {index + 1}
-              </span>
-              <span className="min-w-0">
-                <span className="block text-sm font-medium text-[#212121] dark:text-white">
-                  {action.title}
-                </span>
-                <ExpandableCopy text={action.detail} />
-              </span>
-            </li>
-          ))}
-        </ol>
+        <AiStepTimeline items={actions} linkFor={linkFor} />
       ) : (
         <div>
           <DigestDescription isCompanyWide={isCompanyWide} />
           <p className="mt-2 text-sm text-[#9e9e9e] dark:text-[#7a7a7a]">
-            {creditHint}
+            {digest.creditHint}
           </p>
           <button
             type="button"
-            onClick={() => void runGenerate(false)}
-            disabled={generating}
-            className={cn(
-              "mt-3 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white",
-              "disabled:opacity-60 disabled:cursor-not-allowed",
-            )}
-            style={{
-              background:
-                "linear-gradient(135deg, var(--ai-urim-purple), var(--ai-urim-blue))",
-            }}
+            onClick={() => void digest.generate(false)}
+            className="ai-urim-fill mt-3 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium"
           >
-            <HugeiconsIcon
-              icon={SparklesIcon}
-              size={16}
-              className={generating ? "animate-spin" : undefined}
-            />
-            {generating ? "Generando…" : generateLabel}
+            <HugeiconsIcon icon={SparklesIcon} size={16} />
+            {generateLabel}
           </button>
         </div>
       )}
