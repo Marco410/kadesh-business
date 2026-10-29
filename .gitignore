@@ -19,6 +19,11 @@ pnpm-debug.log*
 # Vercel
 .vercel/
 
+# Cloudflare (OpenNext / Wrangler)
+.open-next/
+.wrangler/
+.dev.vars*
+
 # Output of 'npm pack'
 *.tgz
 

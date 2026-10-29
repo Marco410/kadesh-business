@@ -1,0 +1,48 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kadesh-business",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      // Lo usa OpenNext para llamarse a sí mismo (p. ej. al regenerar páginas).
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "kadesh-business"
+    }
+  ],
+  "r2_buckets": [
+    {
+      // Caché de ISR (open-next.config.ts → r2IncrementalCache).
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "kadesh-business-cache"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        // Cola de revalidación (open-next.config.ts → doQueue).
+        "name": "NEXT_CACHE_DO_QUEUE",
+        "class_name": "DOQueueHandler"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["DOQueueHandler"]
+    }
+  ],
+  "routes": [
+    { "pattern": "kadesh.com.mx", "custom_domain": true },
+    { "pattern": "www.kadesh.com.mx", "custom_domain": true },
+    { "pattern": "negocios.kadesh.com.mx", "custom_domain": true }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

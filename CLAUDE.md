@@ -14,9 +14,17 @@ pnpm dev         # start dev server (localhost:3000)
 pnpm build       # production build
 pnpm start       # run production build
 pnpm lint        # eslint (eslint-config-next core-web-vitals)
+pnpm preview     # OpenNext build + local Cloudflare Workers preview (workerd)
+pnpm deploy      # OpenNext build + deploy to Cloudflare Workers
 ```
 
 There is no test suite configured in this repo currently.
+
+### Hosting (Cloudflare Workers via OpenNext)
+
+Production runs on Cloudflare Workers through `@opennextjs/cloudflare`, not Vercel. Config lives in `open-next.config.ts` (R2 incremental cache + Durable Object revalidation queue, needed because the blog and home use `revalidate`) and `wrangler.jsonc` (bindings, custom domains). The `www.` and `negocios.` hosts are redirected to `https://kadesh.com.mx` in `next.config.ts` `redirects()`.
+
+The OpenNext build runs **`next build --webpack`**, not Turbopack (set via `buildCommand` in `open-next.config.ts`): with Turbopack every page ships a ~2.7 MB client-reference-manifest and the worker ends up ~11.7 MB gzipped, over Cloudflare's 10 MB limit; with webpack it's ~4.9 MB. It needs `NODE_OPTIONS=--max-old-space-size=6144` or webpack fails with "heap out of memory". Check the size with `pnpm wrangler deploy --dry-run --outdir /tmp/cf-dry` (the `gzip` figure must stay under 10 MB). `@vercel/analytics` / `@vercel/speed-insights` were removed since they only work on Vercel.
 
 ### Environment
 

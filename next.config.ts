@@ -70,6 +70,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Antes lo hacía el panel de dominios de Vercel; en Cloudflare los tres dominios
+  // llegan al mismo worker, así que el dominio canónico se fuerza aquí.
+  async redirects() {
+    return ["www.kadesh.com.mx", "negocios.kadesh.com.mx"].map((host) => ({
+      source: "/:path*",
+      has: [{ type: "host" as const, value: host }],
+      destination: "https://kadesh.com.mx/:path*",
+      permanent: true,
+    }));
+  },
   async rewrites() {
     return [
       {
