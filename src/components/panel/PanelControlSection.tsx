@@ -362,6 +362,7 @@ function PanelControlSectionContent({
                     companyId={companyId}
                     canManageAi={canConfigureAi}
                     isCompanyWide={hasCompanyWideLeadScope}
+                    navCtx={navAccessCtx}
                   />
                 ) : (
                   <RoleAccessDeniedSection

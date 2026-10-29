@@ -1,13 +1,10 @@
-import { Routes } from "kadesh/core/routes";
 import { GOOGLE_PLACE_CATEGORIES } from "kadesh/constants/constans";
-import { KADESH_URIM_AI_NAME, ONBOARDING_CONTEXT_FIELDS } from "./constants";
 import type { CompanyAiSettings } from "./queries";
 
+/** El tipo, el ícono y a dónde ir salen de `classifyAiAction`, igual que en el playbook de IA. */
 export type ProfileRecommendation = {
   title: string;
   detail: string;
-  href?: string;
-  action?: "info";
 };
 
 const CATEGORY_LABELS = new Map<string, string>(
@@ -62,6 +59,7 @@ function industryHint(text: string): ProfileRecommendation | null {
 
 /**
  * Recomendaciones accionables a partir del onboarding y los nichos de la empresa.
+ * Lo que falta del perfil no va aquí: lo muestran los checks de “Lo que sabe”.
  */
 export function buildProfileRecommendations(
   company: CompanyAiSettings | null,
@@ -74,20 +72,6 @@ export function buildProfileRecommendations(
   const categories = Array.isArray(company?.allowedGooglePlaceCategories)
     ? company.allowedGooglePlaceCategories.filter(Boolean)
     : [];
-
-  const missing = ONBOARDING_CONTEXT_FIELDS.filter((field) => {
-    const value = company?.[field.key];
-    return !value?.trim();
-  }).map((field) => field.label);
-
-  if (missing.length > 0) {
-    recs.push({
-      title: "Completa el contexto de tu negocio",
-      detail: `Falta ${missing.join(", ")}. Completa tu perfil para que ${KADESH_URIM_AI_NAME} tenga el mismo contexto de negocio que tu equipo.`,
-      href: Routes.panelProfile,
-      action: "info",
-    });
-  }
 
   if (offer) {
     recs.push({
@@ -124,7 +108,6 @@ export function buildProfileRecommendations(
     recs.push({
       title: "Extrae solo en los nichos que ya elegiste",
       detail: `Tus categorías (${labels.join(", ")}) son el mapa. Un radio más chico y mejor calificado rinde más que ampliar a todo el directorio.`,
-      href: `${Routes.panel}?tab=clientes`,
     });
   }
 

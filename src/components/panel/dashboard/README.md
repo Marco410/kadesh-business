@@ -12,7 +12,7 @@ Catálogo y fases: `src/components/profile/usuarios/README.md`.
 
 ## Digest de IA
 
-El resumen diario de Kadesh AI (`DailyDigestCard`) **también** está en `/panel?tab=ai` (Dashboard). No lo quites de Inicio al cambiar la pantalla de IA.
+El resumen diario de Kadesh AI (`DailyDigestCard`) **también** está en `/panel?tab=ai` (Dashboard, como `AiTodayCard`). No lo quites de Inicio al cambiar la pantalla de IA. Los dos comparten `useDailyDigest` y la línea de tiempo `AiStepTimeline`. `CompanyDashboard` le pasa `navCtx` para que cada paso enlace a la pantalla que lo resuelve (calendario, cotizaciones, clientes, extracción) solo si la persona tiene acceso.
 
 Producto, copy y acceso de IA: `src/components/profile/ai/README.md`.
 
