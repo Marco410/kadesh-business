@@ -113,7 +113,7 @@ export const TECH_BUSINESS_LEADS_QUERY = gql`
     $take: Int
     $skip: Int
     $orderBy: [TechBusinessLeadOrderByInput!]
-    $statusWhere: TechStatusBusinessLeadWhereInput
+    $statusWhere: TechStatusBusinessLeadWhereInput!
     $salesPersonWhere2: UserWhereInput!
   ) {
     techBusinessLeads(where: $where, take: $take, skip: $skip, orderBy: $orderBy) {
@@ -187,7 +187,7 @@ type TechBusinessLeadWhereFilter = {
 export interface TechBusinessLeadsVariables {
   where: TechBusinessLeadWhereFilter;
   /** Filtro de la relación status: solo el de la company. */
-  statusWhere?: TechStatusBusinessLeadWhereInputFilter | null;
+  statusWhere: TechStatusBusinessLeadWhereInputFilter;
   salesPersonWhere2?: UserWhereInput | null;
   take?: number;
   skip?: number;
@@ -248,7 +248,7 @@ export interface TechBusinessLeadsCountResponse {
 export const TECH_BUSINESS_LEAD_QUERY = gql`
   query TechBusinessLead(
     $where: TechBusinessLeadWhereUniqueInput!
-    $statusWhere: TechStatusBusinessLeadWhereInput
+    $statusWhere: TechStatusBusinessLeadWhereInput!
     $salesPersonWhere2: UserWhereInput!
   ) {
     techBusinessLead(where: $where) {
@@ -332,7 +332,7 @@ export const TECH_BUSINESS_LEAD_QUERY = gql`
 export interface TechBusinessLeadVariables {
   where: { id: string };
   /** Filtro de la relación status: solo el de esta company. */
-  statusWhere?: TechStatusBusinessLeadWhereInputFilter | null;
+  statusWhere: TechStatusBusinessLeadWhereInputFilter;
   /** Filtro de asignados (p. ej. misma company). */
   salesPersonWhere2?: { company?: { id?: { equals: string } } } | null;
 }

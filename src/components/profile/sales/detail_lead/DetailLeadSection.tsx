@@ -128,7 +128,7 @@ export default function DetailLeadSection() {
   const { subscription } = useSubscription();
   const id = typeof params?.id === "string" ? params.id : "";
 
-  const { data: userCompanyData } = useQuery<
+  const { data: userCompanyData, loading: companyLoading } = useQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {
@@ -140,24 +140,26 @@ export default function DetailLeadSection() {
   const canEditLead = can(user, PERMISSION_KEYS.CLIENTES_EDITAR, () => true);
 
   // Estatus compartido de la empresa (uno por lead): todo el equipo ve y edita el mismo.
+  // Nunca null: `status(where:)` es non-null en el schema y un null explícito truena la query.
   const statusWhere =
-    companyId != null ? { saasCompany: { id: { equals: companyId } } } : undefined;
+    companyId != null ? { saasCompany: { id: { equals: companyId } } } : {};
 
   const salesPersonWhere2 =
     companyId != null ? { company: { id: { equals: companyId } } } : {};
 
   const queryVariables: TechBusinessLeadVariables = {
     where: { id },
-    statusWhere: statusWhere ?? null,
+    statusWhere,
     salesPersonWhere2,
   };
 
+  // Espera a la empresa para no pedir el lead sin filtro y volver a pedirlo al llegar.
   const { data, loading, error, refetch: refetchLead } = useQuery<
     TechBusinessLeadResponse,
     TechBusinessLeadVariables
   >(TECH_BUSINESS_LEAD_QUERY, {
     variables: queryVariables,
-    skip: !id,
+    skip: !id || companyLoading,
   });
 
   const [updateLead, { loading: savingLead }] = useMutation<
