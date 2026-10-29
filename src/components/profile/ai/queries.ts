@@ -272,6 +272,43 @@ export interface GenerateAiPlaybookVariables {
   force?: boolean | null;
 }
 
+/** Conteos del pipeline que revisa el resumen del día (mismos filtros que kadesh-back). */
+export const AI_PIPELINE_SIGNALS_QUERY = gql`
+  query AiPipelineSignals(
+    $companyId: ID!
+    $quotesWhere: SaasQuotationWhereInput!
+    $uncontactedWhere: TechStatusBusinessLeadWhereInput!
+    $coldWhere: TechStatusBusinessLeadWhereInput!
+    $overdueWhere: TechFollowUpTaskWhereInput!
+  ) {
+    saasCompany(where: { id: $companyId }) {
+      id
+      quotesWithoutReply: quotationsCount(where: $quotesWhere)
+      uncontactedLeads: techStatusBusinessLeadsCount(where: $uncontactedWhere)
+      coldLeads: techStatusBusinessLeadsCount(where: $coldWhere)
+    }
+    overdueFollowUps: techFollowUpTasksCount(where: $overdueWhere)
+  }
+`;
+
+export interface AiPipelineSignalsResponse {
+  saasCompany: {
+    id: string;
+    quotesWithoutReply: number | null;
+    uncontactedLeads: number | null;
+    coldLeads: number | null;
+  } | null;
+  overdueFollowUps: number | null;
+}
+
+export interface AiPipelineSignalsVariables {
+  companyId: string;
+  quotesWhere: Record<string, unknown>;
+  uncontactedWhere: Record<string, unknown>;
+  coldWhere: Record<string, unknown>;
+  overdueWhere: Record<string, unknown>;
+}
+
 export const COMPANY_AI_BRIEF_QUERY = gql`
   query CompanyAiBrief($companyId: ID!) {
     companyAiBrief(companyId: $companyId) {

@@ -1,4 +1,12 @@
+import { formatDate } from "kadesh/utils/format-date";
+
 export const KADESH_URIM_AI_NAME = "Kadesh AI";
+
+/** `formatDate` para ir a media frase: “Generado hoy a las 1:05 AM”, “Actualizado hace 1 mes”. */
+export function formatAiDateInline(dateString: string): string {
+  const label = formatDate(dateString);
+  return label.charAt(0).toLowerCase() + label.slice(1);
+}
 
 export const AI_BILLING_MODE = {
   BYOK: "byok",
@@ -91,8 +99,11 @@ export const ONBOARDING_CONTEXT_FIELDS = [
     label: "Oferta principal",
     title: 'El "Qué" — Oferta principal',
     shortLabel: "Qué",
+    question: "¿Qué vendes?",
     placeholder:
       "En una o dos oraciones: ¿qué servicio o producto principal vendes?",
+    example:
+      "Ej. Instalamos paneles solares en negocios y les bajamos hasta 70% el recibo de luz.",
     hint: "Escríbelo en el recuadro: qué vendes y qué resultado le das al cliente.",
   },
   {
@@ -100,7 +111,10 @@ export const ONBOARDING_CONTEXT_FIELDS = [
     label: "Cliente ideal",
     title: 'El "Quién" — Cliente ideal',
     shortLabel: "Quién",
+    question: "¿A quién le vendes?",
     placeholder: "Ej. clínicas dentales, constructoras, restaurantes…",
+    example:
+      "Ej. Restaurantes y hoteles de Querétaro con 10 a 50 empleados. Decide el dueño o el gerente general.",
     hint: "Quién te compra de verdad: industria, cargo o tipo de empresa.",
   },
   {
@@ -108,8 +122,11 @@ export const ONBOARDING_CONTEXT_FIELDS = [
     label: "Ticket o valor",
     title: 'El "Cuánto" — Ticket o valor',
     shortLabel: "Cuánto",
+    question: "¿Cuánto cuesta lo que vendes?",
     placeholder:
       "Precio promedio, o cuánto ayudas a ganar o ahorrar a tus clientes",
+    example:
+      "Ej. Desde $45,000 MXN por proyecto, pago único. Incluye instalación y 5 años de garantía.",
     hint: "Precio, rango o valor. Si puedes, incluye moneda y si es mensual o por proyecto.",
   },
   {
@@ -117,10 +134,51 @@ export const ONBOARDING_CONTEXT_FIELDS = [
     label: "Adquisición y dolores al vender",
     title: 'El "Cómo" — Adquisición y dolores al vender',
     shortLabel: "Cómo",
+    question: "¿Cómo consigues clientes y qué se te traba al vender?",
     placeholder: "¿Cómo consigues clientes hoy y qué te cuesta más al vender?",
+    example:
+      "Ej. Llegan por referidos y Facebook. Se traba cuando piden cotización y dejan de contestar.",
     hint: "Cómo llegan hoy los clientes y qué se traba al cerrar.",
   },
 ] as const;
+
+export function isOnboardingContextKey(
+  value: string,
+): value is OnboardingContextKey {
+  return ONBOARDING_CONTEXT_FIELDS.some((field) => field.key === value);
+}
+
+/**
+ * Lo que revisa el resumen del día, en el orden en que el backend lo prioriza
+ * (`DAILY_DIGEST_FEATURE_PROMPT` en kadesh-back).
+ */
+export const AI_PIPELINE_SIGNALS = [
+  {
+    key: "overdueFollowUps",
+    label: "Seguimientos vencidos",
+    hint: "Clientes que esperaban tu llamada",
+  },
+  {
+    key: "quotesWithoutReply",
+    label: "Cotizaciones sin respuesta",
+    hint: "Enviadas y sin aceptar ni rechazar",
+  },
+  {
+    key: "uncontactedLeads",
+    label: "Sin primer contacto",
+    hint: "Detectados o seleccionados",
+  },
+  {
+    key: "coldLeads",
+    label: "Leads fríos",
+    hint: "Sin respuesta o sin movimiento",
+  },
+] as const;
+
+export type AiPipelineSignalKey = (typeof AI_PIPELINE_SIGNALS)[number]["key"];
+
+/** Debe coincidir con `COLD_LEAD_DAYS` de kadesh-back (`utils/ai/dailyDigest.ts`). */
+export const AI_COLD_LEAD_DAYS = 14;
 
 export type OnboardingContextKey =
   (typeof ONBOARDING_CONTEXT_FIELDS)[number]["key"];

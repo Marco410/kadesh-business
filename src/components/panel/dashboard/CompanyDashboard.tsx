@@ -509,6 +509,7 @@ export function CompanyDashboard({
         <DashboardInView delay={0.04}>
           <DailyDigestCard
             companyId={companyId}
+            navCtx={navCtx}
             canManageAi={canManageAi}
             isCompanyWide={hasCompanyWideLeadScope}
             remainingQuota={credits.remainingQuota}
@@ -526,6 +527,7 @@ export function CompanyDashboard({
         <DashboardInView>
           <DailyDigestCard
             companyId={companyId}
+            navCtx={navCtx}
             canManageAi={canManageAi}
             isCompanyWide={hasCompanyWideLeadScope}
             remainingQuota={credits.remainingQuota}
@@ -585,6 +587,7 @@ export function CompanyDashboard({
       <DashboardInView delay={0.05}>
         <DailyDigestCard
           companyId={companyId}
+          navCtx={navCtx}
           canManageAi={canManageAi}
           isCompanyWide={hasCompanyWideLeadScope}
           remainingQuota={remainingQuota}

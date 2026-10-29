@@ -12,11 +12,12 @@ import {
   SparklesIcon,
 } from "@hugeicons/core-free-icons";
 import { Routes } from "kadesh/core/routes";
+import type { NavAccessContext } from "kadesh/components/profile/usuarios/can";
 import { AiCompanyInfoTab } from "./AiCompanyInfoTab";
 import { AiDashboardTab } from "./AiDashboardTab";
 import { AiSettingsSection } from "./AiSettingsSection";
 import { cn } from "kadesh/utils/cn";
-import { KADESH_URIM_AI_NAME } from "./constants";
+import { KADESH_URIM_AI_NAME, type OnboardingContextKey } from "./constants";
 import { useCompanyAiLive } from "./useCompanyAiLive";
 import {
   AI_MOTION_EASE,
@@ -31,6 +32,8 @@ type AiSectionProps = {
   companyId: string | null;
   canManageAi: boolean;
   isCompanyWide: boolean;
+  /** Para enlazar cada paso o recomendación con la pantalla que la resuelve. */
+  navCtx?: NavAccessContext;
 };
 
 /**
@@ -40,11 +43,18 @@ export function AiSection({
   companyId,
   canManageAi,
   isCompanyWide,
+  navCtx,
 }: AiSectionProps) {
   const { configured, loading } = useCompanyAiLive(companyId);
   const [tab, setTab] = useState<AiTab | null>(null);
+  const [infoStep, setInfoStep] = useState<OnboardingContextKey | undefined>();
   const reduce = useReducedMotion();
   const fadeUp = aiFadeUpVariants(reduce);
+
+  const openInfo = (step?: OnboardingContextKey) => {
+    setInfoStep(step);
+    setTab("info");
+  };
 
   if (!companyId) {
     return (
@@ -94,9 +104,9 @@ export function AiSection({
     tab === "settings" && !canManageAi ? "dashboard" : tab;
   const subtitle =
     activeTab === "dashboard"
-      ? "Hoy y el perfil de tu negocio."
+      ? "Tu asistente de ventas: qué hacer hoy y lo que ya sabe de tu negocio."
       : activeTab === "info"
-        ? `Edita qué vendes, a quién y cómo cierras. Al guardar, el Dashboard actualiza el resumen de tu negocio.`
+        ? "Responde 4 preguntas sobre tu negocio. Mientras más completas, más precisos tus pasos y recomendaciones."
         : "Esta modalidad aplica a todo el equipo: los vendedores no ven esta pantalla, pero usarán la IA con lo que guardes aquí.";
 
   return (
@@ -138,7 +148,10 @@ export function AiSection({
             role="tab"
             data-tour={`ai-tab-${item.key}`}
             aria-selected={activeTab === item.key}
-            onClick={() => setTab(item.key)}
+            onClick={() => {
+              if (item.key === "info") setInfoStep(undefined);
+              setTab(item.key);
+            }}
             className={cn(
               "relative flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium",
               activeTab === item.key
@@ -192,18 +205,20 @@ export function AiSection({
                 companyId={companyId}
                 canManageAi={canManageAi}
                 isCompanyWide={isCompanyWide}
+                navCtx={navCtx}
                 onOpenSettings={() => setTab("settings")}
-                onOpenCompanyInfo={() => setTab("info")}
+                onOpenCompanyInfo={openInfo}
               />
             ) : activeTab === "info" ? (
               <AiCompanyInfoTab
                 companyId={companyId}
+                initialStep={infoStep}
                 onOpenDashboard={() => setTab("dashboard")}
               />
             ) : (
               <AiSettingsSection
                 companyId={companyId}
-                onOpenCompanyInfo={() => setTab("info")}
+                onOpenCompanyInfo={() => openInfo()}
               />
             )}
           </motion.div>
