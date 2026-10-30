@@ -1,7 +1,6 @@
 import "./globals.css";
 import { Inter, Poppins } from "next/font/google";
 import ClientProviders from "./ClientProviders";
-import { Analytics } from "@vercel/analytics/next";
 import {
   FONT_SCALE_DEFAULT,
   FONT_SCALE_MAX,
@@ -187,7 +186,6 @@ export default function RootLayout({
           />
         </noscript>
         <ClientProviders>{children}</ClientProviders>
-        <Analytics />
       </body>
     </html>
   );

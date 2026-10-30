@@ -1,8 +1,10 @@
 allowBuilds:
   '@heroui/shared-utils': true
   core-js: true
+  esbuild: true
   sharp: true
   unrs-resolver: true
+  workerd: true
 
 overrides:
   '@internationalized/date': ^3.10.0
