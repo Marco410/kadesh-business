@@ -102,6 +102,7 @@ export default function AdminPetPlaceServicesPanel({
   const [updateService] = useMutation(UPDATE_PET_PLACE_SERVICE_MUTATION, {
     refetchQueries: [
       { query: ADMIN_OVERVIEW_QUERY, variables: overviewVariables },
+      "AdminNavCounts",
     ],
   });
   const [updatePetPlace] = useMutation(UPDATE_PET_PLACE_MUTATION);
@@ -239,10 +240,10 @@ export default function AdminPetPlaceServicesPanel({
               <article key={service.id} className={`${surfaceClass} p-4`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-semibold text-[#212121] dark:text-white">
+                    <p className="font-semibold text-dash-ink">
                       {service.name ?? "Servicio"}
                     </p>
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                    <p className="text-xs text-dash-muted mt-0.5">
                       {service.requestedFor?.name ?? "Sin clínica"}
                     </p>
                   </div>
@@ -256,7 +257,7 @@ export default function AdminPetPlaceServicesPanel({
                     }
                   />
                 </div>
-                <p className="mt-3 text-sm text-[#424242] dark:text-[#e0e0e0]">
+                <p className="mt-3 text-sm text-dash-soft">
                   {formatPersonName(
                     service.requestedBy?.name,
                     service.requestedBy?.lastName,
@@ -276,7 +277,7 @@ export default function AdminPetPlaceServicesPanel({
           <div className={`${surfaceClass} hidden md:block overflow-x-auto`}>
             <table className="min-w-[920px] w-full text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] border-b border-[#e8e8e8] dark:border-[#333]">
+                <tr className="text-left text-dash-muted border-b border-dash-line text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                   <th className="px-4 py-3">Servicio</th>
                   <th className="px-4 py-3">Clínica</th>
                   <th className="px-4 py-3">Quién lo pidió</th>
@@ -288,23 +289,23 @@ export default function AdminPetPlaceServicesPanel({
                 {services.map((service) => (
                   <tr
                     key={service.id}
-                    className="border-b border-[#f0f0f0] dark:border-[#2a2a2a] last:border-0"
+                    className="border-b border-dash-line last:border-0"
                   >
                     <td className="px-4 py-3 align-top">
-                      <div className="font-semibold text-[#212121] dark:text-white">
+                      <div className="font-semibold text-dash-ink">
                         {service.name ?? "Servicio"}
                       </div>
-                      <div className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                      <div className="text-xs text-dash-muted mt-0.5">
                         {formatDateShort(service.createdAt, false)}
                       </div>
                     </td>
                     <td className="px-4 py-3 align-top">
                       {service.requestedFor ? (
                         <>
-                          <div className="text-[#212121] dark:text-white">
+                          <div className="text-dash-ink">
                             {service.requestedFor.name}
                           </div>
-                          <div className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                          <div className="text-xs text-dash-muted mt-0.5">
                             {[
                               service.requestedFor.municipality,
                               service.requestedFor.state,
@@ -314,17 +315,17 @@ export default function AdminPetPlaceServicesPanel({
                           </div>
                         </>
                       ) : (
-                        <span className="text-[#9e9e9e]">Sin clínica</span>
+                        <span className="text-dash-faint">Sin clínica</span>
                       )}
                     </td>
                     <td className="px-4 py-3 align-top">
-                      <div className="text-[#212121] dark:text-white">
+                      <div className="text-dash-ink">
                         {formatPersonName(
                           service.requestedBy?.name,
                           service.requestedBy?.lastName,
                         )}
                       </div>
-                      <div className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                      <div className="text-xs text-dash-muted mt-0.5">
                         {service.requestedBy?.email ?? "—"}
                       </div>
                     </td>
@@ -343,7 +344,7 @@ export default function AdminPetPlaceServicesPanel({
                       <button
                         type="button"
                         onClick={() => setSelectedId(service.id)}
-                        className="h-11 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-4 text-xs font-semibold hover:border-orange-300 cursor-pointer"
+                        className="h-11 rounded-full border border-dash-line px-4 text-xs font-semibold hover:border-orange-300 cursor-pointer"
                       >
                         Revisar
                       </button>

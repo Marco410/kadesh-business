@@ -23,10 +23,10 @@ import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
 import { useRefreshCompanyAiBrief } from "kadesh/components/profile/ai/useRefreshCompanyAiBrief";
 
 const INPUT_CLASS =
-  "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
+  "w-full px-4 py-3 rounded-lg border border-dash-line bg-dash-surface text-dash-ink placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
 
 const TEXTAREA_CLASS =
-  "w-full min-h-[100px] px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed resize-y";
+  "w-full min-h-[100px] px-4 py-3 rounded-lg border border-dash-line bg-dash-surface text-dash-ink placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed resize-y";
 
 const COMPANY_LOGO_PX = 500;
 const DEFAULT_PRIMARY = "#F7945E";
@@ -117,7 +117,7 @@ function SaveChangesButton({
           transition={
             reduce ? { duration: 0.12 } : { duration: 0.22, ease: MOTION_EASE }
           }
-          className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto"
+          className="px-5 py-2.5 dash-grad-accent hover:shadow-dash-accent-lift text-white font-semibold rounded-full disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto shadow-dash-accent"
         >
           {saving ? (
             <>
@@ -339,7 +339,7 @@ export default function ProfileCompanySection({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.2 }}
-        className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 sm:p-8 border border-[#e0e0e0] dark:border-[#3a3a3a] shadow-md dark:shadow-lg"
+        className="bg-dash-surface rounded-xl p-6 sm:p-8 border border-dash-line shadow-md dark:shadow-lg"
       >
         <div className="flex items-center justify-center py-12">
           <span className="animate-spin size-8 border-2 border-orange-500 border-t-transparent rounded-full" />
@@ -353,10 +353,10 @@ export default function ProfileCompanySection({
       initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={cardTransition}
-      className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 sm:p-8 border border-[#e0e0e0] dark:border-[#3a3a3a] shadow-md dark:shadow-lg"
+      className="bg-dash-surface rounded-xl p-6 sm:p-8 border border-dash-line shadow-md dark:shadow-lg"
     >
       <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-        <h2 className="text-2xl font-bold text-[#212121] dark:text-[#ffffff]">
+        <h2 className="text-2xl font-bold text-dash-ink">
           Información de la empresa
         </h2>
         <SaveChangesButton
@@ -380,7 +380,7 @@ export default function ProfileCompanySection({
       ) : null}
 
       {!savedCompany ? (
-        <p className="text-[#616161] dark:text-[#b0b0b0] text-sm">
+        <p className="text-dash-muted text-sm">
           No hay una empresa vinculada a tu cuenta. Si acabas de registrarte,
           recarga la página. Si el problema continúa, escríbenos en{" "}
           <Link
@@ -399,7 +399,7 @@ export default function ProfileCompanySection({
           animate="show"
         >
           <FieldGroup>
-            <div className="flex flex-col sm:flex-row sm:items-start gap-4 pb-6 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-4 pb-6 border-b border-dash-line">
               <div className="flex flex-col items-start gap-1">
                 <input
                   ref={companyLogoInputRef}
@@ -415,7 +415,7 @@ export default function ProfileCompanySection({
                   whileHover={reduce ? undefined : { scale: 1.02 }}
                   whileTap={reduce ? undefined : { scale: 0.98 }}
                   transition={{ duration: 0.12, ease: MOTION_EASE }}
-                  className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-xl border-2 border-dashed border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#2a2a2a] flex items-center justify-center overflow-hidden group cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e]"
+                  className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-xl border-2 border-dashed border-dash-line bg-dash-surface-2 flex items-center justify-center overflow-hidden group cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e]"
                 >
                   {companyLogoDisplayUrl ? (
                     <Image
@@ -436,7 +436,7 @@ export default function ProfileCompanySection({
                   <span className="absolute bottom-1 right-1 rounded-md bg-white/90 dark:bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <HugeiconsIcon
                       icon={Edit01Icon}
-                      className="size-4 text-[#212121] dark:text-white"
+                      className="size-4 text-dash-ink"
                     />
                   </span>
                 </motion.button>
@@ -446,7 +446,7 @@ export default function ProfileCompanySection({
                   </p>
                 )}
               </div>
-              <p className="text-xs text-[#616161] dark:text-[#b0b0b0] sm:pt-1">
+              <p className="text-xs text-dash-muted sm:pt-1">
                 Solo imágenes de {COMPANY_LOGO_PX}×{COMPANY_LOGO_PX} px
                 (cuadrado). Se guarda al pulsar &quot;Guardar empresa&quot;. PNG
                 o JPG recomendado.
@@ -456,7 +456,7 @@ export default function ProfileCompanySection({
 
           <FieldGroup>
             <div>
-              <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+              <label className="block text-sm font-semibold text-dash-muted mb-2">
                 Nombre de la empresa <span className="text-red-500">*</span>
               </label>
               <input
@@ -467,7 +467,7 @@ export default function ProfileCompanySection({
                 className={INPUT_CLASS}
                 required
               />
-              <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              <p className="mt-1.5 text-xs text-dash-muted">
                 Nombre de la compañía u organización.
               </p>
             </div>
@@ -475,12 +475,12 @@ export default function ProfileCompanySection({
 
           <FieldGroup>
             <div>
-              <h3 className="text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-3">
+              <h3 className="text-sm font-semibold text-dash-muted mb-3">
                 Personalización y contacto (opcional)
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
                 <div className="h-full min-h-0">
-                  <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+                  <label className="block text-sm font-semibold text-dash-muted mb-2">
                     Color primario (hex)
                   </label>
                   <div className="space-y-2">
@@ -503,7 +503,7 @@ export default function ProfileCompanySection({
                 </div>
 
                 <div className="h-full min-h-0">
-                  <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+                  <label className="block text-sm font-semibold text-dash-muted mb-2">
                     Color secundario (hex)
                   </label>
                   <div className="space-y-2">
@@ -528,7 +528,7 @@ export default function ProfileCompanySection({
                 </div>
 
                 <div className="h-full min-h-0">
-                  <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+                  <label className="block text-sm font-semibold text-dash-muted mb-2">
                     Email de contacto
                   </label>
                   <input
@@ -541,7 +541,7 @@ export default function ProfileCompanySection({
                 </div>
 
                 <div className="h-full min-h-0">
-                  <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+                  <label className="block text-sm font-semibold text-dash-muted mb-2">
                     Teléfono de contacto
                   </label>
                   <input
@@ -553,7 +553,7 @@ export default function ProfileCompanySection({
                   />
                 </div>
               </div>
-              <p className="mt-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              <p className="mt-2 text-xs text-dash-muted">
                 Los colores se guardan como hexadecimal en formato #RRGGBB.
               </p>
             </div>
@@ -561,7 +561,7 @@ export default function ProfileCompanySection({
 
           <FieldGroup>
             <div>
-              <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2 flex items-center gap-1.5">
+              <label className="block text-sm font-semibold text-dash-muted mb-2 flex items-center gap-1.5">
                 <HugeiconsIcon
                   icon={InformationCircleIcon}
                   className="size-4 shrink-0 text-orange-500 dark:text-orange-400"
@@ -581,10 +581,10 @@ export default function ProfileCompanySection({
           <FieldGroup>
             <div>
               {/* Copy de IA: no hablar de “cada llamada”. Ver src/components/profile/ai/README.md */}
-              <h3 className="text-lg font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+              <h3 className="text-lg font-semibold text-dash-muted mb-2">
                 Información
               </h3>
-              <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mb-5">
+              <p className="text-xs text-dash-muted mb-5">
                 {KADESH_URIM_AI_NAME} ya conoce tu negocio con lo que vas
                 capturando aquí y usando Kadesh: qué vendes, a quién y cómo
                 cierras.{" "}
@@ -596,7 +596,7 @@ export default function ProfileCompanySection({
                 </Link>
                 .
               </p>
-              <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2 flex items-center gap-1.5">
+              <label className="block text-sm font-semibold text-dash-muted mb-2 flex items-center gap-1.5">
                 <HugeiconsIcon
                   icon={InformationCircleIcon}
                   className="size-4 shrink-0 text-orange-500 dark:text-orange-400"
@@ -615,7 +615,7 @@ export default function ProfileCompanySection({
 
           <FieldGroup>
             <div>
-              <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2 flex items-center gap-1.5">
+              <label className="block text-sm font-semibold text-dash-muted mb-2 flex items-center gap-1.5">
                 <HugeiconsIcon
                   icon={InformationCircleIcon}
                   className="size-4 shrink-0 text-orange-500 dark:text-orange-400"
@@ -634,7 +634,7 @@ export default function ProfileCompanySection({
 
           <FieldGroup>
             <div>
-              <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2 flex items-center gap-1.5">
+              <label className="block text-sm font-semibold text-dash-muted mb-2 flex items-center gap-1.5">
                 <HugeiconsIcon
                   icon={InformationCircleIcon}
                   className="size-4 shrink-0 text-orange-500 dark:text-orange-400"
@@ -653,7 +653,7 @@ export default function ProfileCompanySection({
 
           <FieldGroup>
             <div>
-              <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2 flex items-center gap-1.5">
+              <label className="block text-sm font-semibold text-dash-muted mb-2 flex items-center gap-1.5">
                 <HugeiconsIcon
                   icon={InformationCircleIcon}
                   className="size-4 shrink-0 text-orange-500 dark:text-orange-400"

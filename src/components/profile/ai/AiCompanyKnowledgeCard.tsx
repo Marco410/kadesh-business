@@ -84,19 +84,19 @@ export function AiCompanyKnowledgeCard({
       : "Según tu perfil";
 
   return (
-    <section className="rounded-2xl border border-[#e0e0e0] bg-white shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
-      <div className="sticky top-0 z-10 border-b border-[#ececec] bg-white px-4 py-3 dark:border-[#2a2a2a] dark:bg-[#1e1e1e]">
+    <section className="rounded-3xl border border-dash-line bg-dash-surface shadow-sm lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+      <div className="sticky top-0 z-10 border-b border-dash-line bg-dash-surface px-4 py-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <span className="ai-urim-icon">
                 <HugeiconsIcon icon={SparklesIcon} size={18} />
               </span>
-              <h3 className="text-base font-semibold text-[#212121] dark:text-white">
+              <h3 className="text-base font-semibold text-dash-ink">
                 Lo que {KADESH_URIM_AI_NAME} sabe
               </h3>
             </div>
-            <p className="mt-0.5 text-xs text-[#9e9e9e] dark:text-[#7a7a7a]">
+            <p className="mt-0.5 text-xs text-dash-faint dark:text-[#7a7a7a]">
               {updatedLabel}
             </p>
           </div>
@@ -110,12 +110,12 @@ export function AiCompanyKnowledgeCard({
           </button>
         </div>
         {!loading ? (
-          <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
-            <span className="font-semibold text-[#212121] dark:text-white">
+          <p className="mt-2 text-sm text-dash-muted">
+            <span className="font-semibold text-dash-ink">
               {knowledge.answered} de {ONBOARDING_CONTEXT_FIELDS.length}
             </span>{" "}
             preguntas respondidas · conoce tu negocio al{" "}
-            <span className="font-semibold text-[#212121] dark:text-white">
+            <span className="font-semibold text-dash-ink">
               {knowledge.percent}%
             </span>
           </p>
@@ -141,7 +141,7 @@ export function AiCompanyKnowledgeCard({
           {[0, 1, 2, 3].map((item) => (
             <div
               key={item}
-              className="h-14 animate-pulse rounded-lg bg-[#ececec] dark:bg-[#2a2a2a]"
+              className="h-14 dash-shimmer rounded-lg"
             />
           ))}
         </div>
@@ -188,9 +188,9 @@ function PillarRow({
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
-          <p className="min-w-0 truncate text-sm font-semibold text-[#212121] dark:text-white">
+          <p className="min-w-0 truncate text-sm font-semibold text-dash-ink">
             {field.shortLabel}
-            <span className="font-normal text-[#616161] dark:text-[#b0b0b0]">
+            <span className="font-normal text-dash-muted">
               {" "}
               · {field.label}
             </span>
@@ -203,7 +203,7 @@ function PillarRow({
 
         {pillar.state === "empty" ? (
           <div className="mt-1.5">
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="text-sm text-dash-muted">
               {field.question}
             </p>
             <button
@@ -227,7 +227,7 @@ function PillarRow({
               type="button"
               onClick={() => setShowGaps((current) => !current)}
               aria-expanded={showGaps}
-              className="inline-flex items-center gap-1 text-xs font-medium text-[#616161] hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:text-white"
+              className="inline-flex items-center gap-1 text-xs font-medium text-dash-muted hover:text-dash-ink"
             >
               Para afinar ({pillar.gaps.length})
               <HugeiconsIcon
@@ -240,12 +240,12 @@ function PillarRow({
               />
             </button>
             {showGaps ? (
-              <div className="mt-1.5 rounded-lg bg-[#fafafa] p-2.5 dark:bg-[#252525]">
+              <div className="mt-1.5 rounded-lg bg-dash-surface-2 p-2.5">
                 <ul className="space-y-1">
                   {pillar.gaps.map((gap) => (
                     <li
                       key={gap}
-                      className="flex gap-2 text-xs leading-snug text-[#616161] dark:text-[#b0b0b0]"
+                      className="flex gap-2 text-xs leading-snug text-dash-muted"
                     >
                       <span
                         aria-hidden

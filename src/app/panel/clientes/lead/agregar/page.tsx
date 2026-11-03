@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
-import { Footer, Navigation } from "kadesh/components/layout";
+import PanelShell from "kadesh/components/panel/PanelShell";
 import { AddLeadSection } from "kadesh/components/profile/sales/lead";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
@@ -28,28 +28,24 @@ export default function AgregarLeadPage() {
 
   if (!companyId) {
     return (
-      <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#121212]">
-        <Navigation />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
+      <PanelShell selectedTab="clientes" title="Nuevo cliente">
+        <div className="mx-auto max-w-7xl">
           <EmptyCompanySection
             userId={userId}
             onSuccess={async () => {}}
           />
-        </main>
-        <Footer />
-      </div>
+        </div>
+    </PanelShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#121212]">
-      <Navigation />
+    <PanelShell selectedTab="clientes" title="Nuevo cliente">
       <SubscriptionProvider companyId={companyId}>
-        <main className="pt-20 pb-12">
+        <div className="pb-6">
           <AddLeadSection />
-        </main>
+        </div>
       </SubscriptionProvider>
-      <Footer />
-    </div>
+    </PanelShell>
   );
 }

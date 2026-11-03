@@ -66,13 +66,13 @@ import {
 } from "./motion";
 
 const inputClassName =
-  "w-full min-h-11 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-[#212121] dark:text-white text-sm placeholder-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
+  "w-full min-h-11 rounded-xl border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-dash-ink text-sm placeholder-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 const labelClassName =
-  "block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5";
+  "block text-sm font-medium text-dash-muted mb-1.5";
 const secondaryBtnClass =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] px-3.5 text-sm font-medium text-[#212121] hover:bg-[#f5f5f5] disabled:pointer-events-none disabled:opacity-50 dark:border-[#3a3a3a] dark:text-white dark:hover:bg-[#333]";
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-dash-line px-3.5 text-sm font-medium text-dash-ink hover:bg-dash-hover disabled:pointer-events-none disabled:opacity-50";
 const primaryBtnClass =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 text-sm font-semibold text-white hover:bg-orange-600 disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full dash-grad-accent px-4 text-sm font-semibold text-white hover:shadow-dash-accent-lift disabled:pointer-events-none disabled:opacity-50 shadow-dash-accent";
 
 function toDateOnly(iso: string | null | undefined): string {
   if (!iso) return "";
@@ -175,10 +175,10 @@ function DetailMessage({
       <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500">
         <HugeiconsIcon icon={Invoice01Icon} size={24} />
       </span>
-      <h1 className="mt-4 text-lg font-bold tracking-tight text-[#212121] dark:text-white">
+      <h1 className="mt-4 text-lg font-bold tracking-tight text-dash-ink">
         {title}
       </h1>
-      <p className="mt-2 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+      <p className="mt-2 text-sm leading-relaxed text-dash-muted">
         {children}
       </p>
       <Link
@@ -473,7 +473,7 @@ export default function QuotationDetail() {
         >
           <Link
             href={`${Routes.panel}?tab=cotizaciones`}
-            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-[#616161] hover:text-orange-500 dark:text-[#b0b0b0] dark:hover:text-orange-400"
+            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-dash-muted hover:text-orange-500 dark:hover:text-orange-400"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
             Cotizaciones
@@ -483,9 +483,9 @@ export default function QuotationDetail() {
         {loading && !detail ? (
           <div className="space-y-4" aria-busy="true">
             <span className="sr-only">Cargando cotización</span>
-            <div className="h-10 w-56 rounded-lg bg-[#ececec] animate-pulse dark:bg-[#333]" />
-            <div className="h-48 rounded-2xl border border-[#e0e0e0] bg-white animate-pulse dark:border-[#3a3a3a] dark:bg-[#1e1e1e]" />
-            <div className="h-64 rounded-2xl border border-[#e0e0e0] bg-white animate-pulse dark:border-[#3a3a3a] dark:bg-[#1e1e1e]" />
+            <div className="h-10 w-56 rounded-lg dash-shimmer" />
+            <div className="h-48 rounded-3xl border border-dash-line bg-dash-surface animate-pulse" />
+            <div className="h-64 rounded-3xl border border-dash-line bg-dash-surface animate-pulse" />
           </div>
         ) : error ? (
           <DetailMessage title="No se pudo cargar">
@@ -504,16 +504,16 @@ export default function QuotationDetail() {
             >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-xl font-bold tracking-tight text-[#212121] dark:text-white sm:text-2xl">
+                  <h1 className="text-xl font-bold tracking-tight text-dash-ink sm:text-2xl">
                     {detail.quotationNumber}
                   </h1>
                   <StatusBadge status={status} />
                 </div>
-                <p className="mt-1 text-2xl font-bold tabular-nums tracking-tight text-[#212121] dark:text-white">
+                <p className="mt-1 text-2xl font-bold tabular-nums tracking-tight text-dash-ink">
                   {formatMoney(detail.total, cc)}
                 </p>
                 {detail.lead?.businessName ? (
-                  <p className="mt-0.5 text-sm text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-0.5 text-sm text-dash-muted">
                     {detail.lead.businessName}
                   </p>
                 ) : null}
@@ -553,7 +553,7 @@ export default function QuotationDetail() {
               variants={fadeUp}
               transition={quotationMotionTransition(reduce)}
               onSubmit={handleSaveQuotation}
-              className="space-y-6 rounded-2xl border border-[#e0e0e0] bg-white p-4 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-6"
+              className="space-y-6 rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm sm:p-6"
             >
               <fieldset
                 disabled={!canEditQuotation}
@@ -561,7 +561,7 @@ export default function QuotationDetail() {
               >
               <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 <div>
-                  <dt className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <dt className="text-xs text-dash-muted">
                     Subtotal
                   </dt>
                   <dd className="mt-0.5 font-medium tabular-nums">
@@ -569,7 +569,7 @@ export default function QuotationDetail() {
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <dt className="text-xs text-dash-muted">
                     Descuento
                   </dt>
                   <dd className="mt-0.5 font-medium tabular-nums">
@@ -577,7 +577,7 @@ export default function QuotationDetail() {
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <dt className="text-xs text-dash-muted">
                     IVA
                   </dt>
                   <dd className="mt-0.5 font-medium tabular-nums">
@@ -585,7 +585,7 @@ export default function QuotationDetail() {
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <dt className="text-xs text-dash-muted">
                     Total
                   </dt>
                   <dd className="mt-0.5 font-semibold tabular-nums">
@@ -666,7 +666,7 @@ export default function QuotationDetail() {
                 {sentAt ? (
                   <div>
                     <p className={labelClassName}>Enviada</p>
-                    <p className="text-sm text-[#212121] dark:text-white">
+                    <p className="text-sm text-dash-ink">
                       {formatDateShort(sentAt)}
                     </p>
                   </div>
@@ -674,7 +674,7 @@ export default function QuotationDetail() {
                 {acceptedAt ? (
                   <div>
                     <p className={labelClassName}>Aceptada</p>
-                    <p className="text-sm text-[#212121] dark:text-white">
+                    <p className="text-sm text-dash-ink">
                       {formatDateShort(acceptedAt)}
                     </p>
                   </div>
@@ -707,7 +707,7 @@ export default function QuotationDetail() {
               <div className="flex flex-col gap-3 sm:flex-row sm:gap-8">
                 <label
                   htmlFor="qd-show-discount"
-                  className="inline-flex min-h-11 items-center gap-2 text-sm text-[#616161] dark:text-[#b0b0b0]"
+                  className="inline-flex min-h-11 items-center gap-2 text-sm text-dash-muted"
                 >
                   <input
                     id="qd-show-discount"
@@ -720,7 +720,7 @@ export default function QuotationDetail() {
                 </label>
                 <label
                   htmlFor="qd-show-notes"
-                  className="inline-flex min-h-11 items-center gap-2 text-sm text-[#616161] dark:text-[#b0b0b0]"
+                  className="inline-flex min-h-11 items-center gap-2 text-sm text-dash-muted"
                 >
                   <input
                     id="qd-show-notes"
@@ -764,12 +764,12 @@ export default function QuotationDetail() {
             <motion.section
               variants={fadeUp}
               transition={quotationMotionTransition(reduce)}
-              className="space-y-4 rounded-2xl border border-[#e0e0e0] bg-white p-4 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-6"
+              className="space-y-4 rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm sm:p-6"
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="text-base font-semibold text-[#212121] dark:text-white">
+                <h2 className="text-base font-semibold text-dash-ink">
                   Conceptos
-                  <span className="ml-2 font-normal text-[#616161] dark:text-[#b0b0b0]">
+                  <span className="ml-2 font-normal text-dash-muted">
                     {products.length}
                   </span>
                 </h2>
@@ -787,10 +787,10 @@ export default function QuotationDetail() {
 
               {products.length === 0 ? (
                 <div className="flex flex-col items-center px-4 py-10 text-center">
-                  <p className="text-sm font-medium text-[#212121] dark:text-white">
+                  <p className="text-sm font-medium text-dash-ink">
                     Aún no hay conceptos
                   </p>
-                  <p className="mt-1 max-w-sm text-sm text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-1 max-w-sm text-sm text-dash-muted">
                     Agrega productos o servicios. El total de la cotización se
                     calcula con estas líneas.
                   </p>
@@ -807,7 +807,7 @@ export default function QuotationDetail() {
                 </div>
               ) : (
                 <>
-                  <ul className="divide-y divide-[#eee] overflow-hidden rounded-xl border border-[#e8e8e8] dark:divide-[#333] dark:border-[#3a3a3a] md:hidden">
+                  <ul className="divide-y divide-dash-line overflow-hidden rounded-xl border border-dash-line md:hidden">
                     {products.map((row, index) => (
                       <li
                         key={row.id}
@@ -816,10 +816,10 @@ export default function QuotationDetail() {
                         }}
                         className="clientes-row-in p-4"
                       >
-                        <p className="font-medium text-[#212121] dark:text-white">
+                        <p className="font-medium text-dash-ink">
                           {row.description ?? "—"}
                         </p>
-                        <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+                        <p className="mt-1 text-sm text-dash-muted">
                           {row.quantity ?? "—"} ×{" "}
                           {formatMoney(row.unitPrice, cc)}
                           {row.taxRate != null ? ` · IVA ${row.taxRate}%` : ""}
@@ -839,7 +839,7 @@ export default function QuotationDetail() {
                                 type="button"
                                 onClick={() => openEditProduct(row)}
                                 disabled={deletingProduct}
-                                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a]"
+                                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-dash-line"
                                 aria-label="Editar concepto"
                               >
                                 <HugeiconsIcon icon={Edit01Icon} size={16} />
@@ -970,7 +970,7 @@ export default function QuotationDetail() {
                                       type="button"
                                       onClick={() => openEditProduct(row)}
                                       disabled={deletingProduct}
-                                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#e0e0e0] hover:bg-[#f5f5f5] disabled:opacity-50 dark:border-[#3a3a3a] dark:hover:bg-[#333]"
+                                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-dash-line hover:bg-dash-hover disabled:opacity-50"
                                       aria-label="Editar concepto"
                                     >
                                       <HugeiconsIcon
@@ -1011,7 +1011,7 @@ export default function QuotationDetail() {
       </motion.div>
 
       {detail && canEditQuotation ? (
-        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-[#e0e0e0] bg-white px-4 py-3 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-dash-line bg-dash-surface px-4 py-3 sm:hidden">
           <button
             type="submit"
             form="quotation-detail-form"

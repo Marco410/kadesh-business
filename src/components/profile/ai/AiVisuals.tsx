@@ -99,7 +99,7 @@ export const PILLAR_STATE_META: Record<
   empty: {
     label: "Sin responder",
     icon: CircleIcon,
-    className: "text-[#9e9e9e] dark:text-[#7a7a7a]",
+    className: "text-dash-faint dark:text-[#7a7a7a]",
   },
 };
 
@@ -191,7 +191,7 @@ export function AiThinking({
       aria-live="polite"
       className="rounded-xl border border-violet-200 bg-violet-50/70 p-4 dark:border-violet-500/25 dark:bg-violet-500/10"
     >
-      <p className="flex items-center gap-2 text-sm font-semibold text-[#212121] dark:text-white">
+      <p className="flex items-center gap-2 text-sm font-semibold text-dash-ink">
         <span className="size-4 shrink-0 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
         {title}
       </p>
@@ -205,10 +205,10 @@ export function AiThinking({
               className={cn(
                 "flex items-center gap-2.5 text-sm transition-colors",
                 done
-                  ? "text-[#616161] dark:text-[#b0b0b0]"
+                  ? "text-dash-muted"
                   : current
-                    ? "font-medium text-[#212121] dark:text-white"
-                    : "text-[#9e9e9e] dark:text-[#7a7a7a]",
+                    ? "font-medium text-dash-ink"
+                    : "text-dash-faint dark:text-[#7a7a7a]",
               )}
             >
               {done ? (

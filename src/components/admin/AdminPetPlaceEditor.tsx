@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { AnimatePresence, motion } from "framer-motion";
+import { DASH_EASE } from "kadesh/components/app-shell";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
@@ -33,10 +34,10 @@ import { PIPELINE_STATUS } from "kadesh/constants/constans";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const inputClass =
-  "h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:opacity-60";
+  "h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:opacity-60";
 
 const textareaClass =
-  "min-h-28 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:opacity-60";
+  "min-h-28 w-full rounded-xl border border-dash-line bg-dash-surface px-3 py-2.5 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:opacity-60";
 
 type PlaceScheduleSlot = {
   key: string;
@@ -208,21 +209,21 @@ export default function AdminPetPlaceEditor({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50"
+            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50"
             onClick={onClose}
           />
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 24, scale: 0.98 }}
+            transition={{ duration: 0.3, ease: DASH_EASE }}
             className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none"
           >
             <div
               role="dialog"
               aria-modal="true"
               aria-label="Editar veterinaria"
-              className="bg-white dark:bg-[#1e1e1e] rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
+              className="bg-dash-surface rounded-t-3xl sm:rounded-3xl shadow-dash-lift font-dash text-dash-ink w-full max-w-3xl max-h-[92vh] overflow-y-auto pointer-events-auto border border-dash-line"
               onClick={(e) => e.stopPropagation()}
             >
               {placeId ? (
@@ -591,23 +592,23 @@ function EditorBody({
 
   return (
     <>
-      <div className="sticky top-0 z-10 bg-white dark:bg-[#1e1e1e] px-4 sm:px-6 py-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a] flex items-start justify-between gap-3">
+      <div className="sticky top-0 z-10 bg-dash-surface px-4 sm:px-6 py-4 border-b border-dash-line flex items-start justify-between gap-3">
         {place ? (
           <div className="min-w-0">
-            <h3 className="text-xl font-bold text-[#212121] dark:text-white">
+            <h3 className="text-xl font-bold text-dash-ink">
               Editar ficha
             </h3>
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1 truncate">
+            <p className="text-sm text-dash-muted mt-1 truncate">
               {place.name}
             </p>
           </div>
         ) : (
-          <div className="h-12 w-48 rounded-lg bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
+          <div className="h-12 w-48 rounded-lg dash-shimmer" />
         )}
         <button
           type="button"
           onClick={onClose}
-          className="h-11 w-11 shrink-0 rounded-xl text-2xl text-[#616161] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] cursor-pointer"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full text-2xl leading-none text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-ink cursor-pointer"
           aria-label="Cerrar"
         >
           ×
@@ -619,14 +620,14 @@ function EditorBody({
           <AdminErrorState message="No se pudo cargar la ficha." />
         ) : !place || !draft ? (
           <div className="space-y-3" aria-hidden>
-            <div className="h-24 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
-            <div className="h-40 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
-            <div className="h-40 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
+            <div className="h-24 rounded-xl dash-shimmer" />
+            <div className="h-40 rounded-xl dash-shimmer" />
+            <div className="h-40 rounded-xl dash-shimmer" />
           </div>
         ) : (
           <>
             <section>
-              <h4 className="text-sm font-semibold text-[#212121] dark:text-white mb-3">
+              <h4 className="text-sm font-semibold text-dash-ink mb-3">
                 Datos públicos
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -691,7 +692,7 @@ function EditorBody({
             </section>
 
             <section>
-              <h4 className="text-sm font-semibold text-[#212121] dark:text-white mb-3">
+              <h4 className="text-sm font-semibold text-dash-ink mb-3">
                 Ubicación
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -767,7 +768,7 @@ function EditorBody({
             </section>
 
             <section>
-              <h4 className="text-sm font-semibold text-[#212121] dark:text-white mb-3">
+              <h4 className="text-sm font-semibold text-dash-ink mb-3">
                 Características
               </h4>
               <div className="flex flex-col gap-2">
@@ -811,10 +812,10 @@ function EditorBody({
             </section>
 
             <section>
-              <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+              <h4 className="text-sm font-semibold text-dash-ink">
                 Horario
               </h4>
-              <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+              <p className="text-xs text-dash-muted mt-1 mb-3">
                 Horario semanal de apertura. Un día sin fila está cerrado. La
                 hora de cierre tiene que ser después de la de apertura.
               </p>
@@ -824,7 +825,7 @@ function EditorBody({
                 </p>
               ) : null}
               {draft.schedules.length === 0 ? (
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mb-3">
+                <p className="text-sm text-dash-muted mb-3">
                   Sin horario. La ficha se muestra cerrada.
                 </p>
               ) : (
@@ -893,7 +894,7 @@ function EditorBody({
                         type="button"
                         disabled={saving}
                         onClick={() => removeSchedule(slot.key)}
-                        className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#424242] dark:text-[#e0e0e0] cursor-pointer disabled:opacity-60"
+                        className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-dash-line text-dash-soft cursor-pointer disabled:opacity-60"
                         aria-label={`Quitar horario de ${slot.day}`}
                       >
                         <HugeiconsIcon icon={Cancel01Icon} size={16} />
@@ -906,7 +907,7 @@ function EditorBody({
                 type="button"
                 disabled={saving}
                 onClick={addSchedule}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-4 text-sm font-semibold cursor-pointer disabled:opacity-60 hover:border-orange-300"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-dash-line px-4 text-sm font-semibold cursor-pointer disabled:opacity-60 hover:border-orange-300"
               >
                 <HugeiconsIcon icon={Add01Icon} size={18} />
                 Agregar horario
@@ -914,10 +915,10 @@ function EditorBody({
             </section>
 
             <section>
-              <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+              <h4 className="text-sm font-semibold text-dash-ink">
                 Tipo de negocio
               </h4>
-              <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+              <p className="text-xs text-dash-muted mt-1 mb-3">
                 Al menos uno. Define cómo se clasifica en el directorio.
               </p>
               {typesError ? (
@@ -928,7 +929,7 @@ function EditorBody({
               {typeOptions.length === 0 ? (
                 <div className="space-y-2">
                   {place.types.length === 0 ? (
-                    <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                    <p className="text-sm text-dash-muted">
                       Cargando tipos…
                     </p>
                   ) : (
@@ -936,7 +937,7 @@ function EditorBody({
                       {place.types.map((type) => (
                         <li
                           key={type.id}
-                          className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-3 py-2 text-sm text-[#212121] dark:text-white"
+                          className="rounded-xl border border-dash-line px-3 py-2 text-sm text-dash-ink"
                         >
                           {type.label ??
                             PET_PLACE_TYPE_OPTIONS.find(
@@ -948,7 +949,7 @@ function EditorBody({
                       ))}
                     </ul>
                   )}
-                  <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="text-xs text-dash-muted">
                     Cuando cargue el catálogo podrás cambiar los tipos.
                   </p>
                 </div>
@@ -964,7 +965,7 @@ function EditorBody({
                     return (
                       <label
                         key={type.id}
-                        className="flex items-center gap-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-3 py-3 min-h-11 cursor-pointer"
+                        className="flex items-center gap-3 rounded-xl border border-dash-line bg-dash-surface-2 px-3 py-3 min-h-11 cursor-pointer"
                       >
                         <input
                           type="checkbox"
@@ -973,7 +974,7 @@ function EditorBody({
                           onChange={() => toggleType(type.id)}
                           className="h-4 w-4 accent-orange-500"
                         />
-                        <span className="text-sm font-medium text-[#212121] dark:text-white">
+                        <span className="text-sm font-medium text-dash-ink">
                           {label}
                         </span>
                       </label>
@@ -984,16 +985,16 @@ function EditorBody({
             </section>
 
             <section>
-              <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+              <h4 className="text-sm font-semibold text-dash-ink">
                 Servicios
               </h4>
-              <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+              <p className="text-xs text-dash-muted mt-1 mb-3">
                 Los que salen en la ficha pública. Puedes quitar, agregar del
                 catálogo o crear uno nuevo.
               </p>
 
               {draft.serviceIds.length === 0 ? (
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mb-3">
+                <p className="text-sm text-dash-muted mb-3">
                   Esta ficha aún no tiene servicios.
                 </p>
               ) : (
@@ -1006,7 +1007,7 @@ function EditorBody({
                           type="button"
                           disabled={saving}
                           onClick={() => toggleService(id)}
-                          className="inline-flex h-11 items-center gap-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-3 text-sm text-[#212121] dark:text-white cursor-pointer disabled:opacity-60"
+                          className="inline-flex h-11 items-center gap-2 rounded-xl border border-dash-line bg-dash-surface-2 px-3 text-sm text-dash-ink cursor-pointer disabled:opacity-60"
                           title="Quitar de la ficha"
                         >
                           {row?.name ?? "Servicio"}
@@ -1031,20 +1032,20 @@ function EditorBody({
               </label>
 
               {filteredCatalog.length > 0 ? (
-                <ul className="max-h-48 overflow-y-auto rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a] mb-4">
+                <ul className="max-h-48 overflow-y-auto rounded-xl border border-dash-line divide-y divide-dash-line mb-4">
                   {filteredCatalog.map((row) => (
                     <li key={row.id}>
                       <button
                         type="button"
                         disabled={saving}
                         onClick={() => toggleService(row.id)}
-                        className="w-full text-left px-3 py-3 text-sm hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer disabled:opacity-60"
+                        className="w-full text-left px-3 py-3 text-sm hover:bg-dash-hover cursor-pointer disabled:opacity-60"
                       >
-                        <span className="font-medium text-[#212121] dark:text-white">
+                        <span className="font-medium text-dash-ink">
                           {row.name ?? "Servicio"}
                         </span>
                         {row.description ? (
-                          <span className="block text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5 line-clamp-2">
+                          <span className="block text-xs text-dash-muted mt-0.5 line-clamp-2">
                             {row.description}
                           </span>
                         ) : null}
@@ -1053,16 +1054,16 @@ function EditorBody({
                   ))}
                 </ul>
               ) : debouncedServiceSearch.trim().length >= 1 ? (
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mb-4">
+                <p className="text-sm text-dash-muted mb-4">
                   No hay más servicios con ese nombre.
                 </p>
               ) : null}
 
-              <div className="rounded-xl border border-dashed border-[#e0e0e0] dark:border-[#3a3a3a] p-3 sm:p-4">
-                <p className="text-sm font-semibold text-[#212121] dark:text-white mb-2">
+              <div className="rounded-xl border border-dashed border-dash-line p-3 sm:p-4">
+                <p className="text-sm font-semibold text-dash-ink mb-2">
                   Crear servicio nuevo
                 </p>
-                <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mb-3">
+                <p className="text-xs text-dash-muted mb-3">
                   Entra al catálogo aprobado y se marca en esta clínica.
                 </p>
                 <div className="flex flex-col gap-3">
@@ -1089,7 +1090,7 @@ function EditorBody({
                       saving || creatingService || !newServiceName.trim()
                     }
                     onClick={() => void handleCreateService()}
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-4 text-sm font-semibold cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed hover:border-orange-300"
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-dash-line px-4 text-sm font-semibold cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed hover:border-orange-300"
                   >
                     <HugeiconsIcon icon={Add01Icon} size={18} />
                     {creatingService ? "Creando..." : "Crear y agregar"}
@@ -1103,7 +1104,7 @@ function EditorBody({
                 type="button"
                 disabled={!hasChanges || saving}
                 onClick={() => setEdits({})}
-                className="h-11 rounded-xl px-4 text-sm font-semibold border border-[#e0e0e0] dark:border-[#3a3a3a] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                className="h-11 rounded-full px-4 text-sm font-semibold border border-dash-line cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 Descartar cambios
               </button>
@@ -1111,7 +1112,7 @@ function EditorBody({
                 type="button"
                 disabled={!canSave}
                 onClick={() => void handleSave()}
-                className="h-11 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+                className="h-11 rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed shadow-dash-accent"
               >
                 {saving ? "Guardando..." : "Guardar ficha"}
               </button>
@@ -1134,7 +1135,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5">
+      <span className="block text-xs font-medium text-dash-muted mb-1.5">
         {label}
       </span>
       {children}
@@ -1167,7 +1168,7 @@ function Toggle({
         onChange={(e) => onChange(e.target.checked)}
         className="h-4 w-4 accent-orange-500"
       />
-      <span className="text-sm text-[#212121] dark:text-white">{label}</span>
+      <span className="text-sm text-dash-ink">{label}</span>
     </label>
   );
 }

@@ -1,7 +1,3 @@
-"use client";
-
-import { useSyncExternalStore } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
 import {
   DashboardSquare01Icon,
   UserIcon,
@@ -17,312 +13,211 @@ import {
   SparklesIcon,
   WhatsappIcon,
   Analytics01Icon,
-  SidebarLeftIcon,
-  SidebarRightIcon,
+  ZapIcon,
 } from "@hugeicons/core-free-icons";
+import { createElement } from "react";
+import type { AppNavGroup, AppNavItem } from "kadesh/components/app-shell";
 import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
 import { canAccessNavTab } from "kadesh/components/profile/usuarios/can";
 import FeatureBetaBadge from "kadesh/components/profile/sales/planes/FeatureBetaBadge";
 import { PLAN_FEATURE_KEYS } from "kadesh/constants/constans";
-import { cn } from "kadesh/utils/cn";
+import { Routes } from "kadesh/core/routes";
 import type { User } from "kadesh/utils/types";
 
-const SIDEBAR_COLLAPSED_KEY = "kadesh.panel.navCollapsed";
-const SIDEBAR_COLLAPSED_EVENT = "kadesh-panel-nav-collapsed";
+/*
+ * Menú del panel de control (lo pinta `AppShell` desde `PanelShell`). Antes era un menú propio;
+ * desde 2026-11 este archivo solo define secciones, grupos, permisos y anclas de tutorial.
+ * `scripts/check-tours.mjs` lee `navItems` de aquí: conserva el nombre y el formato `key: "…"`.
+ */
+
+/** Grupos del menú, en orden. */
+export const PANEL_NAV_GROUPS = [
+  { id: "general", title: "General" },
+  { id: "ventas", title: "Ventas" },
+  { id: "equipo", title: "Equipo y cuenta" },
+  { id: "kadesh", title: "Kadesh" },
+] as const;
+
+type PanelNavGroupId = (typeof PANEL_NAV_GROUPS)[number]["id"];
 
 const navItems = [
-  { key: "inicio" as const, label: "Inicio", icon: DashboardSquare01Icon },
-  { key: "profile" as const, label: "Datos del perfil", icon: UserIcon },
+  { key: "inicio" as const, label: "Inicio", icon: DashboardSquare01Icon, group: "general" },
+  { key: "profile" as const, label: "Datos del perfil", icon: UserIcon, group: "equipo" },
   {
     key: "usuarios" as const,
     label: "Usuarios",
     icon: UserMultiple02Icon,
+    group: "equipo",
   },
   {
     key: "ai" as const,
     label: KADESH_URIM_AI_NAME,
     icon: SparklesIcon,
     featureKey: "kadesh_ai",
+    group: "general",
   },
   {
     key: "clientes" as const,
     label: "Clientes",
     icon: Chart01Icon,
+    group: "ventas",
   },
   {
     key: "vendedores" as const,
     label: "Vendedores",
     icon: UserGroupIcon,
     featureKey: PLAN_FEATURE_KEYS.SALES_PERSON_MANAGEMENT,
+    group: "equipo",
   },
   {
     key: "analitica" as const,
     label: "Analítica",
     icon: Analytics01Icon,
     featureKey: PLAN_FEATURE_KEYS.ANALYTICS,
+    group: "general",
   },
   {
     key: "archivos" as const,
     label: "Archivos",
     icon: FileIcon,
     featureKey: PLAN_FEATURE_KEYS.UPLOAD_FILES,
+    group: "equipo",
   },
   {
     key: "proyectos" as const,
     label: "Proyectos",
     icon: FolderIcon,
     featureKey: PLAN_FEATURE_KEYS.PROJECTS,
+    group: "ventas",
   },
   {
     key: "cotizaciones" as const,
     label: "Cotizaciones",
     icon: FileIcon,
     featureKey: PLAN_FEATURE_KEYS.QUOTATIONS,
+    group: "ventas",
   },
   {
     key: "calendar" as const,
     label: "Mi Calendario",
     icon: CalendarIcon,
     featureKey: PLAN_FEATURE_KEYS.CALENDAR_CRM,
+    group: "ventas",
   },
   {
     key: "workspaces" as const,
     label: "Espacios de trabajo",
     icon: WorkIcon,
     featureKey: PLAN_FEATURE_KEYS.WORKSPACES,
+    group: "ventas",
   },
   {
     key: "whatsapp" as const,
     label: "WhatsApp Business",
     icon: WhatsappIcon,
     featureKey: PLAN_FEATURE_KEYS.WHATSAPP,
+    group: "equipo",
   },
 ];
 
 const navItemsKadeshConfig = [
-  { key: "referidos" as const, label: "Referidos", icon: UserAdd01Icon },
-  { key: "novedades" as const, label: "Novedades", icon: FlashIcon },
+  { key: "referidos" as const, label: "Referidos", icon: UserAdd01Icon, group: "kadesh" },
+  { key: "novedades" as const, label: "Novedades", icon: FlashIcon, group: "kadesh" },
 ];
+
+/** Orden dentro de cada grupo (el arreglo de arriba conserva su orden histórico). */
+const GROUP_ORDER: Record<PanelNavGroupId, string[]> = {
+  general: ["inicio", "ai", "analitica"],
+  ventas: ["clientes", "cotizaciones", "proyectos", "calendar", "workspaces"],
+  equipo: ["vendedores", "usuarios", "archivos", "whatsapp", "profile"],
+  kadesh: ["referidos", "novedades"],
+};
 
 type NavItem = (typeof navItems)[number] | (typeof navItemsKadeshConfig)[number];
 
-type DashboardSidebarProps = {
+/** Etiqueta de cada sección (`?tab=`), para migas y títulos. */
+export const PANEL_NAV_LABELS: Record<string, string> = Object.fromEntries(
+  [...navItems, ...navItemsKadeshConfig].map((item) => [item.key, item.label]),
+);
+
+export type PanelNavContext = {
   user: User | undefined;
-  selectedTab: string;
-  onTabChange: (key: string) => void;
+  selectedTab: string | null;
+  /** `null` = estamos en Extracción B2B (`/panel` sin `tab`). */
   hasVendedorRole: boolean;
   isAdminCompany: boolean;
   canManageAi: boolean;
-  isAiLive: boolean;
+  canAccessExtraccion: boolean;
   /** Keys de módulos incluidos y marcados en beta en el plan actual. */
   betaFeatureKeys: ReadonlySet<string>;
 };
 
-function readCollapsedPreference(): boolean {
-  try {
-    return window.localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "1";
-  } catch {
-    return false;
-  }
+function isBetaItem(item: NavItem, betaFeatureKeys: ReadonlySet<string>) {
+  return "featureKey" in item && item.featureKey ? betaFeatureKeys.has(item.featureKey) : false;
 }
 
-function subscribeCollapsedPreference(onStoreChange: () => void) {
-  window.addEventListener(SIDEBAR_COLLAPSED_EVENT, onStoreChange);
-  window.addEventListener("storage", onStoreChange);
-  return () => {
-    window.removeEventListener(SIDEBAR_COLLAPSED_EVENT, onStoreChange);
-    window.removeEventListener("storage", onStoreChange);
+function toNavItem(item: NavItem, ctx: PanelNavContext): AppNavItem {
+  const isBeta = isBetaItem(item, ctx.betaFeatureKeys);
+  return {
+    id: item.key,
+    label: item.label,
+    icon: item.icon,
+    href: `${Routes.panel}?tab=${item.key}`,
+    active: ctx.selectedTab === item.key,
+    dataTour: `nav-${item.key}`,
+    variant: item.key === "ai" ? "ai" : "default",
+    extra: isBeta ? createElement(FeatureBetaBadge, { onFill: ctx.selectedTab === item.key }) : undefined,
   };
 }
 
-function writeCollapsedPreference(collapsed: boolean) {
-  try {
-    window.localStorage.setItem(SIDEBAR_COLLAPSED_KEY, collapsed ? "1" : "0");
-  } catch {
-    // Preferencia local; si el navegador bloquea storage, el menú sigue usable.
+/**
+ * Grupos del menú del panel según permisos y plan: Prospección (Extracción B2B, solo admin de
+ * empresa), General, Ventas, Equipo y cuenta, Kadesh. Las secciones que la persona no puede ver
+ * no aparecen (`canAccessNavTab`).
+ */
+export function buildPanelNavGroups(ctx: PanelNavContext): AppNavGroup[] {
+  const access = {
+    hasVendedorRole: ctx.hasVendedorRole,
+    isAdminCompany: ctx.isAdminCompany,
+    canManageAi: ctx.canManageAi,
+  };
+  const all = [...navItems, ...navItemsKadeshConfig].filter(
+    (item) => item.group === "kadesh" || canAccessNavTab(ctx.user, item.key, access),
+  );
+
+  const groups: AppNavGroup[] = [];
+  if (ctx.canAccessExtraccion) {
+    groups.push({
+      id: "prospeccion",
+      title: "Prospección",
+      items: [
+        {
+          id: "extraccion",
+          label: "Extracción B2B",
+          icon: ZapIcon,
+          href: Routes.panel,
+          active: ctx.selectedTab === null,
+          dataTour: "main-tab-extraccion",
+        },
+      ],
+    });
   }
-  window.dispatchEvent(new Event(SIDEBAR_COLLAPSED_EVENT));
+  for (const group of PANEL_NAV_GROUPS) {
+    const items = GROUP_ORDER[group.id]
+      .map((key) => all.find((item) => item.key === key))
+      .filter((item): item is NavItem => Boolean(item))
+      .map((item) => toNavItem(item, ctx));
+    if (items.length) groups.push({ id: group.id, title: group.title, items });
+  }
+  return groups;
 }
 
-function isNavItemVisible(
-  item: NavItem,
-  {
-    user,
-    hasVendedorRole,
-    isAdminCompany,
-    canManageAi,
-  }: DashboardSidebarProps,
-): boolean {
-  return canAccessNavTab(user, item.key, {
-    hasVendedorRole,
-    isAdminCompany,
-    canManageAi,
-  });
+/** Grupo al que pertenece una sección (para las migas); `null` si no es una sección del menú. */
+export function panelNavGroupTitle(tab: string | null): string | null {
+  if (!tab) return "Prospección";
+  const item = [...navItems, ...navItemsKadeshConfig].find((candidate) => candidate.key === tab);
+  return PANEL_NAV_GROUPS.find((group) => group.id === item?.group)?.title ?? null;
 }
 
-function NavButton({
-  item,
-  isActive,
-  isCollapsed,
-  isBeta,
-  onTabChange,
-}: {
-  item: NavItem;
-  isActive: boolean;
-  isCollapsed: boolean;
-  isBeta: boolean;
-  onTabChange: (key: string) => void;
-}) {
-  const isAi = item.key === "ai";
-
-  return (
-    <button
-      type="button"
-      data-tour={`nav-${item.key}`}
-      title={
-        isCollapsed ? (isBeta ? `${item.label} · Beta` : item.label) : undefined
-      }
-      onClick={() => onTabChange(item.key)}
-      className={cn(
-        "relative flex items-center rounded-lg text-sm font-medium transition-colors",
-        isCollapsed
-          ? "size-11 shrink-0 justify-center lg:w-full"
-          : "w-full gap-3 px-4 py-3 text-left",
-        isActive
-          ? isAi
-            ? "ai-urim-fill shadow-[0_6px_14px_rgba(139,92,246,0.28)]"
-            : "bg-orange-500 text-white dark:bg-orange-500 dark:text-white"
-          : "text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]",
-      )}
-    >
-      <span className={isAi && !isActive ? "ai-urim-icon" : undefined}>
-        <HugeiconsIcon icon={item.icon} size={20} />
-      </span>
-      <span
-        className={cn(
-          "flex min-w-0 flex-1 items-center gap-2",
-          isCollapsed && "sr-only",
-        )}
-      >
-        <span className="truncate">{item.label}</span>
-        {isBeta ? <FeatureBetaBadge onFill={isActive} /> : null}
-      </span>
-      {isBeta && isCollapsed ? (
-        <span
-          className="absolute right-1.5 top-1.5 size-2 rounded-full bg-violet-400"
-          aria-hidden
-        />
-      ) : null}
-    </button>
-  );
-}
-
-function isBetaItem(item: NavItem, betaFeatureKeys: ReadonlySet<string>) {
-  return "featureKey" in item && item.featureKey
-    ? betaFeatureKeys.has(item.featureKey)
-    : false;
-}
-
-export default function DashboardSidebar(props: DashboardSidebarProps) {
-  const { selectedTab, onTabChange, isAiLive, betaFeatureKeys } = props;
-  const isCollapsed = useSyncExternalStore(
-    subscribeCollapsedPreference,
-    readCollapsedPreference,
-    () => false,
-  );
-
-  const visibleNavItems = navItems.filter((item) =>
-    isNavItemVisible(item, props),
-  );
-  const collapseLabel = isCollapsed ? "Mostrar menú" : "Ocultar menú";
-
-  return (
-    <aside
-      className={cn(
-        "flex shrink-0 flex-col gap-3 overflow-visible transition-[width] duration-200",
-        isCollapsed ? "w-full lg:w-16" : "w-full lg:w-60",
-      )}
-    >
-      <div className={cn("flex", isCollapsed ? "lg:justify-center" : "justify-end")}>
-        <button
-          type="button"
-          aria-expanded={!isCollapsed}
-          aria-controls="panel-nav"
-          title={collapseLabel}
-          onClick={() => writeCollapsedPreference(!isCollapsed)}
-          className={cn(
-            "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] bg-white text-sm font-medium text-[#616161] shadow-sm transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a]",
-            isCollapsed ? "size-11" : "px-3",
-          )}
-        >
-          <HugeiconsIcon
-            icon={isCollapsed ? SidebarRightIcon : SidebarLeftIcon}
-            size={20}
-          />
-          <span className={cn(isCollapsed && "sr-only")}>{collapseLabel}</span>
-        </button>
-      </div>
-
-      <div id="panel-nav" className="flex flex-col gap-5">
-        <svg width="0" height="0" aria-hidden className="absolute">
-          <defs>
-            <linearGradient
-              id="kadesh-urim-icon-gradient"
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="100%"
-            >
-              <stop offset="0%" stopColor="var(--ai-urim-purple)" />
-              <stop offset="100%" stopColor="var(--ai-urim-blue)" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <div
-          className={cn(
-            "rounded-2xl",
-            isAiLive ? "ai-live-ring shadow-sm" : "shadow-sm",
-          )}
-        >
-          <nav
-            className={cn(
-              "rounded-[14px] bg-white p-2 dark:bg-[#1e1e1e]",
-              isAiLive
-                ? undefined
-                : "rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a]",
-              isCollapsed && "flex flex-row flex-wrap gap-1 lg:flex-col",
-            )}
-          >
-            {visibleNavItems.map((item) => (
-              <NavButton
-                key={item.key}
-                item={item}
-                isActive={selectedTab === item.key}
-                isCollapsed={isCollapsed}
-                isBeta={isBetaItem(item, betaFeatureKeys)}
-                onTabChange={onTabChange}
-              />
-            ))}
-          </nav>
-        </div>
-        <nav
-          className={cn(
-            "rounded-2xl border border-[#e0e0e0] bg-white p-2 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e]",
-            isCollapsed && "flex flex-row flex-wrap gap-1 lg:flex-col",
-          )}
-        >
-          {navItemsKadeshConfig.map((item) => (
-            <NavButton
-              key={item.key}
-              item={item}
-              isActive={selectedTab === item.key}
-              isCollapsed={isCollapsed}
-              isBeta={false}
-              onTabChange={onTabChange}
-            />
-          ))}
-        </nav>
-      </div>
-    </aside>
-  );
-}
+/** Preferencia de menú colapsado (la misma llave que el menú anterior). */
+export const PANEL_NAV_COLLAPSED_KEY = "kadesh.panel.navCollapsed";

@@ -30,7 +30,7 @@ export function TourHelpButton({ tourId, className }: TourHelpButtonProps) {
       aria-label={`Ver tutorial: ${tour.title}`}
       title={`Ver tutorial: ${tour.title}`}
       className={cn(
-        "inline-flex min-h-9 items-center gap-1.5 rounded-full border border-[#e0e0e0] bg-white px-3 py-1.5 text-xs font-semibold text-[#616161] transition-colors hover:bg-[#f5f5f5] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 disabled:opacity-60 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a]",
+        "inline-flex h-10 items-center gap-1.5 rounded-full border border-dash-line bg-dash-surface px-3.5 text-sm font-semibold text-dash-soft transition-colors hover:bg-dash-hover hover:text-dash-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:opacity-60",
         className,
       )}
     >

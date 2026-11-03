@@ -75,14 +75,14 @@ export default function ActivationPanel() {
               {funnel.steps.map((step) => (
                 <li key={step.key}>
                   <div className="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
-                    <span className="text-sm font-medium text-[#212121] dark:text-white">{step.label}</span>
-                    <span className="text-sm tabular-nums text-[#616161] dark:text-[#b0b0b0]">
-                      <strong className="text-[#212121] dark:text-white">{Math.round(step.pct)}%</strong> ·{" "}
+                    <span className="text-sm font-medium text-dash-ink">{step.label}</span>
+                    <span className="text-sm tabular-nums text-dash-muted">
+                      <strong className="text-dash-ink">{Math.round(step.pct)}%</strong> ·{" "}
                       {step.companies}
                       {step.key !== "signup" && formatDays(step.medianDays) ? ` · ${formatDays(step.medianDays)}` : ""}
                     </span>
                   </div>
-                  <div className="h-2.5 overflow-hidden rounded-full bg-[#f0f0f0] dark:bg-[#2a2a2a]">
+                  <div className="h-2.5 overflow-hidden rounded-full bg-dash-surface-2">
                     <div
                       className={cn(
                         "h-full rounded-full",
@@ -94,7 +94,7 @@ export default function ActivationPanel() {
                 </li>
               ))}
             </ol>
-            <p className="mt-4 text-xs text-[#9e9e9e]">
+            <p className="mt-4 text-xs text-dash-faint">
               Primer contacto = registró una actividad, mandó un WhatsApp o movió un lead de etapa.
               Pagó = cobro exitoso (plan o recarga) o plan con costo activo.
             </p>
@@ -107,7 +107,7 @@ export default function ActivationPanel() {
           >
             <div className="relative -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
               <table className="w-full min-w-[560px] text-left text-sm">
-                <thead className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                <thead className="text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                   <tr>
                     <th className="py-2 pr-3 font-medium">Mes</th>
                     <th className="py-2 pr-3 font-medium">Registradas</th>
@@ -117,18 +117,18 @@ export default function ActivationPanel() {
                     <th className="py-2 font-medium">Pagó</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+                <tbody className="divide-y divide-dash-line">
                   {funnel.byMonth.map((row) => {
                     const [year, month] = row.month.split("-").map(Number);
                     return (
                       <tr key={row.month}>
-                        <td className="whitespace-nowrap py-2 pr-3 capitalize text-[#212121] dark:text-white">
+                        <td className="whitespace-nowrap py-2 pr-3 capitalize text-dash-ink">
                           {monthLabel(year, month)}
                         </td>
-                        <td className="py-2 pr-3 tabular-nums text-[#212121] dark:text-white">{row.companies}</td>
+                        <td className="py-2 pr-3 tabular-nums text-dash-ink">{row.companies}</td>
                         {[row.extraction, row.contact, row.quotation, row.paid].map((value, index) => (
-                          <td key={index} className="whitespace-nowrap py-2 pr-3 tabular-nums text-[#616161] dark:text-[#b0b0b0]">
-                            <span className="text-[#212121] dark:text-white">{pct(value, row.companies)}</span>{" "}
+                          <td key={index} className="whitespace-nowrap py-2 pr-3 tabular-nums text-dash-muted">
+                            <span className="text-dash-ink">{pct(value, row.companies)}</span>{" "}
                             <span className="text-xs">({value})</span>
                           </td>
                         ))}

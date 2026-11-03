@@ -13,7 +13,7 @@ import { buildSupportWhatsAppUrl } from "kadesh/constants/support";
 function PlanMetric({
   label,
   value,
-  valueClassName = "text-[#212121] dark:text-[#ffffff]",
+  valueClassName = "text-dash-ink",
 }: {
   label: string;
   value: React.ReactNode;
@@ -21,7 +21,7 @@ function PlanMetric({
 }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0] uppercase tracking-wide">
+      <span className="text-xs font-medium text-dash-muted uppercase tracking-wide">
         {label}
       </span>
       <span className={`text-base font-semibold ${valueClassName}`}>{value}</span>
@@ -35,7 +35,7 @@ const supportLinkClass =
 function SupportHelpFooter({ className }: { className?: string }) {
   return (
     <p
-      className={`text-[11px] leading-relaxed text-[#9e9e9e] dark:text-[#6f6f6f] ${className ?? ""}`}
+      className={`text-[11px] leading-relaxed text-dash-faint dark:text-[#6f6f6f] ${className ?? ""}`}
     >
       ¿Necesitas ayuda con tu plan, facturación o el uso de la plataforma?{" "}
       <a
@@ -56,8 +56,8 @@ export default function CurrentPlanSection() {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 shadow-sm">
-        <p className="text-sm text-[#616161] dark:text-[#b0b0b0] text-center">
+      <div className="rounded-xl border border-dash-line bg-dash-surface p-6 shadow-sm">
+        <p className="text-sm text-dash-muted text-center">
           Cargando suscripción...
         </p>
       </div>
@@ -66,14 +66,14 @@ export default function CurrentPlanSection() {
 
   if (subscription == null) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 shadow-sm text-center gap-2">
-        <p className="text-sm text-[#616161] dark:text-[#b0b0b0] text-center">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dash-line bg-dash-surface p-6 shadow-sm text-center gap-2">
+        <p className="text-sm text-dash-muted text-center">
           {message ?? "No hay suscripción asignada a tu empresa."}
         </p>
         <button
           type="button"
           onClick={() => router.push(Routes.panelPlans)}
-          className="inline-flex px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-orange-500 text-white dark:bg-orange-500 hover:bg-orange-600 dark:hover:bg-orange-600"
+          className="inline-flex px-3 py-1.5 rounded-full text-sm font-medium transition-colors dash-grad-accent text-white hover:shadow-dash-accent-lift shadow-dash-accent"
         >
           Ver planes
         </button>
@@ -83,16 +83,16 @@ export default function CurrentPlanSection() {
   }
 
   return (
-    <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] shadow-sm overflow-hidden">
+    <div className="rounded-xl border border-dash-line bg-dash-surface shadow-sm overflow-hidden">
       <div className="h-1 bg-gradient-to-r from-orange-500 to-orange-400" aria-hidden />
       <div className="p-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-row gap-10 items-center justify-between  ">
             <div className="flex flex-col">
-              <p className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0] uppercase tracking-wide mb-1">
+              <p className="text-xs font-medium text-dash-muted uppercase tracking-wide mb-1">
                 Plan actual
               </p>
-              <h3 className="text-xl font-bold text-[#212121] dark:text-[#ffffff]">
+              <h3 className="text-xl font-bold text-dash-ink">
                 {subscription.planName}
               </h3>
             </div>
@@ -115,7 +115,7 @@ export default function CurrentPlanSection() {
             <button
               type="button"
               onClick={() => router.push(Routes.panelPlans)}
-              className="inline-flex px-3 py-1.5 rounded-lg text-sm font-medium transition-colors bg-orange-500 text-white dark:bg-orange-500 hover:bg-orange-600 dark:hover:bg-orange-600"
+              className="inline-flex px-3 py-1.5 rounded-full text-sm font-medium transition-colors dash-grad-accent text-white hover:shadow-dash-accent-lift shadow-dash-accent"
             >
               Ver planes
             </button>
@@ -123,7 +123,7 @@ export default function CurrentPlanSection() {
           <span
             className={`text-center inline-flex items-center gap-1.5 w-fit px-3 py-1 rounded-full text-sm font-medium ${
               SUBSCRIPTION_STATUS_CLASSES[subscription.status ?? ""] ??
-              "bg-[#e0e0e0] dark:bg-[#3a3a3a] text-[#616161] dark:text-[#b0b0b0]"
+              "bg-dash-surface-3 text-dash-muted"
             }`}
           >
             {SUBSCRIPTION_STATUS_OPTIONS.find((o) => o.value === subscription.status)

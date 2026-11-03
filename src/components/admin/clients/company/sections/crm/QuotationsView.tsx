@@ -79,7 +79,7 @@ export default function QuotationsView({
         <>
           <div className={`${surfaceClass} relative overflow-x-auto`}>
             <table className="w-full min-w-[820px] text-left text-sm">
-              <thead className="border-b border-[#e8e8e8] text-xs uppercase tracking-wide text-[#616161] dark:border-[#333] dark:text-[#b0b0b0]">
+              <thead className="border-b border-dash-line text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                 <tr>
                   <th className="px-4 py-3">Cotización</th>
                   <th className="px-4 py-3">Cliente</th>
@@ -89,15 +89,15 @@ export default function QuotationsView({
                   <th className="px-4 py-3">Hizo</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+              <tbody className="divide-y divide-dash-line">
                 {rows.map((q) => {
                   const owner = q.assignedSeller ?? q.createdBy;
                   return (
                     <tr key={q.id}>
-                      <td className="px-4 py-3 font-medium text-[#212121] dark:text-white">
+                      <td className="px-4 py-3 font-medium text-dash-ink">
                         #{q.quotationNumber || "—"}
                       </td>
-                      <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                      <td className="px-4 py-3 text-dash-muted">
                         {q.lead?.businessName ?? "—"}
                       </td>
                       <td className="px-4 py-3">
@@ -106,17 +106,17 @@ export default function QuotationsView({
                           className={quotationStatusClass(q.status)}
                         />
                       </td>
-                      <td className="px-4 py-3 tabular-nums text-[#212121] dark:text-white">
+                      <td className="px-4 py-3 tabular-nums text-dash-ink">
                         {formatMoney(q.total, q.currency)}
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <td className="px-4 py-3 text-xs text-dash-muted">
                         Creada {formatDateShort(q.createdAt, false)}
                         {q.sentAt ? <span className="block">Enviada {formatDateShort(q.sentAt, false)}</span> : null}
                         {q.acceptedAt ? (
                           <span className="block">Aceptada {formatDateShort(q.acceptedAt, false)}</span>
                         ) : null}
                       </td>
-                      <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                      <td className="px-4 py-3 text-dash-muted">
                         {owner ? formatPersonName(owner.name, owner.lastName) : "—"}
                       </td>
                     </tr>

@@ -62,7 +62,7 @@ export default function NovedadesPage() {
 
   return (
     <>
-      <main className="min-h-screen bg-[#f5f5f5] dark:bg-[#0a0a0a]">
+      <main className="min-h-screen bg-dash-surface-2 dark:bg-[#0a0a0a]">
         <Navigation />
 
         <header className="relative w-full overflow-hidden bg-gradient-to-br from-orange-500 via-orange-400 to-orange-600 dark:from-[#121212] dark:via-[#1a1a1a] dark:to-[#121212]">
@@ -110,7 +110,7 @@ export default function NovedadesPage() {
 
           {!isInitialLoading && releases.length > 0 && (
             <>
-              <p className="mb-8 text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <p className="mb-8 text-sm text-dash-muted">
                 {totalCount === 1
                   ? "1 versión publicada"
                   : `${totalCount} versiones publicadas`}
@@ -123,7 +123,7 @@ export default function NovedadesPage() {
                     type="button"
                     onClick={() => void handleLoadMore()}
                     disabled={loadingMore}
-                    className="inline-flex min-w-[200px] items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70"
+                    className="inline-flex min-w-[200px] items-center justify-center gap-2 rounded-full dash-grad-accent px-6 py-3 text-sm font-semibold text-white shadow-md transition-colors hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-70 shadow-dash-accent"
                   >
                     {loadingMore ? (
                       <>
@@ -146,26 +146,26 @@ export default function NovedadesPage() {
 
         <section
           aria-labelledby="novedades-faq-heading"
-          className="border-t border-[#e0e0e0] bg-white py-12 dark:border-[#2a2a2a] dark:bg-[#121212]"
+          className="border-t border-dash-line bg-dash-surface py-12"
         >
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <h2
               id="novedades-faq-heading"
-              className="text-xl font-bold text-[#212121] dark:text-white sm:text-2xl"
+              className="text-xl font-bold text-dash-ink sm:text-2xl"
             >
               Preguntas frecuentes sobre las actualizaciones
             </h2>
-            <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-2 text-sm text-dash-muted">
               Respuestas sobre el changelog de KADESH Negocios para equipos de
               venta B2B en México.
             </p>
             <dl className="mt-8 space-y-6">
               {NOVEDADES_FAQ.map((item) => (
                 <div key={item.question}>
-                  <dt className="font-semibold text-[#212121] dark:text-white">
+                  <dt className="font-semibold text-dash-ink">
                     {item.question}
                   </dt>
-                  <dd className="mt-2 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+                  <dd className="mt-2 text-sm leading-relaxed text-dash-muted">
                     {item.answer}
                   </dd>
                 </div>
@@ -174,9 +174,9 @@ export default function NovedadesPage() {
           </div>
         </section>
 
-        <section className="border-t border-[#e0e0e0] bg-[#fafafa] py-12 dark:border-[#2a2a2a] dark:bg-[#0f0f0f]">
+        <section className="border-t border-dash-line bg-dash-surface-2 py-12 dark:bg-[#0f0f0f]">
           <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-            <p className="text-[#616161] dark:text-[#b0b0b0]">
+            <p className="text-dash-muted">
               ¿Quieres probar las últimas funciones en tu cuenta?
             </p>
             <Link

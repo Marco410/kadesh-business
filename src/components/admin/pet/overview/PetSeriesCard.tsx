@@ -57,18 +57,18 @@ export default function PetSeriesCard({
     <AdminSectionCard title={title} help={help}>
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         {series ? (
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
-            <span className="text-xl font-semibold tabular-nums text-[#212121] dark:text-white">
+          <p className="text-sm text-dash-muted">
+            <span className="text-xl font-semibold tabular-nums text-dash-ink">
               {series.total.toLocaleString("es-MX")}
             </span>{" "}
             {unitLabel} {bucketSinceLabel(series.from, series.granularity)}
             <span className="hidden sm:inline"> · </span>
-            <span className="block text-xs text-[#9e9e9e] sm:inline">
+            <span className="block text-xs text-dash-faint sm:inline">
               {average.toLocaleString("es-MX", { maximumFractionDigits: 1 })} por {PERIOD_WORD[series.granularity]} en promedio
             </span>
           </p>
         ) : (
-          <span className="h-7 w-40 animate-pulse rounded bg-[#ececec] dark:bg-[#333]" />
+          <span className="h-7 w-40 dash-shimmer rounded" />
         )}
         {controls ? <div className="flex flex-col gap-2 sm:flex-row sm:items-center">{controls}</div> : null}
       </div>
@@ -76,7 +76,7 @@ export default function PetSeriesCard({
       {error && !series ? (
         <AdminErrorState message={error.message} />
       ) : !series ? (
-        <div className="h-40 animate-pulse rounded-xl bg-[#f0f0f0] dark:bg-[#2a2a2a]" />
+        <div className="h-40 dash-shimmer rounded-xl" />
       ) : (
         <div className={cn("transition-opacity", loading ? "opacity-50" : null)} aria-busy={loading}>
           <StackedSeriesBars

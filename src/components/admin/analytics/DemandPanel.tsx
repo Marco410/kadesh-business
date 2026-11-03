@@ -103,14 +103,14 @@ export default function DemandPanel() {
             description="Lo que se buscó 2 veces o más en la misma zona y salió con pocos resultados."
           >
             {demand.gaps.length === 0 ? (
-              <p className="text-sm text-[#9e9e9e]">Ningún giro se repitió con pocos resultados en una misma zona.</p>
+              <p className="text-sm text-dash-faint">Ningún giro se repitió con pocos resultados en una misma zona.</p>
             ) : (
-              <ul className="flex flex-col divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+              <ul className="flex flex-col divide-y divide-dash-line">
                 {demand.gaps.map((gap) => (
                   <li key={`${gap.category}-${gap.lat}-${gap.lng}`} className="flex flex-col gap-1 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
                     <div className="min-w-0">
-                      <p className="font-medium text-[#212121] dark:text-white">{getCategoryLabel(gap.category)}</p>
-                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <p className="font-medium text-dash-ink">{getCategoryLabel(gap.category)}</p>
+                      <p className="text-xs text-dash-muted">
                         {gap.lowRuns} de {gap.runs} con pocos resultados · promedio {gap.avgResults} ·{" "}
                         {gap.companies} empresa{gap.companies === 1 ? "" : "s"}
                         {gap.lastAt ? ` · última ${formatDate(gap.lastAt)}` : ""}
@@ -127,7 +127,7 @@ export default function DemandPanel() {
             <AdminSectionCard title="Por giro" description="Giros con más extracciones flojas." help={HELP.demandCategories}>
               <div className="relative -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
                 <table className="w-full min-w-[420px] text-left text-sm">
-                  <thead className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <thead className="text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                     <tr>
                       <th className="py-2 pr-3 font-medium">Giro</th>
                       <th className="py-2 pr-3 font-medium">Flojas</th>
@@ -135,15 +135,15 @@ export default function DemandPanel() {
                       <th className="py-2 font-medium">Empresas</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+                  <tbody className="divide-y divide-dash-line">
                     {demand.categories.map((row) => (
                       <tr key={row.category}>
-                        <td className="py-2 pr-3 text-[#212121] dark:text-white">{getCategoryLabel(row.category)}</td>
-                        <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-[#212121] dark:text-white">
-                          {row.lowRuns} <span className="text-xs text-[#9e9e9e]">de {row.runs}</span>
+                        <td className="py-2 pr-3 text-dash-ink">{getCategoryLabel(row.category)}</td>
+                        <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-dash-ink">
+                          {row.lowRuns} <span className="text-xs text-dash-faint">de {row.runs}</span>
                         </td>
-                        <td className="py-2 pr-3 tabular-nums text-[#616161] dark:text-[#b0b0b0]">{row.avgResults}</td>
-                        <td className="py-2 tabular-nums text-[#616161] dark:text-[#b0b0b0]">{row.companies}</td>
+                        <td className="py-2 pr-3 tabular-nums text-dash-muted">{row.avgResults}</td>
+                        <td className="py-2 tabular-nums text-dash-muted">{row.companies}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -152,14 +152,14 @@ export default function DemandPanel() {
             </AdminSectionCard>
 
             <AdminSectionCard title="Por zona" description="Zonas con más extracciones flojas y qué se buscó ahí." help={HELP.demandZones}>
-              <ul className="flex flex-col divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+              <ul className="flex flex-col divide-y divide-dash-line">
                 {demand.zones.map((zone) => (
                   <li key={`${zone.lat}-${zone.lng}`} className="flex flex-col gap-1 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm text-[#212121] dark:text-white">
+                      <p className="text-sm text-dash-ink">
                         {zone.topCategories.map((category) => getCategoryLabel(category)).join(", ") || "Varios giros"}
                       </p>
-                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <p className="text-xs text-dash-muted">
                         {zone.lowRuns} de {zone.runs} flojas · {zone.companies} empresa{zone.companies === 1 ? "" : "s"}
                       </p>
                     </div>

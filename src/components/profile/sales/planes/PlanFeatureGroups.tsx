@@ -134,7 +134,7 @@ export default function PlanFeatureGroups({
       {highlighted.length > 0 && (
         <div>
           {highlightLabel && (
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-dash-muted">
               {highlightLabel}
             </p>
           )}
@@ -154,7 +154,7 @@ export default function PlanFeatureGroups({
       >
         {groups.map((group) => (
           <div key={group.title}>
-            <p className="mb-2 text-sm font-semibold text-[#212121] dark:text-white">
+            <p className="mb-2 text-sm font-semibold text-dash-ink">
               {group.title}
             </p>
             <ul className="space-y-1.5">
@@ -162,7 +162,7 @@ export default function PlanFeatureGroups({
                 <li
                   key={f.key}
                   title={f.description}
-                  className="flex items-start gap-2 text-sm text-[#616161] dark:text-[#b0b0b0]"
+                  className="flex items-start gap-2 text-sm text-dash-muted"
                 >
                   <HugeiconsIcon
                     icon={CheckmarkCircle02Icon}

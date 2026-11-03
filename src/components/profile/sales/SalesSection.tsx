@@ -982,11 +982,11 @@ export default function SalesSection({ userId }: SalesSectionProps) {
         <div ref={clientesShellRef} className="space-y-4">
           <div className="clientes-band flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <h2 className="text-2xl font-bold tracking-tight text-[#212121] dark:text-white">
+              <h2 className="text-2xl font-bold tracking-tight text-dash-ink">
                 Clientes
               </h2>
-              <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
-                <span className="font-medium text-[#212121] dark:text-white">
+              <p className="mt-1 text-sm text-dash-muted">
+                <span className="font-medium text-dash-ink">
                   {userData?.user?.company?.name ?? "Tu empresa"}
                 </span>
                 {" · "}

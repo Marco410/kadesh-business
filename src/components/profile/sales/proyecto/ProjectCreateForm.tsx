@@ -13,10 +13,10 @@ const CREATE_STATUSES = [
 ] as const;
 
 export const projectInputClassName =
-  "w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] px-3 py-2.5 text-sm text-[#212121] dark:text-[#ffffff] placeholder:text-[#9e9e9e] dark:placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 transition-[box-shadow,border-color] duration-150 disabled:opacity-60";
+  "w-full rounded-lg border border-dash-line bg-dash-surface px-3 py-2.5 text-sm text-dash-ink placeholder:text-dash-faint dark:placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 transition-[box-shadow,border-color] duration-150 disabled:opacity-60";
 
 const labelClassName =
-  "block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5";
+  "block text-xs font-medium text-dash-muted mb-1.5";
 
 export type ProjectCreateFormValues = {
   name: string;
@@ -93,7 +93,7 @@ export default function ProjectCreateForm({
                   className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-[transform,background-color,box-shadow] duration-150 ease-[cubic-bezier(0.2,0,0,1)] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ${
                     selected
                       ? `${PROJECT_STATUS_CLASSES[opt]} shadow-sm`
-                      : "bg-[#f5f5f5] text-[#616161] dark:bg-[#2a2a2a] dark:text-[#b0b0b0] hover:bg-[#ececec] dark:hover:bg-[#333]"
+                      : "bg-dash-surface-2 text-dash-muted hover:bg-[#ececec] dark:hover:bg-[#333]"
                   }`}
                 >
                   {opt}
@@ -103,11 +103,11 @@ export default function ProjectCreateForm({
           </div>
         </div>
 
-        <div className="border-t border-[#e8e8e8] pt-3 dark:border-[#333]">
+        <div className="border-t border-dash-line pt-3">
           <button
             type="button"
             onClick={() => setMoreOpen((open) => !open)}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-[#616161] hover:text-orange-600 dark:text-[#b0b0b0] dark:hover:text-orange-400"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-dash-muted hover:text-orange-600 dark:hover:text-orange-400"
             aria-expanded={showMore}
           >
             Fechas, alcance y archivos
@@ -188,19 +188,19 @@ export default function ProjectCreateForm({
         </div>
       </div>
 
-      <div className="flex shrink-0 justify-end gap-2 border-t border-[#e0e0e0] bg-[#fafafa] px-5 py-3 dark:border-[#3a3a3a] dark:bg-[#252525]">
+      <div className="flex shrink-0 justify-end gap-2 border-t border-dash-line bg-dash-surface-2 px-5 py-3">
         <button
           type="button"
           onClick={onCancel}
           disabled={creating}
-          className="rounded-lg border border-[#e0e0e0] px-4 py-2 text-sm font-medium text-[#212121] hover:bg-white dark:border-[#3a3a3a] dark:text-white dark:hover:bg-[#2a2a2a]"
+          className="rounded-lg border border-dash-line px-4 py-2 text-sm font-medium text-dash-ink hover:bg-white dark:hover:bg-[#2a2a2a]"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={creating || !canSubmit}
-          className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 hover:-translate-y-px active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0 transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)]"
+          className="rounded-full dash-grad-accent px-4 py-2 text-sm font-medium text-white hover:shadow-dash-accent-lift hover:-translate-y-px active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0 transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] shadow-dash-accent"
         >
           {creating ? "Creando…" : "Crear proyecto"}
         </button>

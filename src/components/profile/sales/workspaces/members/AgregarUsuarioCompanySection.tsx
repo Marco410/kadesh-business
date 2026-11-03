@@ -98,7 +98,7 @@ export default function AgregarUsuarioCompanySection() {
       <div className="mb-6">
         <Link
           href={`${Routes.panel}?tab=workspaces`}
-          className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
+          className="inline-flex items-center gap-1.5 text-sm text-dash-muted hover:text-orange-500 dark:hover:text-orange-400"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
           Volver a Espacios
@@ -113,13 +113,13 @@ export default function AgregarUsuarioCompanySection() {
           listRefetchQueries={listRefetchQueries}
         />
 
-        <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden">
-          <h2 className="px-4 py-3 text-lg font-bold text-[#212121] dark:text-[#ffffff] bg-[#f5f5f5] dark:bg-[#2a2a2a] border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
+        <div className="rounded-xl border border-dash-line bg-dash-surface overflow-hidden">
+          <h2 className="px-4 py-3 text-lg font-bold text-dash-ink bg-dash-surface-2 border-b border-dash-line">
             Usuarios empresa ({companyUsers.length})
           </h2>
           <div className="p-4">
             {!companyId ? (
-              <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <p className="text-sm text-dash-muted">
                 Sin empresa asignada.
               </p>
             ) : listLoading && companyUsers.length === 0 ? (
@@ -127,7 +127,7 @@ export default function AgregarUsuarioCompanySection() {
                 <span className="size-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : companyUsers.length === 0 ? (
-              <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <p className="text-sm text-dash-muted">
                 Aún no hay usuarios con rol empresa. Crea uno con el formulario.
               </p>
             ) : (
@@ -138,18 +138,18 @@ export default function AgregarUsuarioCompanySection() {
                     className={`flex flex-wrap items-center justify-between gap-2 py-3 px-3 rounded-lg border ${
                       editingId === u.id
                         ? "border-orange-500 dark:border-orange-500 bg-orange-50/50 dark:bg-orange-900/10"
-                        : "border-[#e8e8e8] dark:border-[#333] bg-[#fafafa] dark:bg-[#252525]"
+                        : "border-dash-line bg-dash-surface-2"
                     }`}
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-[#212121] dark:text-[#ffffff] truncate">
+                      <p className="font-medium text-dash-ink truncate">
                         {[u.name, u.lastName].filter(Boolean).join(" ") || "—"}
                       </p>
-                      <p className="text-sm text-[#616161] dark:text-[#b0b0b0] truncate">
+                      <p className="text-sm text-dash-muted truncate">
                         {u.email || "Sin correo"}
                       </p>
                       {u.phone && (
-                        <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                        <p className="text-xs text-dash-muted mt-0.5">
                           {u.phone}
                         </p>
                       )}
@@ -163,7 +163,7 @@ export default function AgregarUsuarioCompanySection() {
                       <button
                         type="button"
                         onClick={() => setEditingId(u.id)}
-                        className="inline-flex items-center justify-center p-2 rounded-lg text-[#616161] dark:text-[#b0b0b0] hover:bg-[#eee] dark:hover:bg-[#333] hover:text-orange-500"
+                        className="inline-flex items-center justify-center p-2 rounded-lg text-dash-muted hover:bg-[#eee] dark:hover:bg-[#333] hover:text-orange-500"
                         title="Editar"
                       >
                         <HugeiconsIcon icon={Edit02Icon} size={18} />

@@ -30,13 +30,15 @@ export const TOURS: TourDefinition[] = [
         href: PANEL_INICIO,
         title: "Tu panel de control",
         description:
-          "Aquí vive tu CRM: clientes, cotizaciones, espacios de trabajo y más.",
+          "Desde este menú llegas a todo tu CRM: clientes, cotizaciones, espacios de trabajo y más.",
+        side: "right",
       },
       {
         target: '[data-tour="main-tab-extraccion"]',
         title: "Extracción B2B",
         description:
           "Busca negocios con teléfono según giro y zona para llenar tu lista de clientes.",
+        side: "right",
         when: ({ user }) => isAdminCompanyUser(user),
       },
       {

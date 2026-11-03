@@ -18,7 +18,7 @@ import {
 } from "./ui";
 
 const fieldClass =
-  "h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
+  "h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
 
 export default function AdminBlogTagsPanel() {
   const [name, setName] = useState("");
@@ -71,10 +71,10 @@ export default function AdminBlogTagsPanel() {
         className={`${surfaceClass} p-4 sm:p-5 flex flex-col gap-4`}
       >
         <div>
-          <h2 className="text-lg font-bold text-[#212121] dark:text-white">
+          <h2 className="text-lg font-bold text-dash-ink">
             Nueva etiqueta
           </h2>
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1">
+          <p className="text-sm text-dash-muted mt-1">
             Sirven para los dos blogs. Un artículo puede llevar varias.
           </p>
         </div>
@@ -91,7 +91,7 @@ export default function AdminBlogTagsPanel() {
           <button
             type="submit"
             disabled={saving}
-            className="h-11 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+            className="h-11 rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed shadow-dash-accent"
           >
             {saving ? "Guardando..." : "Agregar etiqueta"}
           </button>
@@ -108,16 +108,16 @@ export default function AdminBlogTagsPanel() {
           description="Agrega la primera para poder marcar artículos."
         />
       ) : (
-        <ul className={`${surfaceClass} divide-y divide-[#e8e8e8] dark:divide-[#333]`}>
+        <ul className={`${surfaceClass} divide-y divide-dash-line`}>
           {tags.map((tag) => (
             <li
               key={tag.id}
               className="flex items-center justify-between gap-3 px-4 py-3 min-h-14"
             >
-              <p className="font-semibold text-[#212121] dark:text-white truncate">
+              <p className="font-semibold text-dash-ink truncate">
                 {tag.name}
               </p>
-              <p className="shrink-0 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              <p className="shrink-0 text-xs text-dash-muted">
                 {tag.postsCount ?? 0} artículos
               </p>
             </li>

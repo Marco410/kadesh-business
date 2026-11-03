@@ -61,10 +61,10 @@ function StatusBadge({ status }: { status: string | null }) {
 }
 
 const primaryCtaClass =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(231,124,58,0.55)] hover:bg-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e]";
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full dash-grad-accent px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(231,124,58,0.55)] hover:shadow-dash-accent-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] shadow-dash-accent";
 
 const pageBtnClass =
-  "inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-xl border border-[#e0e0e0] px-3 text-sm font-medium text-[#212121] transition-colors hover:bg-[#f5f5f5] disabled:pointer-events-none disabled:opacity-40 dark:border-[#3a3a3a] dark:text-white dark:hover:bg-[#333]";
+  "inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-xl border border-dash-line px-3 text-sm font-medium text-dash-ink transition-colors hover:bg-dash-hover disabled:pointer-events-none disabled:opacity-40";
 
 function QuotationsSkeleton() {
   return (
@@ -73,23 +73,23 @@ function QuotationsSkeleton() {
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-2xl border border-[#e0e0e0] bg-white p-4 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+            className="rounded-3xl border border-dash-line bg-dash-surface p-4"
           >
             <div className="flex items-start justify-between gap-3">
-              <div className="h-4 w-28 rounded bg-[#ececec] animate-pulse dark:bg-[#333]" />
-              <div className="h-6 w-16 rounded-full bg-[#ececec] animate-pulse dark:bg-[#333]" />
+              <div className="h-4 w-28 rounded dash-shimmer" />
+              <div className="h-6 w-16 rounded-full dash-shimmer" />
             </div>
-            <div className="mt-3 h-3 w-40 rounded bg-[#ececec] animate-pulse dark:bg-[#333]" />
-            <div className="mt-4 h-3 w-24 rounded bg-[#ececec] animate-pulse dark:bg-[#333]" />
+            <div className="mt-3 h-3 w-40 rounded dash-shimmer" />
+            <div className="mt-4 h-3 w-24 rounded dash-shimmer" />
           </div>
         ))}
       </div>
       <div className={`${quotationTableWrapClass} hidden md:block`} aria-hidden>
         <div className="h-11 bg-orange-500/[0.06] dark:bg-orange-500/10" />
-        <div className="divide-y divide-[#e8e8e8] dark:divide-[#333]">
+        <div className="divide-y divide-dash-line">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex h-14 items-center px-4">
-              <div className="h-3 w-full max-w-md rounded bg-[#ececec] animate-pulse dark:bg-[#333]" />
+              <div className="h-3 w-full max-w-md rounded dash-shimmer" />
             </div>
           ))}
         </div>
@@ -112,27 +112,27 @@ function QuotationCard({
       type="button"
       onClick={onOpen}
       style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
-      className="clientes-row-in group w-full rounded-2xl border border-[#e0e0e0] bg-white p-4 text-left shadow-sm transition-[border-color,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] hover:border-orange-500/35 hover:bg-orange-500/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:hover:border-orange-500/40 dark:hover:bg-orange-500/10"
+      className="clientes-row-in group w-full rounded-3xl border border-dash-line bg-dash-surface p-4 text-left shadow-sm transition-[border-color,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] hover:border-orange-500/35 hover:bg-orange-500/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:hover:border-orange-500/40 dark:hover:bg-orange-500/10"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate font-semibold text-[#212121] dark:text-white">
+          <p className="truncate font-semibold text-dash-ink">
             {row.quotationNumber}
           </p>
-          <p className="mt-0.5 truncate text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-0.5 truncate text-sm text-dash-muted">
             {row.lead?.businessName ?? "Sin cliente"}
           </p>
         </div>
         <StatusBadge status={row.status} />
       </div>
       <div className="mt-3 flex items-center justify-between gap-3">
-        <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <p className="text-xs text-dash-muted">
           {formatDateShort(row.createdAt, false)}
           {row.validUntil
             ? ` · vence ${formatDateShort(row.validUntil, false)}`
             : ""}
         </p>
-        <span className="inline-flex items-center gap-1 text-sm font-semibold tabular-nums text-[#212121] dark:text-white">
+        <span className="inline-flex items-center gap-1 text-sm font-semibold tabular-nums text-dash-ink">
           {formatMoney(row.total, row.currency ?? "MXN")}
           <HugeiconsIcon
             icon={ArrowRight01Icon}
@@ -198,9 +198,9 @@ export default function QuotationsListPanel({
       <div
         role="region"
         aria-label="Cotizaciones"
-        className="rounded-2xl border border-[#e0e0e0] bg-white p-6 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-8"
+        className="rounded-3xl border border-dash-line bg-dash-surface p-6 sm:p-8"
       >
-        <p className="text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+        <p className="text-sm leading-relaxed text-dash-muted">
           No hay una empresa vinculada a tu cuenta. Asóciala en tu perfil para
           crear cotizaciones.
         </p>
@@ -212,7 +212,7 @@ export default function QuotationsListPanel({
     <div role="region" aria-label="Lista de cotizaciones" className="space-y-4">
       {!isEmpty && (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="text-sm text-dash-muted">
             {isAdminCompany
               ? "Todas las cotizaciones de la empresa."
               : "Cotizaciones donde eres el vendedor asignado."}
@@ -268,7 +268,7 @@ export default function QuotationsListPanel({
             initial="hidden"
             animate="show"
             exit={{ opacity: 0 }}
-            className="flex flex-col items-center px-6 py-12 text-center rounded-2xl border border-[#e0e0e0] bg-white dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:py-16"
+            className="flex flex-col items-center px-6 py-12 text-center rounded-3xl border border-dash-line bg-dash-surface sm:py-16"
           >
             <motion.span
               variants={fadeUp}
@@ -280,14 +280,14 @@ export default function QuotationsListPanel({
             <motion.h4
               variants={fadeUp}
               transition={quotationMotionTransition(reduce)}
-              className="mt-4 text-lg font-semibold text-[#212121] dark:text-white"
+              className="mt-4 text-lg font-semibold text-dash-ink"
             >
               Aún no hay cotizaciones
             </motion.h4>
             <motion.p
               variants={fadeUp}
               transition={quotationMotionTransition(reduce)}
-              className="mt-1 max-w-sm text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]"
+              className="mt-1 max-w-sm text-sm leading-relaxed text-dash-muted"
             >
               {isAdminCompany
                 ? "Crea la primera para un cliente de la empresa. El folio, el total y el estado quedan en un solo lugar."
@@ -359,18 +359,18 @@ export default function QuotationsListPanel({
                         style={{
                           animationDelay: `${Math.min(index, 8) * 40}ms`,
                         }}
-                        className="clientes-row-in group cursor-pointer border-b border-[#e8e8e8] transition-[background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] last:border-b-0 hover:bg-orange-500/[0.06] dark:border-[#333] dark:hover:bg-orange-500/10"
+                        className="clientes-row-in group cursor-pointer border-b border-dash-line transition-[background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] last:border-b-0 hover:bg-orange-500/[0.06] dark:hover:bg-orange-500/10"
                       >
                         <td className={`${quotationTdClass} font-medium`}>
                           {row.quotationNumber}
                         </td>
                         <td className={quotationTdClass}>
                           {row.lead?.businessName ?? (
-                            <span className="text-[#9e9e9e]">Sin cliente</span>
+                            <span className="text-dash-faint">Sin cliente</span>
                           )}
                         </td>
                         <td
-                          className={`${quotationTdClass} whitespace-nowrap text-xs text-[#616161] dark:text-[#b0b0b0]`}
+                          className={`${quotationTdClass} whitespace-nowrap text-xs text-dash-muted`}
                         >
                           {formatDateShort(row.createdAt, false)}
                         </td>
@@ -399,7 +399,7 @@ export default function QuotationsListPanel({
 
       {!loading && rows.length > 0 && (
         <div className="flex flex-col items-center justify-between gap-3 pt-1 sm:flex-row">
-          <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <p className="text-xs text-dash-muted">
             Página {page}
             {hasNextPage ? " · hay más resultados" : ""}
           </p>

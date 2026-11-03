@@ -140,14 +140,14 @@ function TemplatePicker({
 
   return (
     <div
-      className="pointer-events-auto flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white shadow-2xl dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+      className="pointer-events-auto flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-dash-line bg-dash-surface shadow-2xl"
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="border-b border-[#e0e0e0] p-5 dark:border-[#3a3a3a]">
-        <h3 className="text-lg font-bold text-[#212121] dark:text-white">
+      <div className="border-b border-dash-line p-5">
+        <h3 className="text-lg font-bold text-dash-ink">
           Elige el mensaje de inicio
         </h3>
-        <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-1 text-sm text-dash-muted">
           Para escribir primero{recipientName ? ` a ${recipientName}` : ""}, Meta sólo permite
           plantillas aprobadas. Estas son las de tu cuenta.
         </p>
@@ -155,7 +155,7 @@ function TemplatePicker({
 
       <div className="flex-1 overflow-y-auto p-5">
         {loading && templates.length === 0 ? (
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="text-sm text-dash-muted">
             Cargando tus plantillas...
           </p>
         ) : error || payload?.success === false ? (
@@ -180,18 +180,18 @@ function TemplatePicker({
                       className={`w-full rounded-xl border p-3 text-left transition-colors ${
                         isSelected
                           ? "border-orange-500 bg-orange-50 dark:bg-orange-950/30"
-                          : "border-[#e0e0e0] hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:hover:bg-[#2a2a2a]"
+                          : "border-dash-line hover:bg-dash-hover"
                       }`}
                     >
                       <span className="flex items-center justify-between gap-2">
-                        <span className="text-sm font-semibold text-[#212121] dark:text-white">
+                        <span className="text-sm font-semibold text-dash-ink">
                           {template.name}
                         </span>
-                        <span className="shrink-0 text-[10px] uppercase tracking-wide text-[#9e9e9e]">
+                        <span className="shrink-0 text-[10px] uppercase tracking-wide text-dash-faint">
                           {template.language}
                         </span>
                       </span>
-                      <span className="mt-1 block line-clamp-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <span className="mt-1 block line-clamp-2 text-xs text-dash-muted">
                         {template.bodyText}
                       </span>
                     </button>
@@ -202,12 +202,12 @@ function TemplatePicker({
 
             {selected && selected.variableCount > 0 ? (
               <div className="mt-4 space-y-3">
-                <p className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+                <p className="text-xs font-medium text-dash-muted">
                   Datos que pide esta plantilla
                 </p>
                 {params.map((value, index) => (
                   <label key={index} className="block">
-                    <span className="mb-1 block text-xs text-[#9e9e9e]">
+                    <span className="mb-1 block text-xs text-dash-faint">
                       {`{{${index + 1}}}`}
                     </span>
                     <input
@@ -215,7 +215,7 @@ function TemplatePicker({
                       value={value}
                       onChange={(e) => setParam(index, e.target.value)}
                       disabled={sending}
-                      className="w-full rounded-lg border border-[#e0e0e0] bg-white px-3 py-2 text-sm text-[#212121] placeholder:text-[#9e9e9e] focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-60 dark:border-[#3a3a3a] dark:bg-[#121212] dark:text-white"
+                      className="w-full rounded-lg border border-dash-line bg-dash-surface px-3 py-2 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-60"
                     />
                   </label>
                 ))}
@@ -223,11 +223,11 @@ function TemplatePicker({
             ) : null}
 
             {selected ? (
-              <div className="mt-4 rounded-xl border border-[#e0e0e0] bg-[#f5f5f5] p-3 dark:border-[#3a3a3a] dark:bg-[#121212]">
-                <p className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+              <div className="mt-4 rounded-xl border border-dash-line bg-dash-surface-2 p-3 dark:bg-[#121212]">
+                <p className="text-xs font-medium text-dash-muted">
                   Así le va a llegar
                 </p>
-                <p className="mt-1.5 whitespace-pre-wrap text-sm text-[#212121] dark:text-white">
+                <p className="mt-1.5 whitespace-pre-wrap text-sm text-dash-ink">
                   {selected.headerText ? `${selected.headerText}\n\n` : ""}
                   {renderPreview(selected.bodyText, params)}
                   {selected.footerText ? `\n\n${selected.footerText}` : ""}
@@ -238,12 +238,12 @@ function TemplatePicker({
         )}
       </div>
 
-      <div className="flex justify-end gap-2 border-t border-[#e0e0e0] p-4 dark:border-[#3a3a3a]">
+      <div className="flex justify-end gap-2 border-t border-dash-line p-4">
         <button
           type="button"
           onClick={onClose}
           disabled={sending}
-          className="h-10 rounded-lg px-4 text-sm font-semibold text-[#616161] hover:bg-[#f5f5f5] disabled:opacity-60 dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a]"
+          className="h-10 rounded-lg px-4 text-sm font-semibold text-dash-muted hover:bg-dash-hover disabled:opacity-60"
         >
           Cancelar
         </button>
@@ -251,7 +251,7 @@ function TemplatePicker({
           type="button"
           onClick={() => void handleSend()}
           disabled={!canSend}
-          className="h-10 rounded-lg bg-orange-500 px-4 text-sm font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="h-10 rounded-full dash-grad-accent px-4 text-sm font-semibold text-white hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 shadow-dash-accent"
         >
           {sending ? "Enviando..." : "Enviar mensaje"}
         </button>

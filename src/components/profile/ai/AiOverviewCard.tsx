@@ -87,14 +87,14 @@ export function AiOverviewCard({
         <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
       </button>
     ) : (
-      <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+      <p className="text-sm text-dash-muted">
         Pide al administrador de la empresa que la active.
       </p>
     );
   }
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white p-4 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-5">
+    <section className="relative overflow-hidden rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm sm:p-5">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-violet-500/[0.07] to-transparent dark:from-violet-500/[0.12]"
@@ -103,19 +103,19 @@ export function AiOverviewCard({
       <div className="relative flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           {status === "loading" ? (
-            <span className="block h-6 w-24 animate-pulse rounded-full bg-[#ececec] dark:bg-[#2a2a2a]" />
+            <span className="block h-6 w-24 dash-shimmer rounded-full" />
           ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#e0e0e0] bg-white px-2.5 py-0.5 text-xs font-medium text-[#212121] dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-dash-line bg-dash-surface px-2.5 py-0.5 text-xs font-medium text-dash-ink">
               <span
                 className={cn("size-2 rounded-full", STATUS_META[status].dot)}
               />
               {STATUS_META[status].label}
             </span>
           )}
-          <h3 className="mt-2 text-lg font-semibold text-[#212121] dark:text-white">
+          <h3 className="mt-2 text-lg font-semibold text-dash-ink">
             Así te ayuda {KADESH_URIM_AI_NAME}
           </h3>
-          <p className="mt-0.5 max-w-xl text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-0.5 max-w-xl text-sm text-dash-muted">
             Aprende de tu negocio, revisa tu pipeline cada día y te dice qué
             hacer primero para cerrar más ventas.
           </p>
@@ -136,15 +136,15 @@ export function AiOverviewCard({
           description="Qué vendes, a quién, a qué precio y cómo cierras."
         >
           {knowledge.loading ? (
-            <span className="block h-2 w-full animate-pulse rounded-full bg-[#ececec] dark:bg-[#2a2a2a]" />
+            <span className="block h-2 w-full dash-shimmer rounded-full" />
           ) : (
             <>
               <AiMeter
                 value={knowledge.percent}
                 label="Qué tanto conoce tu negocio"
               />
-              <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
-                <span className="font-semibold text-[#212121] dark:text-white">
+              <p className="mt-1.5 text-xs text-dash-muted">
+                <span className="font-semibold text-dash-ink">
                   {knowledge.percent}%
                 </span>{" "}
                 · {knowledge.answered} de {totalQuestions} respuestas
@@ -172,10 +172,10 @@ export function AiOverviewCard({
           description="Seguimientos, cotizaciones, primeros contactos y leads fríos."
         >
           {pipeline.loading ? (
-            <span className="block h-7 w-16 animate-pulse rounded-md bg-[#ececec] dark:bg-[#2a2a2a]" />
+            <span className="block h-7 w-16 dash-shimmer rounded-md" />
           ) : pipeline.error ? null : (
-            <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
-              <span className="text-xl font-semibold text-[#212121] dark:text-white">
+            <p className="text-xs text-dash-muted">
+              <span className="text-xl font-semibold text-dash-ink">
                 {pipeline.total.toLocaleString("es-MX")}
               </span>{" "}
               pendientes hoy
@@ -197,12 +197,12 @@ export function AiOverviewCard({
                 Pasos de hoy listos
               </p>
             ) : (
-              <p className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+              <p className="text-xs font-medium text-dash-muted">
                 Pasos de hoy por generar
               </p>
             )
           ) : status === "loading" ? null : (
-            <p className="text-xs font-medium text-[#9e9e9e] dark:text-[#7a7a7a]">
+            <p className="text-xs font-medium text-dash-faint dark:text-[#7a7a7a]">
               Se desbloquea al activarla
             </p>
           )}
@@ -235,7 +235,7 @@ function FlowStep({
       variants={aiFadeUpVariants(reduce)}
       transition={aiMotionTransition(reduce)}
     >
-      <div className="flex h-full flex-col rounded-xl border border-[#ececec] bg-[#fafafa]/90 p-3 dark:border-[#2e2e2e] dark:bg-[#252525]/90">
+      <div className="flex h-full flex-col rounded-xl border border-dash-line bg-[#fafafa]/90 p-3 dark:border-[#2e2e2e] dark:bg-[#252525]/90">
         <div className="flex items-center gap-2">
           <span className="ai-urim-fill flex size-7 shrink-0 items-center justify-center rounded-lg">
             <HugeiconsIcon icon={icon} size={15} />
@@ -244,10 +244,10 @@ function FlowStep({
             Paso {index}
           </span>
         </div>
-        <p className="mt-2 text-sm font-semibold text-[#212121] dark:text-white">
+        <p className="mt-2 text-sm font-semibold text-dash-ink">
           {title}
         </p>
-        <p className="mt-0.5 text-xs leading-snug text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-0.5 text-xs leading-snug text-dash-muted">
           {description}
         </p>
         <div className="mt-auto pt-3">{children}</div>
@@ -255,7 +255,7 @@ function FlowStep({
       {!isLast ? (
         <span
           aria-hidden
-          className="absolute -right-[13px] top-1/2 z-[1] hidden size-6 -translate-y-1/2 items-center justify-center rounded-full border border-[#e0e0e0] bg-white text-[#9e9e9e] dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-[#7a7a7a] sm:flex"
+          className="absolute -right-[13px] top-1/2 z-[1] hidden size-6 -translate-y-1/2 items-center justify-center rounded-full border border-dash-line bg-dash-surface text-dash-faint dark:text-[#7a7a7a] sm:flex"
         >
           <HugeiconsIcon icon={ArrowRight01Icon} size={12} />
         </span>

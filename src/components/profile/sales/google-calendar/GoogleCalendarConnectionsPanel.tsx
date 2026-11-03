@@ -36,13 +36,13 @@ import { accountDisplayLabel, calendarDisplayName } from "./labels";
 const DEFAULT_COLOR = "#039be5";
 
 const BUTTON_PRIMARY =
-  "inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex items-center justify-center gap-2 rounded-full dash-grad-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 shadow-dash-accent";
 const BUTTON_SECONDARY =
-  "inline-flex items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] px-4 py-2.5 text-sm font-semibold text-[#212121] transition-colors hover:bg-[#f5f5f5] disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]";
+  "inline-flex items-center justify-center gap-2 rounded-xl border border-dash-line px-4 py-2.5 text-sm font-semibold text-dash-ink transition-colors hover:bg-dash-hover disabled:cursor-not-allowed disabled:opacity-60 dark:text-[#e0e0e0]";
 const BUTTON_SMALL =
-  "rounded-lg border border-[#e0e0e0] bg-white px-3 py-1.5 text-xs font-semibold text-[#212121] transition-colors hover:bg-[#f5f5f5] disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]";
+  "rounded-lg border border-dash-line bg-dash-surface px-3 py-1.5 text-xs font-semibold text-dash-ink transition-colors hover:bg-dash-hover disabled:cursor-not-allowed disabled:opacity-60 dark:text-[#e0e0e0]";
 const BUTTON_SMALL_PRIMARY =
-  "rounded-lg bg-orange-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60";
+  "rounded-full dash-grad-accent px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 shadow-dash-accent";
 
 /** Registros del CRM que se pueden enviar a cada calendario. */
 const PUSH_OPTIONS: { flag: GooglePushFlag; label: string }[] = [
@@ -227,7 +227,7 @@ export default function GoogleCalendarConnectionsPanel({
       className={`rounded-lg border transition-colors ${
         calendar.isSelected
           ? "border-orange-500/40 bg-orange-500/5"
-          : "border-[#e0e0e0] bg-white dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+          : "border-dash-line bg-dash-surface"
       }`}
     >
       <button
@@ -243,14 +243,14 @@ export default function GoogleCalendarConnectionsPanel({
           aria-hidden
         />
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm text-[#212121] dark:text-[#ffffff]">
+          <span className="block truncate text-sm text-dash-ink">
             {calendarDisplayName(account, calendar)}
           </span>
           {calendar.isPrimary ? (
-            <span className="text-[11px] text-[#9e9e9e]">Principal</span>
+            <span className="text-[11px] text-dash-faint">Principal</span>
           ) : null}
         </span>
-        <span className="hidden text-xs text-[#9e9e9e] sm:inline">
+        <span className="hidden text-xs text-dash-faint sm:inline">
           {calendar.isSelected ? "Visible" : "Oculto"}
         </span>
         <Switch on={calendar.isSelected} />
@@ -258,13 +258,13 @@ export default function GoogleCalendarConnectionsPanel({
 
       {calendar.isSelected ? (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-orange-500/20 px-3 py-2">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-[#9e9e9e]">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-dash-faint">
             Kadesh envía aquí
           </span>
           {PUSH_OPTIONS.map(({ flag, label }) => (
             <label
               key={flag}
-              className="inline-flex cursor-pointer items-center gap-1.5 text-xs text-[#212121] dark:text-[#e0e0e0]"
+              className="inline-flex cursor-pointer items-center gap-1.5 text-xs text-dash-ink dark:text-[#e0e0e0]"
             >
               <input
                 type="checkbox"
@@ -283,16 +283,16 @@ export default function GoogleCalendarConnectionsPanel({
   return (
     <section
       data-tour="calendar-google-accounts"
-      className="w-full rounded-xl border border-[#e0e0e0] bg-white p-4 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-5"
+      className="w-full rounded-xl border border-dash-line bg-dash-surface p-4 shadow-sm sm:p-5"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
           <GoogleCalendarLogo className="size-11 shrink-0" />
           <div className="min-w-0">
-            <h3 className="text-base font-semibold text-[#212121] dark:text-[#ffffff]">
+            <h3 className="text-base font-semibold text-dash-ink">
               Cuentas y calendarios de Google
             </h3>
-            <p className="mt-1 max-w-xl text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-1 max-w-xl text-sm text-dash-muted">
               Activa los calendarios que quieres ver. En cada uno decide qué envía Kadesh
               automáticamente; los eventos que creas a mano eligen su calendario al crearlos.
             </p>
@@ -327,11 +327,11 @@ export default function GoogleCalendarConnectionsPanel({
             <span className="size-6 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
           </div>
         ) : manageableAccounts.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-[#e0e0e0] px-4 py-6 text-center dark:border-[#3a3a3a]">
-            <p className="text-sm font-medium text-[#212121] dark:text-[#ffffff]">
+          <div className="rounded-lg border border-dashed border-dash-line px-4 py-6 text-center">
+            <p className="text-sm font-medium text-dash-ink">
               Aún no conectas una cuenta de Google
             </p>
-            <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-1 text-xs text-dash-muted">
               Conecta tu cuenta para ver tus eventos aquí y enviar los que crees en Kadesh.
             </p>
           </div>
@@ -350,7 +350,7 @@ export default function GoogleCalendarConnectionsPanel({
             return (
               <article
                 key={account.id}
-                className="overflow-hidden rounded-xl border border-[#e0e0e0] bg-[#fafafa] dark:border-[#3a3a3a] dark:bg-[#252525]"
+                className="overflow-hidden rounded-xl border border-dash-line bg-dash-surface-2"
               >
                 <div className="flex flex-wrap items-center gap-3 p-3 sm:p-4">
                   <button
@@ -368,11 +368,11 @@ export default function GoogleCalendarConnectionsPanel({
                       {account.googleAccountEmail.charAt(0)}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold text-[#212121] dark:text-[#ffffff]">
+                      <span className="block truncate text-sm font-semibold text-dash-ink">
                         {accountDisplayLabel(account)}
                       </span>
                       {account.scopeType === "company" ? (
-                        <span className="block truncate text-[11px] text-[#9e9e9e]">
+                        <span className="block truncate text-[11px] text-dash-faint">
                           Conectada con {account.googleAccountEmail}
                         </span>
                       ) : null}
@@ -386,7 +386,7 @@ export default function GoogleCalendarConnectionsPanel({
                               <HugeiconsIcon icon={CheckmarkCircle02Icon} size={13} />
                               Conectada
                             </span>
-                            <span className="text-[#9e9e9e]">
+                            <span className="text-dash-faint">
                               {visibleCount} de {account.calendars.length} visibles
                               {!expanded && hiddenCount > 0 ? " · toca para ver todos" : ""}
                             </span>
@@ -403,7 +403,7 @@ export default function GoogleCalendarConnectionsPanel({
                       <HugeiconsIcon
                         icon={ArrowDown01Icon}
                         size={20}
-                        className={`shrink-0 text-[#616161] transition-transform duration-200 dark:text-[#b0b0b0] ${
+                        className={`shrink-0 text-dash-muted transition-transform duration-200 ${
                           expanded ? "rotate-180" : ""
                         }`}
                       />
@@ -443,17 +443,17 @@ export default function GoogleCalendarConnectionsPanel({
                 </div>
 
                 {account.lastSyncError && account.isActive ? (
-                  <p className="border-t border-[#e0e0e0] px-4 py-2 text-xs text-red-600 dark:border-[#3a3a3a] dark:text-red-400">
+                  <p className="border-t border-dash-line px-4 py-2 text-xs text-red-600 dark:text-red-400">
                     {account.lastSyncError}
                   </p>
                 ) : null}
 
                 {!account.isActive ? (
-                  <p className="border-t border-[#e0e0e0] px-4 py-3 text-sm text-[#616161] dark:border-[#3a3a3a] dark:text-[#b0b0b0]">
+                  <p className="border-t border-dash-line px-4 py-3 text-sm text-dash-muted">
                     Google revocó el acceso. Vuelve a conectar la cuenta para seguir sincronizando.
                   </p>
                 ) : expanded ? (
-                  <div className="border-t border-[#e0e0e0] p-3 dark:border-[#3a3a3a] sm:p-4">
+                  <div className="border-t border-dash-line p-3 sm:p-4">
                     {account.calendars.length > 8 ? (
                       <input
                         type="search"
@@ -462,12 +462,12 @@ export default function GoogleCalendarConnectionsPanel({
                           setSearchByAccount((prev) => ({ ...prev, [account.id]: e.target.value }))
                         }
                         placeholder={`Buscar entre ${account.calendars.length} calendarios…`}
-                        className="mb-3 w-full rounded-lg border border-[#e0e0e0] bg-white px-3 py-2 text-sm text-[#212121] outline-none focus:border-orange-500 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-[#ffffff]"
+                        className="mb-3 w-full rounded-lg border border-dash-line bg-dash-surface px-3 py-2 text-sm text-dash-ink outline-none focus:border-orange-500"
                       />
                     ) : null}
 
                     {rows.length === 0 ? (
-                      <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                      <p className="text-sm text-dash-muted">
                         {search
                           ? "Ningún calendario coincide."
                           : "Esta cuenta no tiene calendarios disponibles."}

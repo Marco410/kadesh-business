@@ -51,14 +51,14 @@ export default function AccountManagerSelect({
 
   return (
     <label className="flex flex-col gap-1">
-      <span className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+      <span className="text-xs font-medium text-dash-muted">
         Dueño de cuenta en Kadesh
       </span>
       <select
         value={manager?.id ?? ""}
         disabled={loading}
         onChange={(e) => change(e.target.value)}
-        className="h-11 w-full rounded-xl border border-[#e0e0e0] bg-white px-3 text-sm text-[#212121] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:opacity-60 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white cursor-pointer"
+        className="h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:opacity-60 cursor-pointer"
       >
         <option value="">Sin asignar</option>
         {showsCurrent ? (

@@ -20,8 +20,8 @@ import {
 } from "kadesh/constants/constans";
 
 const inputClassName =
-  "w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
-const labelClassName = "block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5";
+  "w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
+const labelClassName = "block text-sm font-medium text-dash-muted mb-1.5";
 
 function parseNum(raw: string): number | null {
   const t = raw.trim();
@@ -211,16 +211,16 @@ export default function QuotationProductFormModal({
         className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none"
       >
         <div
-          className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-hidden pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a] flex flex-col"
+          className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-hidden pointer-events-auto border border-dash-line flex flex-col"
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
           aria-labelledby="quotation-product-modal-title"
         >
-          <div className="flex justify-between items-center p-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a]">
+          <div className="flex justify-between items-center p-4 border-b border-dash-line bg-dash-surface-2">
             <h4
               id="quotation-product-modal-title"
-              className="text-lg font-bold text-[#212121] dark:text-[#ffffff]"
+              className="text-lg font-bold text-dash-ink"
             >
               {mode === "create"
                 ? "Agregar producto / servicio"
@@ -229,7 +229,7 @@ export default function QuotationProductFormModal({
             <button
               type="button"
               onClick={handleClose}
-              className="text-2xl font-bold text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#ffffff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#e5e5e5] dark:hover:bg-[#333]"
+              className="text-2xl font-bold text-dash-muted hover:text-dash-ink dark:hover:text-[#ffffff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#e5e5e5] dark:hover:bg-[#333]"
               aria-label="Cerrar"
             >
               ×
@@ -349,18 +349,18 @@ export default function QuotationProductFormModal({
               />
             </div>
 
-            <div className="flex gap-2 justify-end pt-2 border-t border-[#e0e0e0] dark:border-[#3a3a3a]">
+            <div className="flex gap-2 justify-end pt-2 border-t border-dash-line">
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-4 py-2 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-[#ffffff] text-sm font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#333]"
+                className="px-4 py-2 rounded-lg border border-dash-line text-dash-ink text-sm font-medium hover:bg-dash-hover"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium hover:bg-orange-600 disabled:opacity-50 disabled:pointer-events-none"
+                className="px-4 py-2 rounded-full dash-grad-accent text-white text-sm font-medium hover:shadow-dash-accent-lift disabled:opacity-50 disabled:pointer-events-none shadow-dash-accent"
               >
                 {saving ? "Guardando…" : mode === "create" ? "Crear" : "Guardar"}
               </button>

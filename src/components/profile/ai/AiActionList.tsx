@@ -52,15 +52,15 @@ export function AiStepTimeline({
             {!isLast ? (
               <span
                 aria-hidden
-                className="absolute bottom-0 left-[15px] top-9 w-px bg-[#e0e0e0] dark:bg-[#3a3a3a]"
+                className="absolute bottom-0 left-[15px] top-9 w-px bg-dash-surface-3"
               />
             ) : null}
             <span className="ai-urim-fill relative flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold shadow-sm">
               {index + 1}
             </span>
-            <div className="min-w-0 flex-1 rounded-xl border border-[#ececec] bg-[#fafafa] p-3 dark:border-[#2e2e2e] dark:bg-[#252525]">
+            <div className="min-w-0 flex-1 rounded-xl border border-dash-line bg-dash-surface-2 p-3 dark:border-[#2e2e2e]">
               <AiKindChip kind={kind} />
-              <p className="mt-1.5 font-semibold leading-snug text-[#212121] dark:text-white">
+              <p className="mt-1.5 font-semibold leading-snug text-dash-ink">
                 {item.title}
               </p>
               <div className="mt-1">
@@ -104,7 +104,7 @@ export function AiTipGrid({
         return (
           <motion.li
             key={`${item.title}-${index}`}
-            className="flex h-full flex-col rounded-xl border border-[#ececec] bg-[#fafafa] p-3.5 dark:border-[#2e2e2e] dark:bg-[#252525]"
+            className="flex h-full flex-col rounded-xl border border-dash-line bg-dash-surface-2 p-3.5 dark:border-[#2e2e2e]"
             variants={aiFadeUpVariants(reduce)}
             transition={aiMotionTransition(reduce)}
           >
@@ -116,7 +116,7 @@ export function AiTipGrid({
                 {meta.label}
               </span>
             </div>
-            <p className="mt-2 font-semibold leading-snug text-[#212121] dark:text-white">
+            <p className="mt-2 font-semibold leading-snug text-dash-ink">
               {item.title}
             </p>
             <div className="mt-1">

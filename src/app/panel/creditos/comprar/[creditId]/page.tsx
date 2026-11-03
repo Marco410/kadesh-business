@@ -1,16 +1,14 @@
 "use client";
 
-import { Footer, Navigation } from "kadesh/components/layout";
+import PanelShell from "kadesh/components/panel/PanelShell";
 import StripeCreditPurchaseWrapper from "kadesh/components/panel/creditos/StripeCreditPurchaseWrapper";
 
 export default function CompraCreditosPage() {
   return (
-    <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#121212]">
-      <Navigation />
-      <main className="mx-auto max-w-7xl px-4 py-8 pt-20 sm:px-6 lg:px-8">
+    <PanelShell selectedTab="creditos" title="Comprar créditos">
+      <div className="mx-auto max-w-7xl">
         <StripeCreditPurchaseWrapper />
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </PanelShell>
   );
 }

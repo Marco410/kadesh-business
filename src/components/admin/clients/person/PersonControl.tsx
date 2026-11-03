@@ -20,7 +20,7 @@ import {
 
 const MIN_REASON = 5;
 const fieldClass =
-  "w-full rounded-xl border border-[#e0e0e0] bg-white px-3 py-2.5 text-sm text-[#212121] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white";
+  "w-full rounded-xl border border-dash-line bg-dash-surface px-3 py-2.5 text-sm text-dash-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
 const buttonClass =
   "h-11 rounded-xl px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer";
 
@@ -38,13 +38,13 @@ function Block({
   return (
     <section
       className={`rounded-2xl border p-4 ${
-        danger ? "border-red-300 dark:border-red-500/40" : "border-[#e0e0e0] dark:border-[#3a3a3a]"
+        danger ? "border-red-300 dark:border-red-500/40" : "border-dash-line"
       }`}
     >
-      <h4 className={`text-sm font-semibold ${danger ? "text-red-700 dark:text-red-400" : "text-[#212121] dark:text-white"}`}>
+      <h4 className={`text-sm font-semibold ${danger ? "text-red-700 dark:text-red-400" : "text-dash-ink"}`}>
         {title}
       </h4>
-      <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">{description}</p>
+      <p className="mt-1 text-xs text-dash-muted">{description}</p>
       <div className="mt-3">{children}</div>
     </section>
   );
@@ -190,7 +190,7 @@ export default function PersonControl({ userId }: { userId: string }) {
 
   if (person.anonymizedAt) {
     return (
-      <p className="rounded-xl bg-black/5 px-4 py-3 text-sm text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]">
+      <p className="rounded-xl bg-dash-surface-2 px-4 py-3 text-sm text-dash-muted">
         Cuenta anonimizada el {formatDateShort(person.anonymizedAt, false)}: sus datos personales se
         borraron y ya no puede entrar.
       </p>
@@ -199,7 +199,7 @@ export default function PersonControl({ userId }: { userId: string }) {
 
   if (isKadesh) {
     return (
-      <p className="rounded-xl bg-black/5 px-4 py-3 text-sm text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]">
+      <p className="rounded-xl bg-dash-surface-2 px-4 py-3 text-sm text-dash-muted">
         {name} es del equipo de Kadesh: no se puede suspender, ver como ni anonimizar desde aquí.
       </p>
     );
@@ -237,7 +237,7 @@ export default function PersonControl({ userId }: { userId: string }) {
             type="button"
             onClick={viewAs}
             disabled={starting || viewReason.trim().length < MIN_REASON || Boolean(person.suspendedAt) || companySuspended}
-            className={`${buttonClass} bg-orange-500 text-white hover:bg-orange-600 sm:self-start`}
+            className={`${buttonClass} dash-grad-accent text-white hover:shadow-dash-accent-lift sm:self-start shadow-dash-accent`}
           >
             Ver como {person.name || "esta persona"}
           </button>
@@ -269,7 +269,7 @@ export default function PersonControl({ userId }: { userId: string }) {
             disabled={suspending || (!person.suspendedAt && suspendReason.trim().length < MIN_REASON)}
             className={`${buttonClass} sm:self-start ${
               person.suspendedAt
-                ? "border border-[#e0e0e0] text-[#212121] dark:border-[#3a3a3a] dark:text-white"
+                ? "border border-dash-line text-dash-ink"
                 : "bg-red-600 text-white hover:bg-red-700"
             }`}
           >
@@ -286,7 +286,7 @@ export default function PersonControl({ userId }: { userId: string }) {
           type="button"
           onClick={revokeSessions}
           disabled={revoking}
-          className={`${buttonClass} border border-[#e0e0e0] text-[#212121] dark:border-[#3a3a3a] dark:text-white`}
+          className={`${buttonClass} border border-dash-line text-dash-ink`}
         >
           Cerrar sesiones
         </button>
@@ -300,7 +300,7 @@ export default function PersonControl({ userId }: { userId: string }) {
           type="button"
           onClick={exportPersonData}
           disabled={exporting}
-          className={`${buttonClass} border border-[#e0e0e0] text-[#212121] dark:border-[#3a3a3a] dark:text-white`}
+          className={`${buttonClass} border border-dash-line text-dash-ink`}
         >
           {exporting ? "Preparando…" : "Descargar sus datos"}
         </button>

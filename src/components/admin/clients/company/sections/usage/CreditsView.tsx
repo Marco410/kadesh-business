@@ -55,7 +55,7 @@ export default function CreditsView({ companyId }: { companyId: string }) {
         ) : periods.loading && periodRows.length === 0 ? (
           <AdminLoadingRows rows={3} />
         ) : periodRows.length === 0 ? (
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="text-sm text-dash-muted">
             Todavía no hay meses registrados. El primero se abre cuando usan o consultan créditos.
           </p>
         ) : (
@@ -67,10 +67,10 @@ export default function CreditsView({ companyId }: { companyId: string }) {
               return (
                 <li key={p.id}>
                   <div className="flex items-baseline justify-between gap-3">
-                    <p className="text-sm font-medium capitalize text-[#212121] dark:text-white">
+                    <p className="text-sm font-medium capitalize text-dash-ink">
                       {monthLabel(p.year, p.month)}
                     </p>
-                    <p className="text-xs tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+                    <p className="text-xs tabular-nums text-dash-muted">
                       {formatCredits(used)} usados de {formatCredits(plan + bonus)}
                       {bonus ? ` (${formatCredits(bonus)} extra)` : ""}
                     </p>
@@ -90,7 +90,7 @@ export default function CreditsView({ companyId }: { companyId: string }) {
       </AdminSectionCard>
 
       <div className="flex flex-col gap-3">
-        <h3 className="text-sm font-semibold text-[#212121] dark:text-white">Movimientos</h3>
+        <h3 className="text-sm font-semibold text-dash-ink">Movimientos</h3>
         {ledger.error ? (
           <AdminErrorState message={ledger.error.message} />
         ) : ledger.loading && rows.length === 0 ? (
@@ -104,7 +104,7 @@ export default function CreditsView({ companyId }: { companyId: string }) {
           <>
             <div className={`${surfaceClass} relative overflow-x-auto`}>
               <table className="w-full min-w-[720px] text-left text-sm">
-                <thead className="border-b border-[#e8e8e8] text-xs uppercase tracking-wide text-[#616161] dark:border-[#333] dark:text-[#b0b0b0]">
+                <thead className="border-b border-dash-line text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                   <tr>
                     <th className="px-4 py-3">Fecha</th>
                     <th className="px-4 py-3">Tipo</th>
@@ -113,13 +113,13 @@ export default function CreditsView({ companyId }: { companyId: string }) {
                     <th className="px-4 py-3">Notas</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+                <tbody className="divide-y divide-dash-line">
                   {rows.map((row) => (
                     <tr key={row.id}>
-                      <td className="whitespace-nowrap px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                      <td className="whitespace-nowrap px-4 py-3 text-dash-muted">
                         {formatDateShort(row.createdAt, true)}
                       </td>
-                      <td className="px-4 py-3 font-medium text-[#212121] dark:text-white">
+                      <td className="px-4 py-3 font-medium text-dash-ink">
                         {CREDIT_LEDGER_TYPE_LABELS[row.type] ?? row.type}
                       </td>
                       <td
@@ -132,10 +132,10 @@ export default function CreditsView({ companyId }: { companyId: string }) {
                         {row.amount > 0 ? "+" : ""}
                         {formatCredits(row.amount)}
                       </td>
-                      <td className="px-4 py-3 tabular-nums text-[#212121] dark:text-white">
+                      <td className="px-4 py-3 tabular-nums text-dash-ink">
                         {row.balanceAfter != null ? formatCredits(row.balanceAfter) : "—"}
                       </td>
-                      <td className="max-w-[280px] truncate px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                      <td className="max-w-[280px] truncate px-4 py-3 text-dash-muted">
                         {row.notes ?? "—"}
                       </td>
                     </tr>

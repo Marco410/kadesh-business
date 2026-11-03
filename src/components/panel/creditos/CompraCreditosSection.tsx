@@ -50,7 +50,7 @@ const CREDIT_SUMMARY_FEATURES = [
 ] as const;
 
 const inputBase =
-  "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-4 py-2.5 text-sm text-[#212121] dark:text-[#ffffff] placeholder:text-[#9e9e9e] dark:placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent";
+  "w-full rounded-xl border border-dash-line bg-dash-surface px-4 py-2.5 text-sm text-dash-ink placeholder:text-dash-faint dark:placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent";
 
 const cardElementOptionsLight = {
   style: {
@@ -137,18 +137,18 @@ export default function CompraCreditosSection() {
       <div className="mx-auto max-w-lg space-y-6">
         <Link
           href={Routes.panelCredits}
-          className="inline-flex items-center gap-1.5 text-sm text-[#616161] hover:text-orange-500 dark:text-[#b0b0b0] dark:hover:text-orange-400"
+          className="inline-flex items-center gap-1.5 text-sm text-dash-muted hover:text-orange-500 dark:hover:text-orange-400"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
           Volver a créditos
         </Link>
-        <div className="rounded-2xl border border-[#e0e0e0] bg-white p-6 text-center dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
-          <p className="text-[#616161] dark:text-[#b0b0b0]">
+        <div className="rounded-3xl border border-dash-line bg-dash-surface p-6 text-center">
+          <p className="text-dash-muted">
             Identificador de paquete no válido.
           </p>
           <Link
             href={Routes.panelCredits}
-            className="mt-4 inline-block rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+            className="mt-4 inline-block rounded-full dash-grad-accent px-4 py-2 text-sm font-medium text-white hover:shadow-dash-accent-lift shadow-dash-accent"
           >
             Ver paquetes
           </Link>
@@ -170,7 +170,7 @@ export default function CompraCreditosSection() {
       <div className="mx-auto max-w-lg space-y-6">
         <Link
           href={Routes.panelCredits}
-          className="inline-flex items-center gap-1.5 text-sm text-[#616161] hover:text-orange-500 dark:text-[#b0b0b0] dark:hover:text-orange-400"
+          className="inline-flex items-center gap-1.5 text-sm text-dash-muted hover:text-orange-500 dark:hover:text-orange-400"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
           Volver a créditos
@@ -183,7 +183,7 @@ export default function CompraCreditosSection() {
           </p>
           <Link
             href={Routes.panelCredits}
-            className="mt-4 inline-block rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+            className="mt-4 inline-block rounded-full dash-grad-accent px-4 py-2 text-sm font-medium text-white hover:shadow-dash-accent-lift shadow-dash-accent"
           >
             Ver paquetes
           </Link>
@@ -209,17 +209,17 @@ export default function CompraCreditosSection() {
     <div className="mx-auto w-full max-w-5xl space-y-8">
       <Link
         href={Routes.panelCredits}
-        className="inline-flex items-center gap-1.5 text-sm text-[#616161] hover:text-orange-500 dark:text-[#b0b0b0] dark:hover:text-orange-400"
+        className="inline-flex items-center gap-1.5 text-sm text-dash-muted hover:text-orange-500 dark:hover:text-orange-400"
       >
         <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
         Volver a créditos
       </Link>
 
       <section className="text-center">
-        <h1 className="text-2xl font-bold text-[#212121] dark:text-[#ffffff]">
+        <h1 className="text-2xl font-bold text-dash-ink">
           Comprar créditos extra
         </h1>
-        <p className="mt-1 text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-1 text-dash-muted">
           Revisa el resumen del paquete e ingresa tu método de pago.
         </p>
       </section>
@@ -240,7 +240,7 @@ export default function CompraCreditosSection() {
           )}
 
           <div className="text-center">
-            <h2 className="text-xl font-bold text-[#212121] dark:text-[#ffffff]">
+            <h2 className="text-xl font-bold text-dash-ink">
               {credit.name}
             </h2>
             {!isActive && (
@@ -255,20 +255,20 @@ export default function CompraCreditosSection() {
                 </span>
               )}
               <p className="flex items-baseline justify-center gap-1 whitespace-nowrap">
-                <span className="text-3xl font-bold tabular-nums text-[#212121] dark:text-[#ffffff]">
+                <span className="text-3xl font-bold tabular-nums text-dash-ink">
                   {formatPrice(credit.cost, credit.currency)}
                 </span>
-                <span className="shrink-0 text-xs font-medium text-[#616161] dark:text-[#757575]">
+                <span className="shrink-0 text-xs font-medium text-dash-muted dark:text-[#757575]">
                   {credit.currency}
                 </span>
-                <span className="text-[#616161] dark:text-[#b0b0b0]">
+                <span className="text-dash-muted">
                   / {formatPeriod(credit.frequency)}
                 </span>
               </p>
             </div>
-            <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-2 text-sm text-dash-muted">
               Recibes{" "}
-              <strong className="text-[#212121] dark:text-[#e0e0e0]">
+              <strong className="text-dash-ink dark:text-[#e0e0e0]">
                 {formatCredits(credit.creditsToAdd)}
               </strong>{" "}
               créditos extra para extraer leads
@@ -283,7 +283,7 @@ export default function CompraCreditosSection() {
                   size={20}
                   className="shrink-0 text-orange-500 dark:text-orange-400"
                 />
-                <span className="text-[#212121] dark:text-[#e0e0e0]">
+                <span className="text-dash-ink dark:text-[#e0e0e0]">
                   {feature}
                 </span>
               </li>
@@ -300,8 +300,8 @@ export default function CompraCreditosSection() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#e0e0e0] bg-white p-6 sm:p-8 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
-          <h3 className="flex items-center gap-2 text-lg font-bold text-[#212121] dark:text-[#ffffff]">
+        <div className="rounded-3xl border border-dash-line bg-dash-surface p-6 sm:p-8">
+          <h3 className="flex items-center gap-2 text-lg font-bold text-dash-ink">
             <span
               className="flex size-9 items-center justify-center rounded-lg bg-orange-500/15 text-orange-500 dark:bg-orange-500/20 dark:text-orange-400"
               aria-hidden
@@ -322,7 +322,7 @@ export default function CompraCreditosSection() {
             </span>
             Método de pago
           </h3>
-          <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1 text-sm text-dash-muted">
             Ingresa los datos de tu tarjeta para confirmar la compra.
           </p>
 
@@ -330,7 +330,7 @@ export default function CompraCreditosSection() {
             <div>
               <label
                 htmlFor="cardName"
-                className="mb-1.5 block text-sm font-medium text-[#212121] dark:text-[#e0e0e0]"
+                className="mb-1.5 block text-sm font-medium text-dash-ink dark:text-[#e0e0e0]"
               >
                 Nombre en la tarjeta
               </label>
@@ -350,20 +350,20 @@ export default function CompraCreditosSection() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#212121] dark:text-[#e0e0e0]">
+              <label className="mb-1.5 block text-sm font-medium text-dash-ink dark:text-[#e0e0e0]">
                 Datos de la tarjeta
               </label>
-              <div className="rounded-xl border border-[#e0e0e0] bg-white px-4 py-3 focus-within:border-transparent focus-within:ring-2 focus-within:ring-orange-500 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
+              <div className="rounded-xl border border-dash-line bg-dash-surface px-4 py-3 focus-within:border-transparent focus-within:ring-2 focus-within:ring-orange-500">
                 <CardElement options={cardElementOptions} />
               </div>
             </div>
             <div>
               <label
                 htmlFor="notes"
-                className="mb-1.5 block text-sm font-medium text-[#212121] dark:text-[#e0e0e0]"
+                className="mb-1.5 block text-sm font-medium text-dash-ink dark:text-[#e0e0e0]"
               >
                 Notas{" "}
-                <span className="text-[#9e9e9e] dark:text-[#666]">
+                <span className="text-dash-faint dark:text-[#666]">
                   (opcional)
                 </span>
               </label>
@@ -382,9 +382,9 @@ export default function CompraCreditosSection() {
                 type="checkbox"
                 checked={acceptTerms}
                 onChange={(e) => setAcceptTerms(e.target.checked)}
-                className="mt-1 size-4 rounded border-[#e0e0e0] text-orange-500 focus:ring-orange-500 dark:border-[#3a3a3a]"
+                className="mt-1 size-4 rounded border-dash-line text-orange-500 focus:ring-orange-500"
               />
-              <span className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <span className="text-sm text-dash-muted">
                 Acepto los términos y autorizo el cargo único por este paquete
                 de créditos.
               </span>
@@ -392,7 +392,7 @@ export default function CompraCreditosSection() {
 
             <div className="flex flex-col gap-3 pt-2">
               {(loadingPayment || redirecting) && (
-                <p className="text-center text-sm text-[#616161] dark:text-[#b0b0b0]">
+                <p className="text-center text-sm text-dash-muted">
                   {redirecting
                     ? "Redirigiendo a la confirmación…"
                     : "Procesando el pago…"}
@@ -422,7 +422,7 @@ export default function CompraCreditosSection() {
               </button>
               <Link
                 href={Routes.panelCredits}
-                className="w-full rounded-xl border-2 border-[#e0e0e0] px-6 py-3 text-center text-sm font-semibold text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
+                className="w-full rounded-xl border-2 border-dash-line px-6 py-3 text-center text-sm font-semibold text-dash-ink transition-colors hover:bg-dash-hover dark:text-[#e0e0e0]"
               >
                 Cancelar
               </Link>

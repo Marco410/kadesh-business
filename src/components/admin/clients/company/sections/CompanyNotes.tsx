@@ -105,10 +105,10 @@ export default function CompanyNotes({ companyId }: { companyId: string }) {
             onChange={(e) => setBody(e.target.value)}
             rows={4}
             placeholder="Ej.: Llamamos el lunes, quieren probar WhatsApp antes de pagar. Les extendimos 7 días."
-            className="w-full rounded-xl border border-[#e0e0e0] bg-white px-3 py-2.5 text-sm text-[#212121] placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white"
+            className="w-full rounded-xl border border-dash-line bg-dash-surface px-3 py-2.5 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
           />
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <label className="inline-flex min-h-11 items-center gap-2 text-sm text-[#616161] dark:text-[#b0b0b0] cursor-pointer">
+            <label className="inline-flex min-h-11 items-center gap-2 text-sm text-dash-muted cursor-pointer">
               <input
                 type="checkbox"
                 checked={pinned}
@@ -120,7 +120,7 @@ export default function CompanyNotes({ companyId }: { companyId: string }) {
             <button
               type="submit"
               disabled={saving || !body.trim()}
-              className="h-11 rounded-xl bg-orange-500 px-5 text-sm font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+              className="h-11 rounded-full dash-grad-accent px-5 text-sm font-semibold text-white hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer shadow-dash-accent"
             >
               Guardar nota
             </button>
@@ -143,14 +143,14 @@ export default function CompanyNotes({ companyId }: { companyId: string }) {
             <li
               key={note.id}
               className={cn(
-                "rounded-2xl border bg-white p-4 dark:bg-[#1e1e1e]",
+                "rounded-2xl border bg-dash-surface p-4",
                 note.pinned
                   ? "border-orange-300 dark:border-orange-500/40"
-                  : "border-[#e0e0e0] dark:border-[#3a3a3a]",
+                  : "border-dash-line",
               )}
             >
               <div className="flex items-start justify-between gap-3">
-                <p className="min-w-0 whitespace-pre-wrap break-words text-sm text-[#212121] dark:text-white">
+                <p className="min-w-0 whitespace-pre-wrap break-words text-sm text-dash-ink">
                   {note.body}
                 </p>
                 <div className="flex shrink-0 items-center">
@@ -160,8 +160,8 @@ export default function CompanyNotes({ companyId }: { companyId: string }) {
                     aria-label={note.pinned ? "Desfijar nota" : "Fijar nota"}
                     aria-pressed={Boolean(note.pinned)}
                     className={cn(
-                      "inline-flex h-11 w-11 items-center justify-center rounded-xl hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer",
-                      note.pinned ? "text-orange-600 dark:text-orange-400" : "text-[#9e9e9e]",
+                      "inline-flex h-11 w-11 items-center justify-center rounded-xl hover:bg-dash-hover cursor-pointer",
+                      note.pinned ? "text-orange-600 dark:text-orange-400" : "text-dash-faint",
                     )}
                   >
                     <HugeiconsIcon icon={PinIcon} size={18} />
@@ -170,13 +170,13 @@ export default function CompanyNotes({ companyId }: { companyId: string }) {
                     type="button"
                     onClick={() => remove(note)}
                     aria-label="Borrar nota"
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-[#9e9e9e] hover:bg-red-500/10 hover:text-red-600 cursor-pointer"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-dash-faint hover:bg-red-500/10 hover:text-red-600 cursor-pointer"
                   >
                     <HugeiconsIcon icon={Delete02Icon} size={18} />
                   </button>
                 </div>
               </div>
-              <p className="mt-2 text-xs text-[#9e9e9e]">
+              <p className="mt-2 text-xs text-dash-faint">
                 {note.author ? formatPersonName(note.author.name, note.author.lastName) : "Kadesh"}
                 {note.createdAt ? ` · ${formatDate(note.createdAt)}` : ""}
                 {note.pinned ? " · Fijada" : ""}

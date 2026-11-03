@@ -159,7 +159,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
   };
 
   return (
-    <div className="flex h-[70vh] min-h-[420px] overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
+    <div className="flex h-[70vh] min-h-[420px] overflow-hidden rounded-3xl border border-dash-line bg-dash-surface shadow-sm">
       <WhatsAppNewConversationModal
         isOpen={isNewModalOpen}
         onClose={() => setIsNewModalOpen(false)}
@@ -201,18 +201,18 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
       ) : null}
 
       <aside
-        className={`w-full shrink-0 flex-col border-r border-[#e0e0e0] dark:border-[#3a3a3a] sm:flex sm:w-80 ${
+        className={`w-full shrink-0 flex-col border-r border-dash-line sm:flex sm:w-80 ${
           selected ? "hidden" : "flex"
         }`}
       >
-        <div className="flex items-center justify-between gap-2 border-b border-[#e0e0e0] p-4 dark:border-[#3a3a3a]">
-          <h3 className="text-sm font-semibold text-[#212121] dark:text-white">
+        <div className="flex items-center justify-between gap-2 border-b border-dash-line p-4">
+          <h3 className="text-sm font-semibold text-dash-ink">
             Conversaciones
           </h3>
           <button
             type="button"
             onClick={() => setIsNewModalOpen(true)}
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-orange-500 px-3 text-xs font-semibold text-white hover:bg-orange-600"
+            className="inline-flex h-9 items-center gap-1.5 rounded-full dash-grad-accent px-3 text-xs font-semibold text-white hover:shadow-dash-accent-lift shadow-dash-accent"
           >
             <HugeiconsIcon icon={Add01Icon} size={14} />
             Nueva
@@ -233,7 +233,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
               <span className="flex size-10 items-center justify-center rounded-xl bg-[#25D366]/15 text-[#25D366]">
                 <HugeiconsIcon icon={WhatsappIcon} size={18} />
               </span>
-              <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <p className="text-sm text-dash-muted">
                 Todavía no hay conversaciones. Empieza una con &quot;Nueva&quot;.
               </p>
             </div>
@@ -259,7 +259,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
                           phone: c.phone,
                         })
                       }
-                      className={`flex w-full flex-col gap-0.5 border-b border-[#f0f0f0] px-4 py-3 text-left transition-colors dark:border-[#2a2a2a] ${
+                      className={`flex w-full flex-col gap-0.5 border-b border-dash-line px-4 py-3 text-left transition-colors ${
                         isSelected
                           ? "bg-orange-500/10"
                           : "hover:bg-black/[0.03] dark:hover:bg-white/5"
@@ -271,10 +271,10 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
                             <HugeiconsIcon
                               icon={UserGroupIcon}
                               size={14}
-                              className="shrink-0 text-[#616161] dark:text-[#b0b0b0]"
+                              className="shrink-0 text-dash-muted"
                             />
                           ) : null}
-                          <span className="truncate text-sm font-semibold text-[#212121] dark:text-white">
+                          <span className="truncate text-sm font-semibold text-dash-ink">
                             {c.name}
                           </span>
                         </span>
@@ -283,16 +283,16 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
                             Nuevo
                           </span>
                         ) : (
-                          <span className="shrink-0 text-[11px] text-[#9e9e9e]">
+                          <span className="shrink-0 text-[11px] text-dash-faint">
                             {formatDateShort(c.lastMessageAt)}
                           </span>
                         )}
                       </span>
-                      <span className="truncate text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <span className="truncate text-xs text-dash-muted">
                         {preview}
                       </span>
                       {c.kind === "team" ? (
-                        <span className="text-[11px] font-medium text-[#616161] dark:text-[#b0b0b0]">
+                        <span className="text-[11px] font-medium text-dash-muted">
                           Chat interno
                         </span>
                       ) : c.kind === "phone" ? (
@@ -300,7 +300,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
                           Número nuevo · aún no es cliente
                         </span>
                       ) : c.assignedToName ? (
-                        <span className="truncate text-[11px] text-[#616161] dark:text-[#b0b0b0]">
+                        <span className="truncate text-[11px] text-dash-muted">
                           Asignado a {c.assignedToName}
                         </span>
                       ) : canAssign ? (
@@ -322,11 +322,11 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
       >
         {selected ? (
           <>
-            <div className="flex flex-wrap items-center gap-2 border-b border-[#e0e0e0] p-4 dark:border-[#3a3a3a]">
+            <div className="flex flex-wrap items-center gap-2 border-b border-dash-line p-4">
               <button
                 type="button"
                 onClick={() => setSelected(null)}
-                className="rounded-lg p-1.5 text-[#616161] hover:bg-black/5 sm:hidden dark:text-[#b0b0b0] dark:hover:bg-white/10"
+                className="rounded-lg p-1.5 text-dash-muted hover:bg-dash-hover sm:hidden"
                 aria-label="Volver a conversaciones"
               >
                 <HugeiconsIcon icon={ArrowLeft01Icon} size={18} />
@@ -336,23 +336,23 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
                   <Link
                     href={Routes.panelLead(selected.target.id)}
                     title="Ver detalles del cliente"
-                    className="truncate text-sm font-semibold text-[#212121] hover:text-orange-500 hover:underline dark:text-white dark:hover:text-orange-400"
+                    className="truncate text-sm font-semibold text-dash-ink hover:text-orange-500 hover:underline dark:hover:text-orange-400"
                   >
                     {selected.name}
                   </Link>
                 ) : (
-                  <h3 className="truncate text-sm font-semibold text-[#212121] dark:text-white">
+                  <h3 className="truncate text-sm font-semibold text-dash-ink">
                     {selected.name}
                   </h3>
                 )}
                 {chatPhone ? (
-                  <span className="shrink-0 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <span className="shrink-0 text-xs text-dash-muted">
                     {chatPhone}
                   </span>
                 ) : null}
               </div>
               {selected.target.kind === "team" ? (
-                <span className="rounded-full bg-black/5 px-2 py-0.5 text-[11px] font-medium text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]">
+                <span className="rounded-full bg-dash-surface-2 px-2 py-0.5 text-[11px] font-medium text-dash-muted">
                   Chat interno
                 </span>
               ) : selected.target.kind === "phone" ? (
@@ -360,19 +360,19 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
                   <button
                     type="button"
                     onClick={() => setIsSaveContactOpen(true)}
-                    className="ml-auto h-9 rounded-lg bg-orange-500 px-3 text-xs font-semibold text-white hover:bg-orange-600"
+                    className="ml-auto h-9 rounded-full dash-grad-accent px-3 text-xs font-semibold text-white hover:shadow-dash-accent-lift shadow-dash-accent"
                   >
                     Guardar como cliente
                   </button>
                 ) : null
               ) : canAssign ? (
-                <label className="ml-auto flex items-center gap-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                <label className="ml-auto flex items-center gap-2 text-xs text-dash-muted">
                   <span className="hidden sm:inline">Asignado a</span>
                   <select
                     value={selectedRow?.assignedToId ?? ""}
                     disabled={assigning}
                     onChange={(e) => void handleAssign(e.target.value || null)}
-                    className="h-9 max-w-44 rounded-lg border border-[#e0e0e0] bg-white px-2 text-xs text-[#212121] disabled:opacity-60 dark:border-[#3a3a3a] dark:bg-[#121212] dark:text-white"
+                    className="h-9 max-w-44 rounded-lg border border-dash-line bg-dash-surface px-2 text-xs text-dash-ink disabled:opacity-60"
                   >
                     <option value="">Nadie (solo admins)</option>
                     {teamMembers.map((member) => (
@@ -383,7 +383,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
                   </select>
                 </label>
               ) : selectedRow?.assignedToName ? (
-                <span className="ml-auto text-xs text-[#616161] dark:text-[#b0b0b0]">
+                <span className="ml-auto text-xs text-dash-muted">
                   Asignado a {selectedRow.assignedToName}
                 </span>
               ) : null}
@@ -399,7 +399,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
             <span className="flex size-12 items-center justify-center rounded-xl bg-[#25D366]/15 text-[#25D366]">
               <HugeiconsIcon icon={WhatsappIcon} size={22} />
             </span>
-            <p className="max-w-xs text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="max-w-xs text-sm text-dash-muted">
               Elige una conversación de la izquierda, o empieza una nueva.
             </p>
           </div>

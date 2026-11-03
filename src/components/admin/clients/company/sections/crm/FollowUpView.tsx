@@ -29,8 +29,8 @@ function Row({ title, meta, aside }: { title: ReactNode; meta: ReactNode; aside?
   return (
     <li className="flex items-start justify-between gap-3 py-2">
       <div className="min-w-0">
-        <p className="text-sm font-medium text-[#212121] dark:text-white">{title}</p>
-        <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">{meta}</p>
+        <p className="text-sm font-medium text-dash-ink">{title}</p>
+        <p className="text-xs text-dash-muted">{meta}</p>
       </div>
       {aside ? <div className="shrink-0">{aside}</div> : null}
     </li>
@@ -38,7 +38,7 @@ function Row({ title, meta, aside }: { title: ReactNode; meta: ReactNode; aside?
 }
 
 function Empty({ text }: { text: string }) {
-  return <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">{text}</p>;
+  return <p className="text-sm text-dash-muted">{text}</p>;
 }
 
 /** Lo que el equipo registró en el CRM: actividades, seguimientos, tareas y propuestas. */
@@ -66,7 +66,7 @@ export default function FollowUpView({ companyId }: { companyId: string }) {
         {data.techSalesActivities.length === 0 ? (
           <Empty text="Sin actividades registradas." />
         ) : (
-          <ul className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+          <ul className="divide-y divide-dash-line">
             {data.techSalesActivities.map((a) => (
               <Row
                 key={a.id}
@@ -91,7 +91,7 @@ export default function FollowUpView({ companyId }: { companyId: string }) {
         {data.techFollowUpTasks.length === 0 ? (
           <Empty text="Sin seguimientos." />
         ) : (
-          <ul className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+          <ul className="divide-y divide-dash-line">
             {data.techFollowUpTasks.map((f) => {
               const overdue =
                 f.status === FOLLOW_UP_PENDING &&
@@ -114,7 +114,7 @@ export default function FollowUpView({ companyId }: { companyId: string }) {
                       className={cn(
                         overdue
                           ? "bg-red-500/15 text-red-700 dark:text-red-300"
-                          : "bg-black/5 text-[#424242] dark:bg-white/10 dark:text-[#e0e0e0]",
+                          : "bg-dash-surface-2 text-dash-soft",
                       )}
                     />
                   }
@@ -129,7 +129,7 @@ export default function FollowUpView({ companyId }: { companyId: string }) {
         {data.techTasks.length === 0 ? (
           <Empty text="Sin tareas." />
         ) : (
-          <ul className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+          <ul className="divide-y divide-dash-line">
             {data.techTasks.map((t) => (
               <Row
                 key={t.id}
@@ -145,7 +145,7 @@ export default function FollowUpView({ companyId }: { companyId: string }) {
                   t.priority ? (
                     <AdminStatusBadge
                       label={t.priority}
-                      className="bg-black/5 text-[#424242] dark:bg-white/10 dark:text-[#e0e0e0]"
+                      className="bg-dash-surface-2 text-dash-soft"
                     />
                   ) : null
                 }
@@ -159,7 +159,7 @@ export default function FollowUpView({ companyId }: { companyId: string }) {
         {data.techProposals.length === 0 ? (
           <Empty text="Sin propuestas." />
         ) : (
-          <ul className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+          <ul className="divide-y divide-dash-line">
             {data.techProposals.map((p) => (
               <Row
                 key={p.id}
@@ -175,7 +175,7 @@ export default function FollowUpView({ companyId }: { companyId: string }) {
                 aside={
                   <AdminStatusBadge
                     label={p.status ?? "—"}
-                    className="bg-black/5 text-[#424242] dark:bg-white/10 dark:text-[#e0e0e0]"
+                    className="bg-dash-surface-2 text-dash-soft"
                   />
                 }
               />

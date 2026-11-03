@@ -19,9 +19,9 @@ type Mode = "suspend" | "reactivate" | "revoke" | "transfer" | null;
 const MIN_REASON = 5;
 
 const secondaryButton =
-  "inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-[#e0e0e0] px-4 text-sm font-semibold text-[#212121] hover:border-orange-300 dark:border-[#3a3a3a] dark:text-white cursor-pointer";
+  "inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-dash-line px-4 text-sm font-semibold text-dash-ink hover:border-orange-300 cursor-pointer";
 const fieldClass =
-  "w-full rounded-xl border border-[#e0e0e0] bg-white px-3 py-2.5 text-sm text-[#212121] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white";
+  "w-full rounded-xl border border-dash-line bg-dash-surface px-3 py-2.5 text-sm text-dash-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
 
 /**
  * Acceso de la empresa: suspender o reactivar (nadie del equipo entra), cerrar las sesiones
@@ -106,7 +106,7 @@ export default function CompanyControl({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">Acceso de la cuenta</p>
+      <p className="text-xs font-medium text-dash-muted">Acceso de la cuenta</p>
       {suspended ? (
         <div className="rounded-xl bg-red-500/10 px-3 py-2 text-xs text-red-800 dark:text-red-300">
           <p className="font-semibold">
@@ -147,13 +147,13 @@ export default function CompanyControl({
         >
           {mode === "suspend" ? (
             <>
-              <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <p className="text-sm text-dash-muted">
                 Nadie del equipo podrá entrar y se cierran las sesiones abiertas. Al iniciar sesión
                 verán un aviso para escribir a Kadesh. Sus datos no se borran y el cobro en Stripe
                 sigue igual: si hay que cancelarlo, hazlo aparte.
               </p>
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+                <span className="text-xs font-medium text-dash-muted">
                   Motivo (interno, mínimo {MIN_REASON} letras)
                 </span>
                 <textarea
@@ -168,13 +168,13 @@ export default function CompanyControl({
             </>
           ) : null}
           {mode === "reactivate" ? (
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="text-sm text-dash-muted">
               El equipo podrá volver a iniciar sesión. Tendrán que entrar de nuevo: sus sesiones
               anteriores se cerraron al suspender.
             </p>
           ) : null}
           {mode === "revoke" ? (
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="text-sm text-dash-muted">
               Todas las personas de {company.name} tendrán que volver a iniciar sesión en todos
               sus dispositivos. Úsalo si sospechas que alguien compartió su cuenta o perdió un
               equipo.
@@ -182,12 +182,12 @@ export default function CompanyControl({
           ) : null}
           {mode === "transfer" ? (
             <>
-              <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <p className="text-sm text-dash-muted">
                 La persona elegida queda como administradora de la empresa. La facturación no
                 cambia: la tarjeta y el cliente de Stripe siguen siendo de quien pagó.
               </p>
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">Nuevo dueño</span>
+                <span className="text-xs font-medium text-dash-muted">Nuevo dueño</span>
                 <select
                   value={newOwnerId}
                   onChange={(e) => setNewOwnerId(e.target.value)}
@@ -202,7 +202,7 @@ export default function CompanyControl({
                   ))}
                 </select>
               </label>
-              <label className="inline-flex min-h-11 items-center gap-2 text-sm text-[#616161] dark:text-[#b0b0b0] cursor-pointer">
+              <label className="inline-flex min-h-11 items-center gap-2 text-sm text-dash-muted cursor-pointer">
                 <input
                   type="checkbox"
                   checked={removeOtherAdmins}
@@ -218,7 +218,7 @@ export default function CompanyControl({
             <button
               type="button"
               onClick={close}
-              className="h-11 rounded-xl border border-[#e0e0e0] px-5 text-sm font-semibold text-[#212121] dark:border-[#3a3a3a] dark:text-white cursor-pointer"
+              className="h-11 rounded-full border border-dash-line px-5 text-sm font-semibold text-dash-ink cursor-pointer"
             >
               Cancelar
             </button>

@@ -42,8 +42,8 @@ export function ExpandableCopy({ text, lines = 2 }: ExpandableCopyProps) {
         ref={textRef}
         className={
           open
-            ? "block text-sm leading-snug text-[#616161] dark:text-[#b0b0b0]"
-            : `block ${clamp} text-sm leading-snug text-[#616161] dark:text-[#b0b0b0]`
+            ? "block text-sm leading-snug text-dash-muted"
+            : `block ${clamp} text-sm leading-snug text-dash-muted`
         }
       >
         {text}

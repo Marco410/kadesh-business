@@ -36,12 +36,12 @@ export default function CompanyTeam({
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+      <p className="text-sm text-dash-muted">
         Uso de cada persona en los últimos {days} días. Toca una fila para ponerla en foco.
       </p>
       <div className={`${surfaceClass} relative overflow-x-auto`}>
         <table className="w-full min-w-[1160px] text-left text-sm">
-          <thead className="border-b border-[#e8e8e8] text-xs uppercase tracking-wide text-[#616161] dark:border-[#333] dark:text-[#b0b0b0]">
+          <thead className="border-b border-dash-line text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
             <tr>
               <th className="px-4 py-3">Persona</th>
               <th className="px-4 py-3">Rol</th>
@@ -60,7 +60,7 @@ export default function CompanyTeam({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+          <tbody className="divide-y divide-dash-line">
             {members.map((member) => {
               const s = stats.get(member.id);
               const selected = member.id === focusPersonId;
@@ -77,7 +77,7 @@ export default function CompanyTeam({
                     <div className="flex items-center gap-2.5">
                       <AdminAvatar name={member.name} lastName={member.lastName} size={30} />
                       <div className="min-w-0">
-                        <p className="font-medium text-[#212121] dark:text-white">
+                        <p className="font-medium text-dash-ink">
                           {formatPersonName(member.name, member.lastName)}
                           {member.suspendedAt ? (
                             <AdminStatusBadge
@@ -86,7 +86,7 @@ export default function CompanyTeam({
                             />
                           ) : null}
                         </p>
-                        <p className="truncate text-xs text-[#9e9e9e]">{member.email ?? "—"}</p>
+                        <p className="truncate text-xs text-dash-faint">{member.email ?? "—"}</p>
                       </div>
                     </div>
                   </td>
@@ -96,40 +96,40 @@ export default function CompanyTeam({
                         <AdminStatusBadge
                           key={r.name}
                           label={ROLE_LABELS[r.name] ?? r.name}
-                          className="bg-black/5 px-2 py-0.5 text-[#424242] dark:bg-white/10 dark:text-[#e0e0e0]"
+                          className="bg-dash-surface-2 px-2 py-0.5 text-dash-soft"
                         />
                       ))}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-[#212121] dark:text-white">
+                  <td className="px-4 py-3 text-dash-ink">
                     <span className="tabular-nums">{s?.logins ?? 0}</span>
                     {s?.failedLogins ? (
                       <span className="ml-1 text-xs text-red-600 dark:text-red-400">
                         ({s.failedLogins} fallidos)
                       </span>
                     ) : null}
-                    <p className="whitespace-nowrap text-xs text-[#9e9e9e]">
+                    <p className="whitespace-nowrap text-xs text-dash-faint">
                       {seenAt ? `Visto ${formatDateShort(seenAt, false)}` : "Nunca entró"}
                     </p>
                   </td>
-                  <td className="px-4 py-3 text-[#212121] dark:text-white">
+                  <td className="px-4 py-3 text-dash-ink">
                     {s?.activeMinutes ? (
                       <>
                         <span className="whitespace-nowrap tabular-nums">
                           {formatMinutes(s.activeMinutes)}
                         </span>
-                        <p className="whitespace-nowrap text-xs text-[#9e9e9e]">
+                        <p className="whitespace-nowrap text-xs text-dash-faint">
                           en {s.activeDays} día{s.activeDays === 1 ? "" : "s"}
                         </p>
                       </>
                     ) : (
-                      <span className="text-[#9e9e9e]">—</span>
+                      <span className="text-dash-faint">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                  <td className="px-4 py-3 text-dash-muted">
                     {s?.lastActivityAt ? formatDate(s.lastActivityAt) : "—"}
                     {s?.changes ? (
-                      <p className="whitespace-nowrap text-xs text-[#9e9e9e]">
+                      <p className="whitespace-nowrap text-xs text-dash-faint">
                         {s.changes} cambio{s.changes === 1 ? "" : "s"} registrado{s.changes === 1 ? "" : "s"}
                       </p>
                     ) : null}
@@ -140,7 +140,7 @@ export default function CompanyTeam({
                   <td className="px-4 py-3 tabular-nums">{s?.extractions ?? 0}</td>
                   <td className="px-4 py-3 tabular-nums">{s?.aiCalls ?? 0}</td>
                   <td className="px-4 py-3 tabular-nums">{s?.whatsappSent ?? 0}</td>
-                  <td className="px-4 py-3 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <td className="px-4 py-3 text-xs text-dash-muted">
                     {s ? `${s.toursCompleted} vistos · ${s.toursSkipped} saltados` : "—"}
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -150,7 +150,7 @@ export default function CompanyTeam({
                         e.stopPropagation();
                         onEditPerson(member.id);
                       }}
-                      className="h-9 rounded-lg border border-[#e0e0e0] px-3 text-xs font-semibold text-[#212121] hover:border-orange-300 dark:border-[#3a3a3a] dark:text-white cursor-pointer"
+                      className="h-9 rounded-lg border border-dash-line px-3 text-xs font-semibold text-dash-ink hover:border-orange-300 cursor-pointer"
                     >
                       Editar
                     </button>
@@ -163,7 +163,7 @@ export default function CompanyTeam({
       </div>
 
       <div className="flex flex-col gap-3">
-        <h3 className="text-sm font-semibold text-[#212121] dark:text-white">
+        <h3 className="text-sm font-semibold text-dash-ink">
           Historial de accesos del equipo
         </h3>
         <AuthLogList companyId={companyId} />

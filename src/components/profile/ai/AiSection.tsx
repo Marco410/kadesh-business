@@ -62,12 +62,12 @@ export function AiSection({
         initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={aiMotionTransition(reduce)}
-        className="rounded-2xl border border-[#e0e0e0] bg-white p-6 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-8"
+        className="rounded-3xl border border-dash-line bg-dash-surface p-6 shadow-sm sm:p-8"
       >
-        <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
+        <h2 className="text-xl font-semibold text-dash-ink">
           {KADESH_URIM_AI_NAME}
         </h2>
-        <p className="mt-2 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-2 text-sm leading-relaxed text-dash-muted">
           No hay una empresa vinculada a tu cuenta. Crea o asocia un negocio en
           tu perfil para usar la IA.
         </p>
@@ -122,17 +122,17 @@ export function AiSection({
           <HugeiconsIcon icon={SparklesIcon} size={22} />
         </span>
         <div data-tour="ai-header">
-          <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
+          <h2 className="text-xl font-semibold text-dash-ink">
             {KADESH_URIM_AI_NAME}
           </h2>
-          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-dash-muted">
             {activeTab ? subtitle : "Cargando tu configuración de IA…"}
           </p>
         </div>
       </motion.div>
 
       <motion.div
-        className="flex w-full gap-1 rounded-xl border border-[#e0e0e0] bg-white p-1 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+        className="flex w-full gap-1 rounded-xl border border-dash-line bg-dash-surface p-1 shadow-sm"
         role="tablist"
         data-tour="ai-tabs"
         aria-label={`${KADESH_URIM_AI_NAME} secciones`}
@@ -156,7 +156,7 @@ export function AiSection({
               "relative flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium",
               activeTab === item.key
                 ? "text-white"
-                : "text-[#616161] hover:bg-[#f5f5f5] dark:text-[#9e9e9e] dark:hover:bg-[#2a2a2a]",
+                : "text-dash-muted hover:bg-dash-hover",
             )}
           >
             {activeTab === item.key ? (
@@ -188,7 +188,7 @@ export function AiSection({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={aiTabSwitchTransition(reduce)}
-            className="flex items-center justify-center rounded-2xl border border-[#e0e0e0] bg-white py-16 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+            className="flex items-center justify-center rounded-3xl border border-dash-line bg-dash-surface py-16"
           >
             <span className="size-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
           </motion.div>

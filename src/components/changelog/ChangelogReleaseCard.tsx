@@ -36,10 +36,10 @@ export default function ChangelogReleaseCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.4, delay: Math.min(index * 0.06, 0.3) }}
-      className={`relative rounded-2xl border bg-white p-6 shadow-sm dark:bg-[#1a1a1a] sm:p-8 ${
+      className={`relative rounded-2xl border bg-dash-surface p-6 shadow-sm sm:p-8 ${
         isLatest
           ? "border-orange-400/60 shadow-orange-500/10 ring-1 ring-orange-500/20 dark:border-orange-500/40"
-          : "border-[#e0e0e0] dark:border-[#333]"
+          : "border-dash-line"
       }`}
     >
       <header className="flex flex-wrap items-start justify-between gap-3">
@@ -49,7 +49,7 @@ export default function ChangelogReleaseCard({
               className={`inline-flex items-center rounded-lg px-2.5 py-1 font-mono text-sm font-bold tracking-tight ${
                 isLatest
                   ? "bg-orange-500 text-white"
-                  : "bg-[#f0f0f0] text-[#212121] dark:bg-[#2a2a2a] dark:text-orange-300"
+                  : "bg-dash-surface-2 text-dash-ink dark:text-orange-300"
               }`}
             >
               v{release.version}
@@ -60,12 +60,12 @@ export default function ChangelogReleaseCard({
               </span>
             )}
           </div>
-          <h2 className="mt-3 text-xl font-bold text-[#212121] dark:text-white sm:text-2xl">
+          <h2 className="mt-3 text-xl font-bold text-dash-ink sm:text-2xl">
             {heading}
           </h2>
           <time
             dateTime={release.releasedAt}
-            className="mt-1 block text-sm text-[#757575] dark:text-[#9e9e9e]"
+            className="mt-1 block text-sm text-dash-muted"
           >
             {formatReleaseDate(release.releasedAt)}
           </time>
@@ -90,7 +90,7 @@ export default function ChangelogReleaseCard({
           )}
         </div>
       ) : (
-        <p className="mt-4 text-sm italic text-[#9e9e9e]">
+        <p className="mt-4 text-sm italic text-dash-faint">
           Sin notas de cambio para esta versión.
         </p>
       )}

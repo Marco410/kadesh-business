@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useQuery } from "@apollo/client";
-import { WeeklyBars } from "kadesh/components/panel/dashboard";
+import { ColumnBars } from "kadesh/components/app-shell";
 import { cn } from "kadesh/utils/cn";
 import { AdminSectionCard, formatCredits } from "../../../ui";
 import { formatMinutes } from "../format";
@@ -30,7 +30,7 @@ function value(key: string, amount: number) {
 function comparison(metric: AdminBenchmarkMetric): { label: string; tone: string } | null {
   if (metric.median == null) return null;
   if (metric.median === 0 && metric.company === 0) {
-    return { label: "Igual", tone: "bg-black/5 text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]" };
+    return { label: "Igual", tone: "bg-dash-surface-2 text-dash-muted" };
   }
   const ratio = metric.median === 0 ? Infinity : metric.company / metric.median;
   if (ratio >= 1.2) {
@@ -39,7 +39,7 @@ function comparison(metric: AdminBenchmarkMetric): { label: string; tone: string
   if (ratio <= 0.8) {
     return { label: "Abajo", tone: "bg-amber-500/15 text-amber-800 dark:text-amber-300" };
   }
-  return { label: "En la media", tone: "bg-black/5 text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]" };
+  return { label: "En la media", tone: "bg-dash-surface-2 text-dash-muted" };
 }
 
 /**
@@ -71,9 +71,9 @@ export default function TrendsCard({ companyId }: { companyId: string }) {
   if (!trends.ready) {
     return (
       <AdminSectionCard title="Tendencia" description="Últimas 12 semanas y comparación con su plan.">
-        <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <p className="text-sm text-dash-muted">
           Todavía no hay resumen diario de uso. Se arma cada noche; para llenar semanas pasadas se
-          corre <code className="rounded bg-black/5 px-1 dark:bg-white/10">pnpm usage:rollup</code> en
+          corre <code className="rounded bg-dash-surface-2 px-1">pnpm usage:rollup</code> en
           el back.
         </p>
       </AdminSectionCard>
@@ -85,13 +85,17 @@ export default function TrendsCard({ companyId }: { companyId: string }) {
       title="Tendencia"
       description="Minutos con el panel abierto por semana (últimas 12)."
     >
-      <WeeklyBars bars={bars} ariaLabel="Minutos con el panel abierto por semana" unitLabel="minutos" />
+      <ColumnBars
+        points={bars.map((bar) => ({ key: bar.weekStart, label: bar.label, value: bar.count }))}
+        ariaLabel="Minutos con el panel abierto por semana"
+        unitLabel="minutos"
+      />
 
       <div className="mt-5">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-[#9e9e9e]">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-dash-faint">
           Últimas 4 semanas contra su plan
         </h4>
-        <p className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-0.5 text-xs text-dash-muted">
           {trends.planName
             ? trends.peers >= 3
               ? `Mediana de ${trends.peers} empresas con el plan ${trends.planName}.`
@@ -100,7 +104,7 @@ export default function TrendsCard({ companyId }: { companyId: string }) {
         </p>
         <div className="relative mt-3 overflow-x-auto">
           <table className="w-full min-w-[420px] text-left text-sm">
-            <thead className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <thead className="text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
               <tr>
                 <th className="py-2 pr-3 font-medium">Métrica</th>
                 <th className="py-2 pr-3 font-medium">Esta empresa</th>
@@ -110,18 +114,18 @@ export default function TrendsCard({ companyId }: { companyId: string }) {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+            <tbody className="divide-y divide-dash-line">
               {trends.benchmark.map((metric) => {
                 const verdict = comparison(metric);
                 return (
                   <tr key={metric.key}>
-                    <td className="py-2 pr-3 text-[#212121] dark:text-white">
+                    <td className="py-2 pr-3 text-dash-ink">
                       {METRIC_LABELS[metric.key] ?? metric.key}
                     </td>
-                    <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-[#212121] dark:text-white">
+                    <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-dash-ink">
                       {value(metric.key, metric.company)}
                     </td>
-                    <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+                    <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-dash-muted">
                       {metric.median == null ? "—" : value(metric.key, metric.median)}
                     </td>
                     <td className="py-2">

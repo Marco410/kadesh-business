@@ -17,7 +17,7 @@ const DEFAULT_PIPELINE_COLOR =
   "bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300";
 
 const thClass =
-  "text-left text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] px-4 py-3 whitespace-nowrap";
+  "text-left text-xs font-semibold uppercase tracking-wide text-dash-muted px-4 py-3 whitespace-nowrap";
 
 type LeadItem = TechBusinessLeadsResponse["techBusinessLeads"][number];
 
@@ -74,12 +74,12 @@ export default function SalesLeadsTable({
 
   if (loading && leads.length === 0) {
     return (
-      <div className="w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden">
-        <div className="h-11 bg-[#f5f5f5] dark:bg-[#2a2a2a]" />
-        <div className="divide-y divide-[#e8e8e8] dark:divide-[#333]">
+      <div className="w-full rounded-xl border border-dash-line bg-dash-surface overflow-hidden">
+        <div className="h-11 bg-dash-surface-2" />
+        <div className="divide-y divide-dash-line">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="h-14 px-4 flex items-center">
-              <div className="h-3 w-full max-w-md rounded bg-[#ececec] dark:bg-[#333] animate-pulse" />
+              <div className="h-3 w-full max-w-md rounded dash-shimmer" />
             </div>
           ))}
         </div>
@@ -98,7 +98,7 @@ export default function SalesLeadsTable({
         </div>
         <Link
           href={Routes.panel}
-          className="mt-4 inline-flex items-center px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold hover:bg-orange-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+          className="mt-4 inline-flex items-center px-4 py-2 rounded-full dash-grad-accent text-white font-semibold hover:shadow-dash-accent-lift transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 shadow-dash-accent"
         >
           Ir a Extracción B2B
         </Link>
@@ -109,7 +109,7 @@ export default function SalesLeadsTable({
   return (
     <div className="w-full space-y-3">
       <div
-        className="relative overflow-x-auto rounded-xl border border-orange-200/50 dark:border-orange-900/30 bg-white dark:bg-[#1e1e1e] shadow-sm"
+        className="relative overflow-x-auto rounded-xl border border-orange-200/50 dark:border-orange-900/30 bg-dash-surface shadow-sm"
         aria-busy={loading}
       >
         {loading && (
@@ -126,7 +126,7 @@ export default function SalesLeadsTable({
                     checked={allSelected}
                     onChange={() => onToggleAll?.(leadIds)}
                     onClick={(e) => e.stopPropagation()}
-                    className="rounded border-[#e0e0e0] dark:border-[#3a3a3a] text-orange-500 focus:ring-orange-500"
+                    className="rounded border-dash-line text-orange-500 focus:ring-orange-500"
                     aria-label="Seleccionar todos los de esta página"
                   />
                 </th>
@@ -159,7 +159,7 @@ export default function SalesLeadsTable({
                       router.push(Routes.panelLead(lead.id));
                     }
                   }}
-                  className={`clientes-row-in border-b border-[#e8e8e8] dark:border-[#333] cursor-pointer transition-[background-color,box-shadow] duration-150 ease-[cubic-bezier(0.2,0,0,1)] hover:bg-orange-500/[0.06] dark:hover:bg-orange-500/10 ${
+                  className={`clientes-row-in border-b border-dash-line cursor-pointer transition-[background-color,box-shadow] duration-150 ease-[cubic-bezier(0.2,0,0,1)] hover:bg-orange-500/[0.06] dark:hover:bg-orange-500/10 ${
                     selectedLeadIds.has(lead.id)
                       ? "bg-orange-500/10 dark:bg-orange-500/15 shadow-[inset_3px_0_0_0_#f7945e]"
                       : ""
@@ -175,15 +175,15 @@ export default function SalesLeadsTable({
                         type="checkbox"
                         checked={selectedLeadIds.has(lead.id)}
                         onChange={() => onToggleLead?.(lead.id)}
-                        className="rounded border-[#e0e0e0] dark:border-[#3a3a3a] text-orange-500 focus:ring-orange-500"
+                        className="rounded border-dash-line text-orange-500 focus:ring-orange-500"
                         aria-label={`Seleccionar ${lead.businessName}`}
                       />
                     </td>
                   )}
-                  <td className="px-4 py-3 text-[#212121] dark:text-white font-medium">
+                  <td className="px-4 py-3 text-dash-ink font-medium">
                     {lead.businessName || "—"}
                   </td>
-                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                  <td className="px-4 py-3 text-dash-muted">
                     {getCategoryLabel(lead.category)}
                   </td>
                   <td className="px-4 py-3">
@@ -199,13 +199,13 @@ export default function SalesLeadsTable({
                         </span>
                       </div>
                     ) : (
-                      <span className="text-[#616161] dark:text-[#b0b0b0]">
+                      <span className="text-dash-muted">
                         —
                       </span>
                     )}
                   </td>
                   <td
-                    className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0] whitespace-nowrap"
+                    className="px-4 py-3 text-dash-muted whitespace-nowrap"
                     onClick={(e) => e.stopPropagation()}
                     onKeyDown={(e) => e.stopPropagation()}
                   >
@@ -223,25 +223,25 @@ export default function SalesLeadsTable({
                       "—"
                     )}
                   </td>
-                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                  <td className="px-4 py-3 text-dash-muted">
                     {lead.city ?? "—"}
                   </td>
-                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                  <td className="px-4 py-3 text-dash-muted">
                     {lead.state ?? "—"}
                   </td>
-                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                  <td className="px-4 py-3 text-dash-muted">
                     {lead.country ?? "—"}
                   </td>
-                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                  <td className="px-4 py-3 text-dash-muted">
                     {leadStatus?.opportunityLevel ?? "—"}
                   </td>
-                  <td className="px-4 py-3 text-center text-[#212121] dark:text-white tabular-nums">
+                  <td className="px-4 py-3 text-center text-dash-ink tabular-nums">
                     {lead.rating != null ? lead.rating : "—"}
                   </td>
-                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                  <td className="px-4 py-3 text-dash-muted">
                     {lead.source ?? "—"}
                   </td>
-                  <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                  <td className="px-4 py-3 text-dash-muted">
                     {(() => {
                       const persons = lead.salesPerson ?? [];
                       const count = persons.length;

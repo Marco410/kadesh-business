@@ -16,6 +16,7 @@ import {
   POST_STATUS_FILTERS,
 } from "./constants";
 import { useDebouncedValue } from "./hooks/useDebouncedValue";
+import { useAdminNavigation } from "./hooks/useAdminNavigation";
 import {
   AdminEmptyState,
   AdminErrorState,
@@ -42,7 +43,11 @@ export function AdminBlogPostsPanel() {
     "all",
   );
   const [page, setPage] = useState(1);
-  const [editorId, setEditorId] = useState<string | null>(null);
+  const { searchParams, setParams } = useAdminNavigation();
+  // `?nuevo=1` (desde "+ Nuevo" de la barra) abre el editor de un artículo nuevo al llegar.
+  const [editorId, setEditorId] = useState<string | null>(() =>
+    searchParams.get("nuevo") ? "new" : null,
+  );
   const debouncedSearch = useDebouncedValue(search);
 
   const where = useMemo(() => {
@@ -83,21 +88,24 @@ export function AdminBlogPostsPanel() {
     <div className="flex flex-col gap-4">
       <AdminBlogPostForm
         postId={editorId}
-        onClose={() => setEditorId(null)}
+        onClose={() => {
+          setEditorId(null);
+          if (searchParams.get("nuevo")) setParams({ nuevo: null });
+        }}
         onSaved={() => {
           void refetch();
         }}
       />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-[#616161] dark:text-[#b0b0b0] max-w-xl">
+        <p className="text-sm text-dash-muted max-w-xl">
           Artículos de Pet, de SaaS o de los dos. La portada es la imagen que
           se ve en la lista y al abrir el artículo.
         </p>
         <button
           type="button"
           onClick={() => setEditorId("new")}
-          className="h-11 shrink-0 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 text-sm font-semibold cursor-pointer"
+          className="h-11 shrink-0 rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white px-5 text-sm font-semibold cursor-pointer shadow-dash-accent"
         >
           Nuevo artículo
         </button>
@@ -154,7 +162,7 @@ export function AdminBlogPostsPanel() {
           <div className={`${surfaceClass} hidden md:block overflow-x-auto`}>
             <table className="min-w-[760px] w-full text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] border-b border-[#e8e8e8] dark:border-[#333]">
+                <tr className="text-left text-dash-muted border-b border-dash-line text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                   <th className="px-4 py-3">Artículo</th>
                   <th className="px-4 py-3">Blog</th>
                   <th className="px-4 py-3">Estado</th>
@@ -165,7 +173,7 @@ export function AdminBlogPostsPanel() {
                 {posts.map((post) => (
                   <tr
                     key={post.id}
-                    className="border-b border-[#f0f0f0] dark:border-[#2a2a2a] last:border-0"
+                    className="border-b border-dash-line last:border-0"
                   >
                     <td className="px-4 py-3">
                       <button
@@ -175,10 +183,10 @@ export function AdminBlogPostsPanel() {
                       >
                         <PostThumb url={post.image?.url} />
                         <span className="min-w-0">
-                          <span className="block font-semibold text-[#212121] dark:text-white">
+                          <span className="block font-semibold text-dash-ink">
                             {post.title || "Sin título"}
                           </span>
-                          <span className="block text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                          <span className="block text-xs text-dash-muted mt-0.5">
                             {getCategoryLabel(post.category?.name)}
                             {post.tags.length > 0
                               ? ` · ${post.tags.map((tag) => tag.name).filter(Boolean).join(", ")}`
@@ -193,7 +201,7 @@ export function AdminBlogPostsPanel() {
                     <td className="px-4 py-3">
                       <PublishedBadge published={Boolean(post.published)} />
                     </td>
-                    <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0] whitespace-nowrap">
+                    <td className="px-4 py-3 text-dash-muted whitespace-nowrap">
                       {formatDateShort(post.updatedAt, false)}
                     </td>
                   </tr>
@@ -230,14 +238,14 @@ function PostCard({
       <div className="flex items-start gap-3">
         <PostThumb url={post.image?.url} />
         <span className="min-w-0 flex-1">
-          <span className="block font-semibold text-[#212121] dark:text-white">
+          <span className="block font-semibold text-dash-ink">
             {post.title || "Sin título"}
           </span>
           <span className="mt-1 flex flex-wrap gap-1.5">
             <ProductBadge product={post.product} />
             <PublishedBadge published={Boolean(post.published)} />
           </span>
-          <span className="mt-1 block text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <span className="mt-1 block text-xs text-dash-muted">
             {getCategoryLabel(post.category?.name)}
           </span>
         </span>
@@ -249,7 +257,7 @@ function PostCard({
 function PostThumb({ url }: { url?: string | null }) {
   if (!url) {
     return (
-      <span className="h-14 w-14 shrink-0 rounded-xl bg-[#f5f5f5] dark:bg-[#2a2a2a]" />
+      <span className="h-14 w-14 shrink-0 rounded-xl bg-dash-surface-2" />
     );
   }
   return (
@@ -277,7 +285,7 @@ function PublishedBadge({ published }: { published: boolean }) {
       className={
         published
           ? "bg-green-500/15 text-green-700 dark:text-green-400 dark:bg-green-500/20"
-          : "bg-[#e0e0e0] dark:bg-[#3a3a3a] text-[#616161] dark:text-[#b0b0b0]"
+          : "bg-dash-surface-3 text-dash-muted"
       }
     />
   );

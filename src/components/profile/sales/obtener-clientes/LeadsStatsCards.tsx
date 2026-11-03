@@ -29,14 +29,14 @@ const LeadsStatsCards = forwardRef<LeadsStatsCardsHandle>(
 
     return (
       <div className="space-y-4">
-        <div className="rounded-xl border border-[#e0e0e0] bg-gradient-to-br from-orange-500/5 to-transparent p-5 shadow-sm dark:border-[#3a3a3a] dark:from-orange-500/10">
-          <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+        <div className="rounded-xl border border-dash-line bg-gradient-to-br from-orange-500/5 to-transparent p-5 shadow-sm dark:from-orange-500/10">
+          <p className="text-sm font-medium text-dash-muted">
             Total de clientes obtenidos
           </p>
-          <p className="mt-1 text-3xl font-bold text-[#212121] dark:text-white">
+          <p className="mt-1 text-3xl font-bold text-dash-ink">
             {total.toLocaleString("es-MX")}
           </p>
-          <p className="mt-1 text-xs text-[#9e9e9e] dark:text-[#666]">
+          <p className="mt-1 text-xs text-dash-faint dark:text-[#666]">
             {categories.length}{" "}
             {categories.length === 1 ? "categoría" : "categorías"}
           </p>
@@ -44,7 +44,7 @@ const LeadsStatsCards = forwardRef<LeadsStatsCardsHandle>(
 
         {categories.length > 0 && (
           <div>
-            <h4 className="mb-3 text-sm font-semibold text-[#212121] dark:text-white">
+            <h4 className="mb-3 text-sm font-semibold text-dash-ink">
               Clientes por categoría
             </h4>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -58,7 +58,7 @@ const LeadsStatsCards = forwardRef<LeadsStatsCardsHandle>(
                 return (
                   <div
                     key={item.category}
-                    className="rounded-xl border border-[#e0e0e0] bg-white p-4 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+                    className="rounded-xl border border-dash-line bg-dash-surface p-4 shadow-sm"
                   >
                     <div className="mb-2 flex items-center justify-between gap-2">
                       <span
@@ -66,12 +66,12 @@ const LeadsStatsCards = forwardRef<LeadsStatsCardsHandle>(
                       >
                         {pct}%
                       </span>
-                      <span className="text-lg font-bold text-[#212121] dark:text-white">
+                      <span className="text-lg font-bold text-dash-ink">
                         {item.count}
                       </span>
                     </div>
                     <p
-                      className="flex items-center gap-1.5 text-xs font-medium text-[#616161] dark:text-[#b0b0b0]"
+                      className="flex items-center gap-1.5 text-xs font-medium text-dash-muted"
                       title={label}
                     >
                       <span

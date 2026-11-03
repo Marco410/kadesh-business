@@ -19,7 +19,7 @@ export default function WorkspaceColumn({
 }: WorkspaceColumnProps) {
   return (
     <div
-      className={`flex min-h-[420px] flex-col overflow-hidden rounded-2xl border border-neutral-300 bg-white shadow-[0_2px_6px_-1px_rgba(0,0,0,0.07),0_4px_14px_-3px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.04] dark:border-[#333] dark:bg-[#181818] dark:shadow-none dark:ring-0 ${className ?? ""}`}
+      className={`flex min-h-[420px] flex-col overflow-hidden rounded-2xl border border-neutral-300 bg-dash-surface shadow-[0_2px_6px_-1px_rgba(0,0,0,0.07),0_4px_14px_-3px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.04] dark:border-[#333] dark:shadow-none dark:ring-0 ${className ?? ""}`}
     >
       {accentColor ? (
         <div

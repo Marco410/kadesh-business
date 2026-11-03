@@ -37,10 +37,10 @@ export default function AdminActivityPanel() {
   return (
     <div className="flex flex-col gap-4" data-tour="admin-actividad">
       <div>
-        <h2 className="text-lg font-semibold text-[#212121] dark:text-white">
+        <h2 className="text-lg font-semibold text-dash-ink">
           Actividad
         </h2>
-        <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-1 text-sm text-dash-muted">
           Lo que hacen las empresas en Kadesh, lo más reciente primero. Toca una
           empresa o persona para abrir su detalle.
         </p>

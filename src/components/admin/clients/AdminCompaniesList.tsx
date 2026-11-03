@@ -53,7 +53,7 @@ export function SubscriptionStatusBadge({ status }: { status: string | null | un
       label={subscriptionStatusLabel(status)}
       className={
         (status && SUBSCRIPTION_STATUS_CLASSES[status]) ??
-        "bg-[#e0e0e0] text-[#616161] dark:bg-[#3a3a3a] dark:text-[#b0b0b0]"
+        "bg-dash-surface-3 text-dash-muted"
       }
     />
   );
@@ -81,9 +81,9 @@ function CreditsCell({ company }: { company: AdminCompanyListItem }) {
   const total = company.creditsPlan + company.creditsBonus;
   return (
     <div className="min-w-[9rem]">
-      <p className="text-sm tabular-nums text-[#212121] dark:text-white">
+      <p className="text-sm tabular-nums text-dash-ink">
         {formatCredits(company.creditsRemaining)}
-        <span className="text-[#9e9e9e]"> disp. de {formatCredits(total)}</span>
+        <span className="text-dash-faint"> disp. de {formatCredits(total)}</span>
       </p>
       <div className="mt-1.5">
         <AdminProgressBar
@@ -201,7 +201,7 @@ export default function AdminCompaniesList() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="font-semibold text-[#212121] dark:text-white">
+                      <p className="font-semibold text-dash-ink">
                         {company.name}
                         {company.suspendedAt ? (
                           <span className="ml-1.5 text-xs font-semibold text-red-600 dark:text-red-400">
@@ -209,7 +209,7 @@ export default function AdminCompaniesList() {
                           </span>
                         ) : null}
                       </p>
-                      <p className="mt-0.5 truncate text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <p className="mt-0.5 truncate text-xs text-dash-muted">
                         {company.owner
                           ? formatPersonName(company.owner.name, company.owner.lastName)
                           : "Sin equipo"}
@@ -231,11 +231,11 @@ export default function AdminCompaniesList() {
                   <div className="mt-3">
                     <CreditsCell company={company} />
                   </div>
-                  <p className="mt-3 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-3 text-xs text-dash-muted">
                     {company.planName ?? "Sin plan"} · {company.usersCount} en el equipo ·{" "}
                     {formatCredits(company.leadsCount)} leads
                   </p>
-                  <p className="mt-1 text-xs text-[#9e9e9e]">
+                  <p className="mt-1 text-xs text-dash-faint">
                     {formatLastAccess(company, "Nadie ha entrado", "Último acceso: ")}
                     {managerHint(company) ? ` · ${managerHint(company)}` : ""}
                   </p>
@@ -246,7 +246,7 @@ export default function AdminCompaniesList() {
 
           <div className={`${surfaceClass} relative hidden overflow-x-auto md:block`}>
             <table className="w-full min-w-[1020px] text-left text-sm">
-              <thead className="border-b border-[#e8e8e8] text-xs uppercase tracking-wide text-[#616161] dark:border-[#333] dark:text-[#b0b0b0]">
+              <thead className="border-b border-dash-line text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                 <tr>
                   <th className="px-4 py-3">Empresa</th>
                   <th className="px-4 py-3">Plan</th>
@@ -260,7 +260,7 @@ export default function AdminCompaniesList() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+              <tbody className="divide-y divide-dash-line">
                 {rows.map((company) => (
                   <tr
                     key={company.id}
@@ -274,14 +274,14 @@ export default function AdminCompaniesList() {
                           e.stopPropagation();
                           openCompany(company.id);
                         }}
-                        className="text-left font-semibold text-[#212121] hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 rounded dark:text-white dark:hover:text-orange-400 cursor-pointer"
+                        className="text-left font-semibold text-dash-ink hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 rounded dark:hover:text-orange-400 cursor-pointer"
                       >
                         {company.name}
                       </button>
                       {company.isTest ? (
                         <AdminStatusBadge
                           label="Prueba interna"
-                          className="ml-2 bg-black/5 px-2 py-0.5 text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]"
+                          className="ml-2 bg-dash-surface-2 px-2 py-0.5 text-dash-muted"
                         />
                       ) : null}
                       {company.suspendedAt ? (
@@ -290,23 +290,23 @@ export default function AdminCompaniesList() {
                           className="ml-2 bg-red-500/15 px-2 py-0.5 text-red-700 dark:text-red-300"
                         />
                       ) : null}
-                      <p className="mt-0.5 text-xs text-[#9e9e9e]">
+                      <p className="mt-0.5 text-xs text-dash-faint">
                         Alta {formatDateShort(company.createdAt, false)}
                         {company.owner?.email ? ` · ${company.owner.email}` : ""}
                       </p>
                       {managerHint(company) ? (
-                        <p className="mt-0.5 text-xs text-[#9e9e9e]">{managerHint(company)}</p>
+                        <p className="mt-0.5 text-xs text-dash-faint">{managerHint(company)}</p>
                       ) : null}
                     </td>
                     <td className="px-4 py-3 align-top">
-                      <p className="text-[#212121] dark:text-white">
+                      <p className="text-dash-ink">
                         {company.planName ?? "—"}
                       </p>
                       <div className="mt-1">
                         <SubscriptionStatusBadge status={company.subscriptionStatus} />
                       </div>
                       {periodHint(company) ? (
-                        <p className="mt-1 text-xs text-[#9e9e9e]">{periodHint(company)}</p>
+                        <p className="mt-1 text-xs text-dash-faint">{periodHint(company)}</p>
                       ) : null}
                     </td>
                     <td className="px-4 py-3 align-top">
@@ -320,22 +320,22 @@ export default function AdminCompaniesList() {
                           ) : null}
                         </>
                       ) : (
-                        <span className="text-xs text-[#9e9e9e]">—</span>
+                        <span className="text-xs text-dash-faint">—</span>
                       )}
                     </td>
                     <td className="px-4 py-3 align-top">
                       <CreditsCell company={company} />
                     </td>
-                    <td className="px-4 py-3 align-top tabular-nums text-[#212121] dark:text-white">
+                    <td className="px-4 py-3 align-top tabular-nums text-dash-ink">
                       {company.usersCount}
                     </td>
-                    <td className="px-4 py-3 align-top tabular-nums text-[#212121] dark:text-white">
+                    <td className="px-4 py-3 align-top tabular-nums text-dash-ink">
                       {formatCredits(company.leadsCount)}
                     </td>
-                    <td className="px-4 py-3 align-top text-[#616161] dark:text-[#b0b0b0]">
+                    <td className="px-4 py-3 align-top text-dash-muted">
                       {formatLastAccess(company, "Nunca")}
                     </td>
-                    <td className="px-2 py-3 align-top text-[#9e9e9e]">
+                    <td className="px-2 py-3 align-top text-dash-faint">
                       <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
                     </td>
                   </tr>

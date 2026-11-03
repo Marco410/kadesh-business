@@ -4,7 +4,7 @@ import { cn } from "kadesh/utils/cn";
 import { useFitLeadMapStage } from "kadesh/components/profile/sales/obtener-clientes/useFitLeadMapStage";
 
 const boneClass =
-  "motion-safe:animate-pulse rounded-md bg-[#ececec] dark:bg-[#2a2a2a]";
+  "motion-safe:animate-pulse rounded-md bg-dash-surface-2";
 
 function Bone({ className }: { className?: string }) {
   return <div className={cn(boneClass, className)} />;
@@ -17,7 +17,7 @@ export default function PanelMapSkeleton() {
   return (
     <div
       ref={setStage}
-      className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[calc(100dvh-7.75rem)] w-screen overflow-hidden bg-[#e8eef4] dark:bg-[#1e2a3a]"
+      className="relative -mx-4 -mt-5 h-[calc(100dvh-4.1rem)] overflow-hidden bg-[#e8eef4] dark:bg-[#1e2a3a] sm:-mx-6 lg:mx-0 lg:mt-0 lg:h-[calc(100dvh-7.25rem)] lg:rounded-3xl lg:border lg:border-dash-line"
       role="status"
       aria-busy="true"
       aria-live="polite"
@@ -38,12 +38,12 @@ export default function PanelMapSkeleton() {
       </div>
 
       <div className="absolute inset-x-0 top-0 z-10 px-4 pt-4 sm:pt-6">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 rounded-2xl border border-[#e0e0e0] bg-white/95 p-2 shadow-sm sm:flex-row sm:items-center dark:border-[#3a3a3a] dark:bg-[#1e1e1e]/95">
-          <div className="flex gap-1 rounded-xl bg-[#f8f8f8] p-1 dark:bg-[#121212]">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 rounded-2xl border border-dash-line bg-white/95 p-2 shadow-sm sm:flex-row sm:items-center dark:bg-[#1e1e1e]/95">
+          <div className="flex gap-1 rounded-xl bg-dash-surface-2 p-1 dark:bg-[#121212]">
             <Bone className="h-9 w-28 rounded-lg" />
             <Bone className="h-9 w-16 rounded-lg" />
           </div>
-          <div className="flex gap-1 rounded-xl bg-[#f8f8f8] p-1 dark:bg-[#121212]">
+          <div className="flex gap-1 rounded-xl bg-dash-surface-2 p-1 dark:bg-[#121212]">
             <Bone className="h-9 w-24 rounded-lg" />
             <Bone className="h-9 w-28 rounded-lg" />
           </div>

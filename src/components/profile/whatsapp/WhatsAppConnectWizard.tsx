@@ -20,7 +20,7 @@ import {
 } from "./queries";
 
 const INPUT_CLASS =
-  "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
+  "w-full px-4 py-3 rounded-lg border border-dash-line bg-dash-surface text-dash-ink placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
 
 const META_APPS_URL = "https://developers.facebook.com/apps";
 
@@ -52,8 +52,8 @@ function Step({
         {n}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-[#212121] dark:text-white">{title}</p>
-        <div className="mt-1.5 space-y-3 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+        <p className="text-sm font-semibold text-dash-ink">{title}</p>
+        <div className="mt-1.5 space-y-3 text-sm leading-relaxed text-dash-muted">
           {children}
         </div>
       </div>
@@ -147,18 +147,18 @@ export function WhatsAppConnectWizard({
     }
   };
 
-  const label = "mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]";
+  const label = "mb-2 block text-sm font-semibold text-dash-muted";
 
   return (
     <div className="mt-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-semibold text-[#212121] dark:text-white">
+        <p className="text-sm font-semibold text-dash-ink">
           {isConnected ? "Reconectar o cambiar de número" : "Conecta tu WhatsApp en 5 pasos"}
         </p>
         <button
           type="button"
           onClick={() => void copyInstructions()}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-[#e0e0e0] px-3 py-1.5 text-xs font-semibold text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-dash-line px-3 py-1.5 text-xs font-semibold text-dash-ink transition-colors hover:bg-dash-hover dark:text-[#e0e0e0]"
         >
           <HugeiconsIcon icon={copied ? CheckmarkCircle01Icon : Copy01Icon} className="size-3.5" />
           {copied ? "Copiado" : "Copiar instrucciones para mi contacto técnico"}
@@ -260,7 +260,7 @@ export function WhatsAppConnectWizard({
               <button
                 type="button"
                 onClick={() => setShowSecrets((p) => !p)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#616161] transition-colors hover:bg-[#f0f0f0] hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a] dark:hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-dash-muted transition-colors hover:bg-[#f0f0f0] hover:text-dash-ink dark:hover:bg-[#2a2a2a]"
                 aria-label={showSecrets ? "Ocultar" : "Mostrar"}
               >
                 <HugeiconsIcon icon={showSecrets ? ViewOffIcon : EyeIcon} className="size-5" />
@@ -272,7 +272,7 @@ export function WhatsAppConnectWizard({
             type="button"
             onClick={() => void run()}
             disabled={loading || !canSubmit}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-full dash-grad-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 shadow-dash-accent"
           >
             {loading ? (
               <>
@@ -294,8 +294,8 @@ export function WhatsAppConnectWizard({
           )}
 
           {result?.needsSelection && (
-            <div className="rounded-xl border border-[#e0e0e0] p-4 dark:border-[#3a3a3a]">
-              <p className="font-medium text-[#212121] dark:text-white">{result.message}</p>
+            <div className="rounded-xl border border-dash-line p-4">
+              <p className="font-medium text-dash-ink">{result.message}</p>
               <ul className="mt-3 space-y-2">
                 {result.phoneOptions.map((o) => (
                   <li key={o.id}>
@@ -303,9 +303,9 @@ export function WhatsAppConnectWizard({
                       type="button"
                       onClick={() => void run(o.id)}
                       disabled={loading}
-                      className="w-full rounded-lg border border-[#e0e0e0] px-4 py-2.5 text-left text-sm transition-colors hover:bg-[#f5f5f5] disabled:opacity-60 dark:border-[#3a3a3a] dark:hover:bg-[#2a2a2a]"
+                      className="w-full rounded-lg border border-dash-line px-4 py-2.5 text-left text-sm transition-colors hover:bg-dash-hover disabled:opacity-60"
                     >
-                      <span className="font-semibold text-[#212121] dark:text-white">
+                      <span className="font-semibold text-dash-ink">
                         {o.displayPhoneNumber}
                       </span>
                       {o.verifiedName ? ` — ${o.verifiedName}` : ""}

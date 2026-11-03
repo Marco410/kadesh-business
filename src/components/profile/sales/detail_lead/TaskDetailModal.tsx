@@ -19,10 +19,10 @@ interface TaskDetailModalProps {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+      <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-1">
         {label}
       </p>
-      <div className="text-sm text-[#212121] dark:text-[#ffffff] whitespace-pre-wrap break-words">
+      <div className="text-sm text-dash-ink whitespace-pre-wrap break-words">
         {children}
       </div>
     </div>
@@ -60,17 +60,17 @@ export default function TaskDetailModal({ taskId, isOpen, onClose }: TaskDetailM
           className="fixed inset-0 z-[110] flex items-center justify-center p-4 pointer-events-none"
         >
           <div
-            className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-hidden pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a] flex flex-col"
+            className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-hidden pointer-events-auto border border-dash-line flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center p-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a]">
-              <h4 className="text-lg font-bold text-[#212121] dark:text-[#ffffff]">
+            <div className="flex justify-between items-center p-4 border-b border-dash-line bg-dash-surface-2">
+              <h4 className="text-lg font-bold text-dash-ink">
                 Detalle de la tarea
               </h4>
               <button
                 type="button"
                 onClick={onClose}
-                className="text-2xl font-bold text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#ffffff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#e5e5e5] dark:hover:bg-[#333]"
+                className="text-2xl font-bold text-dash-muted hover:text-dash-ink dark:hover:text-[#ffffff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#e5e5e5] dark:hover:bg-[#333]"
                 aria-label="Cerrar"
               >
                 ×
@@ -82,7 +82,7 @@ export default function TaskDetailModal({ taskId, isOpen, onClose }: TaskDetailM
                   <span className="animate-spin size-8 border-2 border-orange-500 border-t-transparent rounded-full" />
                 </div>
               ) : !task ? (
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                <p className="text-sm text-dash-muted">
                   No se encontró la tarea.
                 </p>
               ) : (

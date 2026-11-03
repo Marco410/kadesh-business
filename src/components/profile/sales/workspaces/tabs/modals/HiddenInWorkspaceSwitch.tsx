@@ -15,12 +15,12 @@ export default function HiddenInWorkspaceSwitch({
 }: HiddenInWorkspaceSwitchProps) {
   const labelId = useId();
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#252525] px-4 py-3">
+    <div className="flex items-center justify-between gap-4 rounded-xl border border-dash-line bg-white dark:bg-[#252525] px-4 py-3">
       <div className="min-w-0 pr-2">
-        <p id={labelId} className="text-sm font-medium text-[#212121] dark:text-white">
+        <p id={labelId} className="text-sm font-medium text-dash-ink">
           Ocultar en este espacio
         </p>
-        <p className="mt-0.5 text-xs text-[#616161] dark:text-[#9e9e9e]">
+        <p className="mt-0.5 text-xs text-dash-muted">
           El registro no se muestra en el tablero de este workspace; sigue visible en
           el lead y en vista general.
         </p>
@@ -33,7 +33,7 @@ export default function HiddenInWorkspaceSwitch({
         disabled={disabled}
         onClick={() => onCheckedChange(!checked)}
         className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] disabled:cursor-not-allowed disabled:opacity-50 ${
-          checked ? "bg-orange-500" : "bg-[#e0e0e0] dark:bg-[#525252]"
+          checked ? "bg-orange-500" : "bg-dash-surface-3 dark:bg-[#525252]"
         }`}
       >
         <span

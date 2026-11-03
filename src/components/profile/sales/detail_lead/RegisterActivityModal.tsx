@@ -162,17 +162,17 @@ export default function RegisterActivityModal({
             className="fixed inset-0 z-[90] flex items-center justify-center p-4 pointer-events-none"
           >
             <div
-              className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[min(90vh,760px)] flex flex-col overflow-hidden pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
+              className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[min(90vh,760px)] flex flex-col overflow-hidden pointer-events-auto border border-dash-line"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex justify-between items-start p-6 pb-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
-                <h3 className="text-xl font-bold text-[#212121] dark:text-[#ffffff] pr-4">
+              <div className="flex justify-between items-start p-6 pb-4 border-b border-dash-line">
+                <h3 className="text-xl font-bold text-dash-ink pr-4">
                   Registrar actividad
                 </h3>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="text-2xl font-bold text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#ffffff] transition-colors flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                  className="text-2xl font-bold text-dash-muted hover:text-dash-ink dark:hover:text-[#ffffff] transition-colors flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-dash-hover"
                   disabled={submitting}
                   aria-label="Cerrar"
                 >
@@ -181,7 +181,7 @@ export default function RegisterActivityModal({
               </div>
 
               <div className="px-6 pb-6 pt-4 flex-1 overflow-y-auto min-h-0">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-2">
                   Actividades registradas
                 </p>
                 {activitiesLoading ? (
@@ -189,24 +189,24 @@ export default function RegisterActivityModal({
                     <span className="animate-spin size-8 border-2 border-orange-500 border-t-transparent rounded-full" />
                   </div>
                 ) : activities.length === 0 ? (
-                  <p className="text-sm text-[#616161] dark:text-[#b0b0b0] py-4">
+                  <p className="text-sm text-dash-muted py-4">
                     Aún no hay actividades para este lead.
                   </p>
                 ) : (
-                  <div className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] overflow-hidden">
+                  <div className="rounded-lg border border-dash-line overflow-hidden">
                     <table className="w-full text-sm border-collapse">
                       <thead>
-                        <tr className="bg-[#f5f5f5] dark:bg-[#2a2a2a] border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
-                          <th className="text-left px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                        <tr className="bg-dash-surface-2 border-b border-dash-line">
+                          <th className="text-left px-3 py-2 font-semibold text-dash-ink whitespace-nowrap">
                             Fecha
                           </th>
-                          <th className="text-left px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                          <th className="text-left px-3 py-2 font-semibold text-dash-ink whitespace-nowrap">
                             Tipo
                           </th>
-                          <th className="text-left px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap max-w-[120px]">
+                          <th className="text-left px-3 py-2 font-semibold text-dash-ink whitespace-nowrap max-w-[120px]">
                             Resultado
                           </th>
-                          <th className="text-left px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap max-w-[140px]">
+                          <th className="text-left px-3 py-2 font-semibold text-dash-ink whitespace-nowrap max-w-[140px]">
                             Comentarios
                           </th>
                         </tr>
@@ -224,18 +224,18 @@ export default function RegisterActivityModal({
                                 setSelectedId(a.id);
                               }
                             }}
-                            className="border-b border-[#e0e0e0] dark:border-[#3a3a3a] hover:bg-[#fafafa] dark:hover:bg-[#252525] cursor-pointer transition-colors"
+                            className="border-b border-dash-line hover:bg-dash-hover cursor-pointer transition-colors"
                           >
-                            <td className="px-3 py-2 text-[#616161] dark:text-[#b0b0b0] whitespace-nowrap">
+                            <td className="px-3 py-2 text-dash-muted whitespace-nowrap">
                               {formatDateShort(a.activityDate)}
                             </td>
-                            <td className="px-3 py-2 text-[#212121] dark:text-[#ffffff]">
+                            <td className="px-3 py-2 text-dash-ink">
                               {a.type}
                             </td>
-                            <td className="px-3 py-2 text-[#616161] dark:text-[#b0b0b0] max-w-[120px] truncate" title={a.result ?? undefined}>
+                            <td className="px-3 py-2 text-dash-muted max-w-[120px] truncate" title={a.result ?? undefined}>
                               {a.result ?? "—"}
                             </td>
-                            <td className="px-3 py-2 text-[#616161] dark:text-[#b0b0b0] max-w-[140px] truncate" title={a.comments ?? undefined}>
+                            <td className="px-3 py-2 text-dash-muted max-w-[140px] truncate" title={a.comments ?? undefined}>
                               {a.comments ?? "—"}
                             </td>
                           </tr>
@@ -245,8 +245,8 @@ export default function RegisterActivityModal({
                   </div>
                 )}
 
-              <div className="border-t border-[#e0e0e0] dark:border-[#3a3a3a] pt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-3">
+              <div className="border-t border-dash-line pt-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-3">
                   Nueva actividad
                 </p>
               </div>
@@ -255,7 +255,7 @@ export default function RegisterActivityModal({
                 <div>
                   <label
                     htmlFor="activity-type"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Tipo <span className="text-red-500">*</span>
                   </label>
@@ -264,7 +264,7 @@ export default function RegisterActivityModal({
                     required
                     value={type}
                     onChange={(e) => setType(e.target.value)}
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
                     {ACTIVITY_TYPE_OPTIONS.map((opt) => (
                       <option key={opt} value={opt}>
@@ -277,7 +277,7 @@ export default function RegisterActivityModal({
                 <div>
                   <label
                     htmlFor="activity-date"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Fecha y hora <span className="text-red-500">*</span>
                   </label>
@@ -287,14 +287,14 @@ export default function RegisterActivityModal({
                     required
                     value={activityDate}
                     onChange={(e) => setActivityDate(e.target.value)}
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="activity-result"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Resultado de la interacción <span className="text-red-500">*</span>
                   </label>
@@ -305,14 +305,14 @@ export default function RegisterActivityModal({
                     required
                     onChange={(e) => setResult(e.target.value)}
                     placeholder="Ej. Cliente interesado, pendiente de cotización"
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="activity-comments"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Comentarios <span className="text-red-500">*</span>
                   </label>
@@ -323,7 +323,7 @@ export default function RegisterActivityModal({
                     rows={3}
                     required
                     placeholder="Notas adicionales..."
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-y min-h-[80px]"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-y min-h-[80px]"
                   />
                 </div>
 
@@ -332,14 +332,14 @@ export default function RegisterActivityModal({
                     type="button"
                     onClick={onClose}
                     disabled={submitting}
-                    className="px-4 py-2.5 border-2 border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-[#ffffff] font-semibold rounded-lg hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2.5 border-2 border-dash-line text-dash-ink font-semibold rounded-lg hover:bg-dash-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-4 py-2.5 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2.5 dash-grad-accent text-white font-semibold rounded-full hover:shadow-dash-accent-lift focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:opacity-50 disabled:cursor-not-allowed shadow-dash-accent"
                   >
                     {submitting ? "Guardando..." : "Registrar"}
                   </button>

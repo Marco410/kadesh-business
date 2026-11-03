@@ -65,7 +65,7 @@ function EventListItem({
         }
       }}
       style={event.color ? { borderLeft: `4px solid ${event.color}` } : undefined}
-      className="flex flex-col gap-1 p-3 rounded-lg bg-white dark:bg-[#1e1e1e] border border-[#e8e8e8] dark:border-[#333] cursor-pointer hover:border-orange-500/50 hover:ring-1 hover:ring-orange-500/30 transition-colors"
+      className="flex flex-col gap-1 p-3 rounded-lg bg-dash-surface border border-dash-line cursor-pointer hover:border-orange-500/50 hover:ring-1 hover:ring-orange-500/30 transition-colors"
     >
       <div className="flex items-center gap-2 flex-wrap">
         <span
@@ -77,21 +77,21 @@ function EventListItem({
           {event.typeLabel}
         </span>
         {event.timeLabel ? (
-          <span className="text-xs text-[#616161] dark:text-[#b0b0b0] tabular-nums font-medium">
+          <span className="text-xs text-dash-muted tabular-nums font-medium">
             {event.timeLabel}
           </span>
         ) : null}
         {event.extra ? (
-          <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <span className="text-xs text-dash-muted">
             {event.extra}
           </span>
         ) : null}
       </div>
-      <span className="text-sm font-medium text-[#212121] dark:text-[#ffffff] block">
+      <span className="text-sm font-medium text-dash-ink block">
         {event.businessName}
       </span>
       {hideSeller ? null : (
-        <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <span className="text-xs text-dash-muted">
           {event.sellerName}
         </span>
       )}
@@ -242,17 +242,17 @@ export default function SalesCalendarView({
 
   return (
     <section
-      className={`w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden ${
+      className={`w-full rounded-xl border border-dash-line bg-dash-surface overflow-hidden ${
         isCompact ? "" : "min-h-[calc(100vh-12rem)]"
       } ${className}`.trim()}
     >
-      <div className="px-4 py-3 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a] flex flex-wrap items-center justify-between gap-4">
+      <div className="px-4 py-3 border-b border-dash-line bg-dash-surface-2 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0]">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-dash-muted">
             {title}
           </h2>
           {!isCompact && !selectedDateKey ? (
-            <p className="mt-0.5 text-xs font-normal normal-case tracking-normal text-[#9e9e9e]">
+            <p className="mt-0.5 text-xs font-normal normal-case tracking-normal text-dash-faint">
               Toca un día para ver sus eventos
             </p>
           ) : null}
@@ -261,18 +261,18 @@ export default function SalesCalendarView({
           <button
             type="button"
             onClick={prevMonth}
-            className="p-2 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-[#ffffff] hover:bg-[#f0f0f0] dark:hover:bg-[#333] transition-colors"
+            className="p-2 rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] text-dash-ink hover:bg-[#f0f0f0] dark:hover:bg-[#333] transition-colors"
             aria-label="Mes anterior"
           >
             ‹
           </button>
-          <span className="min-w-[180px] text-center font-semibold text-[#212121] dark:text-[#ffffff]">
+          <span className="min-w-[180px] text-center font-semibold text-dash-ink">
             {MONTHS[currentMonth.getMonth()]} {currentMonth.getFullYear()}
           </span>
           <button
             type="button"
             onClick={nextMonth}
-            className="p-2 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-[#ffffff] hover:bg-[#f0f0f0] dark:hover:bg-[#333] transition-colors"
+            className="p-2 rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] text-dash-ink hover:bg-[#f0f0f0] dark:hover:bg-[#333] transition-colors"
             aria-label="Mes siguiente"
           >
             ›
@@ -287,7 +287,7 @@ export default function SalesCalendarView({
           </button>
         </div>
         {hideLegend ? null : (
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-dash-muted">
           {legendItems.map((item) => (
             <span key={item.type} className="flex items-center gap-1.5">
               <span className={`w-3 h-3 rounded-full ${EVENT_COLORS[item.type]}`} />
@@ -300,11 +300,11 @@ export default function SalesCalendarView({
 
       <div className={`p-4 flex flex-col lg:flex-row gap-4 ${isCompact ? "" : "min-h-[500px]"}`}>
         <div className="flex-1 min-w-0">
-          <div className="grid grid-cols-7 gap-px bg-[#e0e0e0] dark:bg-[#3a3a3a] rounded-lg overflow-hidden">
+          <div className="grid grid-cols-7 gap-px bg-dash-surface-3 rounded-lg overflow-hidden">
             {WEEKDAYS.map((w) => (
               <div
                 key={w}
-                className="bg-[#f5f5f5] dark:bg-[#2a2a2a] px-2 py-2 text-center text-xs font-semibold text-[#616161] dark:text-[#b0b0b0]"
+                className="bg-dash-surface-2 px-2 py-2 text-center text-xs font-semibold text-dash-muted"
               >
                 {w}
               </div>
@@ -318,7 +318,7 @@ export default function SalesCalendarView({
                   isCompact
                     ? "min-h-[48px] sm:min-h-[56px]"
                     : "min-h-[90px] sm:min-h-[120px] md:min-h-[140px]"
-                } flex flex-col items-center justify-start p-1 sm:p-2 text-left bg-white dark:bg-[#1e1e1e] hover:bg-[#fafafa] dark:hover:bg-[#252525] transition-colors ${
+                } flex flex-col items-center justify-start p-1 sm:p-2 text-left bg-dash-surface hover:bg-dash-hover transition-colors ${
                   cell.dateKey != null && selectedDateKey === cell.dateKey
                     ? "ring-2 ring-orange-500 ring-inset"
                     : ""
@@ -330,7 +330,7 @@ export default function SalesCalendarView({
                       className={`text-sm font-medium ${
                         cell.dateKey === todayDateKey
                           ? "text-orange-500 dark:text-orange-400"
-                          : "text-[#212121] dark:text-[#ffffff]"
+                          : "text-dash-ink"
                       }`}
                     >
                       {cell.day}
@@ -355,11 +355,11 @@ export default function SalesCalendarView({
         </div>
 
         {selectedDateKey ? (
-          <div className={`w-full shrink-0 flex flex-col rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] overflow-hidden ${
+          <div className={`w-full shrink-0 flex flex-col rounded-lg border border-dash-line bg-dash-surface-2 overflow-hidden ${
             isCompact ? "lg:w-[300px] xl:w-[320px] max-h-[420px]" : "lg:w-[380px] xl:w-[420px]"
           }`}>
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f0f0f0] dark:bg-[#2a2a2a]">
-              <h3 className="text-sm font-semibold text-[#212121] dark:text-[#ffffff] capitalize">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-dash-line bg-dash-surface-2">
+              <h3 className="text-sm font-semibold text-dash-ink capitalize">
                 {new Date(selectedDateKey + "T12:00:00").toLocaleDateString("es-MX", {
                   weekday: "long",
                   day: "numeric",
@@ -371,7 +371,7 @@ export default function SalesCalendarView({
                 <button
                   type="button"
                   onClick={() => setSelectedDateKey(null)}
-                  className="p-1.5 rounded-lg text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#ffffff] hover:bg-[#e5e5e5] dark:hover:bg-[#333] transition-colors"
+                  className="p-1.5 rounded-lg text-dash-muted hover:text-dash-ink dark:hover:text-[#ffffff] hover:bg-[#e5e5e5] dark:hover:bg-[#333] transition-colors"
                   aria-label="Cerrar"
                 >
                   Cerrar
@@ -380,7 +380,7 @@ export default function SalesCalendarView({
             </div>
             <div className="p-4 overflow-y-auto flex-1 space-y-4">
               {selectedEvents.length === 0 ? (
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                <p className="text-sm text-dash-muted">
                   Sin eventos este día.
                 </p>
               ) : (
@@ -397,7 +397,7 @@ export default function SalesCalendarView({
               )}
               {isCompact && upcomingEvents.filter((e) => e.dateKey !== selectedDateKey).length > 0 ? (
                 <div>
-                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#777]">
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-dash-faint dark:text-[#777]">
                     Próximos
                   </p>
                   <ul className="space-y-2">
@@ -417,17 +417,17 @@ export default function SalesCalendarView({
             </div>
           </div>
         ) : upcomingEvents.length > 0 || isCompact ? (
-          <div className={`w-full shrink-0 flex flex-col rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] overflow-hidden ${
+          <div className={`w-full shrink-0 flex flex-col rounded-lg border border-dash-line bg-dash-surface-2 overflow-hidden ${
             isCompact ? "lg:w-[300px] xl:w-[320px] max-h-[420px]" : "lg:w-[380px] xl:w-[420px]"
           }`}>
-            <div className="px-4 py-3 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f0f0f0] dark:bg-[#2a2a2a]">
-              <h3 className="text-sm font-semibold text-[#212121] dark:text-[#ffffff]">
+            <div className="px-4 py-3 border-b border-dash-line bg-dash-surface-2">
+              <h3 className="text-sm font-semibold text-dash-ink">
                 Próximos
               </h3>
             </div>
             <div className="p-4 overflow-y-auto flex-1">
               {upcomingEvents.length === 0 ? (
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                <p className="text-sm text-dash-muted">
                   No hay actividades, propuestas ni seguimientos próximos.
                 </p>
               ) : (

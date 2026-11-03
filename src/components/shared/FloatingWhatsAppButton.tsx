@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon, Message01Icon } from "@hugeicons/core-free-icons";
@@ -26,13 +27,18 @@ export type FloatingWhatsAppButtonProps = {
   message?: string;
   /** Globos periódicos de soporte (panel autenticado). */
   showPrompts?: boolean;
+  /** Rutas (prefijos) donde no se muestra, p. ej. Operaciones: es soporte para clientes. */
+  hiddenOn?: string[];
 };
 
 export default function FloatingWhatsAppButton({
   className,
   message,
   showPrompts = false,
+  hiddenOn,
 }: FloatingWhatsAppButtonProps) {
+  const pathname = usePathname();
+  const hidden = Boolean(hiddenOn?.some((prefix) => pathname?.startsWith(prefix)));
   const reduceMotion = useReducedMotion();
   const [promptIndex, setPromptIndex] = useState(0);
   const [promptVisible, setPromptVisible] = useState(false);
@@ -68,11 +74,11 @@ export default function FloatingWhatsAppButton({
   };
 
   useEffect(() => {
-    if (!showPrompts) return;
+    if (!showPrompts || hidden) return;
     schedule(revealPrompt, FIRST_PROMPT_MS);
     return clearTimers;
     // eslint-disable-next-line react-hooks/exhaustive-deps -- cycle once on mount
-  }, [showPrompts]);
+  }, [showPrompts, hidden]);
 
   const prompt = PANEL_SUPPORT_PROMPTS[promptIndex];
   const defaultMessage =
@@ -81,6 +87,8 @@ export default function FloatingWhatsAppButton({
   const activeMessage =
     showPrompts && promptVisible ? prompt.message : defaultMessage;
   const href = buildSupportWhatsAppUrl(activeMessage);
+
+  if (hidden) return null;
 
   return (
     <div

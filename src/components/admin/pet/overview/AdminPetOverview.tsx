@@ -3,9 +3,8 @@
 import { useState, type ReactNode } from "react";
 import { useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowDownRight01Icon, ArrowUpRight01Icon, EyeIcon } from "@hugeicons/core-free-icons";
-import { ShareBars } from "kadesh/components/panel/dashboard";
-import { barGrowDelay } from "kadesh/components/panel/dashboard/motion";
+import { Bone01Icon, EyeIcon } from "@hugeicons/core-free-icons";
+import { HBarList, cssStaggerDelay } from "kadesh/components/app-shell";
 import { cn } from "kadesh/utils/cn";
 import {
   ADMIN_TABS,
@@ -53,7 +52,9 @@ import { PET_HELP } from "./help";
 import PetSeriesCard from "./PetSeriesCard";
 import type { SeriesSegmentStyle } from "./StackedSeriesBars";
 import {
+  ADMIN_PET_SERIES_QUERY,
   ADMIN_PET_SUMMARY_QUERY,
+  type AdminPetSeriesResponse,
   type AdminPetSummary,
   type AdminPetSummaryResponse,
   type PetCount,
@@ -62,7 +63,7 @@ import {
 const fmt = (value: number) => value.toLocaleString("es-MX");
 
 const selectClass =
-  "h-11 sm:h-9 cursor-pointer rounded-lg border border-[#e0e0e0] bg-white px-3 text-[13px] text-[#212121] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white";
+  "h-11 sm:h-9 cursor-pointer rounded-lg border border-dash-line bg-dash-surface px-3 text-[13px] text-dash-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
 
 const STATUS_SEGMENTS: SeriesSegmentStyle = {
   order: ANIMAL_STATUS_CHART_ORDER,
@@ -118,9 +119,9 @@ function PetGroup({
   return (
     <section className="flex flex-col gap-3" aria-label={title}>
       <div>
-        <h2 className="text-lg font-semibold text-[#212121] dark:text-white">{title}</h2>
+        <h2 className="text-lg font-semibold text-dash-ink">{title}</h2>
         {description ? (
-          <p className="mt-0.5 text-sm text-[#616161] dark:text-[#b0b0b0]">{description}</p>
+          <p className="mt-0.5 text-sm text-dash-muted">{description}</p>
         ) : null}
       </div>
       {children}
@@ -132,52 +133,24 @@ function TilesSkeleton({ count, className }: { count: number; className: string 
   return (
     <div className={className}>
       {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="h-[74px] animate-pulse rounded-xl bg-[#ececec] dark:bg-[#2a2a2a]" />
+        <div key={index} className="dash-shimmer h-[132px] rounded-3xl" />
       ))}
     </div>
   );
 }
 
-/** % de cambio contra el periodo anterior del mismo largo. */
-function PeriodChange({ current, previous }: { current: number; previous: number }) {
+/** Pastilla ↗/↘ contra el periodo anterior del mismo largo (sin rango "Todo" no hay con qué comparar). */
+function periodDelta(range: PetRangeOption, current: number, previous: number) {
+  if (range.days == null) return null;
   const pct = changePct(current, previous);
   if (pct == null) return null;
-  const tone =
-    pct > 0
-      ? "text-emerald-700 dark:text-emerald-400"
-      : pct < 0
-        ? "text-red-700 dark:text-red-400"
-        : "text-[#616161] dark:text-[#b0b0b0]";
-  return (
-    <span
-      className={cn("ml-1 inline-flex items-center gap-0.5 whitespace-nowrap font-medium", tone)}
-      title={`Contra los ${previous} del periodo anterior`}
-    >
-      {pct > 0 ? <HugeiconsIcon icon={ArrowUpRight01Icon} size={14} aria-hidden /> : null}
-      {pct < 0 ? <HugeiconsIcon icon={ArrowDownRight01Icon} size={14} aria-hidden /> : null}
-      {pct > 0 ? "+" : ""}
-      {pct}%
-    </span>
-  );
+  return { value: pct, label: `Contra ${fmt(previous)} del periodo anterior` };
 }
 
-/** "+12 en 90 días ↑ 20%" bajo un total. Con "Todo" no se repite el total. */
-function NewInPeriod({
-  range,
-  current,
-  previous,
-}: {
-  range: PetRangeOption;
-  current: number;
-  previous: number;
-}) {
-  if (range.days == null) return null;
-  return (
-    <>
-      +{fmt(current)} en {range.label}
-      <PeriodChange current={current} previous={previous} />
-    </>
-  );
+/** "+12 en 90 días" bajo un total. Con "Todo" no se repite el total. */
+function newInPeriodText(range: PetRangeOption, current: number) {
+  if (range.days == null) return undefined;
+  return `+${fmt(current)} en ${range.label}`;
 }
 
 type ColorBarItem = {
@@ -211,26 +184,26 @@ function ColorBars({
             <span
               className={cn(
                 "flex min-w-0 items-center gap-1.5 truncate text-sm",
-                item.count > 0 ? "text-[#212121] dark:text-white" : "text-[#9e9e9e]",
+                item.count > 0 ? "text-dash-ink" : "text-dash-faint",
               )}
             >
               <span className={cn("size-2.5 shrink-0 rounded-full", item.barClass)} aria-hidden />
               {item.label}
             </span>
-            <span className="h-2.5 overflow-hidden rounded-full bg-[#f0f0f0] dark:bg-[#2a2a2a]">
+            <span className="h-2.5 overflow-hidden rounded-full bg-dash-surface-2">
               {item.count > 0 ? (
                 <span
                   className={cn("block h-full rounded-full dashboard-bar-grow", item.barClass)}
                   style={{
                     width: `${Math.max((item.count / max) * 100, 3)}%`,
-                    animationDelay: barGrowDelay(index, false),
+                    animationDelay: cssStaggerDelay(index),
                   }}
                 />
               ) : null}
             </span>
-            <span className="text-right text-sm tabular-nums text-[#212121] dark:text-white">
+            <span className="text-right text-sm tabular-nums text-dash-ink">
               {fmt(item.count)}
-              <span className="ml-1 text-xs text-[#9e9e9e]">{share}%</span>
+              <span className="ml-1 text-xs text-dash-faint">{share}%</span>
             </span>
           </>
         );
@@ -245,7 +218,7 @@ function ColorBars({
                 title={`Ver ${item.label.toLowerCase()} en la lista`}
                 className={cn(
                   rowClass,
-                  "cursor-pointer transition-colors hover:bg-black/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:hover:bg-white/5",
+                  "cursor-pointer transition-colors hover:bg-dash-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400",
                 )}
               >
                 {content}
@@ -265,8 +238,8 @@ function SplitBar({ title, items }: { title: string; items: ColorBarItem[] }) {
   const total = items.reduce((sum, item) => sum + item.count, 0);
   return (
     <div>
-      <p className="mb-1.5 text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">{title}</p>
-      <div className="flex h-2.5 overflow-hidden rounded-full bg-[#f0f0f0] dark:bg-[#2a2a2a]">
+      <p className="mb-1.5 text-xs font-medium text-dash-muted">{title}</p>
+      <div className="flex h-2.5 overflow-hidden rounded-full bg-dash-surface-2">
         {total > 0
           ? items
               .filter((item) => item.count > 0)
@@ -282,11 +255,11 @@ function SplitBar({ title, items }: { title: string; items: ColorBarItem[] }) {
       </div>
       <ul className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
         {items.map((item) => (
-          <li key={item.key} className="flex items-center gap-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <li key={item.key} className="flex items-center gap-1.5 text-xs text-dash-muted">
             <span className={cn("size-2.5 shrink-0 rounded-full", item.barClass)} aria-hidden />
             {item.label}
-            <span className="tabular-nums text-[#212121] dark:text-white">{fmt(item.count)}</span>
-            <span className="tabular-nums text-[#9e9e9e]">
+            <span className="tabular-nums text-dash-ink">{fmt(item.count)}</span>
+            <span className="tabular-nums text-dash-faint">
               {total > 0 ? Math.round((item.count / total) * 100) : 0}%
             </span>
           </li>
@@ -308,7 +281,7 @@ function LocationCard({ animals }: { animals: AdminPetSummary["animals"] }) {
       help={PET_HELP.location}
       action={<AdminFilterChips options={[...PET_LOCATION_OPTIONS]} value={view} onChange={setView} />}
     >
-      <ShareBars
+      <HBarList
         items={rows.map((row) => ({ key: row.key, label: row.key, count: row.count }))}
         emptyLabel="Todavía no hay ubicaciones en la bitácora."
       />
@@ -334,26 +307,26 @@ function EngagementCard({
         <AdminStatTile label="Favoritos" value={fmt(engagement.favorites)} />
         <AdminStatTile label="Comentarios" value={fmt(engagement.comments)} />
       </div>
-      <h4 className="mb-1 mt-4 text-xs font-medium uppercase tracking-wide text-[#9e9e9e]">Más vistos</h4>
+      <h4 className="mb-1 mt-4 text-xs font-medium uppercase tracking-wide text-dash-faint">Más vistos</h4>
       {engagement.topViewed.length === 0 ? (
-        <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">Nadie abrió fichas de animales en este periodo.</p>
+        <p className="text-sm text-dash-muted">Nadie abrió fichas de animales en este periodo.</p>
       ) : (
-        <ul className="-mx-1.5 divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+        <ul className="-mx-1.5 divide-y divide-dash-line">
           {engagement.topViewed.map((animal) => (
             <li key={animal.id}>
               <button
                 type="button"
                 onClick={() => onOpenAnimal(animal.id)}
-                className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-1.5 py-2 text-left transition-colors hover:bg-black/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:hover:bg-white/5"
+                className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-1.5 py-2 text-left transition-colors hover:bg-dash-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
               >
                 {animal.coverUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={animal.coverUrl} alt="" className="size-10 shrink-0 rounded-lg object-cover" loading="lazy" />
                 ) : (
-                  <span className="size-10 shrink-0 rounded-lg bg-[#eee] dark:bg-[#2a2a2a]" />
+                  <span className="size-10 shrink-0 rounded-lg bg-dash-surface-2" />
                 )}
                 <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5">
-                  <span className="truncate text-sm font-semibold text-[#212121] dark:text-white">{animal.name}</span>
+                  <span className="truncate text-sm font-semibold text-dash-ink">{animal.name}</span>
                   {animal.status && animal.status !== ANIMAL_STATUS_NONE ? (
                     <AdminStatusBadge
                       label={animalStatusLabel(animal.status)}
@@ -364,7 +337,7 @@ function EngagementCard({
                     />
                   ) : null}
                 </span>
-                <span className="inline-flex shrink-0 items-center gap-1 text-sm tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+                <span className="inline-flex shrink-0 items-center gap-1 text-sm tabular-nums text-dash-muted">
                   <HugeiconsIcon icon={EyeIcon} size={16} aria-hidden />
                   {fmt(animal.views)}
                   <span className="sr-only">vistas</span>
@@ -402,6 +375,15 @@ export default function AdminPetOverview() {
     fetchPolicy: "cache-and-network",
   });
   const summary = data?.adminPetSummary;
+
+  // Línea del KPI "Registrados": misma serie que la gráfica sin desglose (sale de caché si coincide).
+  const { data: sparkData } = useQuery<AdminPetSeriesResponse>(ADMIN_PET_SERIES_QUERY, {
+    variables: {
+      input: { metric: "animals", granularity: granularity.api, range: range.api, breakdown: "none", placeType: null },
+    },
+    fetchPolicy: "cache-and-network",
+  });
+  const sparkline = sparkData?.adminPetSeries.points.map((point) => point.total) ?? null;
 
   const changeRange = (value: string) => {
     const next = findOption(PET_RANGE_OPTIONS, value, PET_DEFAULT_RANGE);
@@ -447,7 +429,7 @@ export default function AdminPetOverview() {
 
       <PetGroup title="Pendientes por revisar" description="Lo que espera una respuesta de Kadesh.">
         {pending ? (
-          <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <AdminStatTile
               label="Fichas en revisión"
               value={fmt(pending.placeClaims)}
@@ -480,23 +462,28 @@ export default function AdminPetOverview() {
             />
           </div>
         ) : (
-          <TilesSkeleton count={4} className="grid grid-cols-2 gap-2 lg:grid-cols-4" />
+          <TilesSkeleton count={4} className="grid grid-cols-2 gap-3 lg:grid-cols-4" />
         )}
       </PetGroup>
 
       <PetGroup title="Animales" description="Reportes de animales perdidos, encontrados y en adopción.">
         {animals ? (
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 2xl:grid-cols-6">
             <AdminStatTile
+              variant="dark"
+              icon={Bone01Icon}
               label="Registrados"
-              value={fmt(animals.total)}
-              hint={<NewInPeriod range={range} current={animals.newInPeriod} previous={animals.newPrevPeriod} />}
+              value={animals.total}
+              sparkline={sparkline}
+              hint={newInPeriodText(range, animals.newInPeriod)}
+              delta={periodDelta(range, animals.newInPeriod, animals.newPrevPeriod)}
               help={PET_HELP.animalsTotal}
               onClick={() => openAnimals()}
             />
             <AdminStatTile
+              variant="tint"
               label="Perdidos"
-              value={fmt(countOf(animals.byStatus, "lost"))}
+              value={countOf(animals.byStatus, "lost")}
               help={PET_HELP.lost}
               onClick={() => openAnimals({ estado: "lost" })}
             />
@@ -528,7 +515,7 @@ export default function AdminPetOverview() {
             />
           </div>
         ) : (
-          <TilesSkeleton count={6} className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6" />
+          <TilesSkeleton count={6} className="grid grid-cols-2 gap-3 sm:grid-cols-3 2xl:grid-cols-6" />
         )}
 
         <PetSeriesCard
@@ -572,7 +559,7 @@ export default function AdminPetOverview() {
               </AdminSectionCard>
 
               <AdminSectionCard title="Tipo y origen" help={PET_HELP.typeAndOrigin}>
-                <ShareBars
+                <HBarList
                   items={animals.byType.map((row) => ({
                     key: row.key,
                     label: row.key === "none" ? "Sin tipo" : (ANIMAL_TYPE_LABELS[row.key] ?? row.key),
@@ -631,11 +618,12 @@ export default function AdminPetOverview() {
 
       <PetGroup title="Veterinarias" description="Fichas del directorio de Kadesh Pet.">
         {places ? (
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 2xl:grid-cols-6">
             <AdminStatTile
               label="Fichas"
               value={fmt(places.total)}
-              hint={<NewInPeriod range={range} current={places.newInPeriod} previous={places.newPrevPeriod} />}
+              hint={newInPeriodText(range, places.newInPeriod)}
+              delta={periodDelta(range, places.newInPeriod, places.newPrevPeriod)}
               help={PET_HELP.placesTotal}
               onClick={() => openPetList(PET_VISTAS.PLACES)}
             />
@@ -662,7 +650,7 @@ export default function AdminPetOverview() {
             />
           </div>
         ) : (
-          <TilesSkeleton count={6} className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6" />
+          <TilesSkeleton count={6} className="grid grid-cols-2 gap-3 sm:grid-cols-3 2xl:grid-cols-6" />
         )}
 
         <PetSeriesCard
@@ -719,7 +707,7 @@ export default function AdminPetOverview() {
             </AdminSectionCard>
 
             <AdminSectionCard title="Tipos y estados" help={PET_HELP.placeTypes}>
-              <ShareBars
+              <HBarList
                 items={places.byType.map((row) => ({
                   key: row.key,
                   label: PLACE_TYPE_LABELS[row.key] ?? row.key,
@@ -727,10 +715,10 @@ export default function AdminPetOverview() {
                 }))}
                 emptyLabel="Todavía no hay fichas con tipo."
               />
-              <h4 className="mb-2 mt-5 text-xs font-medium uppercase tracking-wide text-[#9e9e9e]">
+              <h4 className="mb-2 mt-5 text-xs font-medium uppercase tracking-wide text-dash-faint">
                 Estados con más fichas
               </h4>
-              <ShareBars
+              <HBarList
                 items={places.topStates.map((row) => ({ key: row.key, label: row.key, count: row.count }))}
                 emptyLabel="Las fichas todavía no tienen estado."
               />
@@ -741,23 +729,19 @@ export default function AdminPetOverview() {
 
       <PetGroup title="Usuarios de Kadesh Pet" description="Cuentas creadas en Kadesh Pet.">
         {summary ? (
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 2xl:grid-cols-6">
             <AdminStatTile label="Cuentas" value={fmt(summary.users.total)} help={PET_HELP.usersTotal} />
             {range.days != null ? (
               <AdminStatTile
                 label={`Nuevas en ${range.label}`}
                 value={fmt(summary.users.newInPeriod)}
-                hint={
-                  <>
-                    Antes: {fmt(summary.users.newPrevPeriod)}
-                    <PeriodChange current={summary.users.newInPeriod} previous={summary.users.newPrevPeriod} />
-                  </>
-                }
+                hint={`Antes: ${fmt(summary.users.newPrevPeriod)}`}
+                delta={periodDelta(range, summary.users.newInPeriod, summary.users.newPrevPeriod)}
               />
             ) : null}
           </div>
         ) : (
-          <TilesSkeleton count={2} className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6" />
+          <TilesSkeleton count={2} className="grid grid-cols-2 gap-3 sm:grid-cols-3 2xl:grid-cols-6" />
         )}
 
         <PetSeriesCard

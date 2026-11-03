@@ -108,7 +108,7 @@ function AdminPlansCatalog() {
       />
 
       <div className="flex flex-col gap-2">
-        <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <p className="text-sm text-dash-muted">
           Precio, créditos e inclusión de módulos por plan. El texto de cada
           módulo (nombre y descripción) se edita en la vista Módulos.
         </p>
@@ -159,7 +159,7 @@ function PlanCard({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-lg font-bold text-[#212121] dark:text-white">
+            <h3 className="text-lg font-bold text-dash-ink">
               {plan.name ?? "Plan sin nombre"}
             </h3>
             {plan.bestSeller ? (
@@ -173,18 +173,18 @@ function PlanCard({
               className={
                 plan.active
                   ? "bg-green-500/15 text-green-700 dark:text-green-400"
-                  : "bg-[#e0e0e0] dark:bg-[#3a3a3a] text-[#616161] dark:text-[#b0b0b0]"
+                  : "bg-dash-surface-3 text-dash-muted"
               }
             />
           </div>
-          <p className="mt-2 text-2xl font-bold text-[#212121] dark:text-white">
+          <p className="mt-2 text-2xl font-bold text-dash-ink">
             {formatMoney(plan.cost, plan.currency)}
-            <span className="ml-1 text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+            <span className="ml-1 text-sm font-medium text-dash-muted">
               {formatPlanFrequency(plan.frequency)}
             </span>
           </p>
           {plan.costOld ? (
-            <p className="text-xs text-[#9e9e9e] line-through">
+            <p className="text-xs text-dash-faint line-through">
               {formatMoney(plan.costOld, plan.currency)}
             </p>
           ) : null}
@@ -192,40 +192,40 @@ function PlanCard({
         <button
           type="button"
           onClick={onEdit}
-          className="h-11 shrink-0 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-4 text-xs font-semibold hover:border-orange-300 cursor-pointer"
+          className="h-11 shrink-0 rounded-full border border-dash-line px-4 text-xs font-semibold hover:border-orange-300 cursor-pointer"
         >
           Editar plan
         </button>
       </div>
 
       <dl className="grid grid-cols-3 gap-3">
-        <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
-          <dt className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <div className="rounded-xl bg-dash-surface-2 p-3">
+          <dt className="text-xs text-dash-muted">
             Créditos
           </dt>
-          <dd className="mt-1 font-semibold text-[#212121] dark:text-white">
+          <dd className="mt-1 font-semibold text-dash-ink">
             {formatCredits(plan.leadLimit)}
           </dd>
         </div>
-        <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
-          <dt className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <div className="rounded-xl bg-dash-surface-2 p-3">
+          <dt className="text-xs text-dash-muted">
             Módulos
           </dt>
-          <dd className="mt-1 font-semibold text-[#212121] dark:text-white">
+          <dd className="mt-1 font-semibold text-dash-ink">
             {features.included}/{features.total}
           </dd>
         </div>
-        <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
-          <dt className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <div className="rounded-xl bg-dash-surface-2 p-3">
+          <dt className="text-xs text-dash-muted">
             Empresas
           </dt>
-          <dd className="mt-1 font-semibold text-[#212121] dark:text-white">
+          <dd className="mt-1 font-semibold text-dash-ink">
             {plan.subscriptionsCount ?? 0}
           </dd>
         </div>
       </dl>
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-dash-muted">
         <span
           className={
             hasStripe ? "" : "text-amber-700 dark:text-amber-300 font-medium"

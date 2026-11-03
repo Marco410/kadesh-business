@@ -22,13 +22,13 @@ import {
 import { surfaceClass } from "./ui";
 
 const fieldClass =
-  "h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
+  "h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
 
 const textareaClass =
-  "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
+  "w-full rounded-xl border border-dash-line bg-dash-surface px-3 py-2.5 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
 
 const labelClass =
-  "block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1";
+  "block text-xs font-medium text-dash-muted mb-1";
 
 const AUDIENCE_OPTIONS: Array<{
   id: AdminEmailAudience;
@@ -204,10 +204,10 @@ export default function AdminEmailsPanel({
     <div className="flex flex-col gap-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-8">
       <div className="flex flex-col gap-5">
         <section className={cn(surfaceClass, "p-4 sm:p-5")}>
-          <h2 className="text-base font-semibold text-[#212121] dark:text-white">
+          <h2 className="text-base font-semibold text-dash-ink">
             Destinatarios
           </h2>
-          <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1 text-sm text-dash-muted">
             Elige a quién llega y con qué marca se ve el correo.
           </p>
 
@@ -227,13 +227,13 @@ export default function AdminEmailsPanel({
                     "min-h-11 rounded-xl border px-3 py-2.5 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400",
                     selected
                       ? "border-orange-500 bg-orange-500/10"
-                      : "border-[#e0e0e0] dark:border-[#3a3a3a] hover:border-[#bdbdbd] dark:hover:border-[#555]",
+                      : "border-dash-line hover:border-dash-line-strong",
                   )}
                 >
-                  <span className="block text-sm font-semibold text-[#212121] dark:text-white">
+                  <span className="block text-sm font-semibold text-dash-ink">
                     {option.label}
                   </span>
-                  <span className="block text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <span className="block text-xs text-dash-muted">
                     {option.description}
                   </span>
                 </button>
@@ -255,7 +255,7 @@ export default function AdminEmailsPanel({
                 className={textareaClass}
               />
               {customEmails.length > 0 ? (
-                <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                <p className="mt-1.5 text-xs text-dash-muted">
                   {customEmails.length} correo
                   {customEmails.length === 1 ? "" : "s"}
                   {invalidCustom.length > 0
@@ -271,7 +271,7 @@ export default function AdminEmailsPanel({
             <div
               role="group"
               aria-label="Marca"
-              className="inline-flex rounded-xl bg-black/5 dark:bg-white/10 p-1"
+              className="inline-flex rounded-xl bg-dash-surface-2 p-1"
             >
               {(Object.keys(EMAIL_BRAND_PREVIEW) as EmailBrandId[]).map((id) => {
                 const selected = brand === id;
@@ -284,8 +284,8 @@ export default function AdminEmailsPanel({
                     className={cn(
                       "min-h-10 rounded-lg px-4 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400",
                       selected
-                        ? "bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-white shadow-sm"
-                        : "text-[#616161] dark:text-[#b0b0b0]",
+                        ? "bg-dash-surface dark:bg-dash-surface-3 text-dash-ink shadow-sm"
+                        : "text-dash-muted",
                     )}
                   >
                     <span
@@ -302,10 +302,10 @@ export default function AdminEmailsPanel({
         </section>
 
         <section className={cn(surfaceClass, "p-4 sm:p-5")}>
-          <h2 className="text-base font-semibold text-[#212121] dark:text-white">
+          <h2 className="text-base font-semibold text-dash-ink">
             Contenido
           </h2>
-          <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1 text-sm text-dash-muted">
             Usa párrafos separados por una línea en blanco. Negrita con{" "}
             <code className="text-xs">**así**</code> y enlaces con{" "}
             <code className="text-xs">[texto](https://…)</code>.
@@ -430,7 +430,7 @@ export default function AdminEmailsPanel({
       </div>
 
       <aside className="lg:sticky lg:top-24">
-        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-dash-muted">
           Vista previa · {brandMeta.name}
         </p>
         <EmailPreview
@@ -511,7 +511,7 @@ function EmailPreview({
 
   return (
     <div
-      className="overflow-hidden rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a]"
+      className="overflow-hidden rounded-2xl border border-dash-line"
       style={{ background: EMAIL_TEXT_PREVIEW.page }}
     >
       <div className="px-4 py-5 sm:px-6">

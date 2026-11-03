@@ -32,7 +32,7 @@ const emptyLineClass =
   "rounded-xl border border-dashed border-neutral-300 bg-white py-18 h-42 text-center text-sm font-medium text-neutral-600 shadow-sm dark:border-[#404040] dark:bg-[#1e1e1e]/60 dark:text-[#9e9e9e] ";
 
 const cardShellClass =
-  "flex w-full gap-0 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-all hover:border-orange-400/50 hover:shadow-md dark:border-[#333] dark:bg-[#1e1e1e] dark:hover:border-orange-500/35 text-left min-h-42";
+  "flex w-full gap-0 overflow-hidden rounded-xl border border-neutral-200 bg-dash-surface shadow-sm transition-all hover:border-orange-400/50 hover:shadow-md dark:border-[#333] dark:hover:border-orange-500/35 text-left min-h-42";
 
 const dragHandleClass =
   "flex shrink-0 cursor-grab touch-none items-center justify-center border-r border-neutral-200 bg-neutral-100 px-1.5 text-neutral-500 hover:bg-neutral-200/80 hover:text-neutral-700 active:cursor-grabbing dark:border-[#333] dark:bg-[#222] dark:text-[#9e9e9e] dark:hover:bg-[#2a2a2a] dark:hover:text-[#b0b0b0]";
@@ -181,7 +181,7 @@ export default function WorkspaceCrmStatusColumn({
                       <p className="text-[10px] font-semibold uppercase tracking-wide text-orange-600 dark:text-orange-400">
                         Tarea
                       </p>
-                      <p className="text-sm font-semibold text-[#212121] dark:text-white line-clamp-2">
+                      <p className="text-sm font-semibold text-dash-ink line-clamp-2">
                         {tt.title?.trim()}
                         {tt.businessLead ? ` · ${tt.businessLead.businessName}` : ""}
                       </p>
@@ -194,7 +194,7 @@ export default function WorkspaceCrmStatusColumn({
                           Abrir lead
                         </Link>
                       )}
-                      <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                      <p className="mt-1 text-xs text-dash-muted">
                         {formatDateShort(tt.startDate)}
                         {tt.dueDate ? ` · Vence ${formatDateShort(tt.dueDate)}` : ""}
                         {tt.priority ? ` · ${tt.priority}` : ""}
@@ -234,7 +234,7 @@ export default function WorkspaceCrmStatusColumn({
                       <p className="text-[10px] font-semibold uppercase tracking-wide text-orange-600 dark:text-orange-400">
                         Actividad
                       </p>
-                      <p className="text-sm font-semibold text-[#212121] dark:text-white line-clamp-2">
+                      <p className="text-sm font-semibold text-dash-ink line-clamp-2">
                         {a.title?.trim() || a.type}
                         {a.businessLead ? ` · ${a.businessLead.businessName}` : ""}
                       </p>
@@ -247,7 +247,7 @@ export default function WorkspaceCrmStatusColumn({
                           Abrir lead
                         </Link>
                       )}
-                      <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                      <p className="mt-1 text-xs text-dash-muted">
                         {a.title?.trim() ? `${a.type} · ` : ""}
                         {formatDateShort(a.activityDate)}
                         {a.dueDate ? ` · Vence ${formatDateShort(a.dueDate)}` : ""}
@@ -289,7 +289,7 @@ export default function WorkspaceCrmStatusColumn({
                       <p className="text-[10px] font-semibold uppercase tracking-wide text-orange-600 dark:text-orange-400">
                         Seguimiento
                       </p>
-                      <p className="text-sm font-semibold text-[#212121] dark:text-white line-clamp-2">
+                      <p className="text-sm font-semibold text-dash-ink line-clamp-2">
                         {(t.notes?.trim() || "Seguimiento").slice(0, 120)}
                         {t.businessLead ? ` · ${t.businessLead.businessName}` : ""}
                       </p>
@@ -302,7 +302,7 @@ export default function WorkspaceCrmStatusColumn({
                           Abrir lead
                         </Link>
                       )}
-                      <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                      <p className="mt-1 text-xs text-dash-muted">
                         {formatDateShort(t.scheduledDate)} · Prioridad {t.priority}
                       </p>
                       <div className="mt-3 flex items-center justify-between gap-2">
@@ -340,7 +340,7 @@ export default function WorkspaceCrmStatusColumn({
                       <p className="text-[10px] font-semibold uppercase tracking-wide text-orange-600 dark:text-orange-400">
                         Propuesta
                       </p>
-                      <p className="text-sm font-semibold text-[#212121] dark:text-white line-clamp-2">
+                      <p className="text-sm font-semibold text-dash-ink line-clamp-2">
                         {p.product?.trim() || "Propuesta"}
                         {p.businessLead ? ` · ${p.businessLead.businessName}` : ""}
                       </p>
@@ -353,7 +353,7 @@ export default function WorkspaceCrmStatusColumn({
                           Abrir lead
                         </Link>
                       )}
-                      <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                      <p className="mt-1 text-xs text-dash-muted">
                         {formatDateShort(p.sentDate)}
                         {p.amount != null ? ` · $${p.amount.toLocaleString("es-MX")}` : ""}
                       </p>
@@ -395,7 +395,7 @@ export default function WorkspaceCrmStatusColumn({
                     className={cardBodyClass}
                     onClick={() => onEditTechTask(tt)}
                   >
-                    <p className="text-sm font-semibold text-[#212121] dark:text-white line-clamp-2">
+                    <p className="text-sm font-semibold text-dash-ink line-clamp-2">
                       {tt.title?.trim()}
                       {tt.businessLead ? ` · ${tt.businessLead.businessName}` : ""}
                     </p>
@@ -408,7 +408,7 @@ export default function WorkspaceCrmStatusColumn({
                         Abrir lead
                       </Link>
                     )}
-                    <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                    <p className="mt-1 text-xs text-dash-muted">
                       {formatDateShort(tt.startDate)}
                       {tt.dueDate ? ` · Vence ${formatDateShort(tt.dueDate)}` : ""}
                       {tt.priority ? ` · ${tt.priority}` : ""}
@@ -450,7 +450,7 @@ export default function WorkspaceCrmStatusColumn({
                     className={cardBodyClass}
                     onClick={() => onEditActivity(a)}
                   >
-                    <p className="text-sm font-semibold text-[#212121] dark:text-white line-clamp-2">
+                    <p className="text-sm font-semibold text-dash-ink line-clamp-2">
                       {a.type}
                       {a.businessLead ? ` · ${a.businessLead.businessName}` : ""}
                     </p>
@@ -463,7 +463,7 @@ export default function WorkspaceCrmStatusColumn({
                         Abrir lead
                       </Link>
                     )}
-                    <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                    <p className="mt-1 text-xs text-dash-muted">
                       {formatDateShort(a.activityDate)}
                       {a.result ? ` · ${a.result}` : ""}
                     </p>
@@ -504,7 +504,7 @@ export default function WorkspaceCrmStatusColumn({
                     className={cardBodyClass}
                     onClick={() => onEditTask(t)}
                   >
-                    <p className="text-sm font-semibold text-[#212121] dark:text-white line-clamp-2">
+                    <p className="text-sm font-semibold text-dash-ink line-clamp-2">
                       {(t.notes?.trim() || "Seguimiento").slice(0, 120)}
                       {t.businessLead ? ` · ${t.businessLead.businessName}` : ""}
                     </p>
@@ -517,7 +517,7 @@ export default function WorkspaceCrmStatusColumn({
                         Abrir lead
                       </Link>
                     )}
-                    <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                    <p className="mt-1 text-xs text-dash-muted">
                       {formatDateShort(t.scheduledDate)} · Prioridad {t.priority}
                     </p>
                     <div className="mt-3 flex items-center justify-between gap-2">
@@ -556,7 +556,7 @@ export default function WorkspaceCrmStatusColumn({
                   className={cardBodyClass}
                   onClick={() => onEditProposal(p)}
                 >
-                  <p className="text-sm font-semibold text-[#212121] dark:text-white line-clamp-2">
+                  <p className="text-sm font-semibold text-dash-ink line-clamp-2">
                     {p.product?.trim() || "Propuesta"}
                     {p.businessLead ? ` · ${p.businessLead.businessName}` : ""}
                   </p>
@@ -569,7 +569,7 @@ export default function WorkspaceCrmStatusColumn({
                       Abrir lead
                     </Link>
                   )}
-                  <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                  <p className="mt-1 text-xs text-dash-muted">
                     {formatDateShort(p.sentDate)}
                     {p.amount != null ? ` · $${p.amount.toLocaleString("es-MX")}` : ""}
                   </p>

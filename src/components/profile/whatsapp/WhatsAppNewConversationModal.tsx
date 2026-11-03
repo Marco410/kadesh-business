@@ -17,7 +17,7 @@ import {
 import type { WhatsAppChatTarget } from "./WhatsAppChatPanel";
 
 const inputClass =
-  "w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-60";
+  "w-full rounded-lg border border-dash-line bg-dash-surface px-3 py-2.5 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-60";
 
 type Mode = "cliente" | "equipo";
 
@@ -122,17 +122,17 @@ export default function WhatsAppNewConversationModal({
             className="fixed inset-0 z-[90] flex items-center justify-center p-4 pointer-events-none"
           >
             <div
-              className="w-full max-w-sm rounded-2xl border border-[#e0e0e0] bg-white p-5 shadow-2xl pointer-events-auto dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+              className="w-full max-w-sm rounded-3xl border border-dash-line bg-dash-surface p-5 shadow-2xl pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-lg font-bold text-[#212121] dark:text-white">
+              <h3 className="text-lg font-bold text-dash-ink">
                 Nueva conversación
               </h3>
 
               <div
                 role="tablist"
                 aria-label="Tipo de conversación"
-                className="mt-3 inline-flex rounded-lg bg-black/5 p-1 dark:bg-white/10"
+                className="mt-3 inline-flex rounded-lg bg-dash-surface-2 p-1"
               >
                 {(["cliente", "equipo"] as const).map((item) => {
                   const selected = mode === item;
@@ -145,8 +145,8 @@ export default function WhatsAppNewConversationModal({
                       onClick={() => setMode(item)}
                       className={`h-8 rounded-md px-3 text-xs font-semibold transition-colors ${
                         selected
-                          ? "bg-white text-[#212121] shadow-sm dark:bg-[#3a3a3a] dark:text-white"
-                          : "text-[#616161] hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:text-white"
+                          ? "bg-white text-dash-ink shadow-sm dark:bg-[#3a3a3a]"
+                          : "text-dash-muted hover:text-dash-ink"
                       }`}
                     >
                       {item === "cliente" ? "Cliente" : "Mi equipo"}
@@ -157,14 +157,14 @@ export default function WhatsAppNewConversationModal({
 
               {mode === "cliente" ? (
                 <>
-                  <p className="mt-3 text-sm text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-3 text-sm text-dash-muted">
                     Agrega el cliente con su nombre y teléfono para poder escribirle. Queda
                     guardado en tus clientes.
                   </p>
 
                   <div className="mt-4 flex flex-col gap-3">
                     <label className="block">
-                      <span className="mb-1.5 block text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+                      <span className="mb-1.5 block text-xs font-medium text-dash-muted">
                         Nombre
                       </span>
                       <input
@@ -178,7 +178,7 @@ export default function WhatsAppNewConversationModal({
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-1.5 block text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+                      <span className="mb-1.5 block text-xs font-medium text-dash-muted">
                         Teléfono (con lada)
                       </span>
                       <input
@@ -193,7 +193,7 @@ export default function WhatsAppNewConversationModal({
                     </label>
                   </div>
 
-                  <p className="mt-3 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-3 text-xs text-dash-muted">
                     Si este cliente nunca te ha escrito, al abrir su chat vas a ver un botón
                     &quot;Iniciar conversación&quot; en vez del cuadro de texto — así arranca la
                     plática sin que tengas que hacer nada desde tu WhatsApp normal.
@@ -204,7 +204,7 @@ export default function WhatsAppNewConversationModal({
                       type="button"
                       onClick={handleClose}
                       disabled={loading}
-                      className="h-10 rounded-lg px-4 text-sm font-semibold text-[#616161] hover:bg-[#f5f5f5] disabled:opacity-60 dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a]"
+                      className="h-10 rounded-lg px-4 text-sm font-semibold text-dash-muted hover:bg-dash-hover disabled:opacity-60"
                     >
                       Cancelar
                     </button>
@@ -212,7 +212,7 @@ export default function WhatsAppNewConversationModal({
                       type="button"
                       onClick={() => void handleSave()}
                       disabled={!canSave || loading}
-                      className="h-10 rounded-lg bg-orange-500 px-4 text-sm font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="h-10 rounded-full dash-grad-accent px-4 text-sm font-semibold text-white hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 shadow-dash-accent"
                     >
                       {loading ? "Agregando..." : "Agregar y abrir chat"}
                     </button>
@@ -220,18 +220,18 @@ export default function WhatsAppNewConversationModal({
                 </>
               ) : (
                 <>
-                  <p className="mt-3 text-sm text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-3 text-sm text-dash-muted">
                     Escríbele por WhatsApp a alguien de tu equipo. Se usa el teléfono de su
                     perfil; el chat solo lo ven esa persona y tú.
                   </p>
 
-                  <div className="mt-4 max-h-64 overflow-y-auto rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a]">
+                  <div className="mt-4 max-h-64 overflow-y-auto rounded-lg border border-dash-line">
                     {teamLoading && members.length === 0 ? (
                       <div className="flex justify-center py-6">
                         <span className="size-5 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
                       </div>
                     ) : members.length === 0 ? (
-                      <p className="p-4 text-center text-sm text-[#616161] dark:text-[#b0b0b0]">
+                      <p className="p-4 text-center text-sm text-dash-muted">
                         No hay nadie más en tu empresa todavía.
                       </p>
                     ) : (
@@ -248,12 +248,12 @@ export default function WhatsAppNewConversationModal({
                                   phone: member.phone,
                                 })
                               }
-                              className="flex w-full flex-col items-start gap-0.5 border-b border-[#f0f0f0] px-4 py-3 text-left transition-colors last:border-0 hover:bg-black/[0.03] disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#2a2a2a] dark:hover:bg-white/5"
+                              className="flex w-full flex-col items-start gap-0.5 border-b border-dash-line px-4 py-3 text-left transition-colors last:border-0 hover:bg-black/[0.03] disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-white/5"
                             >
-                              <span className="text-sm font-semibold text-[#212121] dark:text-white">
+                              <span className="text-sm font-semibold text-dash-ink">
                                 {member.name}
                               </span>
-                              <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                              <span className="text-xs text-dash-muted">
                                 {member.canReceiveWhatsapp
                                   ? member.phone
                                   : "Sin teléfono en su perfil"}
@@ -269,7 +269,7 @@ export default function WhatsAppNewConversationModal({
                     <button
                       type="button"
                       onClick={handleClose}
-                      className="h-10 rounded-lg px-4 text-sm font-semibold text-[#616161] hover:bg-[#f5f5f5] dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a]"
+                      className="h-10 rounded-lg px-4 text-sm font-semibold text-dash-muted hover:bg-dash-hover"
                     >
                       Cancelar
                     </button>

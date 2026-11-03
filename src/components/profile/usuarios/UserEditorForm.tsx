@@ -32,7 +32,7 @@ import { cn } from "kadesh/utils/cn";
 import { sileo } from "sileo";
 
 const inputClassName =
-  "w-full min-h-11 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
+  "w-full min-h-11 rounded-xl border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-sm text-dash-ink placeholder-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 
 const ROLE_HINTS: Record<AssignableCompanyRole, string> = {
   gerencia: "Administra usuarios y permisos de la empresa.",
@@ -328,32 +328,32 @@ export default function UserEditorForm({
           <button
             type="button"
             onClick={onCancel}
-            className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#616161] dark:text-[#b0b0b0] hover:border-orange-500/50 hover:text-orange-600 dark:hover:text-orange-400"
+            className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-dash-line text-dash-muted hover:border-orange-500/50 hover:text-orange-600 dark:hover:text-orange-400"
             aria-label="Volver a la lista"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={20} />
           </button>
           <div className="min-w-0">
-            <p className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e]">
+            <p className="text-xs font-medium uppercase tracking-wide text-dash-faint">
               Usuarios
             </p>
-            <h3 className="text-xl font-bold text-[#212121] dark:text-white">
+            <h3 className="text-xl font-bold text-dash-ink">
               {isEditMode ? "Editar usuario" : "Nuevo usuario"}
             </h3>
           </div>
         </div>
       </div>
 
-      <section className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm sm:p-5">
-        <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+      <section className="rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm sm:p-5">
+        <h4 className="text-sm font-semibold text-dash-ink">
           1. Datos personales
         </h4>
-        <p className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-0.5 text-xs text-dash-muted">
           Con estos datos inicia sesión en el panel.
         </p>
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+            <label className="mb-1.5 block text-sm font-medium text-dash-muted">
               Nombre <span className="text-red-500">*</span>
             </label>
             <input
@@ -366,7 +366,7 @@ export default function UserEditorForm({
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+            <label className="mb-1.5 block text-sm font-medium text-dash-muted">
               Apellido <span className="text-red-500">*</span>
             </label>
             <input
@@ -379,7 +379,7 @@ export default function UserEditorForm({
             />
           </div>
           <div className="sm:col-span-2">
-            <label className="mb-1.5 block text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+            <label className="mb-1.5 block text-sm font-medium text-dash-muted">
               Correo <span className="text-red-500">*</span>
             </label>
             <input
@@ -392,7 +392,7 @@ export default function UserEditorForm({
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+            <label className="mb-1.5 block text-sm font-medium text-dash-muted">
               Contraseña {!isEditMode && <span className="text-red-500">*</span>}
             </label>
             <input
@@ -409,7 +409,7 @@ export default function UserEditorForm({
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+            <label className="mb-1.5 block text-sm font-medium text-dash-muted">
               Confirmar contraseña{" "}
               {!isEditMode && <span className="text-red-500">*</span>}
             </label>
@@ -422,7 +422,7 @@ export default function UserEditorForm({
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+            <label className="mb-1.5 block text-sm font-medium text-dash-muted">
               Teléfono <span className="text-red-500">*</span>
             </label>
             <input
@@ -436,7 +436,7 @@ export default function UserEditorForm({
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+            <label className="mb-1.5 block text-sm font-medium text-dash-muted">
               Fecha de nacimiento <span className="text-red-500">*</span>
             </label>
             <input
@@ -450,11 +450,11 @@ export default function UserEditorForm({
         </div>
       </section>
 
-      <fieldset className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm sm:p-5">
-        <legend className="px-1 text-sm font-semibold text-[#212121] dark:text-white">
+      <fieldset className="rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm sm:p-5">
+        <legend className="px-1 text-sm font-semibold text-dash-ink">
           2. Roles
         </legend>
-        <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-1 text-xs text-dash-muted">
           Puedes combinar roles. Elige al menos uno.
         </p>
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3 sm:items-stretch">
@@ -468,7 +468,7 @@ export default function UserEditorForm({
                   "flex h-full flex-col rounded-xl border px-3 py-3 transition-colors",
                   checked
                     ? "border-orange-500 bg-orange-500/10"
-                    : "border-[#e0e0e0] dark:border-[#3a3a3a]",
+                    : "border-dash-line",
                   helpOpen && "ring-2 ring-orange-500/30",
                 )}
               >
@@ -480,7 +480,7 @@ export default function UserEditorForm({
                       onChange={() => toggleRole(role)}
                       className="size-4 shrink-0 rounded border-[#c0c0c0] text-orange-500 focus:ring-orange-500"
                     />
-                    <span className="text-sm font-semibold text-[#212121] dark:text-white">
+                    <span className="text-sm font-semibold text-dash-ink">
                       {ASSIGNABLE_ROLE_LABELS[role]}
                     </span>
                   </label>
@@ -496,13 +496,13 @@ export default function UserEditorForm({
                       "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors",
                       helpOpen
                         ? "bg-orange-500/15 text-orange-600 dark:text-orange-400"
-                        : "text-[#9e9e9e] hover:bg-[#f5f5f5] hover:text-[#212121] dark:hover:bg-[#2a2a2a] dark:hover:text-white",
+                        : "text-dash-faint hover:bg-dash-hover hover:text-dash-ink",
                     )}
                   >
                     <HugeiconsIcon icon={HelpCircleIcon} size={18} />
                   </button>
                 </div>
-                <p className="mt-1.5 flex-1 pl-6 text-xs leading-snug text-[#616161] dark:text-[#b0b0b0]">
+                <p className="mt-1.5 flex-1 pl-6 text-xs leading-snug text-dash-muted">
                   {ROLE_HINTS[role]}
                 </p>
               </div>
@@ -523,12 +523,12 @@ export default function UserEditorForm({
               <button
                 type="button"
                 onClick={() => setOpenRoleHelp(null)}
-                className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-2 text-xs font-medium text-[#616161] hover:bg-black/5 dark:text-[#b0b0b0] dark:hover:bg-white/10"
+                className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-2 text-xs font-medium text-dash-muted hover:bg-dash-hover"
               >
                 Cerrar
               </button>
             </div>
-            <p className="mt-1.5 text-sm leading-relaxed text-[#424242] dark:text-[#e0e0e0]">
+            <p className="mt-1.5 text-sm leading-relaxed text-dash-soft">
               {ROLE_HELP[openRoleHelp]}
             </p>
           </div>
@@ -537,17 +537,17 @@ export default function UserEditorForm({
 
       <fieldset
         data-tour="usuarios-permissions"
-        className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm sm:p-5"
+        className="rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm sm:p-5"
       >
         <legend className="sr-only">Permisos por módulo</legend>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+            <h4 className="text-sm font-semibold text-dash-ink">
               3. Permisos por módulo
             </h4>
-            <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-1 text-xs text-dash-muted">
               El plan de la suscripción sigue limitando módulos.{" "}
-              <span className="font-medium text-[#212121] dark:text-[#e0e0e0]">
+              <span className="font-medium text-dash-ink dark:text-[#e0e0e0]">
                 {selectedCount} seleccionados
               </span>
             </p>
@@ -559,7 +559,7 @@ export default function UserEditorForm({
                 allPermsSelected ? [] : [...ALL_PERMISSION_KEYS],
               )
             }
-            className="inline-flex min-h-9 shrink-0 items-center self-start rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-3 text-xs font-medium text-[#212121] dark:text-[#e0e0e0] hover:border-orange-500/50"
+            className="inline-flex min-h-9 shrink-0 items-center self-start rounded-lg border border-dash-line px-3 text-xs font-medium text-dash-ink dark:text-[#e0e0e0] hover:border-orange-500/50"
           >
             {allPermsSelected ? "Quitar todos" : "Marcar todos"}
           </button>
@@ -577,7 +577,7 @@ export default function UserEditorForm({
             return (
               <div
                 key={mod.id}
-                className="rounded-xl border border-[#ececec] dark:border-[#2e2e2e] bg-[#fafafa] dark:bg-[#181818] p-3"
+                className="rounded-xl border border-dash-line dark:border-[#2e2e2e] bg-dash-surface-2 dark:bg-[#181818] p-3"
               >
                 <div className="flex items-center gap-3">
                   <label className="inline-flex min-h-10 cursor-pointer items-center gap-2">
@@ -593,11 +593,11 @@ export default function UserEditorForm({
                       className="size-4 rounded border-[#c0c0c0] text-orange-500 focus:ring-orange-500"
                       aria-label={`Todo el módulo ${mod.label}`}
                     />
-                    <span className="text-sm font-semibold text-[#212121] dark:text-white">
+                    <span className="text-sm font-semibold text-dash-ink">
                       {mod.label}
                     </span>
                   </label>
-                  <span className="ml-auto rounded-full bg-white px-2 py-0.5 text-[11px] font-medium tabular-nums text-[#616161] dark:bg-[#2a2a2a] dark:text-[#9e9e9e]">
+                  <span className="ml-auto rounded-full bg-white px-2 py-0.5 text-[11px] font-medium tabular-nums text-dash-muted dark:bg-[#2a2a2a]">
                     {checkedCount}/{keys.length}
                   </span>
                 </div>
@@ -612,7 +612,7 @@ export default function UserEditorForm({
                             "inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors",
                             on
                               ? "border-orange-500/60 bg-orange-500/15 text-orange-800 dark:text-orange-200"
-                              : "border-[#e0e0e0] bg-white text-[#616161] dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-[#b0b0b0]",
+                              : "border-dash-line bg-dash-surface text-dash-muted",
                           )}
                         >
                           <input
@@ -645,14 +645,14 @@ export default function UserEditorForm({
           type="button"
           onClick={onCancel}
           disabled={submitting}
-          className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-4 py-2 text-sm font-medium text-[#212121] dark:text-[#e0e0e0] disabled:opacity-50"
+          className="inline-flex min-h-11 items-center justify-center rounded-xl border border-dash-line px-4 py-2 text-sm font-medium text-dash-ink dark:text-[#e0e0e0] disabled:opacity-50"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex min-h-11 items-center justify-center rounded-xl bg-orange-500 px-5 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-50"
+          className="inline-flex min-h-11 items-center justify-center rounded-full dash-grad-accent px-5 py-2 text-sm font-semibold text-white hover:shadow-dash-accent-lift disabled:opacity-50 shadow-dash-accent"
         >
           {submitting
             ? "Guardando…"

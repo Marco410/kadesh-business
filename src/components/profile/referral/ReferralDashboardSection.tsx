@@ -83,7 +83,7 @@ function SummaryCard({ label, amount, currency, highlight, color, className }: S
       ? "border-amber-200/60 dark:border-amber-500/20 bg-amber-50/50 dark:bg-amber-500/5"
       : color === "emerald"
         ? "border-emerald-200/60 dark:border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-500/5"
-        : "border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e]";
+        : "border-dash-line bg-dash-surface";
 
   const amountColor = highlight
     ? "text-orange-600 dark:text-orange-400"
@@ -91,11 +91,11 @@ function SummaryCard({ label, amount, currency, highlight, color, className }: S
       ? "text-amber-600 dark:text-amber-400"
       : color === "emerald"
         ? "text-emerald-600 dark:text-emerald-400"
-        : "text-[#212121] dark:text-white";
+        : "text-dash-ink";
 
   return (
     <div className={`rounded-xl border p-4 ${borderAndBg} ${className ?? ""}`}>
-      <p className="text-xs text-[#616161] dark:text-[#9e9e9e] mb-1">{label}</p>
+      <p className="text-xs text-dash-muted mb-1">{label}</p>
       <p className={`text-lg font-bold ${amountColor}`}>{formatCurrency(amount, currency)}</p>
     </div>
   );
@@ -135,8 +135,8 @@ function ReferredUsersTab({ userId }: { userId: string }) {
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500 mb-4">
           <HugeiconsIcon icon={UserAdd01Icon} size={26} />
         </div>
-        <p className="font-semibold text-[#212121] dark:text-white">Sin referidos aún</p>
-        <p className="mt-1 text-sm text-[#616161] dark:text-[#9e9e9e] max-w-xs">
+        <p className="font-semibold text-dash-ink">Sin referidos aún</p>
+        <p className="mt-1 text-sm text-dash-muted max-w-xs">
           Comparte tu enlace de referido para comenzar a ganar comisiones.
         </p>
       </div>
@@ -145,46 +145,46 @@ function ReferredUsersTab({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-[#616161] dark:text-[#9e9e9e]">
-        <span className="font-medium text-[#424242] dark:text-[#e0e0e0]">{users.length}</span>{" "}
+      <p className="text-sm text-dash-muted">
+        <span className="font-medium text-dash-soft">{users.length}</span>{" "}
         {users.length === 1 ? "usuario registrado" : "usuarios registrados"} con tu código
-        <span className="text-[#9e9e9e] dark:text-[#616161]"> · más recientes primero</span>
+        <span className="text-dash-faint"> · más recientes primero</span>
       </p>
-      <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden">
-        <div className="hidden sm:grid sm:grid-cols-[minmax(0,1fr)_auto_auto] gap-4 px-5 py-2.5 border-b border-[#f0f0f0] dark:border-[#2a2a2a] bg-[#fafafa] dark:bg-[#161616] text-[10px] font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#616161]">
+      <div className="rounded-xl border border-dash-line bg-dash-surface overflow-hidden">
+        <div className="hidden sm:grid sm:grid-cols-[minmax(0,1fr)_auto_auto] gap-4 px-5 py-2.5 border-b border-dash-line bg-dash-surface-2 text-[10px] font-semibold uppercase tracking-wide text-dash-faint">
           <span>Referido</span>
           <span className="text-right sm:text-left whitespace-nowrap">Último acceso</span>
           <span className="text-right sm:text-left whitespace-nowrap">Registro</span>
         </div>
-        <ul className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+        <ul className="divide-y divide-dash-line">
           {paginatedUsers.map((user) => (
             <li key={user.id}>
               <div className="flex flex-col gap-3 px-5 py-4 sm:grid sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:gap-4">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f5f5f5] dark:bg-[#2a2a2a] text-[#9e9e9e]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-dash-surface-2 text-dash-faint">
                     <HugeiconsIcon icon={UserIcon} size={18} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-[#212121] dark:text-white truncate">
+                    <p className="text-sm font-medium text-dash-ink truncate">
                       {user.name?.trim() || "Sin nombre"}
                     </p>
-                    <p className="text-xs text-[#616161] dark:text-[#9e9e9e] truncate">{user.email}</p>
+                    <p className="text-xs text-dash-muted truncate">{user.email}</p>
                   </div>
                 </div>
                 <div className="flex sm:contents flex-wrap gap-4 pl-[52px] sm:pl-0">
                   <div className="min-w-[8.5rem]">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#616161] sm:hidden">
+                    <p className="text-[10px] font-medium uppercase tracking-wide text-dash-faint sm:hidden">
                       Último acceso
                     </p>
-                    <p className="text-sm text-[#424242] dark:text-[#e0e0e0] tabular-nums">
+                    <p className="text-sm text-dash-soft tabular-nums">
                       {formatDate(user.lastLoginAt, { emptyLabel: "Sin ingresos aún" })}
                     </p>
                   </div>
                   <div className="min-w-[8.5rem]">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#616161] sm:hidden">
+                    <p className="text-[10px] font-medium uppercase tracking-wide text-dash-faint sm:hidden">
                       Registro
                     </p>
-                    <p className="text-sm text-[#424242] dark:text-[#e0e0e0] tabular-nums">
+                    <p className="text-sm text-dash-soft tabular-nums">
                       {formatDate(user.createdAt)}
                     </p>
                   </div>
@@ -194,8 +194,8 @@ function ReferredUsersTab({ userId }: { userId: string }) {
           ))}
         </ul>
         {totalPages > 1 && (
-          <div className="flex flex-col gap-2 border-t border-[#f0f0f0] dark:border-[#2a2a2a] px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-[#9e9e9e] dark:text-[#616161]">
+          <div className="flex flex-col gap-2 border-t border-dash-line px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-dash-faint">
               {(currentPage - 1) * REFERRED_USERS_PAGE_SIZE + 1}–
               {Math.min(currentPage * REFERRED_USERS_PAGE_SIZE, users.length)} de {users.length}
             </p>
@@ -204,18 +204,18 @@ function ReferredUsersTab({ userId }: { userId: string }) {
                 type="button"
                 onClick={() => setPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-3 py-1.5 text-xs font-medium text-[#424242] dark:text-[#bdbdbd] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="rounded-lg border border-dash-line px-3 py-1.5 text-xs font-medium text-dash-soft dark:text-[#bdbdbd] hover:bg-dash-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 ← Anterior
               </button>
-              <span className="px-2 text-xs text-[#616161] dark:text-[#9e9e9e]">
+              <span className="px-2 text-xs text-dash-muted">
                 {currentPage} / {totalPages}
               </span>
               <button
                 type="button"
                 onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-3 py-1.5 text-xs font-medium text-[#424242] dark:text-[#bdbdbd] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="rounded-lg border border-dash-line px-3 py-1.5 text-xs font-medium text-dash-soft dark:text-[#bdbdbd] hover:bg-dash-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Siguiente →
               </button>
@@ -268,8 +268,8 @@ function CommissionsTab({ userId }: { userId: string }) {
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500 mb-4">
           <HugeiconsIcon icon={Chart01Icon} size={26} />
         </div>
-        <p className="font-semibold text-[#212121] dark:text-white">Sin comisiones aún</p>
-        <p className="mt-1 text-sm text-[#616161] dark:text-[#9e9e9e] max-w-xs">
+        <p className="font-semibold text-dash-ink">Sin comisiones aún</p>
+        <p className="mt-1 text-sm text-dash-muted max-w-xs">
           Tus comisiones aparecerán aquí una vez que tus referidos se suscriban.
         </p>
       </div>
@@ -300,35 +300,35 @@ function CommissionsTab({ userId }: { userId: string }) {
         />
       </div>
 
-      <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden">
+      <div className="rounded-xl border border-dash-line bg-dash-surface overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#f0f0f0] dark:border-[#2a2a2a] bg-[#fafafa] dark:bg-[#161616]">
-                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#616161]">
+              <tr className="border-b border-dash-line bg-dash-surface-2">
+                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-dash-faint">
                   Referido
                 </th>
-                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#616161]">
+                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-dash-faint">
                   Plan
                 </th>
-                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#616161]">
+                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-dash-faint">
                   Tipo
                 </th>
-                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#616161]">
+                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-dash-faint">
                   Estado
                 </th>
-                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#616161] hidden sm:table-cell">
+                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-dash-faint hidden sm:table-cell">
                   Período
                 </th>
-                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#616161] hidden md:table-cell">
+                <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-dash-faint hidden md:table-cell">
                   Fecha de creación
                 </th>
-                <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#616161]">
+                <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-dash-faint">
                   Monto
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+            <tbody className="divide-y divide-dash-line">
               {paginated.map((commission) => {
                 const statusCfg = STATUS_CONFIG[commission.status] ?? STATUS_CONFIG.PENDING;
                 const typeCfg = TYPE_CONFIG[commission.type] ?? TYPE_CONFIG.RECURRING;
@@ -342,7 +342,7 @@ function CommissionsTab({ userId }: { userId: string }) {
                     : "—";
 
                 return (
-                  <tr key={commission.id} className="hover:bg-[#fafafa] dark:hover:bg-[#1a1a1a] transition-colors">
+                  <tr key={commission.id} className="hover:bg-dash-hover dark:hover:bg-[#1a1a1a] transition-colors">
                     <td className="px-5 py-3.5">
                       {commission.referredUser.name} {commission.referredUser.lastName}
                     </td>
@@ -359,13 +359,13 @@ function CommissionsTab({ userId }: { userId: string }) {
                         {statusCfg.label}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-xs text-[#616161] dark:text-[#9e9e9e] hidden sm:table-cell whitespace-nowrap">
+                    <td className="px-5 py-3.5 text-xs text-dash-muted hidden sm:table-cell whitespace-nowrap">
                       {periodRange}
                     </td>
-                    <td className="px-5 py-3.5 text-xs text-[#616161] dark:text-[#9e9e9e] hidden md:table-cell whitespace-nowrap">
+                    <td className="px-5 py-3.5 text-xs text-dash-muted hidden md:table-cell whitespace-nowrap">
                       {formatDate(commission.createdAt ?? "")}
                     </td>
-                    <td className="px-5 py-3.5 text-right font-semibold text-[#212121] dark:text-white whitespace-nowrap">
+                    <td className="px-5 py-3.5 text-right font-semibold text-dash-ink whitespace-nowrap">
                       {formatCurrency(commission.amount, commission.currency)}
                     </td>
                   </tr>
@@ -376,8 +376,8 @@ function CommissionsTab({ userId }: { userId: string }) {
         </div>
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-[#f0f0f0] dark:border-[#2a2a2a] px-5 py-3.5">
-            <p className="text-xs text-[#9e9e9e] dark:text-[#616161]">
+          <div className="flex items-center justify-between border-t border-dash-line px-5 py-3.5">
+            <p className="text-xs text-dash-faint">
               {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, commissions.length)} de{" "}
               {commissions.length} comisiones
             </p>
@@ -386,7 +386,7 @@ function CommissionsTab({ userId }: { userId: string }) {
                 type="button"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-3 py-1.5 text-xs font-medium text-[#424242] dark:text-[#bdbdbd] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="rounded-lg border border-dash-line px-3 py-1.5 text-xs font-medium text-dash-soft dark:text-[#bdbdbd] hover:bg-dash-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 ← Anterior
               </button>
@@ -399,7 +399,7 @@ function CommissionsTab({ userId }: { userId: string }) {
                 }, [])
                 .map((p, idx) =>
                   p === "…" ? (
-                    <span key={`ellipsis-${idx}`} className="px-1 text-xs text-[#9e9e9e]">
+                    <span key={`ellipsis-${idx}`} className="px-1 text-xs text-dash-faint">
                       …
                     </span>
                   ) : (
@@ -410,7 +410,7 @@ function CommissionsTab({ userId }: { userId: string }) {
                       className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                         page === p
                           ? "bg-orange-500 text-white shadow-sm"
-                          : "border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#424242] dark:text-[#bdbdbd] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                          : "border border-dash-line text-dash-soft dark:text-[#bdbdbd] hover:bg-dash-hover"
                       }`}
                     >
                       {p}
@@ -421,7 +421,7 @@ function CommissionsTab({ userId }: { userId: string }) {
                 type="button"
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] px-3 py-1.5 text-xs font-medium text-[#424242] dark:text-[#bdbdbd] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="rounded-lg border border-dash-line px-3 py-1.5 text-xs font-medium text-dash-soft dark:text-[#bdbdbd] hover:bg-dash-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Siguiente →
               </button>
@@ -463,7 +463,7 @@ export default function ReferralDashboardSection({ userId }: ReferralDashboardSe
       />
 
       <div
-        className="flex w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-1 gap-1 shadow-sm"
+        className="flex w-full rounded-xl border border-dash-line bg-dash-surface p-1 gap-1 shadow-sm"
         role="tablist"
         aria-label="Vista de referidos"
       >
@@ -477,7 +477,7 @@ export default function ReferralDashboardSection({ userId }: ReferralDashboardSe
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 min-w-0 ${
               activeSubTab === tab.key
                 ? "bg-orange-500 text-white shadow-sm"
-                : "text-[#616161] dark:text-[#9e9e9e] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                : "text-dash-muted hover:bg-dash-hover"
             }`}
           >
             <HugeiconsIcon icon={tab.icon} size={16} className="shrink-0" />

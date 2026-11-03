@@ -37,11 +37,11 @@ function Field({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="grid grid-cols-[120px_1fr] gap-2 py-2 text-sm border-b border-[#e8e8e8] dark:border-[#333] last:border-0">
-      <dt className="font-medium text-[#616161] dark:text-[#b0b0b0] shrink-0">
+    <div className="grid grid-cols-[120px_1fr] gap-2 py-2 text-sm border-b border-dash-line last:border-0">
+      <dt className="font-medium text-dash-muted shrink-0">
         {label}
       </dt>
-      <dd className="text-[#212121] dark:text-[#ffffff] min-w-0 break-words">
+      <dd className="text-dash-ink min-w-0 break-words">
         {children ?? (value != null && value !== "" ? String(value) : "—")}
       </dd>
     </div>
@@ -56,8 +56,8 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] overflow-hidden shadow-sm">
-      <h2 className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] bg-[#fafafa] dark:bg-[#252525] border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
+    <div className="rounded-xl border border-dash-line bg-dash-surface overflow-hidden shadow-sm">
+      <h2 className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-dash-muted bg-dash-surface-2 border-b border-dash-line">
         {title}
       </h2>
       <div className="px-4 py-3">{children}</div>
@@ -80,9 +80,9 @@ function toDateInputValue(value: string | null | undefined): string {
 }
 
 const inputClassName =
-  "w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
+  "w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 const labelClassName =
-  "block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5";
+  "block text-sm font-medium text-dash-muted mb-1.5";
 
 export default function ProjectDetailSection() {
   const params = useParams();
@@ -195,7 +195,7 @@ export default function ProjectDetailSection() {
   if (!id) {
     return (
       <main className="max-w-4xl mx-auto px-4 py-8">
-        <p className="text-[#616161] dark:text-[#b0b0b0]">
+        <p className="text-dash-muted">
           ID de proyecto no válido.
         </p>
       </main>
@@ -215,14 +215,14 @@ export default function ProjectDetailSection() {
   if (error || !project) {
     return (
       <main className="max-w-4xl mx-auto px-4 py-8">
-        <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 text-center">
-          <p className="text-[#616161] dark:text-[#b0b0b0] mb-4">
+        <div className="rounded-xl border border-dash-line bg-dash-surface p-6 text-center">
+          <p className="text-dash-muted mb-4">
             {error?.message ?? "No se encontró el proyecto."}
           </p>
           <button
             type="button"
             onClick={() => router.back()}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium hover:bg-orange-600"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full dash-grad-accent text-white text-sm font-medium hover:shadow-dash-accent-lift shadow-dash-accent"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={18} />
             Volver
@@ -234,10 +234,10 @@ export default function ProjectDetailSection() {
 
   const statusClass =
     PROJECT_STATUS_CLASSES[project.status ?? ""] ??
-    "bg-[#f0f0f0] text-[#616161] dark:bg-[#333] dark:text-[#b0b0b0]";
+    "bg-dash-surface-2 text-dash-muted";
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-6 sm:py-8 mt-20">
+    <main className="max-w-4xl mx-auto pb-8">
       <div className="mb-6">
         <Link
           href={
@@ -245,7 +245,7 @@ export default function ProjectDetailSection() {
               ? Routes.panelLead(project.businessLead.id)
               : "/panel"
           }
-          className="inline-flex items-center gap-2 text-sm font-medium text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-medium text-dash-muted hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={18} />
           {project.businessLead?.businessName
@@ -256,7 +256,7 @@ export default function ProjectDetailSection() {
 
       <header className="mb-8">
         <div className="flex flex-wrap items-start gap-3">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#212121] dark:text-[#ffffff]">
+          <h1 className="text-2xl sm:text-3xl font-bold text-dash-ink">
             {isEditing ? name || "Proyecto" : project.name}
           </h1>
           {!isEditing && project.status && (
@@ -270,7 +270,7 @@ export default function ProjectDetailSection() {
             <span
               className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
                 PROJECT_STATUS_CLASSES[status] ??
-                "bg-[#f0f0f0] text-[#616161] dark:bg-[#333] dark:text-[#b0b0b0]"
+                "bg-dash-surface-2 text-dash-muted"
               }`}
             >
               {status || "—"}
@@ -280,7 +280,7 @@ export default function ProjectDetailSection() {
         {(project.serviceType ||
           project.startDate ||
           (isEditing && (serviceType || startDate))) && (
-          <p className="mt-2 text-[#616161] dark:text-[#b0b0b0] text-sm">
+          <p className="mt-2 text-dash-muted text-sm">
             {[
               isEditing ? serviceType : project.serviceType,
               (isEditing ? startDate : project.startDate)
@@ -425,14 +425,14 @@ export default function ProjectDetailSection() {
                 <button
                   type="button"
                   onClick={handleCancelEdit}
-                  className="px-4 py-2 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-[#ffffff] text-sm font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#333]"
+                  className="px-4 py-2 rounded-lg border border-dash-line text-dash-ink text-sm font-medium hover:bg-dash-hover"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={saving || !name.trim()}
-                  className="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium hover:bg-orange-600 disabled:opacity-50 disabled:pointer-events-none"
+                  className="px-4 py-2 rounded-full dash-grad-accent text-white text-sm font-medium hover:shadow-dash-accent-lift disabled:opacity-50 disabled:pointer-events-none shadow-dash-accent"
                 >
                   {saving ? "Guardando…" : "Guardar"}
                 </button>
@@ -559,7 +559,7 @@ export default function ProjectDetailSection() {
         )}
       </div>
 
-      <div className="mt-6 text-xs text-[#9e9e9e] dark:text-[#666]">
+      <div className="mt-6 text-xs text-dash-faint dark:text-[#666]">
         Creado:{" "}
         {project.createdAt ? formatDateShort(project.createdAt, true) : "—"}
         {project.updatedAt && (

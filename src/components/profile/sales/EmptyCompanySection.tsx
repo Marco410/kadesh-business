@@ -102,11 +102,11 @@ export default function EmptyCompanySection({ userId, onSuccess }: EmptyCompanyS
 
   return (
     <div className="w-full space-y-6">
-      <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8 shadow-sm max-w-lg">
-        <h2 className="text-xl font-bold text-[#212121] dark:text-[#ffffff] mb-2">
+      <div className="rounded-xl border border-dash-line bg-dash-surface p-6 sm:p-8 shadow-sm max-w-lg">
+        <h2 className="text-xl font-bold text-dash-ink mb-2">
           Crea tu negocio
         </h2>
-        <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mb-6">
+        <p className="text-sm text-dash-muted mb-6">
           Asocia un negocio a tu cuenta para empezar a obtener clientes y gestionar ventas.
         </p>
         <form onSubmit={handleCreateCompany} className="space-y-4">
@@ -118,7 +118,7 @@ export default function EmptyCompanySection({ userId, onSuccess }: EmptyCompanyS
           <div>
             <label
               htmlFor="company-name"
-              className="block text-sm font-medium text-[#212121] dark:text-[#ffffff] mb-1.5"
+              className="block text-sm font-medium text-dash-ink mb-1.5"
             >
               Nombre de negocio <span className="text-red-500">*</span>
             </label>
@@ -129,13 +129,13 @@ export default function EmptyCompanySection({ userId, onSuccess }: EmptyCompanyS
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               disabled={creatingCompany}
-              className="w-full px-4 py-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60"
+              className="w-full px-4 py-3 rounded-xl border border-dash-line bg-dash-surface text-dash-ink placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60"
             />
           </div>
           <button
             type="submit"
             disabled={creatingCompany}
-            className="w-full px-4 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full px-4 py-3 rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white font-semibold transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-dash-accent"
           >
             {creatingCompany ? (
               <>

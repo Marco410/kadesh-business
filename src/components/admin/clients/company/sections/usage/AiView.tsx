@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
-import { ShareBars } from "kadesh/components/panel/dashboard";
+import { HBarList } from "kadesh/components/app-shell";
 import { TRACK_EVENT, trackActivity } from "kadesh/utils/activity";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { ADMIN_PAGE_SIZE, AI_FEATURE_LABELS } from "../../../../constants";
@@ -82,10 +82,10 @@ function ConversationDrawer({
         <div className="flex flex-col gap-4">
           {blocks.map((block) => (
             <section key={block.label}>
-              <h4 className="text-xs font-semibold uppercase tracking-wide text-[#9e9e9e]">
+              <h4 className="text-xs font-semibold uppercase tracking-wide text-dash-faint">
                 {block.label}
               </h4>
-              <pre className="mt-1.5 max-h-80 overflow-auto whitespace-pre-wrap rounded-xl bg-[#fafafa] p-3 font-sans text-sm text-[#212121] dark:bg-[#252525] dark:text-white">
+              <pre className="mt-1.5 max-h-80 overflow-auto whitespace-pre-wrap rounded-xl bg-dash-surface-2 p-3 font-sans text-sm text-dash-ink">
                 {block.value?.trim() || "—"}
               </pre>
             </section>
@@ -141,7 +141,7 @@ export default function AiView({
           />
         </div>
         <AdminSectionCard title="Por función" description="Llamadas a la IA por función.">
-          <ShareBars items={byFeature} emptyLabel="Todavía no usan la IA." />
+          <HBarList items={byFeature} emptyLabel="Todavía no usan la IA." />
         </AdminSectionCard>
       </div>
 
@@ -158,7 +158,7 @@ export default function AiView({
         <>
           <div className={`${surfaceClass} relative overflow-x-auto`}>
             <table className="w-full min-w-[880px] text-left text-sm">
-              <thead className="border-b border-[#e8e8e8] text-xs uppercase tracking-wide text-[#616161] dark:border-[#333] dark:text-[#b0b0b0]">
+              <thead className="border-b border-dash-line text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                 <tr>
                   <th className="px-4 py-3">Fecha</th>
                   <th className="px-4 py-3">Función</th>
@@ -172,30 +172,30 @@ export default function AiView({
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+              <tbody className="divide-y divide-dash-line">
                 {rows.map((row) => (
                   <tr key={row.id}>
-                    <td className="whitespace-nowrap px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                    <td className="whitespace-nowrap px-4 py-3 text-dash-muted">
                       {formatDateShort(row.createdAt, true)}
                     </td>
-                    <td className="px-4 py-3 font-medium text-[#212121] dark:text-white">
+                    <td className="px-4 py-3 font-medium text-dash-ink">
                       {AI_FEATURE_LABELS[row.feature ?? ""] ?? row.feature ?? "—"}
                     </td>
-                    <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                    <td className="px-4 py-3 text-dash-muted">
                       {row.user ? formatPersonName(row.user.name, row.user.lastName) : "—"}
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <td className="px-4 py-3 text-xs text-dash-muted">
                       {row.model ?? "—"}
                       {row.billingMode ? (
-                        <span className="block text-[#9e9e9e]">
+                        <span className="block text-dash-faint">
                           {BILLING_LABELS[row.billingMode] ?? row.billingMode}
                         </span>
                       ) : null}
                     </td>
-                    <td className="px-4 py-3 text-xs tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+                    <td className="px-4 py-3 text-xs tabular-nums text-dash-muted">
                       {formatCredits((row.inputTokens ?? 0) + (row.outputTokens ?? 0))}
                     </td>
-                    <td className="px-4 py-3 tabular-nums text-[#212121] dark:text-white">
+                    <td className="px-4 py-3 tabular-nums text-dash-ink">
                       {formatCredits(row.creditsCharged ?? 0)}
                     </td>
                     <td className="px-4 py-3">
@@ -217,7 +217,7 @@ export default function AiView({
                       <button
                         type="button"
                         onClick={() => setOpenCallId(row.id)}
-                        className="h-9 whitespace-nowrap rounded-lg border border-[#e0e0e0] px-3 text-xs font-semibold text-[#212121] hover:border-orange-300 dark:border-[#3a3a3a] dark:text-white cursor-pointer"
+                        className="h-9 whitespace-nowrap rounded-lg border border-dash-line px-3 text-xs font-semibold text-dash-ink hover:border-orange-300 cursor-pointer"
                       >
                         Ver conversación
                       </button>
