@@ -26,9 +26,8 @@ import AdminAnalyticsSection from "./analytics/AdminAnalyticsSection";
 import AdminPlansPanel from "./AdminPlansPanel";
 import AdminContentSection from "./AdminContentSection";
 import AdminReleasesPanel from "./releases/AdminReleasesPanel";
-import AdminPetPlacesPanel, {
-  type PetPlacesVista,
-} from "./AdminPetPlacesPanel";
+import AdminPetSection from "./pet/AdminPetSection";
+import { parsePetVista, PET_VISTAS, type PetVista } from "./pet/constants";
 
 function AdminFallback() {
   return (
@@ -48,9 +47,7 @@ function AdminDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tab = parseAdminTab(searchParams.get("tab"));
-  const rawPetVista = searchParams.get("vista");
-  const vista: PetPlacesVista =
-    rawPetVista === "servicios" || rawPetVista === "fichas" ? rawPetVista : "animales";
+  const petVista = parsePetVista(searchParams.get("vista"));
   const plansVista = parsePlansVista(searchParams.get("vista"));
   const [reviewPlaceId, setReviewPlaceId] = useState<string | null>(null);
   const [reviewServiceId, setReviewServiceId] = useState<string | null>(null);
@@ -90,9 +87,10 @@ function AdminDashboardContent() {
     [router, searchParams],
   );
 
-  const setPetPlacesVista = useCallback(
-    (next: PetPlacesVista) => {
-      setTab(ADMIN_TABS.PET_PLACES, next === "animales" ? undefined : next);
+  /** Kadesh Pet abre en Resumen: esa vista no lleva `vista` en la URL. */
+  const setPetVista = useCallback(
+    (next: PetVista) => {
+      setTab(ADMIN_TABS.PET_PLACES, next === PET_VISTAS.SUMMARY ? undefined : next);
     },
     [setTab],
   );
@@ -110,7 +108,7 @@ function AdminDashboardContent() {
   const openPlaceReview = useCallback(
     (placeId: string) => {
       setReviewPlaceId(placeId);
-      setTab(ADMIN_TABS.PET_PLACES, "fichas");
+      setTab(ADMIN_TABS.PET_PLACES, PET_VISTAS.PLACES);
     },
     [setTab],
   );
@@ -118,7 +116,7 @@ function AdminDashboardContent() {
   const openServiceReview = useCallback(
     (serviceId: string) => {
       setReviewServiceId(serviceId);
-      setTab(ADMIN_TABS.PET_PLACES, "servicios");
+      setTab(ADMIN_TABS.PET_PLACES, PET_VISTAS.SERVICES);
     },
     [setTab],
   );
@@ -184,9 +182,9 @@ function AdminDashboardContent() {
       {tab === ADMIN_TABS.CONTENT ? <AdminContentSection /> : null}
       {tab === ADMIN_TABS.RELEASES ? <AdminReleasesPanel /> : null}
       {tab === ADMIN_TABS.PET_PLACES ? (
-        <AdminPetPlacesPanel
-          vista={vista}
-          onVistaChange={setPetPlacesVista}
+        <AdminPetSection
+          vista={petVista}
+          onVistaChange={setPetVista}
           initialPlaceId={reviewPlaceId}
           onConsumedInitialPlace={clearReviewPlace}
           initialServiceId={reviewServiceId}
@@ -202,7 +200,8 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#0a0a0a]">
       <Navigation />
       <main className="pt-20 pb-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Todo el ancho (es una herramienta interna con tablas y gráficas); mismo margen que la barra de navegación. */}
+        <div className="w-full px-4 sm:px-10">
           <Suspense fallback={<AdminFallback />}>
             <AdminDashboardContent />
           </Suspense>

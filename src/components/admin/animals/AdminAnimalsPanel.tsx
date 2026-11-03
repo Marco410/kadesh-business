@@ -58,10 +58,20 @@ const selectClass =
 const iconButton =
   "inline-flex size-10 items-center justify-center rounded-xl border border-[#e0e0e0] text-[#424242] transition-colors hover:border-orange-400 hover:text-orange-800 disabled:opacity-40 dark:border-[#3a3a3a] dark:text-[#d6d6d6] dark:hover:text-orange-300";
 
+function parseFacebookFilter(value: string | null): AnimalFacebookFilter {
+  return FACEBOOK_FILTER_OPTIONS.find((option) => option.value === value)?.value ?? "todos";
+}
+
+function parseStatusFilter(value: string | null): string {
+  return value && value in ANIMAL_STATUS_LABELS ? value : "";
+}
+
 /**
  * Kadesh Pet → Animales: todos los animales (de usuarios y del admin) con filtros, estadísticas
  * y acciones: ver detalle, editar en Kadesh Pet, abrir la ficha pública y publicar en Facebook.
  * El animal abierto vive en `?animal=` para que la campana pueda llevar directo a él.
+ * `?estado=` (valor de la bitácora) y `?facebook=` (`pendiente` / `publicado`) fijan los filtros
+ * iniciales.
  */
 export default function AdminAnimalsPanel() {
   const router = useRouter();
@@ -72,8 +82,11 @@ export default function AdminAnimalsPanel() {
   const [search, setSearch] = useState("");
   const [animalTypeId, setAnimalTypeId] = useState("");
   const [creator, setCreator] = useState<AnimalCreatorFilter>("todos");
-  const [facebook, setFacebook] = useState<AnimalFacebookFilter>("todos");
-  const [status, setStatus] = useState("");
+  // Filtros iniciales desde la URL: el Resumen de Kadesh Pet abre la lista ya filtrada.
+  const [facebook, setFacebook] = useState<AnimalFacebookFilter>(() =>
+    parseFacebookFilter(searchParams.get("facebook")),
+  );
+  const [status, setStatus] = useState(() => parseStatusFilter(searchParams.get("estado")));
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebouncedValue(search, 300);
 

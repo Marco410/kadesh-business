@@ -4,7 +4,7 @@ Pantalla interna en `/panel/clientes/admin`. No es el panel de un cliente: es de
 
 ## Promesa
 
-Ver y controlar a cada **cliente** en 360° (empresa, plan y pagos, equipo, CRM, consumo, integraciones y lo que hace cada persona), seguir la **actividad** de toda la plataforma, y ajustar el **catálogo de planes**, el **contenido** (blog y correos) y **Kadesh Pet** (animales, fichas de veterinarias y servicios). El default es Inicio. Las secciones viven en `?tab=clientes`, `?tab=actividad`, `?tab=analitica`, `?tab=planes`, `?tab=contenido` y `?tab=veterinarias` (Kadesh Pet; la llave se conserva para no romper enlaces).
+Ver y controlar a cada **cliente** en 360° (empresa, plan y pagos, equipo, CRM, consumo, integraciones y lo que hace cada persona), seguir la **actividad** de toda la plataforma, y ajustar el **catálogo de planes**, el **contenido** (blog y correos) y **Kadesh Pet** (resumen con cifras y gráficas, animales, fichas de veterinarias y servicios). El default es Inicio. Las secciones viven en `?tab=clientes`, `?tab=actividad`, `?tab=analitica`, `?tab=planes`, `?tab=contenido` y `?tab=veterinarias` (Kadesh Pet; la llave se conserva para no romper enlaces).
 
 Los enlaces viejos (`?tab=usuarios`, `suscripciones`, `empresas`, `blog`, `correos`) se redirigen solos a la sección nueva (`normalizeLegacyAdminParams` en `constants.ts`).
 
@@ -157,7 +157,17 @@ Un nombre, compartido por los dos blogs. No se renombran ni se borran desde aqu�
 
 ## Veterinarias
 
-Pestaña **Kadesh Pet** (`?tab=veterinarias`), tres vistas: **Animales** (default), **Veterinarias** (`&vista=fichas`) y **Servicios** (`&vista=servicios`).
+Pestaña **Kadesh Pet** (`?tab=veterinarias`), cuatro vistas: **Resumen** (default, sin `vista`), **Animales** (`&vista=animales`), **Veterinarias** (`&vista=fichas`) y **Servicios** (`&vista=servicios`). El shell es `pet/AdminPetSection.tsx`; solo se monta la vista abierta, así cada una pide solo sus datos.
+
+**Resumen** (`pet/overview/`, 2026-11-03): cómo va Kadesh Pet. Sale de `adminPetSummary` y `adminPetSeries` (kadesh-back, `queries/admin/adminPet.ts`).
+
+- **Controles globales** en la URL: **Periodo** (`&rango=30d|90d|6m|12m|todo`, default 90 días) y **Agrupar** (`&agrupar=dia|semana|mes`, default semana). "Día" solo aparece con 30 o 90 días; si cambias a un rango más largo, regresa a semana. El periodo también define "nuevos en el periodo" (con % contra el periodo anterior del mismo largo) y la interacción.
+- **Pendientes por revisar**: fichas en revisión, servicios por aprobar, animales sin publicar en Facebook y reclamos de animales (este último solo se cuenta: se resuelve en Kadesh Pet).
+- **Animales**: registrados, perdidos, encontrados, en adopción, de vuelta en casa (en familia + adoptados) y en Facebook. Gráfica **Animales registrados** con **Desglose** (`&desglose=estatus|origen`): barras apiladas por estatus actual o por quién lo publicó. Estatus actual (todos los de la bitácora + "Sin estatus"), tipo, quién lo publicó / quién lo reporta, dónde se reportan (estados o ciudades) e interacción con los más vistos.
+- **Veterinarias**: fichas, veterinarias, verificadas, en revisión, desde Google y reseñas. Gráfica con **Métrica** (`&metrica=altas|reclamadas|verificadas`) y **tipo de lugar** (`&tipo_lugar=`), estado del reclamo y tipos / estados.
+- **Usuarios de Kadesh Pet**: cuentas (sin cuentas de Negocios ni de prueba) y cuentas nuevas en el tiempo.
+- Las tarjetas y filas tocables abren la lista ya filtrada con `push` (atrás regresa al Resumen): un estatus → Animales `&estado={valor}`, Facebook → `&facebook=pendiente|publicado`, un estado de reclamo → Veterinarias `&estado={valor}`. Esos params solo fijan el filtro inicial de la lista.
+- Gráfica: `StackedSeriesBars`, barras con divs como el resto de Operaciones. Con 14 barras o menos cada una lleva fecha; con más, solo los extremos. La barra del periodo en curso va más clara. Colores de estatus en `ANIMAL_STATUS_BAR_CLASS` (`animals/constants.ts`). Ayudas ⓘ en `pet/overview/help.ts`.
 
 **Animales** (`animals/`, 2026-10-14): todos los animales de Kadesh Pet, de usuarios y del admin, con búsqueda (nombre, ciudad, quién lo publicó), filtros (publicado por usuario o admin, en Facebook o no, estatus, tipo) y vistas / favoritos / comentarios por fila. Acciones: **Publicar en Facebook** (`adminPublishAnimalToFacebook`; si ya salió pide confirmar y vuelve a publicar), **Editar en Kadesh Pet** (abre el mismo formulario de kadesh-landing en otra pestaña: no se duplicó el formulario con mapa y fotos; requiere sesión de admin en Kadesh Pet) y **Ver ficha pública**. El detalle (`&animal={id}`, al que lleva la campana) muestra fotos, datos, etapas, vistas por día (30 días, con quién lo vio), comentarios y favoritos; el admin borra comentarios, quita favoritos y borra vistas (todas o solo sin sesión).
 
@@ -197,6 +207,20 @@ Asunto, título de cabecera, etiqueta superior, vista previa de bandeja, cuerpo,
 La columna derecha es vista previa en vivo. **Revisar y enviar** primero cuenta destinatarios (`dryRun`) y pide confirmación antes del envío real. Mutación `sendAdminBroadcastEmail` (solo admin de plataforma).
 
 ## Decisiones
+
+### 2026-11-03 — Operaciones usa todo el ancho de la pantalla
+
+Qué: el contenedor de Operaciones dejó el `max-w-7xl` y ocupa todo el ancho, con el mismo margen lateral que la barra de navegación (`px-4`, `sm:px-10`).
+
+Por qué: es una herramienta interna de tablas y gráficas; en pantallas anchas quedaba mucho espacio vacío a los lados y las gráficas se apretaban. Formularios y modales conservan su propio ancho máximo.
+
+### 2026-11-03 — Kadesh Pet abre en un Resumen con cifras y gráficas
+
+Qué: vista **Resumen** como entrada de Kadesh Pet (antes abría en Animales) con pendientes, cifras de animales, veterinarias y cuentas de Pet, y gráficas por día, semana o mes. La lista de Veterinarias salió del shell a su propio componente, y su query ya no corre cuando está abierta otra vista.
+
+Por qué: desde Operaciones no se veía cuántos animales hay ni en qué estatus, ni cómo crecen los registros y las veterinarias. El estatus de un animal es el registro más reciente de su bitácora, así que se cuenta en el back (`adminPetSummary`): en el front habría que bajar todas las bitácoras. Los reportes repetidos que se unieron a otro no cuentan.
+
+Qué no hacer: no agregar una librería de gráficas (el worker de Cloudflare tiene tope de 10 MB y el resto de Operaciones ya usa barras con divs); no ofrecer barras por día en rangos de más de 90 días (no se leen); no contar el estatus con "alguna vez tuvo" en vez del registro más reciente.
 
 ### 2026-10-12 — Ayudas ⓘ e instrucciones en cada vista (Fase 5)
 
