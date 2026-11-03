@@ -6,7 +6,7 @@ Un usuario nuevo aprende a conseguir y registrar clientes en un minuto, y puede 
 ## Cuándo aparece
 - **Tutorial de bienvenida (`welcome`)**: automático la primera vez que el usuario entra a `/panel`, tanto con registro por correo como con Google. La señal es el progreso guardado, no el query `?registro-exitoso=1`.
 - Usuarios creados antes de `ONBOARDING_LAUNCH_DATE` no lo ven solos; pueden abrirlo desde el botón de ayuda.
-- **Tutoriales de sección**: solo bajo demanda con el botón "Tutorial" (`TourHelpButton`). Elige el tour de la sección actual y, si no hay, el de bienvenida.
+- **Tutoriales de sección**: solo bajo demanda con el botón "Tutorial" (`TourHelpButton`). Elige el tour de la sección actual y, si no hay, el de bienvenida. El botón lee `?tab=` con `useSearchParams`, así que trae su propio `<Suspense>` (fallback: el mismo botón deshabilitado). Sin ese límite, el prerender de las páginas de `PanelShell` rompe el build.
 - Siempre se puede salir (X, Esc o clic fuera). Salir cuenta como "visto" y no vuelve a aparecer solo.
 
 ## Tono y copy
