@@ -64,17 +64,17 @@ export default function ProposalDetailModal({
         className="fixed inset-0 z-[110] flex items-center justify-center p-4 pointer-events-none"
       >
         <div
-          className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-hidden pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a] flex flex-col"
+          className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-hidden pointer-events-auto border border-dash-line flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex justify-between items-center p-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a]">
-            <h4 className="text-lg font-bold text-[#212121] dark:text-[#ffffff]">
+          <div className="flex justify-between items-center p-4 border-b border-dash-line bg-dash-surface-2">
+            <h4 className="text-lg font-bold text-dash-ink">
               Detalle de propuesta
             </h4>
             <button
               type="button"
               onClick={onClose}
-              className="text-2xl font-bold text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#ffffff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#e5e5e5] dark:hover:bg-[#333]"
+              className="text-2xl font-bold text-dash-muted hover:text-dash-ink dark:hover:text-[#ffffff] w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#e5e5e5] dark:hover:bg-[#333]"
               aria-label="Cerrar"
             >
               ×
@@ -86,53 +86,53 @@ export default function ProposalDetailModal({
                 <span className="animate-spin size-8 border-2 border-orange-500 border-t-transparent rounded-full" />
               </div>
             ) : !proposal ? (
-              <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <p className="text-sm text-dash-muted">
                 No se encontró la propuesta.
               </p>
             ) : (
               <>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-1">
                     Fecha envío
                   </p>
-                  <p className="text-sm text-[#212121] dark:text-[#ffffff]">
+                  <p className="text-sm text-dash-ink">
                     {formatDateShort(proposal.sentDate)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-1">
                     Monto
                   </p>
-                  <p className="text-sm text-[#212121] dark:text-[#ffffff]">
+                  <p className="text-sm text-dash-ink">
                     {proposal.amount != null
                       ? `$${Number(proposal.amount).toLocaleString("es-MX")}`
                       : "—"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-1">
                     Estado
                   </p>
-                  <p className="text-sm text-[#212121] dark:text-[#ffffff]">
+                  <p className="text-sm text-dash-ink">
                     {proposal.status}
                   </p>
                 </div>
               {proposal.product && (
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-1">
                     Producto
                   </p>
-                  <p className="text-sm text-[#212121] dark:text-[#ffffff] whitespace-pre-wrap">
+                  <p className="text-sm text-dash-ink whitespace-pre-wrap">
                     {proposal.product}
                   </p>
                 </div>
               )}
                 {proposal.businessLead && (
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-1">
                       Empresa
                     </p>
-                    <p className="text-sm text-[#212121] dark:text-[#ffffff]">
+                    <p className="text-sm text-dash-ink">
                       {proposal.businessLead.businessName}
                     </p>
                   </div>
@@ -140,7 +140,7 @@ export default function ProposalDetailModal({
 
                 {proposal.project?.id && hasProjectsFeature && (
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-1">
                       Proyecto
                     </p>
                     <Link
@@ -152,10 +152,10 @@ export default function ProposalDetailModal({
                   </div>
                 )}
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-1">
                   URL / archivo
                   </p>
-                  <p className="text-sm text-[#212121] dark:text-[#ffffff] whitespace-pre-wrap break-all">
+                  <p className="text-sm text-dash-ink whitespace-pre-wrap break-all">
                     {proposal.fileOrUrl ? (
                       <a
                         href={proposal.fileOrUrl}
@@ -172,28 +172,28 @@ export default function ProposalDetailModal({
                 </div>
               {proposal.notes && (
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-1">
                     Notas
                   </p>
-                  <p className="text-sm text-[#212121] dark:text-[#ffffff] whitespace-pre-wrap">
+                  <p className="text-sm text-dash-ink whitespace-pre-wrap">
                     {proposal.notes}
                   </p>
                 </div>
               )}
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-1">
                     Registrado
                   </p>
-                  <p className="text-sm text-[#212121] dark:text-[#ffffff]">
+                  <p className="text-sm text-dash-ink">
                     {formatDateShort(proposal.createdAt)}
                   </p>
                 </div>
                 {proposal.updatedAt && (
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-1">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-1">
                       Actualizado
                     </p>
-                    <p className="text-sm text-[#212121] dark:text-[#ffffff]">
+                    <p className="text-sm text-dash-ink">
                       {formatDateShort(proposal.updatedAt)}
                     </p>
                   </div>

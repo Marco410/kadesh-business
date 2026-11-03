@@ -248,7 +248,7 @@ function segmentClass(isActive: boolean) {
   return `relative inline-flex items-center justify-center gap-1.5 cursor-pointer rounded-lg px-3 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS_RING} ${
     isActive
       ? "text-orange-700 dark:text-orange-300"
-      : "text-[#424242] hover:bg-[#f8f8f8] dark:text-[#e0e0e0] dark:hover:bg-white/5"
+      : "text-dash-soft hover:bg-[#f8f8f8] dark:hover:bg-white/5"
   }`;
 }
 
@@ -437,10 +437,23 @@ declare global {
   }
 }
 
+/**
+ * Alto y forma del mapa: a pantalla completa bajo la barra del sitio (ruta suelta) o dentro del
+ * shell de paneles (`/panel`): de orilla a orilla en móvil y tarjeta redondeada en escritorio.
+ */
+const MAP_STAGE_CLASS = {
+  fullscreen: "relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[calc(100dvh-7.75rem)] w-screen",
+  shell:
+    "relative -mx-4 -mt-5 h-[calc(100dvh-4.1rem)] sm:-mx-6 lg:mx-0 lg:mt-0 lg:h-[calc(100dvh-7.25rem)] lg:rounded-3xl lg:border lg:border-dash-line lg:shadow-dash",
+} as const;
+
 export default function ObtenerClientesSection({
   onLeadsSyncSuccess,
+  inShell = false,
 }: {
   onLeadsSyncSuccess?: () => void | Promise<void>;
+  /** Dentro de `PanelShell` (menú lateral y barra de los paneles). */
+  inShell?: boolean;
 } = {}) {
   const [searchMode, setSearchMode] = useState<"category" | "custom">(
     "category",
@@ -1180,12 +1193,12 @@ export default function ObtenerClientesSection({
     <div className="space-y-6">
       <div
         ref={setMapStage}
-        className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[calc(100dvh-7.75rem)] w-screen overflow-visible bg-[#eef3f8] dark:bg-[#1e2a3a]"
+        className={`${MAP_STAGE_CLASS[inShell ? "shell" : "fullscreen"]} overflow-visible bg-[#eef3f8] dark:bg-[#1e2a3a]`}
         aria-label="Búsqueda de leads en mapa"
       >
         <div
           ref={mapContainerRef}
-          className={`lead-exploration-map absolute inset-0 z-0 h-full w-full overflow-hidden ${
+          className={`lead-exploration-map absolute inset-0 z-0 h-full w-full overflow-hidden ${inShell ? "lg:rounded-3xl " : ""}${
             themeMounted && isDarkMapTheme(resolvedTheme)
               ? "lead-exploration-map--night"
               : "lead-exploration-map--standard"
@@ -1236,7 +1249,7 @@ export default function ObtenerClientesSection({
                     <circle cx="18" cy="15" r="3" fill="#f7945e" />
                   </svg>
                 </div>
-                <p className="text-sm font-medium text-[#424242] dark:text-[#e0e0e0]">
+                <p className="text-sm font-medium text-dash-soft">
                   Cargando mapa…
                 </p>
                 <AnimatePresence>
@@ -1248,7 +1261,7 @@ export default function ObtenerClientesSection({
                       exit={reduceMotion ? undefined : { opacity: 0 }}
                       transition={motionTransition}
                       onClick={() => window.location.reload()}
-                      className={`inline-flex min-h-11 cursor-pointer items-center justify-center rounded-xl bg-orange-500 px-5 text-sm font-semibold text-white hover:bg-orange-600 ${FOCUS_RING}`}
+                      className={`inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full dash-grad-accent px-5 text-sm font-semibold text-white hover:shadow-dash-accent-lift  shadow-dash-accent${FOCUS_RING}`}
                     >
                       Recargar
                     </motion.button>
@@ -1267,13 +1280,13 @@ export default function ObtenerClientesSection({
             transition={motionTransition}
           >
             <div
-              className="overflow-visible rounded-2xl border border-[#e0e0e0] bg-white/95 p-2 shadow-sm backdrop-blur-md dark:border-[#3a3a3a] dark:bg-[#1e1e1e]/95"
+              className="overflow-visible rounded-2xl border border-dash-line bg-white/95 p-2 shadow-sm backdrop-blur-md dark:bg-[#1e1e1e]/95"
               role="search"
               aria-busy={isLoading}
             >
               <div className="flex min-w-0 flex-col gap-2 overflow-visible sm:flex-row sm:items-center">
                 <div
-                  className="relative inline-flex w-full rounded-xl bg-[#f8f8f8] p-0.5 dark:bg-[#121212] sm:w-auto sm:shrink-0"
+                  className="relative inline-flex w-full rounded-xl bg-dash-surface-2 p-0.5 dark:bg-[#121212] sm:w-auto sm:shrink-0"
                   role="group"
                   aria-label="Fuente de búsqueda"
                 >
@@ -1305,7 +1318,7 @@ export default function ObtenerClientesSection({
                 </div>
 
                 <div
-                  className="relative inline-flex w-full rounded-xl border border-[#e0e0e0] bg-[#f8f8f8] p-0.5 dark:border-[#3a3a3a] dark:bg-[#121212] sm:w-auto sm:shrink-0"
+                  className="relative inline-flex w-full rounded-xl border border-dash-line bg-dash-surface-2 p-0.5 dark:bg-[#121212] sm:w-auto sm:shrink-0"
                   role="group"
                   aria-label="Tipo de búsqueda"
                 >
@@ -1369,7 +1382,7 @@ export default function ObtenerClientesSection({
                       <HugeiconsIcon
                         icon={Search01Icon}
                         size={18}
-                        className="shrink-0 text-[#616161] dark:text-[#b0b0b0]"
+                        className="shrink-0 text-dash-muted"
                         aria-hidden
                       />
                       <input
@@ -1390,7 +1403,7 @@ export default function ObtenerClientesSection({
                         data-lpignore="true"
                         data-1p-ignore
                         data-form-type="other"
-                        className="min-w-0 flex-1 border-0 bg-transparent text-sm text-[#212121] placeholder:text-[#616161] focus:outline-none focus:ring-0 dark:text-white dark:placeholder:text-[#b0b0b0]"
+                        className="min-w-0 flex-1 border-0 bg-transparent text-sm text-dash-ink placeholder:text-[#616161] focus:outline-none focus:ring-0 dark:placeholder:text-[#b0b0b0]"
                         maxLength={CUSTOM_SEARCH_MAX_LENGTH}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") void runSync();
@@ -1409,7 +1422,7 @@ export default function ObtenerClientesSection({
                     value={radiusKm}
                     onChange={(e) => setRadiusKm(Number(e.target.value))}
                     disabled={isLoading}
-                    className={`cursor-pointer rounded-xl border-0 bg-transparent py-2 pl-2 pr-6 text-sm font-semibold text-[#212121] dark:text-white ${FOCUS_RING} disabled:cursor-not-allowed disabled:opacity-60`}
+                    className={`cursor-pointer rounded-xl border-0 bg-transparent py-2 pl-2 pr-6 text-sm font-semibold text-dash-ink ${FOCUS_RING} disabled:cursor-not-allowed disabled:opacity-60`}
                   >
                     {radiusOptions.map((km) => (
                       <option key={km} value={km}>
@@ -1423,7 +1436,7 @@ export default function ObtenerClientesSection({
                       <button
                         type="button"
                         onClick={() => setShowAdvancedFilters((v) => !v)}
-                        className={`relative flex size-11 cursor-pointer items-center justify-center rounded-xl border border-[#e0e0e0] bg-white text-[#212121] transition-colors duration-150 hover:bg-orange-50 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
+                        className={`relative flex size-11 cursor-pointer items-center justify-center rounded-xl border border-dash-line bg-dash-surface text-dash-ink transition-colors duration-150 hover:bg-orange-50 dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
                         aria-expanded={showAdvancedFilters}
                         aria-controls="obtener-clientes-advanced-filters"
                         aria-label={
@@ -1455,9 +1468,9 @@ export default function ObtenerClientesSection({
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -8 }}
                             transition={motionTransition}
-                            className="absolute right-0 top-full z-30 mt-2 w-72 rounded-2xl border border-[#e0e0e0] bg-white p-4 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+                            className="absolute right-0 top-full z-30 mt-2 w-72 rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm"
                           >
-                            <h3 className="mb-4 text-sm font-semibold text-[#212121] dark:text-white">
+                            <h3 className="mb-4 text-sm font-semibold text-dash-ink">
                               Calificación y reseñas
                             </h3>
 
@@ -1466,7 +1479,7 @@ export default function ObtenerClientesSection({
                                 <div className="mb-2 flex items-center justify-between gap-2">
                                   <label
                                     htmlFor="obtener-clientes-min-rating"
-                                    className="text-sm font-semibold text-[#212121] dark:text-white"
+                                    className="text-sm font-semibold text-dash-ink"
                                   >
                                     Calificación mínima
                                   </label>
@@ -1487,7 +1500,7 @@ export default function ObtenerClientesSection({
                                     setMinRating(Number(e.target.value))
                                   }
                                   disabled={isLoading}
-                                  className="h-2 w-full cursor-pointer appearance-none rounded-full bg-[#e0e0e0] accent-orange-500 dark:bg-[#3a3a3a]"
+                                  className="h-2 w-full cursor-pointer appearance-none rounded-full bg-dash-surface-3 accent-orange-500"
                                 />
                                 <div className="mt-2 flex gap-1">
                                   {[1, 2, 3, 4, 5].map((star) => {
@@ -1509,7 +1522,7 @@ export default function ObtenerClientesSection({
                                         className={`inline-flex size-11 cursor-pointer items-center justify-center rounded-xl border transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS_RING} ${
                                           isActive
                                             ? "border-orange-200 bg-orange-50 text-orange-600 dark:border-orange-900/40 dark:bg-orange-500/15 dark:text-orange-400"
-                                            : "border-[#e0e0e0] bg-transparent text-[#616161] hover:bg-[#f8f8f8] dark:border-[#3a3a3a] dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a]"
+                                            : "border-dash-line bg-transparent text-dash-muted hover:bg-[#f8f8f8] dark:hover:bg-[#2a2a2a]"
                                         }`}
                                       >
                                         <HugeiconsIcon
@@ -1526,7 +1539,7 @@ export default function ObtenerClientesSection({
                               <div>
                                 <label
                                   htmlFor="obtener-clientes-min-reviews"
-                                  className="mb-2 block text-sm font-semibold text-[#212121] dark:text-white"
+                                  className="mb-2 block text-sm font-semibold text-dash-ink"
                                 >
                                   Mínimo de reseñas
                                 </label>
@@ -1541,7 +1554,7 @@ export default function ObtenerClientesSection({
                                   }
                                   disabled={isLoading}
                                   placeholder="Ej. 10, 50, 100"
-                                  className={`w-full rounded-xl border border-[#e0e0e0] bg-[#f8f8f8] px-3 py-2 text-sm text-[#212121] dark:border-[#3a3a3a] dark:bg-[#121212] dark:text-white ${FOCUS_RING}`}
+                                  className={`w-full rounded-xl border border-dash-line bg-dash-surface-2 px-3 py-2 text-sm text-dash-ink dark:bg-[#121212] ${FOCUS_RING}`}
                                 />
                               </div>
                             </div>
@@ -1558,7 +1571,7 @@ export default function ObtenerClientesSection({
                     data-tour="extraccion-buscar-leads"
                     whileHover={reduceMotion ? undefined : { scale: 1.03 }}
                     whileTap={reduceMotion ? undefined : { scale: 0.97 }}
-                    className={`inline-flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-150 hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70 sm:flex-none ${FOCUS_RING}`}
+                    className={`inline-flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full dash-grad-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-150 hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-70 sm:flex-none  shadow-dash-accent${FOCUS_RING}`}
                   >
                     <motion.span
                       animate={
@@ -1588,7 +1601,7 @@ export default function ObtenerClientesSection({
               </div>
             </div>
 
-            <p className="pointer-events-none mt-2 text-center text-sm font-medium text-[#424242] dark:text-[#e0e0e0]">
+            <p className="pointer-events-none mt-2 text-center text-sm font-medium text-dash-soft">
               {leadSource === "inegi"
                 ? "Haz clic en el mapa para mover el centro. En INEGI el radio es 2 o 5 km; no hay calificación ni reseñas."
                 : "Haz clic en el mapa para mover el centro de búsqueda."}
@@ -1608,7 +1621,7 @@ export default function ObtenerClientesSection({
             disabled={locatingUser || !leafletReady}
             whileHover={reduceMotion ? undefined : { scale: 1.06 }}
             whileTap={reduceMotion ? undefined : { scale: 0.94 }}
-            className={`flex size-11 cursor-pointer items-center justify-center rounded-full border border-[#e0e0e0] bg-white text-[#212121] shadow-sm transition-colors duration-150 hover:bg-orange-50 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
+            className={`flex size-11 cursor-pointer items-center justify-center rounded-full border border-dash-line bg-dash-surface text-dash-ink shadow-sm transition-colors duration-150 hover:bg-orange-50 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
             title="Centrar en mi ubicación"
             aria-label="Centrar en mi ubicación"
           >
@@ -1629,7 +1642,7 @@ export default function ObtenerClientesSection({
             disabled={!leafletReady}
             whileHover={reduceMotion ? undefined : { scale: 1.06 }}
             whileTap={reduceMotion ? undefined : { scale: 0.94 }}
-            className={`flex size-11 cursor-pointer items-center justify-center rounded-full border border-[#e0e0e0] bg-white text-sm font-semibold text-[#212121] shadow-sm transition-colors duration-150 hover:bg-orange-50 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
+            className={`flex size-11 cursor-pointer items-center justify-center rounded-full border border-dash-line bg-dash-surface text-sm font-semibold text-dash-ink shadow-sm transition-colors duration-150 hover:bg-orange-50 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
             title="Centrar en Ciudad de México"
             aria-label="Centrar en Ciudad de México"
           >
@@ -1659,7 +1672,7 @@ export default function ObtenerClientesSection({
               role="status"
               aria-live="polite"
             >
-              <div className="rounded-2xl border border-[#e0e0e0] bg-white p-4 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
+              <div className="rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm">
                 <div className="flex items-start gap-3">
                   <span
                     className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${
@@ -1680,7 +1693,7 @@ export default function ObtenerClientesSection({
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className="text-sm font-semibold tracking-tight text-[#212121] dark:text-white">
+                      <h3 className="text-sm font-semibold tracking-tight text-dash-ink">
                         {showZeroResultsHint
                           ? "No se encontraron negocios nuevos en esta zona"
                           : addedCount > 0
@@ -1690,7 +1703,7 @@ export default function ObtenerClientesSection({
                       <button
                         type="button"
                         onClick={() => setResultDismissed(true)}
-                        className={`-mr-1 flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-xl text-[#616161] transition-colors duration-150 hover:bg-[#f8f8f8] dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
+                        className={`-mr-1 flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-xl text-dash-muted transition-colors duration-150 hover:bg-[#f8f8f8] dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
                         aria-label="Cerrar resultado"
                       >
                         <HugeiconsIcon
@@ -1702,13 +1715,13 @@ export default function ObtenerClientesSection({
                     </div>
 
                     {secondarySearchStats && !showZeroResultsHint && (
-                      <p className="mt-1 text-sm text-[#424242] dark:text-[#e0e0e0]">
+                      <p className="mt-1 text-sm text-dash-soft">
                         {secondarySearchStats}
                       </p>
                     )}
 
                     {showZeroResultsHint && (
-                      <p className="mt-1 text-sm text-[#424242] dark:text-[#e0e0e0]">
+                      <p className="mt-1 text-sm text-dash-soft">
                         Prueba otro giro o haz clic en otra zona del mapa.
                       </p>
                     )}
@@ -1721,7 +1734,7 @@ export default function ObtenerClientesSection({
                           <button
                             type="button"
                             onClick={() => setRadiusKm(widerRadiusKm)}
-                            className={`cursor-pointer rounded-xl border border-[#e0e0e0] bg-white px-3 py-2 text-sm font-semibold text-[#212121] transition-colors duration-150 hover:bg-[#f8f8f8] dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
+                            className={`cursor-pointer rounded-xl border border-dash-line bg-dash-surface px-3 py-2 text-sm font-semibold text-dash-ink transition-colors duration-150 hover:bg-[#f8f8f8] dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
                           >
                             Ampliar a {widerRadiusKm} km
                           </button>
@@ -1733,7 +1746,7 @@ export default function ObtenerClientesSection({
                               setMinRating(0);
                               setMinReviews(0);
                             }}
-                            className={`cursor-pointer rounded-xl border border-[#e0e0e0] bg-white px-3 py-2 text-sm font-semibold text-[#212121] transition-colors duration-150 hover:bg-[#f8f8f8] dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
+                            className={`cursor-pointer rounded-xl border border-dash-line bg-dash-surface px-3 py-2 text-sm font-semibold text-dash-ink transition-colors duration-150 hover:bg-[#f8f8f8] dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
                           >
                             Quitar filtros
                           </button>
@@ -1750,7 +1763,7 @@ export default function ObtenerClientesSection({
                             whileTap={
                               reduceMotion ? undefined : { scale: 0.97 }
                             }
-                            className={`inline-flex cursor-pointer items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-semibold text-white transition-colors duration-150 hover:bg-orange-600 ${FOCUS_RING}`}
+                            className={`inline-flex cursor-pointer items-center gap-2 rounded-full dash-grad-accent px-3 py-2 text-sm font-semibold text-white transition-colors duration-150 hover:shadow-dash-accent-lift  shadow-dash-accent${FOCUS_RING}`}
                           >
                             <HugeiconsIcon
                               icon={MentoringIcon}
@@ -1771,7 +1784,7 @@ export default function ObtenerClientesSection({
       </div>
 
       {stats && hasSearched && (
-        <p className="text-center text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <p className="text-center text-sm text-dash-muted">
           Última búsqueda: {stats.created}{" "}
           {stats.created === 1 ? "nuevo" : "nuevos"}
           {secondarySearchStats ? ` · ${secondarySearchStats}` : ""}

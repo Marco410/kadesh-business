@@ -166,25 +166,25 @@ export default function CreateProjectModal({
               role="dialog"
               aria-modal="true"
               aria-labelledby="create-project-title"
-              className="pointer-events-auto flex max-h-[min(88vh,640px)] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white shadow-2xl dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+              className="pointer-events-auto flex max-h-[min(88vh,640px)] w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-dash-line bg-dash-surface shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-start justify-between gap-3 border-b border-[#e0e0e0] bg-[#f5f5f5] px-5 py-4 dark:border-[#3a3a3a] dark:bg-[#2a2a2a]">
+              <div className="flex items-start justify-between gap-3 border-b border-dash-line bg-dash-surface-2 px-5 py-4">
                 <div className="min-w-0">
                   <h2
                     id="create-project-title"
-                    className="text-lg font-bold text-[#212121] dark:text-white"
+                    className="text-lg font-bold text-dash-ink"
                   >
                     Nuevo proyecto
                   </h2>
-                  <p className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-0.5 text-xs text-dash-muted">
                     Nombre y cliente bastan. Lo demás es opcional.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="flex size-8 shrink-0 items-center justify-center rounded-lg text-[#616161] hover:bg-[#e5e5e5] hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:bg-[#333] dark:hover:text-white"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-lg text-dash-muted hover:bg-[#e5e5e5] hover:text-dash-ink dark:hover:bg-[#333]"
                   aria-label="Cerrar"
                 >
                   <HugeiconsIcon icon={Cancel01Icon} size={18} />

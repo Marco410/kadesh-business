@@ -27,10 +27,10 @@ import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { sileo } from "sileo";
 
 const fieldClass =
-  "w-full min-h-11 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
+  "w-full min-h-11 rounded-xl border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-sm text-dash-ink placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 
 const labelClass =
-  "block text-sm font-medium text-[#212121] dark:text-[#e0e0e0] mb-1.5";
+  "block text-sm font-medium text-dash-ink dark:text-[#e0e0e0] mb-1.5";
 
 export interface AddCompanyUserFormProps {
   companyId: string | null;
@@ -266,10 +266,10 @@ export default function AddCompanyUserForm({
         <p className="text-xs font-semibold uppercase tracking-wide text-orange-700/80 dark:text-orange-300/80">
           {isEditMode ? "Editando" : "Nueva alta"}
         </p>
-        <h3 className="mt-0.5 text-base font-bold text-[#212121] dark:text-white">
+        <h3 className="mt-0.5 text-base font-bold text-dash-ink">
           {isEditMode ? "Editar usuario" : "Usuario de empresa"}
         </h3>
-        <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-1 text-xs text-dash-muted">
           {isEditMode
             ? "La contraseña solo cambia si escribes una nueva."
             : "Rol al crear: acceso de empresa (user_company). El correo es su inicio de sesión."}
@@ -278,7 +278,7 @@ export default function AddCompanyUserForm({
 
       <div className="space-y-5 px-4 py-4 sm:px-5">
         <section className="space-y-3">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-dash-faint dark:text-[#888]">
             Identidad
           </h4>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -348,7 +348,7 @@ export default function AddCompanyUserForm({
         </section>
 
         <section className="space-y-3">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-dash-faint dark:text-[#888]">
             Acceso al panel
           </h4>
           <div>
@@ -420,13 +420,13 @@ export default function AddCompanyUserForm({
           </p>
         )}
 
-        <div className="flex flex-col-reverse gap-2 border-t border-[#e8e8e8] pt-4 dark:border-[#333] sm:flex-row sm:justify-end">
+        <div className="flex flex-col-reverse gap-2 border-t border-dash-line pt-4 sm:flex-row sm:justify-end">
           {editingId && (
             <button
               type="button"
               onClick={() => onEditingIdChange(null)}
               disabled={submitting}
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#e0e0e0] bg-white px-4 text-sm font-medium text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:bg-[#2a2a2a] dark:text-[#e0e0e0] dark:hover:bg-[#333]"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-dash-line bg-white px-4 text-sm font-medium text-dash-ink transition-colors hover:bg-dash-hover dark:bg-[#2a2a2a] dark:text-[#e0e0e0]"
             >
               Cancelar edición
             </button>
@@ -434,7 +434,7 @@ export default function AddCompanyUserForm({
           <button
             type="submit"
             disabled={submitting || !companyId || passwordMismatch}
-            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-orange-500 px-5 text-sm font-semibold text-white shadow-sm shadow-orange-500/25 transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] hover:bg-orange-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex min-h-11 items-center justify-center rounded-full dash-grad-accent px-5 text-sm font-semibold text-white shadow-sm shadow-orange-500/25 transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] hover:shadow-dash-accent-lift active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 shadow-dash-accent"
           >
             {submitting
               ? "Guardando…"

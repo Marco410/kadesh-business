@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
-import { Footer, Navigation } from "kadesh/components/layout";
+import PanelShell from "kadesh/components/panel/PanelShell";
 import PlansSection from "kadesh/components/profile/sales/planes/PlansSection";
 import { SubscriptionProvider } from "kadesh/components/profile/sales/SubscriptionContext";
 import {
@@ -26,14 +26,12 @@ export default function PlanesPage() {
   const companyId = userData?.user?.company?.id ?? null;
 
   return (
-    <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#121212]">
-      <Navigation />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
+    <PanelShell selectedTab="planes" title="Planes">
+      <div className="mx-auto max-w-7xl">
         <SubscriptionProvider companyId={companyId}>
           <PlansSection />
         </SubscriptionProvider>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </PanelShell>
   );
 }

@@ -6,6 +6,8 @@ import { join } from "node:path";
 
 const SRC = "src";
 const REGISTRY = "src/components/onboarding/registry.ts";
+// Desde 2026-11 el menú lo pinta `AppShell`; este archivo sigue siendo la configuración (navItems)
+// y declara las anclas como `dataTour: …` (o `navDataTour="…"` para todo el menú).
 const PANEL_NAV = "src/components/panel/DashboardSidebar.tsx";
 
 /** Secciones del sidebar sin paso de tutorial todavía. Quitar de aquí al registrar su paso. */
@@ -47,9 +49,14 @@ for (const target of new Set(targets)) {
   const dataTour = target.match(/^\[data-tour="(.+)"\]$/);
   if (dataTour) {
     const name = dataTour[1];
-    const literal = sources.includes(`data-tour="${name}"`);
+    const literal =
+      sources.includes(`data-tour="${name}"`) ||
+      sources.includes(`dataTour: "${name}"`) ||
+      sources.includes(`navDataTour="${name}"`);
     const dynamic = DYNAMIC_PREFIXES.some(
-      (p) => name.startsWith(p) && sources.includes(`data-tour={\`${p}$`),
+      (p) =>
+        name.startsWith(p) &&
+        (sources.includes(`data-tour={\`${p}$`) || sources.includes(`dataTour: \`${p}$`)),
     );
     if (!literal && !dynamic) errors.push(`data-tour "${name}" no existe en src/`);
     continue;

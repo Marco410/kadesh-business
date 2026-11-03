@@ -249,17 +249,17 @@ export default function RegisterProposalModal({
             className="fixed inset-0 z-[90] flex items-center justify-center p-4 pointer-events-none"
           >
             <div
-              className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[min(90vh,760px)] flex flex-col overflow-hidden pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
+              className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[min(90vh,760px)] flex flex-col overflow-hidden pointer-events-auto border border-dash-line"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex justify-between items-start p-6 pb-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
-                <h3 className="text-xl font-bold text-[#212121] dark:text-[#ffffff] pr-4">
+              <div className="flex justify-between items-start p-6 pb-4 border-b border-dash-line">
+                <h3 className="text-xl font-bold text-dash-ink pr-4">
                   Enviar propuesta
                 </h3>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="text-2xl font-bold text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#ffffff] transition-colors flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                  className="text-2xl font-bold text-dash-muted hover:text-dash-ink dark:hover:text-[#ffffff] transition-colors flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-dash-hover"
                   disabled={submitting}
                   aria-label="Cerrar"
                 >
@@ -268,7 +268,7 @@ export default function RegisterProposalModal({
               </div>
 
               <div className="px-6 pb-6 pt-4 flex-1 overflow-y-auto min-h-0">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-2">
                   Propuestas registradas
                 </p>
                 {proposalsLoading ? (
@@ -276,27 +276,27 @@ export default function RegisterProposalModal({
                     <span className="animate-spin size-8 border-2 border-orange-500 border-t-transparent rounded-full" />
                   </div>
                 ) : proposals.length === 0 ? (
-                  <p className="text-sm text-[#616161] dark:text-[#b0b0b0] py-4">
+                  <p className="text-sm text-dash-muted py-4">
                     Aún no hay propuestas para este lead.
                   </p>
                 ) : (
-                  <div className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] overflow-hidden">
+                  <div className="rounded-lg border border-dash-line overflow-hidden">
                     <table className="w-full text-sm border-collapse">
                       <thead>
-                        <tr className="bg-[#f5f5f5] dark:bg-[#2a2a2a] border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
-                          <th className="text-left px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                        <tr className="bg-dash-surface-2 border-b border-dash-line">
+                          <th className="text-left px-3 py-2 font-semibold text-dash-ink whitespace-nowrap">
                             Fecha envío
                           </th>
-                          <th className="text-left px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                          <th className="text-left px-3 py-2 font-semibold text-dash-ink whitespace-nowrap">
                             Monto
                           </th>
-                          <th className="text-left px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                          <th className="text-left px-3 py-2 font-semibold text-dash-ink whitespace-nowrap">
                             Estado
                           </th>
-                          <th className="text-left px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap max-w-[160px]">
+                          <th className="text-left px-3 py-2 font-semibold text-dash-ink whitespace-nowrap max-w-[160px]">
                             Producto
                           </th>
-                          <th className="text-right px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap w-[100px]">
+                          <th className="text-right px-3 py-2 font-semibold text-dash-ink whitespace-nowrap w-[100px]">
                             Acciones
                           </th>
                         </tr>
@@ -314,22 +314,22 @@ export default function RegisterProposalModal({
                                 setSelectedId(p.id);
                               }
                             }}
-                            className={`border-b border-[#e0e0e0] dark:border-[#3a3a3a] hover:bg-[#fafafa] dark:hover:bg-[#252525] cursor-pointer transition-colors ${
+                            className={`border-b border-dash-line hover:bg-dash-hover cursor-pointer transition-colors ${
                               editingProposal?.id === p.id
                                 ? "bg-orange-50 dark:bg-orange-950/30 ring-inset ring-2 ring-orange-500/50"
                                 : ""
                             }`}
                           >
-                            <td className="px-3 py-2 text-[#616161] dark:text-[#b0b0b0] whitespace-nowrap">
+                            <td className="px-3 py-2 text-dash-muted whitespace-nowrap">
                               {formatDateShort(p.sentDate,false)}
                             </td>
-                            <td className="px-3 py-2 text-[#212121] dark:text-[#ffffff]">
+                            <td className="px-3 py-2 text-dash-ink">
                               {p.amount != null ? `$${Number(p.amount).toLocaleString("es-MX")}` : "—"}
                             </td>
-                            <td className="px-3 py-2 text-[#212121] dark:text-[#ffffff]">
+                            <td className="px-3 py-2 text-dash-ink">
                               {p.status}
                             </td>
-                            <td className="px-3 py-2 text-[#616161] dark:text-[#b0b0b0] max-w-[160px] truncate" title={p.product ?? undefined}>
+                            <td className="px-3 py-2 text-dash-muted max-w-[160px] truncate" title={p.product ?? undefined}>
                               {p.product ?? "—"}
                             </td>
                             <td className="px-3 py-2 text-right" onClick={(e) => e.stopPropagation()}>
@@ -346,7 +346,7 @@ export default function RegisterProposalModal({
                                     <button
                                       type="button"
                                       onClick={() => setCreateProjectProposalId(p.id)}
-                                      className="inline-flex items-center gap-1 px-2 py-1 rounded border border-orange-500 bg-orange-500 text-white text-xs font-medium hover:bg-orange-600 hover:border-orange-600 transition-colors"
+                                      className="inline-flex items-center gap-1 px-2 py-1 rounded border border-orange-500 dash-grad-accent text-white text-xs font-medium hover:shadow-dash-accent-lift hover:border-orange-600 transition-colors shadow-dash-accent"
                                     >
                                       Crear proyecto
                                     </button>
@@ -355,7 +355,7 @@ export default function RegisterProposalModal({
                                 <button
                                   type="button"
                                   onClick={() => fillFormForEdit(p)}
-                                  className="inline-flex items-center gap-1 px-2 py-1 rounded border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-[#ffffff] text-xs font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#333] transition-colors"
+                                  className="inline-flex items-center gap-1 px-2 py-1 rounded border border-dash-line bg-white dark:bg-[#2a2a2a] text-dash-ink text-xs font-medium hover:bg-dash-hover transition-colors"
                                 >
                                   Editar
                                 </button>
@@ -386,8 +386,8 @@ export default function RegisterProposalModal({
                 }}
               />
 
-              <div className="border-t border-[#e0e0e0] dark:border-[#3a3a3a] pt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-3">
+              <div className="border-t border-dash-line pt-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-3">
                   {isEditing ? "Editar Propuesta" : "Nueva propuesta"}
                 </p>
               </div>
@@ -396,7 +396,7 @@ export default function RegisterProposalModal({
                 <div>
                   <label
                     htmlFor="proposal-sentDate"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Fecha envío <span className="text-red-500">*</span>
                   </label>
@@ -406,14 +406,14 @@ export default function RegisterProposalModal({
                     required
                     value={sentDate}
                     onChange={(e) => setSentDate(e.target.value)}
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="proposal-product"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Producto o servicio principal
                   </label>
@@ -423,14 +423,14 @@ export default function RegisterProposalModal({
                     value={product}
                     onChange={(e) => setProduct(e.target.value)}
                     placeholder="Ej. Paquete pro, plan starter, etc."
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="proposal-amount"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Monto
                   </label>
@@ -442,10 +442,10 @@ export default function RegisterProposalModal({
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="0.00"
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
                   {salesComission > 0 && amount.trim() && !Number.isNaN(Number(amount)) && Number(amount) > 0 && (
-                    <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <p className="mt-1 text-xs text-dash-muted">
                       Tu comisión estimada con {salesComission}% es{" "}
                       <span className="font-semibold text-orange-600 dark:text-orange-400">
                         $
@@ -465,7 +465,7 @@ export default function RegisterProposalModal({
                 <div className="sm:col-span-2">
                   <label
                     htmlFor="proposal-notes"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Notas o condiciones de la propuesta
                   </label>
@@ -475,14 +475,14 @@ export default function RegisterProposalModal({
                     onChange={(e) => setNotes(e.target.value)}
                     rows={3}
                     placeholder="Plazos, condiciones especiales, alcances y límites de la propuesta..."
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="proposal-status"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Estado
                   </label>
@@ -490,7 +490,7 @@ export default function RegisterProposalModal({
                     id="proposal-status"
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
                     {PROPOSAL_STATUS_OPTIONS.map((opt) => (
                       <option key={opt} value={opt}>
@@ -503,7 +503,7 @@ export default function RegisterProposalModal({
                 <div>
                   <label
                     htmlFor="proposal-fileOrUrl"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     URL o referencia al archivo <span className="text-red-500">*</span>
                   </label>
@@ -515,9 +515,9 @@ export default function RegisterProposalModal({
                     value={fileOrUrl}
                     onChange={(e) => setFileOrUrl(e.target.value)}
                     placeholder="Pega aquí el enlace del doc o de la tarea..."
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
-                   <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-2">
+                   <p className="text-xs text-dash-muted mt-2">
                     Crea el documento (si aún no tienes uno) y pega aquí el enlace. Es importate que el link que pegues sea el que no este restringido.
                   </p>
                   <div className="flex flex-wrap gap-2 mt-2">
@@ -525,7 +525,7 @@ export default function RegisterProposalModal({
                       href="https://docs.google.com/document/create"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-[#ffffff] text-sm font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#333] transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] text-dash-ink text-sm font-medium hover:bg-dash-hover transition-colors"
                     >
                       Crear documento propuesta
                     </a>
@@ -537,7 +537,7 @@ export default function RegisterProposalModal({
                     type="button"
                     onClick={onClose}
                     disabled={submitting}
-                    className="px-4 py-2.5 border-2 border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-[#ffffff] font-semibold rounded-lg hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2.5 border-2 border-dash-line text-dash-ink font-semibold rounded-lg hover:bg-dash-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancelar
                   </button>
@@ -552,7 +552,7 @@ export default function RegisterProposalModal({
                         setFileOrUrl("");
                       }}
                       disabled={submitting}
-                      className="px-4 py-2.5 border-2 border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-[#ffffff] font-semibold rounded-lg hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2.5 border-2 border-dash-line text-dash-ink font-semibold rounded-lg hover:bg-dash-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Cancelar edición
                     </button>
@@ -560,7 +560,7 @@ export default function RegisterProposalModal({
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-4 py-2.5 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2.5 dash-grad-accent text-white font-semibold rounded-full hover:shadow-dash-accent-lift focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:opacity-50 disabled:cursor-not-allowed shadow-dash-accent"
                   >
                     {submitting ? "Guardando..." : isEditing ? "Guardar cambios" : "Registrar propuesta"}
                   </button>

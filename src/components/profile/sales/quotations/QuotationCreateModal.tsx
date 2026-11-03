@@ -18,9 +18,9 @@ import { Routes } from "kadesh/core/routes";
 import { quotationMotionTransition } from "./motion";
 
 const inputClassName =
-  "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-[#212121] dark:text-white text-sm placeholder-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
+  "w-full rounded-xl border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-dash-ink text-sm placeholder-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 const labelClassName =
-  "block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5";
+  "block text-sm font-medium text-dash-muted mb-1.5";
 
 export interface QuotationCreateModalProps {
   isOpen: boolean;
@@ -118,28 +118,28 @@ export default function QuotationCreateModal({
             className="pointer-events-none fixed inset-0 z-[100] flex items-center justify-center p-4"
           >
             <div
-              className="pointer-events-auto flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white shadow-2xl dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+              className="pointer-events-auto flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-dash-line bg-dash-surface shadow-2xl"
               onClick={(e) => e.stopPropagation()}
               role="dialog"
               aria-modal="true"
               aria-labelledby="quotation-create-modal-title"
             >
-              <div className="flex items-start justify-between gap-3 border-b border-[#e0e0e0] bg-[#f5f5f5] px-5 py-4 dark:border-[#3a3a3a] dark:bg-[#2a2a2a]">
+              <div className="flex items-start justify-between gap-3 border-b border-dash-line bg-dash-surface-2 px-5 py-4">
                 <div className="min-w-0">
                   <h4
                     id="quotation-create-modal-title"
-                    className="text-lg font-bold text-[#212121] dark:text-white"
+                    className="text-lg font-bold text-dash-ink"
                   >
                     Nueva cotización
                   </h4>
-                  <p className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-0.5 text-xs text-dash-muted">
                     Elige el cliente. Fecha y notas son opcionales.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#616161] hover:bg-[#e5e5e5] hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:bg-[#333] dark:hover:text-white"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-dash-muted hover:bg-[#e5e5e5] hover:text-dash-ink dark:hover:bg-[#333]"
                   aria-label="Cerrar"
                 >
                   <HugeiconsIcon icon={Cancel01Icon} size={18} />
@@ -187,18 +187,18 @@ export default function QuotationCreateModal({
                   />
                 </div>
 
-                <div className="flex justify-end gap-2 border-t border-[#e0e0e0] pt-4 dark:border-[#3a3a3a]">
+                <div className="flex justify-end gap-2 border-t border-dash-line pt-4">
                   <button
                     type="button"
                     onClick={onClose}
-                    className="inline-flex min-h-11 items-center rounded-xl border border-[#e0e0e0] px-4 text-sm font-medium text-[#212121] hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-white dark:hover:bg-[#333]"
+                    className="inline-flex min-h-11 items-center rounded-xl border border-dash-line px-4 text-sm font-medium text-dash-ink hover:bg-dash-hover"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={loading || !leadId.trim()}
-                    className="inline-flex min-h-11 items-center rounded-xl bg-orange-500 px-4 text-sm font-semibold text-white hover:bg-orange-600 disabled:pointer-events-none disabled:opacity-50"
+                    className="inline-flex min-h-11 items-center rounded-full dash-grad-accent px-4 text-sm font-semibold text-white hover:shadow-dash-accent-lift disabled:pointer-events-none disabled:opacity-50 shadow-dash-accent"
                   >
                     {loading ? "Creando…" : "Crear cotización"}
                   </button>

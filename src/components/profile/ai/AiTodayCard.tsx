@@ -71,18 +71,18 @@ export function AiTodayCard({
   const title = isCompanyWide ? "Resumen del día" : "Tu resumen del día";
 
   return (
-    <section className="rounded-2xl border border-[#e0e0e0] bg-white p-4 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
+    <section className="rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span className="ai-urim-icon">
               <HugeiconsIcon icon={SparklesIcon} size={20} />
             </span>
-            <h3 className="text-base font-semibold text-[#212121] dark:text-white">
+            <h3 className="text-base font-semibold text-dash-ink">
               {title}
             </h3>
           </div>
-          <p className="mt-0.5 text-xs text-[#9e9e9e] dark:text-[#7a7a7a]">
+          <p className="mt-0.5 text-xs text-dash-faint dark:text-[#7a7a7a]">
             {digest.insight?.generatedAt
               ? `Generado ${formatAiDateInline(digest.insight.generatedAt)}`
               : isCompanyWide
@@ -96,7 +96,7 @@ export function AiTodayCard({
             onClick={() => void digest.generate(true)}
             disabled={digest.generating}
             title={digest.isManaged ? digest.creditHint : undefined}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#e0e0e0] px-2.5 py-1.5 text-xs font-medium text-[#616161] hover:border-violet-300 hover:text-violet-700 disabled:opacity-50 dark:border-[#3a3a3a] dark:text-[#b0b0b0] dark:hover:border-violet-500/50 dark:hover:text-violet-300"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-dash-line px-2.5 py-1.5 text-xs font-medium text-dash-muted hover:border-violet-300 hover:text-violet-700 disabled:opacity-50 dark:hover:border-violet-500/50 dark:hover:text-violet-300"
           >
             <HugeiconsIcon
               icon={RefreshIcon}
@@ -110,10 +110,10 @@ export function AiTodayCard({
 
       {pipeline.error ? null : (
         <div className="mt-4">
-          <p className="text-sm font-semibold text-[#212121] dark:text-white">
+          <p className="text-sm font-semibold text-dash-ink">
             Lo que revisa en tu pipeline
             {!pipeline.loading ? (
-              <span className="font-normal text-[#616161] dark:text-[#b0b0b0]">
+              <span className="font-normal text-dash-muted">
                 {" "}
                 · {pipeline.total.toLocaleString("es-MX")} pendientes
               </span>
@@ -128,7 +128,7 @@ export function AiTodayCard({
       )}
 
       <div className="mt-5">
-        <p className="mb-2 text-sm font-semibold text-[#212121] dark:text-white">
+        <p className="mb-2 text-sm font-semibold text-dash-ink">
           Tus 3 pasos para hoy
         </p>
         {digest.liveLoading && !digest.configured ? (
@@ -155,14 +155,14 @@ export function AiTodayCard({
           <AiStepTimeline items={digest.actions} linkFor={linkFor} />
         ) : (
           <div className="rounded-xl border border-dashed border-violet-300 bg-violet-50/60 p-4 dark:border-violet-500/40 dark:bg-violet-500/10">
-            <p className="text-sm font-medium text-[#212121] dark:text-white">
+            <p className="text-sm font-medium text-dash-ink">
               {KADESH_URIM_AI_NAME} todavía no arma tus pasos de hoy.
             </p>
-            <p className="mt-0.5 text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-0.5 text-sm text-dash-muted">
               Revisa los pendientes de arriba y te dice a quién contactar, qué
               cotización empujar y qué seguimiento no puede esperar.
             </p>
-            <p className="mt-2 text-xs text-[#9e9e9e] dark:text-[#7a7a7a]">
+            <p className="mt-2 text-xs text-dash-faint dark:text-[#7a7a7a]">
               {digest.creditHint}
             </p>
             <button
@@ -201,7 +201,7 @@ function SignalTiles({
         {[0, 1, 2, 3].map((item) => (
           <div
             key={item}
-            className="h-[7.5rem] animate-pulse rounded-xl bg-[#ececec] dark:bg-[#2a2a2a]"
+            className="h-[7.5rem] dash-shimmer rounded-xl"
           />
         ))}
       </div>
@@ -227,7 +227,7 @@ function SignalTiles({
             "flex h-full flex-col rounded-xl border p-3 text-left transition-colors",
             focus
               ? "border-violet-300 bg-violet-50/70 dark:border-violet-500/50 dark:bg-violet-500/10"
-              : "border-[#ececec] bg-[#fafafa] dark:border-[#2e2e2e] dark:bg-[#252525]",
+              : "border-dash-line bg-dash-surface-2 dark:border-[#2e2e2e]",
             link?.href &&
               "hover:border-violet-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 dark:hover:border-violet-400/60",
           );
@@ -239,7 +239,7 @@ function SignalTiles({
                     "flex size-7 items-center justify-center rounded-lg",
                     focus
                       ? "ai-urim-fill"
-                      : "bg-[#efefef] text-[#616161] dark:bg-[#2e2e2e] dark:text-[#b0b0b0]",
+                      : "bg-[#efefef] text-dash-muted dark:bg-[#2e2e2e]",
                   )}
                 >
                   <HugeiconsIcon icon={meta.icon} size={15} />
@@ -249,19 +249,19 @@ function SignalTiles({
                     "text-[11px] font-medium",
                     focus
                       ? "text-violet-700 dark:text-violet-300"
-                      : "text-[#9e9e9e] dark:text-[#7a7a7a]",
+                      : "text-dash-faint dark:text-[#7a7a7a]",
                   )}
                 >
                   {focus ? "Empieza aquí" : `Prioridad ${signal.priority}`}
                 </span>
               </span>
-              <span className="mt-2 text-2xl font-semibold leading-none text-[#212121] dark:text-white">
+              <span className="mt-2 text-2xl font-semibold leading-none text-dash-ink">
                 {countFormat.format(signal.count)}
               </span>
-              <span className="mt-1 text-sm font-medium leading-tight text-[#212121] dark:text-white">
+              <span className="mt-1 text-sm font-medium leading-tight text-dash-ink">
                 {signal.label}
               </span>
-              <span className="mt-0.5 text-xs leading-snug text-[#9e9e9e] dark:text-[#7a7a7a]">
+              <span className="mt-0.5 text-xs leading-snug text-dash-faint dark:text-[#7a7a7a]">
                 {signal.hint}
               </span>
             </>
@@ -289,7 +289,7 @@ function SignalTiles({
         })}
       </motion.ul>
       {focusKey === null ? (
-        <p className="mt-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-2 text-xs text-dash-muted">
           Tu pipeline está al día. {KADESH_URIM_AI_NAME} te propondrá
           prospectar con tu oferta.
         </p>
@@ -303,8 +303,8 @@ function StepsSkeleton() {
     <div className="space-y-3">
       {[0, 1, 2].map((item) => (
         <div key={item} className="flex gap-3">
-          <span className="size-8 shrink-0 animate-pulse rounded-full bg-[#ececec] dark:bg-[#2a2a2a]" />
-          <span className="h-20 flex-1 animate-pulse rounded-xl bg-[#ececec] dark:bg-[#2a2a2a]" />
+          <span className="size-8 shrink-0 dash-shimmer rounded-full" />
+          <span className="h-20 flex-1 dash-shimmer rounded-xl" />
         </div>
       ))}
     </div>
@@ -326,28 +326,28 @@ function LockedSteps({
       <div aria-hidden className="space-y-3 opacity-60 blur-[1.5px]">
         {[0, 1, 2].map((item) => (
           <div key={item} className="flex gap-3">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#ececec] text-sm font-semibold text-[#9e9e9e] dark:bg-[#2a2a2a] dark:text-[#7a7a7a]">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-dash-surface-2 text-sm font-semibold text-dash-faint dark:text-[#7a7a7a]">
               {item + 1}
             </span>
-            <span className="flex-1 space-y-2 rounded-xl border border-[#ececec] bg-[#fafafa] p-3 dark:border-[#2e2e2e] dark:bg-[#252525]">
+            <span className="flex-1 space-y-2 rounded-xl border border-dash-line bg-dash-surface-2 p-3 dark:border-[#2e2e2e]">
               <span className="block h-3 w-24 rounded-full bg-[#e6e6e6] dark:bg-[#333]" />
               <span className="block h-3 w-3/4 rounded-full bg-[#e6e6e6] dark:bg-[#333]" />
-              <span className="block h-3 w-1/2 rounded-full bg-[#ececec] dark:bg-[#2e2e2e]" />
+              <span className="block h-3 w-1/2 rounded-full bg-dash-surface-2 dark:bg-[#2e2e2e]" />
             </span>
           </div>
         ))}
       </div>
       <div className="absolute inset-0 flex items-center justify-center p-3">
-        <div className="max-w-sm rounded-xl border border-[#e0e0e0] bg-white p-4 text-center shadow-lg dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
+        <div className="max-w-sm rounded-xl border border-dash-line bg-dash-surface p-4 text-center shadow-lg">
           <span className="mx-auto flex size-9 items-center justify-center rounded-full bg-violet-50 text-violet-600 dark:bg-violet-500/15 dark:text-violet-300">
             <HugeiconsIcon icon={LockIcon} size={18} />
           </span>
-          <p className="mt-2 text-sm font-semibold text-[#212121] dark:text-white">
+          <p className="mt-2 text-sm font-semibold text-dash-ink">
             {configured
               ? "Prueba la conexión para ver tus pasos"
               : `Activa ${KADESH_URIM_AI_NAME} para ver tus pasos`}
           </p>
-          <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1 text-sm text-dash-muted">
             Cada día te dice a quién contactar, qué cotización empujar y qué
             seguimiento no puede esperar.
           </p>
@@ -361,7 +361,7 @@ function LockedSteps({
               <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
             </button>
           ) : !canManageAi ? (
-            <p className="mt-2 text-xs text-[#9e9e9e] dark:text-[#7a7a7a]">
+            <p className="mt-2 text-xs text-dash-faint dark:text-[#7a7a7a]">
               Pide al administrador de la empresa que la active.
             </p>
           ) : null}

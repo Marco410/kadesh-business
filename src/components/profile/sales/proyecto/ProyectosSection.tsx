@@ -70,8 +70,8 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
 
   if (!companyId) {
     return (
-      <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8 shadow-sm">
-        <p className="text-[#616161] dark:text-[#b0b0b0]">
+      <div className="rounded-3xl border border-dash-line bg-dash-surface p-6 sm:p-8 shadow-sm">
+        <p className="text-dash-muted">
           No se pudo cargar la empresa. Los proyectos se listan por empresa.
         </p>
       </div>
@@ -80,10 +80,10 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-8 shadow-sm flex items-center justify-center min-h-[200px]">
+      <div className="rounded-3xl border border-dash-line bg-dash-surface p-8 shadow-sm flex items-center justify-center min-h-[200px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-10 w-10 border-2 border-orange-500 border-t-transparent mx-auto" />
-          <p className="mt-3 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-3 text-sm text-dash-muted">
             Cargando proyectos...
           </p>
         </div>
@@ -95,10 +95,10 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xl font-bold text-[#212121] dark:text-white">
+          <h3 className="text-xl font-bold text-dash-ink">
             Proyectos
           </h3>
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1">
+          <p className="text-sm text-dash-muted mt-1">
             {canSeeCompanyProjects || isAdminCompany
               ? "Todos los proyectos de la empresa."
               : "Proyectos."}
@@ -113,7 +113,7 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
           <button
             type="button"
             onClick={() => setIsCreateProjectOpen(true)}
-            className="inline-flex min-h-11 items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 transition-colors"
+            className="inline-flex min-h-11 items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-white dash-grad-accent hover:shadow-dash-accent-lift transition-colors shadow-dash-accent"
           >
             <HugeiconsIcon icon={Add01Icon} size={16} />
             Crear proyecto
@@ -122,14 +122,14 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
       ) : null}
 
       {projects.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#d0d0d0] dark:border-[#444] bg-white dark:bg-[#1e1e1e] p-8 sm:p-12 shadow-sm text-center">
+        <div className="rounded-2xl border border-dashed border-dash-line-strong dark:border-[#444] bg-dash-surface p-8 sm:p-12 shadow-sm text-center">
           <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10 dark:bg-orange-500/20 text-orange-500 dark:text-orange-400 mb-4">
             <HugeiconsIcon icon={FolderIcon} size={28} />
           </span>
-          <p className="font-semibold text-[#212121] dark:text-white mb-1">
+          <p className="font-semibold text-dash-ink mb-1">
             Sin proyectos
           </p>
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0] max-w-sm mx-auto">
+          <p className="text-sm text-dash-muted max-w-sm mx-auto">
             {canCreateProject
               ? 'Crea un proyecto desde aquí o desde una propuesta con estado "Comprada".'
               : "Aún no tienes proyectos creados."}
@@ -140,12 +140,12 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
           {projects.map((p) => {
             const statusClass =
               PROJECT_STATUS_CLASSES[p.status ?? ""] ??
-              "bg-[#f0f0f0] text-[#616161] dark:bg-[#333] dark:text-[#b0b0b0]";
+              "bg-dash-surface-2 text-dash-muted";
             return (
               <Link
                 key={p.id}
                 href={Routes.panelProject(p.id)}
-                className="group rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-5 shadow-sm hover:border-orange-500/40 dark:hover:border-orange-500/40 hover:shadow-md transition-all"
+                className="group rounded-3xl border border-dash-line bg-dash-surface p-5 shadow-sm hover:border-orange-500/40 dark:hover:border-orange-500/40 hover:shadow-md transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-center gap-3 min-w-0">
@@ -153,11 +153,11 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
                       <HugeiconsIcon icon={FolderIcon} size={20} />
                     </span>
                     <div className="min-w-0">
-                      <p className="font-semibold text-[#212121] dark:text-white truncate group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
+                      <p className="font-semibold text-dash-ink truncate group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
                         {p.name}
                       </p>
                       {p.businessLead?.businessName && (
-                        <p className="text-xs text-[#616161] dark:text-[#b0b0b0] truncate mt-0.5">
+                        <p className="text-xs text-dash-muted truncate mt-0.5">
                           {p.businessLead.businessName}
                         </p>
                       )}
@@ -172,7 +172,7 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-[#9e9e9e] dark:text-[#666]">
+                <div className="flex items-center justify-between text-xs text-dash-faint dark:text-[#666]">
                   <div className="flex items-center gap-3">
                     {p.serviceType && (
                       <span className="truncate max-w-[140px]">
@@ -193,8 +193,8 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
                 </div>
 
                 {p.responsible?.name && (
-                  <p className="mt-2 pt-2 border-t border-[#f0f0f0] dark:border-[#333] text-xs text-[#616161] dark:text-[#b0b0b0]">
-                    Creado por: <span className="font-medium text-[#212121] dark:text-white">{p.responsible.name}</span>
+                  <p className="mt-2 pt-2 border-t border-dash-line text-xs text-dash-muted">
+                    Creado por: <span className="font-medium text-dash-ink">{p.responsible.name}</span>
                   </p>
                 )}
               </Link>

@@ -61,7 +61,7 @@ export default function WorkspaceSwitcher({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex w-full sm:w-auto min-w-[220px] max-w-md items-center justify-between gap-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-4 py-2.5 text-left text-sm font-medium text-[#212121] dark:text-white shadow-sm hover:border-orange-500/40 transition-colors"
+        className="inline-flex w-full sm:w-auto min-w-[220px] max-w-md items-center justify-between gap-3 rounded-xl border border-dash-line bg-dash-surface px-4 py-2.5 text-left text-sm font-medium text-dash-ink shadow-sm hover:border-orange-500/40 transition-colors"
         aria-expanded={open}
         aria-haspopup="listbox"
       >
@@ -76,13 +76,13 @@ export default function WorkspaceSwitcher({
         <HugeiconsIcon
           icon={ArrowDown01Icon}
           size={18}
-          className={`shrink-0 text-[#616161] transition-transform ${open ? "rotate-180" : ""}`}
+          className={`shrink-0 text-dash-muted transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
         <div
-          className="absolute left-0 right-0 sm:right-auto z-50 mt-2 w-full sm:min-w-[280px] max-w-md rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] py-1 shadow-lg shadow-black/10"
+          className="absolute left-0 right-0 sm:right-auto z-50 mt-2 w-full sm:min-w-[280px] max-w-md rounded-xl border border-dash-line bg-dash-surface py-1 shadow-lg shadow-black/10"
           role="listbox"
         >
           <button
@@ -96,12 +96,12 @@ export default function WorkspaceSwitcher({
             className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
               currentWorkspaceId == null
                 ? "bg-orange-500/10 text-orange-700 dark:text-orange-300 font-medium"
-                : "text-[#212121] dark:text-white hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                : "text-dash-ink hover:bg-dash-hover"
             }`}
           >
             General · Todos los registros
           </button>
-          <div className="my-1 h-px bg-[#e0e0e0] dark:bg-[#3a3a3a]" />
+          <div className="my-1 h-px bg-dash-surface-3" />
           {workspaces.map((w) => (
             <button
               key={w.id}
@@ -115,14 +115,14 @@ export default function WorkspaceSwitcher({
               className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
                 currentWorkspaceId === w.id
                   ? "bg-orange-500/10 text-orange-700 dark:text-orange-300 font-medium"
-                  : "text-[#212121] dark:text-white hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                  : "text-dash-ink hover:bg-dash-hover"
               }`}
             >
               {w.name}
             </button>
           ))}
           {workspaces.length === 0 && !loading && (
-            <p className="px-4 py-3 text-xs text-[#616161] dark:text-[#9e9e9e]">
+            <p className="px-4 py-3 text-xs text-dash-muted">
               {canCreateWorkspace ? (
                 <>
                   Aún no tienes espacios. Crea uno para organizar tareas, actividades, seguimientos y
@@ -139,7 +139,7 @@ export default function WorkspaceSwitcher({
 
           {canCreateWorkspace && (
             <>
-              <div className="my-1 h-px bg-[#e0e0e0] dark:bg-[#3a3a3a]" />
+              <div className="my-1 h-px bg-dash-surface-3" />
               <button
                 type="button"
                 onClick={() => {

@@ -45,7 +45,7 @@ export function WhatsAppSettingsSection({
     <div className="flex flex-col gap-4">
       {beta && activeTab === "chats" ? (
         <div className="flex flex-wrap items-center gap-2">
-          <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
+          <h2 className="text-xl font-semibold text-dash-ink">
             WhatsApp Business
           </h2>
           <FeatureBetaBadge />
@@ -55,7 +55,7 @@ export function WhatsAppSettingsSection({
         <div
           role="tablist"
           aria-label="WhatsApp Business"
-          className="inline-flex self-start rounded-xl bg-black/5 p-1 dark:bg-white/10"
+          className="inline-flex self-start rounded-xl bg-dash-surface-2 p-1"
         >
           {tabs.map((item) => {
             const selected = item.id === activeTab;
@@ -68,8 +68,8 @@ export function WhatsAppSettingsSection({
                 onClick={() => setTab(item.id)}
                 className={`h-10 min-w-28 rounded-lg px-4 text-sm font-semibold transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 ${
                   selected
-                    ? "bg-white text-[#212121] shadow-sm dark:bg-[#3a3a3a] dark:text-white"
-                    : "text-[#616161] hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:text-white"
+                    ? "bg-white text-dash-ink shadow-sm dark:bg-[#3a3a3a]"
+                    : "text-dash-muted hover:text-dash-ink"
                 }`}
               >
                 {item.label}

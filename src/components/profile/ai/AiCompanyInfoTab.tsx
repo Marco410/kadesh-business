@@ -40,7 +40,7 @@ import { AiMeter, AiSegmentMeter } from "./AiVisuals";
 import { aiMotionTransition, aiTabSwitchTransition } from "./motion";
 
 const TEXTAREA_CLASS =
-  "w-full min-h-[150px] px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#9e9e9e] dark:placeholder:text-[#7a7a7a] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed resize-y";
+  "w-full min-h-[150px] px-4 py-3 rounded-lg border border-dash-line bg-dash-surface text-dash-ink placeholder:text-dash-faint dark:placeholder:text-[#7a7a7a] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed resize-y";
 
 const EMPTY_VALUES: Record<OnboardingContextKey, string> = {
   onboardingMainOffer: "",
@@ -178,7 +178,7 @@ export function AiCompanyInfoTab({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.2 }}
-        className="flex items-center justify-center rounded-2xl border border-[#e0e0e0] bg-white py-16 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+        className="flex items-center justify-center rounded-3xl border border-dash-line bg-dash-surface py-16"
       >
         <span className="size-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
       </motion.div>
@@ -273,20 +273,20 @@ function AiCompanyInfoWizard({
 
   return (
     <div className="space-y-4">
-      <section className="rounded-2xl border border-[#e0e0e0] bg-white p-4 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-6">
+      <section className="rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
-            <h3 className="text-lg font-semibold text-[#212121] dark:text-white">
+            <h3 className="text-lg font-semibold text-dash-ink">
               Cuéntale a {KADESH_URIM_AI_NAME} de tu negocio
             </h3>
-            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-dash-muted">
               4 preguntas cortas. Con tus respuestas arma tu resumen del día y
               tus recomendaciones.
             </p>
           </div>
           <div className="w-full shrink-0 sm:w-56">
-            <p className="mb-1.5 text-right text-xs text-[#616161] dark:text-[#b0b0b0]">
-              <span className="font-semibold text-[#212121] dark:text-white">
+            <p className="mb-1.5 text-right text-xs text-dash-muted">
+              <span className="font-semibold text-dash-ink">
                 {answeredCount} de {fields.length}
               </span>{" "}
               respondidas
@@ -313,7 +313,7 @@ function AiCompanyInfoWizard({
                     "flex w-full flex-col items-center gap-1.5 rounded-xl border px-1 py-2.5 text-center transition-colors sm:flex-row sm:gap-2.5 sm:px-3 sm:text-left",
                     active
                       ? "border-violet-400 bg-violet-50 dark:border-violet-500/60 dark:bg-violet-500/10"
-                      : "border-[#ececec] hover:border-[#d6d6d6] dark:border-[#2e2e2e] dark:hover:border-[#4a4a4a]",
+                      : "border-dash-line hover:border-[#d6d6d6] dark:border-[#2e2e2e] dark:hover:border-[#4a4a4a]",
                   )}
                 >
                   <span
@@ -323,7 +323,7 @@ function AiCompanyInfoWizard({
                         ? "bg-emerald-500 text-white"
                         : active
                           ? "ai-urim-fill"
-                          : "bg-[#efefef] text-[#616161] dark:bg-[#2e2e2e] dark:text-[#b0b0b0]",
+                          : "bg-[#efefef] text-dash-muted dark:bg-[#2e2e2e]",
                     )}
                   >
                     {done ? (
@@ -339,10 +339,10 @@ function AiCompanyInfoWizard({
                     ) : null}
                   </span>
                   <span className="min-w-0">
-                    <span className="block text-xs font-semibold text-[#212121] dark:text-white sm:text-sm">
+                    <span className="block text-xs font-semibold text-dash-ink sm:text-sm">
                       {item.shortLabel}
                     </span>
-                    <span className="hidden truncate text-xs text-[#616161] dark:text-[#b0b0b0] sm:block">
+                    <span className="hidden truncate text-xs text-dash-muted sm:block">
                       {done ? "Respondida" : item.label}
                     </span>
                   </span>
@@ -391,18 +391,18 @@ function AiCompanyInfoWizard({
           animate={{ opacity: 1, x: 0 }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, x: -12 }}
           transition={aiTabSwitchTransition(reduce)}
-          className="rounded-2xl border border-[#e0e0e0] bg-white p-4 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-6"
+          className="rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm sm:p-6"
         >
           <p className="text-xs font-semibold text-violet-700 dark:text-violet-300">
             Pregunta {stepIndex + 1} de {fields.length} · {field.label}
           </p>
           <label
             htmlFor={field.key}
-            className="mt-1 block text-xl font-semibold text-[#212121] dark:text-white"
+            className="mt-1 block text-xl font-semibold text-dash-ink"
           >
             {field.question}
           </label>
-          <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1 text-sm text-dash-muted">
             {field.hint}
           </p>
 
@@ -418,10 +418,10 @@ function AiCompanyInfoWizard({
                 disabled={saving}
               />
               <div className="mt-2 flex items-center justify-between gap-3">
-                <span className="flex items-center gap-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                <span className="flex items-center gap-2 text-xs text-dash-muted">
                   <AiSegmentMeter covered={detail} total={PILLAR_POINTS} />
                   Nivel de detalle:{" "}
-                  <span className="font-medium text-[#212121] dark:text-white">
+                  <span className="font-medium text-dash-ink">
                     {DETAIL_LABELS[detail]}
                   </span>
                 </span>
@@ -438,10 +438,10 @@ function AiCompanyInfoWizard({
               </div>
             </div>
 
-            <aside className="rounded-xl bg-[#fafafa] p-3.5 dark:bg-[#252525]">
+            <aside className="rounded-xl bg-dash-surface-2 p-3.5">
               {showAiGaps ? (
                 <>
-                  <p className="flex items-center gap-1.5 text-sm font-semibold text-[#212121] dark:text-white">
+                  <p className="flex items-center gap-1.5 text-sm font-semibold text-dash-ink">
                     <span className="ai-urim-icon">
                       <HugeiconsIcon icon={SparklesIcon} size={16} />
                     </span>
@@ -451,7 +451,7 @@ function AiCompanyInfoWizard({
                     {aiGaps.map((gap) => (
                       <li
                         key={gap}
-                        className="flex gap-2 text-sm leading-snug text-[#616161] dark:text-[#b0b0b0]"
+                        className="flex gap-2 text-sm leading-snug text-dash-muted"
                       >
                         <span
                           aria-hidden
@@ -464,7 +464,7 @@ function AiCompanyInfoWizard({
                 </>
               ) : (
                 <>
-                  <p className="flex items-center gap-1.5 text-sm font-semibold text-[#212121] dark:text-white">
+                  <p className="flex items-center gap-1.5 text-sm font-semibold text-dash-ink">
                     <HugeiconsIcon
                       icon={Idea01Icon}
                       size={16}
@@ -476,7 +476,7 @@ function AiCompanyInfoWizard({
                     {PILLAR_GUIDE_POINTS[field.key].map((point) => (
                       <li
                         key={point}
-                        className="flex gap-2 text-sm leading-snug text-[#616161] dark:text-[#b0b0b0]"
+                        className="flex gap-2 text-sm leading-snug text-dash-muted"
                       >
                         <span
                           aria-hidden
@@ -504,13 +504,13 @@ function AiCompanyInfoWizard({
             ) : null}
           </AnimatePresence>
 
-          <div className="mt-5 flex flex-col-reverse gap-2 border-t border-[#ececec] pt-4 dark:border-[#2a2a2a] sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-5 flex flex-col-reverse gap-2 border-t border-dash-line pt-4 sm:flex-row sm:items-center sm:justify-between">
             {stepIndex > 0 ? (
               <button
                 type="button"
                 onClick={() => setStepIndex(stepIndex - 1)}
                 disabled={saving}
-                className="inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-[#616161] hover:bg-[#f5f5f5] disabled:opacity-60 dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a]"
+                className="inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-dash-muted hover:bg-dash-hover disabled:opacity-60"
               >
                 <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
                 Anterior
@@ -525,8 +525,8 @@ function AiCompanyInfoWizard({
               className={cn(
                 "inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-70",
                 isDirty || value.trim()
-                  ? "bg-orange-500 text-white hover:bg-orange-600"
-                  : "border border-[#e0e0e0] text-[#616161] hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a]",
+                  ? "dash-grad-accent text-white hover:shadow-dash-accent-lift shadow-dash-accent"
+                  : "border border-dash-line text-dash-muted hover:bg-dash-hover",
               )}
             >
               {saving ? (

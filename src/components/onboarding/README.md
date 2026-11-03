@@ -31,3 +31,15 @@ Los pasos se omiten solos si el elemento no existe (rol, plan o feature sin acce
 
 ## Pendiente
 Secciones del sidebar sin tour propio (ver `EXEMPT_NAV_KEYS` en `scripts/check-tours.mjs`): perfil, usuarios, vendedores, archivos, proyectos, WhatsApp, referidos, novedades. Ir retirándolas de esa lista al agregar su tour.
+
+## Menú de los paneles y anclas (2026-11-03)
+
+El menú del panel lo pinta `AppShell` y declara las anclas en `DashboardSidebar.tsx`:
+- `dataTour: \`nav-${key}\`` en cada sección.
+- `main-tab-extraccion` en Extracción B2B.
+- `navDataTour="main-tab-control"` para todo el menú (paso «Tu panel de control»).
+
+`scripts/check-tours.mjs` acepta esas formas además de `data-tour="…"`. Los pasos del menú usan `side: "right"`.
+
+En teléfono el menú es un cajón cerrado. Sus anclas existen en el DOM, pero el tour solo resalta elementos visibles (`isShown`); si el ancla está oculta más de 600 ms, el paso se salta. El tour de bienvenida no arranca en Operaciones.
+

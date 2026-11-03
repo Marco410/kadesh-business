@@ -148,24 +148,24 @@ export function AdminCompanySubscriptionsModal({
             className="fixed inset-0 z-[60] flex items-center justify-center p-4 pointer-events-none"
           >
             <div
-              className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-4xl w-full p-6 sm:p-8 pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
+              className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-4xl w-full p-6 sm:p-8 pointer-events-auto border border-dash-line"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between mb-6 pb-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between mb-6 pb-4 border-b border-dash-line">
                 <div className="min-w-0">
-                  <h3 className="text-xl sm:text-2xl font-bold text-[#212121] dark:text-[#ffffff] pr-4">
+                  <h3 className="text-xl sm:text-2xl font-bold text-dash-ink pr-4">
                     Suscripciones:{" "}
                     {[user?.name, user?.lastName, user?.secondLastName]
                       .filter(Boolean)
                       .join(" ") || "—"}
                   </h3>
-                  <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1">
+                  <p className="text-xs text-dash-muted mt-1">
                     {user?.email ?? "—"} · {user?.company?.name ?? "—"}
                   </p>
                 </div>
                 <button
                   onClick={onClose}
-                  className="text-2xl font-bold text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#ffffff] transition-colors flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                  className="text-2xl font-bold text-dash-muted hover:text-dash-ink dark:hover:text-[#ffffff] transition-colors flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg hover:bg-dash-hover"
                   aria-label="Cerrar"
                 >
                   ×
@@ -173,25 +173,25 @@ export function AdminCompanySubscriptionsModal({
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <section className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] p-4 lg:col-span-1">
-                  <h4 className="text-sm font-semibold text-[#212121] dark:text-white mb-3">
+                <section className="rounded-xl border border-dash-line bg-dash-surface-2 p-4 lg:col-span-1">
+                  <h4 className="text-sm font-semibold text-dash-ink mb-3">
                     Resumen
                   </h4>
-                  <div className="text-sm text-[#212121] dark:text-white space-y-2">
+                  <div className="text-sm text-dash-ink space-y-2">
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <span className="text-xs text-dash-muted">
                         Suscripciones
                       </span>
                       <span className="font-semibold">{subscriptions.length}</span>
                     </div>
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <span className="text-xs text-dash-muted">
                         Última suscripción
                       </span>
                       <span className="font-semibold">{latest?.planName ?? "—"}</span>
                     </div>
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">Periodo</span>
+                      <span className="text-xs text-dash-muted">Periodo</span>
                       <span className="font-semibold">
                         {latest?.activatedAt
                           ? `${formatDateShort(latest.activatedAt, false)} → ${formatDateShort(
@@ -202,19 +202,19 @@ export function AdminCompanySubscriptionsModal({
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">Monto</span>
+                      <span className="text-xs text-dash-muted">Monto</span>
                       <span className="font-semibold">
                         {formatMoney(latest?.planCost ?? null, latest?.planCurrency ?? null)}
                       </span>
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-[#e0e0e0] dark:border-[#3a3a3a]">
-                    <label className="block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-2">
+                  <div className="mt-4 pt-4 border-t border-dash-line">
+                    <label className="block text-xs font-medium text-dash-muted mb-2">
                       Seleccionar suscripción
                     </label>
                     <select
-                      className="w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 py-2 text-sm text-[#212121] dark:text-white"
+                      className="w-full rounded-xl border border-dash-line bg-dash-surface px-3 py-2 text-sm text-dash-ink"
                       value={selectedSubscriptionId ?? (latest?.id ?? "")}
                       onChange={(e) => setSelectedSubscriptionId(e.target.value || null)}
                       disabled={subscriptions.length === 0}
@@ -240,13 +240,13 @@ export function AdminCompanySubscriptionsModal({
                   </div>
                 </section>
 
-                <section className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 lg:col-span-2">
+                <section className="rounded-xl border border-dash-line bg-dash-surface p-4 lg:col-span-2">
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div>
-                      <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+                      <h4 className="text-sm font-semibold text-dash-ink">
                         Plan features por suscripción
                       </h4>
-                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1">
+                      <p className="text-xs text-dash-muted mt-1">
                         Edita fechas y features en la suscripción seleccionada y guarda.
                       </p>
                     </div>
@@ -254,7 +254,7 @@ export function AdminCompanySubscriptionsModal({
                       <span
                         className={`text-center inline-flex items-center gap-1.5 w-fit px-3 py-1 rounded-full text-sm font-medium ${
                           SUBSCRIPTION_STATUS_CLASSES[selected.status ?? ""] ??
-                          "bg-[#e0e0e0] dark:bg-[#3a3a3a] text-[#616161] dark:text-[#b0b0b0]"
+                          "bg-dash-surface-3 text-dash-muted"
                         }`}
                       >
                         {SUBSCRIPTION_STATUS_OPTIONS.find((o) => o.value === selected.status)
@@ -264,14 +264,14 @@ export function AdminCompanySubscriptionsModal({
                   </div>
 
                   {!selectedId ? (
-                    <div className="rounded-xl border border-dashed border-[#e0e0e0] dark:border-[#3a3a3a] p-6 text-sm text-[#616161] dark:text-[#b0b0b0] text-center">
+                    <div className="rounded-xl border border-dashed border-dash-line p-6 text-sm text-dash-muted text-center">
                       No hay suscripción seleccionada.
                     </div>
                   ) : (
                     <>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                         <label className="block">
-                          <span className="block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1">
+                          <span className="block text-xs font-medium text-dash-muted mb-1">
                             activatedAt
                           </span>
                           <input
@@ -279,11 +279,11 @@ export function AdminCompanySubscriptionsModal({
                             value={activatedAtLocal}
                             onChange={(e) => setActivatedAtLocal(e.target.value)}
                             disabled={isSaving}
-                            className="w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 py-2 text-sm text-[#212121] dark:text-white"
+                            className="w-full rounded-xl border border-dash-line bg-dash-surface px-3 py-2 text-sm text-dash-ink"
                           />
                         </label>
                         <label className="block">
-                          <span className="block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1">
+                          <span className="block text-xs font-medium text-dash-muted mb-1">
                             currentPeriodEnd
                           </span>
                           <input
@@ -291,7 +291,7 @@ export function AdminCompanySubscriptionsModal({
                             value={currentPeriodEndLocal}
                             onChange={(e) => setCurrentPeriodEndLocal(e.target.value)}
                             disabled={isSaving}
-                            className="w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 py-2 text-sm text-[#212121] dark:text-white"
+                            className="w-full rounded-xl border border-dash-line bg-dash-surface px-3 py-2 text-sm text-dash-ink"
                           />
                         </label>
                       </div>
@@ -303,7 +303,7 @@ export function AdminCompanySubscriptionsModal({
                           return (
                             <label
                               key={`${selectedId}-${key}`}
-                              className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-2 py-1 cursor-pointer hover:border-orange-300 dark:hover:border-orange-500 transition-colors"
+                              className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-dash-line bg-dash-surface-2 px-2 py-1 cursor-pointer hover:border-orange-300 dark:hover:border-orange-500 transition-colors"
                               title={meta?.description ?? ""}
                             >
                               <input
@@ -316,7 +316,7 @@ export function AdminCompanySubscriptionsModal({
                                   setDraft((prev) => ({ ...prev, [key]: next } as any));
                                 }}
                               />
-                              <span className="text-xs text-[#212121] dark:text-white">
+                              <span className="text-xs text-dash-ink">
                                 {meta?.name ?? key}
                               </span>
                             </label>
@@ -325,7 +325,7 @@ export function AdminCompanySubscriptionsModal({
                       </div>
 
                       <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <div className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                        <div className="text-xs text-dash-muted">
                           ID: <span className="font-mono">{selectedId}</span>
                         </div>
                         <button
@@ -343,7 +343,7 @@ export function AdminCompanySubscriptionsModal({
                               currentPeriodEnd: calendarDayOrNull(currentPeriodEndLocal),
                             });
                           }}
-                          className="rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                          className="rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white px-4 py-2 text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-dash-accent"
                         >
                           {isSaving ? (
                             <span className="inline-flex items-center gap-2">

@@ -380,13 +380,13 @@ export default function WorkspaceCrmBoard({
             : loadingProposals;
 
   const addBtnClass =
-    "inline-flex items-center gap-1.5 rounded-xl border border-neutral-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-orange-600 shadow-sm hover:border-orange-300 hover:bg-orange-50/80 dark:border-[#333] dark:bg-[#1e1e1e] dark:text-orange-400 dark:shadow-none dark:hover:bg-orange-500/5";
+    "inline-flex items-center gap-1.5 rounded-xl border border-neutral-300 bg-dash-surface px-2.5 py-1.5 text-xs font-semibold text-orange-600 shadow-sm hover:border-orange-300 hover:bg-orange-50/80 dark:border-[#333] dark:text-orange-400 dark:shadow-none dark:hover:bg-orange-500/5";
 
   const tabGroupShellClass =
     "rounded-xl border border-neutral-300/90 bg-neutral-200/90 p-1.5 shadow-sm dark:border-transparent dark:bg-[#252525] dark:shadow-none";
 
   const tabButtonSelectedClass =
-    "border border-neutral-200/80 bg-white font-semibold text-neutral-900 shadow-sm dark:border-transparent dark:bg-[#1e1e1e] dark:text-white dark:shadow-sm";
+    "border border-neutral-200/80 bg-dash-surface font-semibold text-neutral-900 shadow-sm dark:border-transparent dark:text-white dark:shadow-sm";
   const tabButtonIdleClass =
     "border border-transparent font-medium text-neutral-600 dark:text-neutral-400";
 

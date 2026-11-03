@@ -22,7 +22,7 @@ export function CopyPhoneButton({ phone }: { phone: string }) {
     <button
       type="button"
       onClick={() => void handleCopy()}
-      className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-[#9e9e9e] transition-colors hover:bg-black/5 hover:text-[#212121] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-[#777] dark:hover:bg-white/10 dark:hover:text-white"
+      className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-dash-faint transition-colors hover:bg-dash-hover hover:text-dash-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-[#777]"
       aria-label={copied ? "Teléfono copiado" : "Copiar teléfono"}
       title={copied ? "Copiado" : "Copiar teléfono"}
     >

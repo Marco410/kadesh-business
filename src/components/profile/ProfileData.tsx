@@ -25,10 +25,10 @@ import { can } from "kadesh/components/profile/usuarios/can";
 import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 
 const INPUT_CLASS =
-  "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
+  "w-full px-4 py-3 rounded-lg border border-dash-line bg-dash-surface text-dash-ink placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
 
 const DISABLED_FIELD_CLASS =
-  "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a] text-[#616161] dark:text-[#b0b0b0]";
+  "w-full px-4 py-3 rounded-lg border border-dash-line bg-dash-surface-2 text-dash-muted";
 
 function toDateInputValue(isoOrNull: string | null | undefined): string {
   if (!isoOrNull) return "";
@@ -58,7 +58,7 @@ function SaveChangesButton({
       type="button"
       onClick={onSave}
       disabled={saving}
-      className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto"
+      className="px-5 py-2.5 dash-grad-accent hover:shadow-dash-accent-lift text-white font-semibold rounded-full transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto shadow-dash-accent"
     >
       {saving ? (
         <>
@@ -235,7 +235,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
 
   if (userLoading && !data?.user) {
     return (
-      <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 sm:p-8 border border-[#e0e0e0] dark:border-[#3a3a3a] shadow-md dark:shadow-lg">
+      <div className="bg-dash-surface rounded-xl p-6 sm:p-8 border border-dash-line shadow-md dark:shadow-lg">
         <div className="flex items-center justify-center py-12">
           <span className="animate-spin size-8 border-2 border-orange-500 border-t-transparent rounded-full" />
         </div>
@@ -250,9 +250,9 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
         className={`grid grid-cols-1 gap-6${isAdminCompany ? " xl:grid-cols-2" : ""}`}
       >
 
-        <div className="bg-white dark:bg-[#1e1e1e] rounded-xl p-6 sm:p-8 border border-[#e0e0e0] dark:border-[#3a3a3a] shadow-md dark:shadow-lg">
+        <div className="bg-dash-surface rounded-xl p-6 sm:p-8 border border-dash-line shadow-md dark:shadow-lg">
           <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-            <h2 className="text-2xl font-bold text-[#212121] dark:text-[#ffffff]">
+            <h2 className="text-2xl font-bold text-dash-ink">
               Información Personal
             </h2>
             <SaveChangesButton
@@ -263,7 +263,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
           </div>
 
           {!canEditProfile && (
-            <div className="mb-6 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f8f8f8] dark:bg-[#2a2a2a] p-3 text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <div className="mb-6 rounded-xl border border-dash-line bg-dash-surface-2 p-3 text-sm text-dash-muted">
               Solo puedes ver tu perfil. Pide a Gerencia permiso para editarlo.
             </div>
           )}
@@ -276,7 +276,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Avatar con botón editar */}
-          <div className="md:col-span-2 flex items-center gap-6 mb-4 pb-6 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
+          <div className="md:col-span-2 flex items-center gap-6 mb-4 pb-6 border-b border-dash-line">
             <div className="flex flex-col items-start gap-1">
               <input
                 ref={fileInputRef}
@@ -309,7 +309,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
                   <span className="rounded-full bg-white/90 dark:bg-black/50 p-1.5">
                     <HugeiconsIcon
                       icon={Edit01Icon}
-                      className="size-5 text-[#212121] dark:text-white"
+                      className="size-5 text-dash-ink"
                     />
                   </span>
                 </span>
@@ -326,10 +326,10 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
               )}
             </div>
             <div>
-              <h3 className="text-xl font-bold text-[#212121] dark:text-[#ffffff]">
+              <h3 className="text-xl font-bold text-dash-ink">
                 {user.name} {user.lastName} {user.secondLastName || ""}
               </h3>
-              <p className="text-[#616161] dark:text-[#b0b0b0]">
+              <p className="text-dash-muted">
                 @{user.username}
               </p>
               {user.verified && (
@@ -353,7 +353,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
 
           {/* Nombre - editable */}
           <div>
-            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+            <label className="block text-sm font-semibold text-dash-muted mb-2">
               Nombre
             </label>
             <input
@@ -368,7 +368,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
 
           {/* Apellido Paterno - editable */}
           <div>
-            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+            <label className="block text-sm font-semibold text-dash-muted mb-2">
               Apellido Paterno
             </label>
             <input
@@ -383,7 +383,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
 
           {/* Apellido Materno - editable */}
           <div>
-            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+            <label className="block text-sm font-semibold text-dash-muted mb-2">
               Apellido Materno
             </label>
             <input
@@ -398,7 +398,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
 
           {/* Username - no editable */}
           <div>
-            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+            <label className="block text-sm font-semibold text-dash-muted mb-2">
               Nombre de Usuario
             </label>
             <div className="flex items-center gap-2">
@@ -410,7 +410,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
                 className={DISABLED_FIELD_CLASS}
               />
             </div>
-            <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-1.5 text-xs text-dash-muted">
               Si necesitas actualizar este campo, envía un mensaje en{" "}
               <Link
                 href={Routes.contact}
@@ -424,7 +424,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
 
           {/* Email - no editable */}
           <div>
-            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+            <label className="block text-sm font-semibold text-dash-muted mb-2">
               Correo Electrónico
             </label>
             <div className="flex items-center gap-2">
@@ -436,7 +436,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
                 className={DISABLED_FIELD_CLASS}
               />
             </div>
-            <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-1.5 text-xs text-dash-muted">
               Si necesitas actualizar este campo, envía un mensaje en{" "}
               <Link
                 href={Routes.contact}
@@ -450,7 +450,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
 
             {/* Correo de empresa - editable */}
             <div>
-            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+            <label className="block text-sm font-semibold text-dash-muted mb-2">
               Correo de la empresa
             </label>
             <input
@@ -461,14 +461,14 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
               className={INPUT_CLASS}
               disabled={!canEditProfile}
             />
-            <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-1.5 text-xs text-dash-muted">
               Este correo se usará para las cotizaciones y ventas.
             </p>
           </div>
 
           {/* Teléfono de empresa - editable */}
           <div>
-            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+            <label className="block text-sm font-semibold text-dash-muted mb-2">
               Teléfono de la empresa
             </label>
             <input
@@ -479,14 +479,14 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
               className={INPUT_CLASS}
               disabled={!canEditProfile}
             />
-            <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-1.5 text-xs text-dash-muted">
               Este teléfono se usará para las cotizaciones y ventas.
             </p>
           </div>
 
           {/* Teléfono - editable */}
           <div>
-            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+            <label className="block text-sm font-semibold text-dash-muted mb-2">
               Teléfono <span className="text-red-500">*</span>
             </label>
             <input
@@ -517,7 +517,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
 
           {/* Fecha de Nacimiento - editable */}
           <div>
-            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+            <label className="block text-sm font-semibold text-dash-muted mb-2">
               Fecha de Nacimiento
             </label>
             <input
@@ -530,7 +530,7 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+            <label className="block text-sm font-semibold text-dash-muted mb-2">
               Edad
             </label>
             <div className="flex items-center gap-2">
@@ -546,17 +546,17 @@ export default function ProfileData({ user: userProp }: ProfileDataProps) {
                 className={DISABLED_FIELD_CLASS}
               />
             </div>
-            <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-1.5 text-xs text-dash-muted">
               Se autogenera con tu fecha de nacimiento.
             </p>
           </div>
 
           {/* Miembro desde - no editable */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] mb-2">
+            <label className="block text-sm font-semibold text-dash-muted mb-2">
               Miembro desde
             </label>
-            <div className="px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a] text-[#616161] dark:text-[#b0b0b0]">
+            <div className="px-4 py-3 rounded-lg border border-dash-line bg-dash-surface-2 text-dash-muted">
               {formatDate(user.createdAt)}
             </div>
           </div>

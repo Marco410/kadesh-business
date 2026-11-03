@@ -7,7 +7,7 @@ function renderInlineMarkdown(text: string): ReactNode[] {
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return (
-        <strong key={i} className="font-semibold text-[#212121] dark:text-white">
+        <strong key={i} className="font-semibold text-dash-ink">
           {part.slice(2, -2)}
         </strong>
       );
@@ -60,7 +60,7 @@ export default function ChangelogReleaseBody({
 
   return (
     <div
-      className={`space-y-3 text-[15px] leading-relaxed text-[#424242] dark:text-[#c8c8c8] ${className}`}
+      className={`space-y-3 text-[15px] leading-relaxed text-dash-soft dark:text-[#c8c8c8] ${className}`}
     >
       {blocks.map((block, blockIndex) => {
         if (block.type === "list") {

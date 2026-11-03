@@ -38,7 +38,7 @@ const FINAL_STAGES = new Set([
 ]);
 
 const cardClass =
-  "rounded-2xl border border-[#e0e0e0] bg-white p-4 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-5";
+  "rounded-3xl border border-dash-line bg-dash-surface p-4 sm:p-5";
 
 const stageLabel = (stage: string) => stage.replace(/^\d+\s*-\s*/, "");
 
@@ -62,12 +62,12 @@ function Card({
 }) {
   return (
     <section className={cardClass}>
-      <h3 className="flex items-center gap-1 text-base font-semibold text-[#212121] dark:text-white">
+      <h3 className="flex items-center gap-1 text-base font-semibold text-dash-ink">
         {title}
         {help ? <InfoTip label={title}>{help}</InfoTip> : null}
       </h3>
       {description ? (
-        <p className="mt-0.5 text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-0.5 text-sm text-dash-muted">
           {description}
         </p>
       ) : null}
@@ -95,19 +95,19 @@ function Stat({
         "relative rounded-xl border px-3 py-2 pr-8",
         warning
           ? "border-amber-300 dark:border-amber-600"
-          : "border-[#e8e8e8] dark:border-[#333]",
+          : "border-dash-line",
       )}
     >
       <span className="absolute right-2 top-1.5">
         <InfoTip label={label}>{help}</InfoTip>
       </span>
-      <p className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+      <p className="text-xs font-medium text-dash-muted">
         {label}
       </p>
-      <p className="mt-0.5 text-xl font-semibold tabular-nums text-[#212121] dark:text-white">
+      <p className="mt-0.5 text-xl font-semibold tabular-nums text-dash-ink">
         {value}
       </p>
-      {hint ? <p className="mt-0.5 text-xs text-[#9e9e9e]">{hint}</p> : null}
+      {hint ? <p className="mt-0.5 text-xs text-dash-faint">{hint}</p> : null}
     </div>
   );
 }
@@ -141,10 +141,10 @@ export default function CompanyAnalyticsSection() {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
+        <h2 className="text-xl font-semibold text-dash-ink">
           Analítica
         </h2>
-        <p className="mt-1 text-sm text-[#616161] dark:text-[#9e9e9e]">
+        <p className="mt-1 text-sm text-dash-muted">
           {a?.scope === "own"
             ? "Tus números de venta: solo los leads que tienes asignados."
             : "Los números de venta de todo tu equipo."}
@@ -153,13 +153,13 @@ export default function CompanyAnalyticsSection() {
 
       <div
         data-tour="analytics-guide"
-        className="rounded-xl border border-orange-200 bg-orange-50 p-3 text-sm text-[#424242] dark:border-orange-900/60 dark:bg-orange-500/10 dark:text-[#e0e0e0]"
+        className="rounded-xl border border-orange-200 bg-orange-50 p-3 text-sm text-dash-soft dark:border-orange-900/60 dark:bg-orange-500/10"
       >
-        <p className="font-semibold text-[#212121] dark:text-white">
+        <p className="font-semibold text-dash-ink">
           Cómo leer esta sección
         </p>
         <p className="mt-1">{HELP.guide}</p>
-        <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-1 text-xs text-dash-muted">
           {a?.dataSince
             ? `Datos desde el ${formatDateShort(a.dataSince, false)}. `
             : ""}
@@ -173,7 +173,7 @@ export default function CompanyAnalyticsSection() {
         data-tour="analytics-period"
         className="flex flex-wrap items-center gap-2"
       >
-        <span className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+        <span className="text-xs font-medium text-dash-muted">
           Periodo
         </span>
         {PERIODS.map((period) => (
@@ -186,7 +186,7 @@ export default function CompanyAnalyticsSection() {
               "h-11 rounded-lg border px-3 text-sm font-medium transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 sm:h-9",
               days === period.days
                 ? "border-orange-500 bg-orange-500/10 text-orange-700 dark:text-orange-300"
-                : "border-transparent bg-black/5 text-[#616161] hover:bg-black/10 dark:bg-white/5 dark:text-[#b0b0b0] dark:hover:bg-white/10",
+                : "border-transparent bg-dash-surface-2 text-dash-muted hover:bg-black/10 dark:hover:bg-white/10",
             )}
           >
             {period.label}
@@ -204,16 +204,16 @@ export default function CompanyAnalyticsSection() {
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="h-28 animate-pulse rounded-2xl bg-[#ececec] dark:bg-[#2a2a2a]"
+              className="h-28 dash-shimmer rounded-2xl"
             />
           ))}
         </div>
       ) : !a || !a.dataSince ? (
         <div className={cn(cardClass, "py-10 text-center")}>
-          <p className="font-semibold text-[#212121] dark:text-white">
+          <p className="font-semibold text-dash-ink">
             Todavía no hay datos
           </p>
-          <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1 text-sm text-dash-muted">
             Los números empiezan a salir cuando mueves tus leads de etapa en
             Clientes.
           </p>
@@ -307,13 +307,13 @@ export default function CompanyAnalyticsSection() {
 
           <Card title="Etapas de tu pipeline" help={HELP.stages}>
             {a.stages.length === 0 ? (
-              <p className="text-sm text-[#9e9e9e]">
+              <p className="text-sm text-dash-faint">
                 Ningún lead cambió de etapa en el periodo.
               </p>
             ) : (
               <div className="relative -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
                 <table className="w-full min-w-[600px] text-left text-sm">
-                  <thead className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <thead className="text-xs text-dash-muted">
                     <tr>
                       <Th label="Etapa" />
                       <Th label="Entraron" help={HELP.stageEntered} />
@@ -323,26 +323,26 @@ export default function CompanyAnalyticsSection() {
                       <Th label="Estancados" help={HELP.stageStalled} />
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+                  <tbody className="divide-y divide-dash-line">
                     {a.stages.map((row) => {
                       const final = FINAL_STAGES.has(row.stage);
                       return (
                         <tr key={row.stage}>
-                          <td className="py-2 pr-3 text-[#212121] dark:text-white">
+                          <td className="py-2 pr-3 text-dash-ink">
                             {stageLabel(row.stage)}
                           </td>
-                          <td className="py-2 pr-3 tabular-nums text-[#212121] dark:text-white">
+                          <td className="py-2 pr-3 tabular-nums text-dash-ink">
                             {row.entered}
                           </td>
-                          <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+                          <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-dash-muted">
                             {final
                               ? "—"
                               : `${formatShare(row.advanced, row.entered)} (${row.advanced})`}
                           </td>
-                          <td className="py-2 pr-3 tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+                          <td className="py-2 pr-3 tabular-nums text-dash-muted">
                             {final ? "—" : row.lost}
                           </td>
-                          <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+                          <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-dash-muted">
                             {formatDays(row.medianDays)}
                           </td>
                           <td
@@ -350,7 +350,7 @@ export default function CompanyAnalyticsSection() {
                               "py-2 tabular-nums",
                               row.stalled
                                 ? "font-semibold text-amber-700 dark:text-amber-300"
-                                : "text-[#9e9e9e]",
+                                : "text-dash-faint",
                             )}
                           >
                             {row.stalled}
@@ -367,13 +367,13 @@ export default function CompanyAnalyticsSection() {
           {a.scope === "team" ? (
             <Card title="Tu equipo" help={HELP.team}>
               {a.sellers.length === 0 ? (
-                <p className="text-sm text-[#9e9e9e]">
+                <p className="text-sm text-dash-faint">
                   Nadie movió leads en el periodo.
                 </p>
               ) : (
                 <div className="relative -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
                   <table className="w-full min-w-[760px] text-left text-sm">
-                    <thead className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <thead className="text-xs text-dash-muted">
                       <tr>
                         <Th label="Vendedor" />
                         <Th label="Leads nuevos" help={HELP.stageEntered} />
@@ -385,10 +385,10 @@ export default function CompanyAnalyticsSection() {
                         <Th label="WhatsApp" />
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+                    <tbody className="divide-y divide-dash-line">
                       {a.sellers.map((seller) => (
                         <tr key={seller.userId ?? "sin-vendedor"}>
-                          <td className="py-2 pr-3 font-medium text-[#212121] dark:text-white">
+                          <td className="py-2 pr-3 font-medium text-dash-ink">
                             {seller.name}
                           </td>
                           <td className="py-2 pr-3 tabular-nums">
@@ -431,19 +431,19 @@ export default function CompanyAnalyticsSection() {
           <div data-tour="analytics-stalled">
             <Card title="Tratos estancados" help={HELP.stalledList}>
               {a.stalledDeals.length === 0 ? (
-                <p className="text-sm text-[#9e9e9e]">
+                <p className="text-sm text-dash-faint">
                   Ningún trato lleva más de 14 días sin moverse. ¡Bien!
                 </p>
               ) : (
-                <ul className="flex flex-col divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+                <ul className="flex flex-col divide-y divide-dash-line">
                   {a.stalledDeals.map((deal, index) => {
                     const content = (
                       <>
                         <span className="min-w-0">
-                          <span className="block truncate font-medium text-[#212121] dark:text-white">
+                          <span className="block truncate font-medium text-dash-ink">
                             {deal.leadName}
                           </span>
-                          <span className="block text-xs text-[#616161] dark:text-[#b0b0b0]">
+                          <span className="block text-xs text-dash-muted">
                             {stageLabel(deal.stage)} · {deal.days} días sin
                             moverse
                             {deal.sellerName ? ` · ${deal.sellerName}` : ""}
@@ -452,7 +452,7 @@ export default function CompanyAnalyticsSection() {
                         <HugeiconsIcon
                           icon={ArrowRight01Icon}
                           size={16}
-                          className="shrink-0 text-[#9e9e9e]"
+                          className="shrink-0 text-dash-faint"
                         />
                       </>
                     );

@@ -66,7 +66,7 @@ function SaveLeadButton({
       type="button"
       onClick={handleSaveLead}
       disabled={saving}
-      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium hover:bg-orange-600 hover:-translate-y-px active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)]"
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-full dash-grad-accent text-white text-sm font-medium hover:shadow-dash-accent-lift hover:-translate-y-px active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] shadow-dash-accent"
     >
       {saving ? "Guardando..." : "Guardar cambios"}
     </button>
@@ -90,10 +90,10 @@ function SocialRow({
 }) {
   const href = asExternalHref(value);
   return (
-    <div className="flex items-center gap-2 py-1.5 border-b border-[#e8e8e8] dark:border-[#333] last:border-0">
+    <div className="flex items-center gap-2 py-1.5 border-b border-dash-line last:border-0">
       <label
         htmlFor={id}
-        className="w-24 shrink-0 text-sm font-medium text-[#616161] dark:text-[#b0b0b0]"
+        className="w-24 shrink-0 text-sm font-medium text-dash-muted"
       >
         {label}
       </label>
@@ -239,7 +239,7 @@ export default function DetailLeadSection() {
       <div className="flex items-center justify-center py-24">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto" />
-          <p className="mt-4 text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-4 text-dash-muted">
             Cargando cliente...
           </p>
         </div>
@@ -249,7 +249,7 @@ export default function DetailLeadSection() {
 
   if (error || !lead) {
     return (
-      <div className="max-w-3xl mx-auto px-4 pt-24 pb-12">
+      <div className="max-w-3xl mx-auto pb-12">
         <p className="text-red-600 dark:text-red-400">
           No se pudo cargar el cliente o no existe.
         </p>
@@ -368,22 +368,22 @@ export default function DetailLeadSection() {
   };
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-15 pt-20 pb-10 space-y-5">
+    <div className="w-full max-w-[1920px] mx-auto pb-10 space-y-5">
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => router.back()}
-            className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
+            className="inline-flex items-center gap-1.5 text-sm text-dash-muted hover:text-orange-500 dark:hover:text-orange-400"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
             Volver a Clientes
           </button>
-          <h1 className="text-lg font-bold text-[#212121] dark:text-[#ffffff] truncate">
+          <h1 className="text-lg font-bold text-dash-ink truncate">
             {lead.businessName || "Cliente sin nombre"}
           </h1>
           {lead.source ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-2.5 py-1 text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-dash-line bg-dash-surface-2 px-2.5 py-1 text-xs font-medium text-dash-muted">
               {isInegi ? <InegiMark size={14} /> : null}
               {isGoogleMaps ? <GoogleMapsMark size={14} /> : null}
               {lead.source}
@@ -466,7 +466,7 @@ export default function DetailLeadSection() {
             <div className="grid grid-cols-[7.5rem_1fr] gap-x-3 py-1.5 text-sm items-center">
               <label
                 htmlFor="lead-website-url"
-                className="font-medium text-[#616161] dark:text-[#b0b0b0]"
+                className="font-medium text-dash-muted"
               >
                 URL
               </label>
@@ -508,7 +508,7 @@ export default function DetailLeadSection() {
         >
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#777]">
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-dash-faint dark:text-[#777]">
                 Redes
               </p>
               <SocialRow
@@ -545,7 +545,7 @@ export default function DetailLeadSection() {
               />
             </div>
             <div>
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#777]">
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-dash-faint dark:text-[#777]">
                 Fechas
               </p>
               <div className="relative pl-4 before:absolute before:left-[3px] before:top-2 before:bottom-2 before:w-px before:bg-[#e8e8e8] dark:before:bg-[#333]">
@@ -553,7 +553,7 @@ export default function DetailLeadSection() {
                   <span className="absolute -left-4 top-2 size-1.5 rounded-full bg-orange-500" />
                   <label
                     htmlFor="lead-first-contact"
-                    className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]"
+                    className="text-sm font-medium text-dash-muted"
                   >
                     Primer contacto
                   </label>
@@ -569,28 +569,28 @@ export default function DetailLeadSection() {
                 </div>
                 <div className="relative mb-3">
                   <span className="absolute -left-4 top-1.5 size-1.5 rounded-full bg-emerald-500" />
-                  <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="text-sm font-medium text-dash-muted">
                     Próximo seguimiento
                   </p>
-                  <p className="text-sm text-[#212121] dark:text-white">
+                  <p className="text-sm text-dash-ink">
                     {formatDateShort(status?.nextFollowUpDate)}
                   </p>
                 </div>
                 <div className="relative mb-3">
                   <span className="absolute -left-4 top-1.5 size-1.5 rounded-full bg-[#bdbdbd] dark:bg-[#666]" />
-                  <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="text-sm font-medium text-dash-muted">
                     Alta
                   </p>
-                  <p className="text-sm text-[#212121] dark:text-white">
+                  <p className="text-sm text-dash-ink">
                     {formatDateShort(lead.createdAt, false)}
                   </p>
                 </div>
                 <div className="relative">
                   <span className="absolute -left-4 top-1.5 size-1.5 rounded-full bg-[#bdbdbd] dark:bg-[#666]" />
-                  <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="text-sm font-medium text-dash-muted">
                     Actualizado
                   </p>
-                  <p className="text-sm text-[#212121] dark:text-white">
+                  <p className="text-sm text-dash-ink">
                     {formatDateShort(lead.updatedAt)}
                   </p>
                 </div>
@@ -600,7 +600,7 @@ export default function DetailLeadSection() {
         </SectionCard>
       </div>
 
-      <div className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e]">
+      <div className="rounded-lg border border-dash-line bg-dash-surface">
         <h2
           className={`px-4 py-3 text-sm font-semibold uppercase tracking-wide border-b ${
             pipelineStatus && PIPELINE_STATUS_SECTION_HEADER[pipelineStatus]
@@ -637,10 +637,10 @@ export default function DetailLeadSection() {
                 <HugeiconsIcon icon={FolderIcon} size={18} />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[11px] font-medium text-[#616161] dark:text-[#b0b0b0]">
+                <span className="block truncate text-[11px] font-medium text-dash-muted">
                   Proyectos
                 </span>
-                <span className="tabular-nums text-lg font-bold leading-none text-[#212121] dark:text-white">
+                <span className="tabular-nums text-lg font-bold leading-none text-dash-ink">
                   {projectsCount}
                 </span>
               </span>

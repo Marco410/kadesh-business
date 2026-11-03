@@ -50,10 +50,8 @@ import WorkspacesTab from "kadesh/components/profile/sales/workspaces/Workspaces
 import CreateWorkspaceModal from "kadesh/components/profile/sales/workspaces/CreateWorkspaceModal";
 import { NovedadesPage } from "../changelog";
 import { KADESH_URIM_AI_NAME } from "kadesh/components/profile/ai/constants";
-import { useCompanyAiLive } from "kadesh/components/profile/ai/useCompanyAiLive";
 import { WhatsAppSettingsSection } from "kadesh/components/profile/whatsapp/WhatsAppSettingsSection";
 import PanelControlSkeleton from "./PanelControlSkeleton";
-import DashboardSidebar from "./DashboardSidebar";
 import { CompanyAnalyticsSection } from "kadesh/components/analytics";
 
 const VALID_TABS = [
@@ -166,7 +164,6 @@ function PanelControlSectionContent({
     skip: !user?.id,
   });
   const companyId = userData?.user?.company?.id ?? null;
-  const { isAiLive } = useCompanyAiLive(companyId);
 
   const { data: subscriptionData, loading: subscriptionLoading } = useQuery<
     SubscriptionStatusResponse,
@@ -229,13 +226,6 @@ function PanelControlSectionContent({
     hasWorkspacesFeature,
   );
 
-  const handleTabChange = (key: string) => {
-    const params = preserveRegisterSuccessParam(
-      new URLSearchParams(searchParams.toString()),
-    );
-    params.set("tab", key);
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  };
 
   useEffect(() => {
     if (companyId && subscriptionLoading) return;
@@ -281,28 +271,18 @@ function PanelControlSectionContent({
         >
           {!embedded && (
             <div className="mb-8">
-              <h1 className="text-2xl sm:text-3xl font-bold text-[#212121] dark:text-white">
+              <h1 className="text-2xl sm:text-3xl font-bold text-dash-ink">
                 Panel de control
               </h1>
-              <p className="text-[#616161] dark:text-[#b0b0b0] mt-1">
+              <p className="text-dash-muted mt-1">
                 Gestiona tu información y ventas
               </p>
             </div>
           )}
 
-          <div className="flex flex-col lg:flex-row gap-6">
-            <DashboardSidebar
-              user={user}
-              selectedTab={selectedTab}
-              onTabChange={handleTabChange}
-              hasVendedorRole={hasVendedorRole}
-              isAdminCompany={isAdminCompany}
-              canManageAi={canManageAi}
-              isAiLive={isAiLive}
-              betaFeatureKeys={betaFeatureKeys}
-            />
-
-            <main className="flex-1 min-w-0">
+          {/* El menú lo pinta el shell (`PanelShell`); aquí solo va la sección abierta. */}
+          <div className="min-w-0">
+            <div>
               {selectedTab === "inicio" &&
                 (canSeeInicio ? (
                   <CompanyDashboard
@@ -332,7 +312,7 @@ function PanelControlSectionContent({
 
               {selectedTab === "profile" &&
                 (canSeeProfile ? (
-                  <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8 shadow-sm">
+                  <div className="rounded-3xl border border-dash-line bg-dash-surface p-6 sm:p-8 shadow-sm">
                     <ProfileData user={user} />
                   </div>
                 ) : (
@@ -516,10 +496,10 @@ function PanelControlSectionContent({
               {selectedTab === "referidos" && (
                 <div className="flex flex-col gap-5">
                   <div className="max-w-none">
-                    <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
+                    <h2 className="text-xl font-semibold text-dash-ink">
                       Referidos
                     </h2>
-                    <p className="mt-1 text-sm text-[#616161] dark:text-[#9e9e9e]">
+                    <p className="mt-1 text-sm text-dash-muted">
                       Usuarios que se registraron con tu código y tus comisiones
                       generadas.
                     </p>
@@ -533,7 +513,7 @@ function PanelControlSectionContent({
                   <NovedadesPage />
                 </div>
               )}
-            </main>
+            </div>
           </div>
         </div>
       </div>
@@ -545,7 +525,7 @@ function PanelControlSectionContent({
       {embedded ? (
         panelBody
       ) : (
-        <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#0a0a0a]">
+        <div className="min-h-screen bg-dash-surface-2">
           <Navigation />
           {panelBody}
           <Footer />

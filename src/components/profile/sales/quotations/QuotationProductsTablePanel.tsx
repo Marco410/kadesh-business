@@ -133,7 +133,7 @@ export default function QuotationProductsTablePanel({
         aria-labelledby="tab-productos"
         className="space-y-3"
       >
-        <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <p className="text-sm text-dash-muted">
           No se pudo obtener la empresa. Los ítems se filtran por cotizaciones de
           tu compañía.
         </p>
@@ -149,13 +149,13 @@ export default function QuotationProductsTablePanel({
       className="space-y-3"
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <p className="text-xs text-dash-muted">
           Líneas de cotización vinculadas a cotizaciones de tu empresa.
         </p>
         <button
           type="button"
           onClick={openCreate}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e]"
+          className="inline-flex items-center justify-center gap-2 rounded-full dash-grad-accent px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:shadow-dash-accent-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] shadow-dash-accent"
         >
           <HugeiconsIcon icon={Add01Icon} size={18} />
           Agregar producto / servicio
@@ -187,7 +187,7 @@ export default function QuotationProductsTablePanel({
                 <tr>
                   <td
                     colSpan={9}
-                    className={`${quotationTdClass} text-center py-12 text-[#616161] dark:text-[#9e9e9e]`}
+                    className={`${quotationTdClass} text-center py-12 text-dash-muted`}
                   >
                     Cargando…
                   </td>
@@ -205,7 +205,7 @@ export default function QuotationProductsTablePanel({
                 <tr>
                   <td
                     colSpan={9}
-                    className={`${quotationTdClass} text-center py-14 text-[#616161] dark:text-[#9e9e9e]`}
+                    className={`${quotationTdClass} text-center py-14 text-dash-muted`}
                   >
                       No hay productos o servicios de tu negocio.
                   </td>
@@ -238,7 +238,7 @@ export default function QuotationProductsTablePanel({
                     <td className={`${quotationTdClass} text-right tabular-nums font-medium`}>
                       {formatMoney(row.lineTotal)}
                     </td>
-                    <td className={`${quotationTdClass} font-mono text-[11px] text-[#616161] dark:text-[#b0b0b0]`}>
+                    <td className={`${quotationTdClass} font-mono text-[11px] text-dash-muted`}>
                       {row.quotation?.id
                         ? `${row.quotation.id.slice(0, 8)}…`
                         : "—"}
@@ -257,7 +257,7 @@ export default function QuotationProductsTablePanel({
                           Editar
                         </button>
                       ) : (
-                        <span className="text-xs text-[#9e9e9e]">—</span>
+                        <span className="text-xs text-dash-faint">—</span>
                       )}
                     </td>
                   </tr>
@@ -270,7 +270,7 @@ export default function QuotationProductsTablePanel({
 
       {!loading && rows.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
-          <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <p className="text-xs text-dash-muted">
             Página {page}
             {hasNextPage ? " · hay más resultados" : ""}
           </p>
@@ -279,7 +279,7 @@ export default function QuotationProductsTablePanel({
               type="button"
               disabled={!hasPrevPage || loading}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="px-3 py-1.5 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] text-sm text-[#212121] dark:text-white disabled:opacity-40 disabled:pointer-events-none hover:bg-[#f5f5f5] dark:hover:bg-[#333]"
+              className="px-3 py-1.5 rounded-lg border border-dash-line text-sm text-dash-ink disabled:opacity-40 disabled:pointer-events-none hover:bg-dash-hover"
             >
               Anterior
             </button>
@@ -287,7 +287,7 @@ export default function QuotationProductsTablePanel({
               type="button"
               disabled={!hasNextPage || loading}
               onClick={() => setPage((p) => p + 1)}
-              className="px-3 py-1.5 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] text-sm text-[#212121] dark:text-white disabled:opacity-40 disabled:pointer-events-none hover:bg-[#f5f5f5] dark:hover:bg-[#333]"
+              className="px-3 py-1.5 rounded-lg border border-dash-line text-sm text-dash-ink disabled:opacity-40 disabled:pointer-events-none hover:bg-dash-hover"
             >
               Siguiente
             </button>

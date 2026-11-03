@@ -263,27 +263,27 @@ export default function WorkspaceMembersModal({
             className="fixed inset-0 z-[125] flex items-end justify-center p-0 sm:items-center sm:p-4 pointer-events-none"
           >
             <div
-              className="pointer-events-auto flex h-[min(100dvh,100%)] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl border border-[#e0e0e0] bg-white shadow-2xl dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:h-auto sm:max-h-[90vh] sm:rounded-2xl"
+              className="pointer-events-auto flex h-[min(100dvh,100%)] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl border border-dash-line bg-dash-surface shadow-2xl sm:h-auto sm:max-h-[90vh] sm:rounded-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="shrink-0 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
+              <div className="shrink-0 border-b border-dash-line">
                 <div className="flex items-start gap-3 px-4 pt-4 pb-3 sm:px-5">
                   <div className="min-w-0 flex-1">
                     <h2
                       id="ws-members-title"
-                      className="text-lg font-bold text-[#212121] dark:text-white"
+                      className="text-lg font-bold text-dash-ink"
                     >
                       Miembros del espacio
                     </h2>
-                    <p className="mt-0.5 truncate text-sm text-[#616161] dark:text-[#9e9e9e]">
+                    <p className="mt-0.5 truncate text-sm text-dash-muted">
                       {wsData?.saasWorkspace?.name ?? "Espacio"}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={onClose}
-                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#616161] transition-colors hover:bg-[#f5f5f5] hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a] dark:hover:text-white"
+                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-ink"
                     aria-label="Cerrar"
                   >
                     <HugeiconsIcon icon={Cancel01Icon} size={22} />
@@ -313,7 +313,7 @@ export default function WorkspaceMembersModal({
                         className={`inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-[transform,background-color,color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] active:scale-[0.97] ${
                           selectedTab
                             ? "bg-orange-500 text-white shadow-sm shadow-orange-500/25"
-                            : "text-[#616161] hover:bg-[#f5f5f5] dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a]"
+                            : "text-dash-muted hover:bg-dash-hover"
                         }`}
                       >
                         {tab.label}
@@ -322,7 +322,7 @@ export default function WorkspaceMembersModal({
                             className={`tabular-nums text-xs ${
                               selectedTab
                                 ? "text-white/90"
-                                : "text-[#9e9e9e] dark:text-[#777]"
+                                : "text-dash-faint dark:text-[#777]"
                             }`}
                           >
                             {tab.count}
@@ -340,7 +340,7 @@ export default function WorkspaceMembersModal({
                   <div className="space-y-5">
                     <section className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                        <h3 className="text-xs font-semibold uppercase tracking-wide text-dash-faint dark:text-[#888]">
                           En este espacio
                         </h3>
                         <button
@@ -358,16 +358,16 @@ export default function WorkspaceMembersModal({
                           {[1, 2, 3].map((i) => (
                             <div
                               key={i}
-                              className="h-16 animate-pulse rounded-xl bg-[#f0f0f0] dark:bg-[#2a2a2a]"
+                              className="h-16 dash-shimmer rounded-xl"
                             />
                           ))}
                         </div>
                       ) : selectedMembers.length === 0 ? (
-                        <div className="rounded-xl border border-dashed border-[#e0e0e0] px-4 py-8 text-center dark:border-[#3a3a3a]">
-                          <p className="text-sm font-medium text-[#212121] dark:text-white">
+                        <div className="rounded-xl border border-dashed border-dash-line px-4 py-8 text-center">
+                          <p className="text-sm font-medium text-dash-ink">
                             Nadie en el espacio aún
                           </p>
-                          <p className="mt-1 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                          <p className="mt-1 text-xs text-dash-muted">
                             Agrega personas de la empresa abajo o crea un usuario
                             nuevo.
                           </p>
@@ -381,17 +381,17 @@ export default function WorkspaceMembersModal({
                             return (
                               <li
                                 key={u.id}
-                                className="flex flex-col gap-2 rounded-xl border border-[#e8e8e8] p-3 dark:border-[#333] sm:flex-row sm:items-center"
+                                className="flex flex-col gap-2 rounded-xl border border-dash-line p-3 sm:flex-row sm:items-center"
                               >
                                 <div className="flex min-w-0 flex-1 items-start gap-3">
-                                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-xs font-semibold text-orange-600 dark:bg-orange-500/20 dark:text-orange-300">
+                                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-500/10 text-xs font-semibold text-orange-600 dark:bg-orange-500/20 dark:text-orange-300">
                                     {initials(u.name, u.lastName)}
                                   </span>
                                   <div className="min-w-0">
-                                    <p className="truncate text-sm font-semibold text-[#212121] dark:text-white">
+                                    <p className="truncate text-sm font-semibold text-dash-ink">
                                       {fullName}
                                     </p>
-                                    <p className="truncate text-xs text-[#616161] dark:text-[#9e9e9e]">
+                                    <p className="truncate text-xs text-dash-muted">
                                       {u.email ?? "Sin correo"}
                                     </p>
                                   </div>
@@ -400,7 +400,7 @@ export default function WorkspaceMembersModal({
                                   <button
                                     type="button"
                                     onClick={() => startEdit(u.id)}
-                                    className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-xl border border-[#e0e0e0] px-3 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-500/10 dark:border-[#3a3a3a] dark:text-orange-400 sm:flex-initial"
+                                    className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-xl border border-dash-line px-3 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-500/10 dark:text-orange-400 sm:flex-initial"
                                   >
                                     <HugeiconsIcon icon={Edit02Icon} size={16} />
                                     Editar
@@ -408,7 +408,7 @@ export default function WorkspaceMembersModal({
                                   <button
                                     type="button"
                                     onClick={() => toggle(u.id)}
-                                    className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-xl border border-[#e0e0e0] px-3 text-sm font-medium text-[#616161] transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:border-[#3a3a3a] dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-red-400 sm:flex-initial"
+                                    className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-xl border border-dash-line px-3 text-sm font-medium text-dash-muted transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-red-400 sm:flex-initial"
                                   >
                                     <HugeiconsIcon icon={Delete02Icon} size={16} />
                                     Quitar
@@ -423,10 +423,10 @@ export default function WorkspaceMembersModal({
 
                     <section className="space-y-2">
                       <div>
-                        <h3 className="text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                        <h3 className="text-xs font-semibold uppercase tracking-wide text-dash-faint dark:text-[#888]">
                           Personas de la empresa
                         </h3>
-                        <p className="mt-0.5 text-xs text-[#616161] dark:text-[#9e9e9e]">
+                        <p className="mt-0.5 text-xs text-dash-muted">
                           {notInWorkspaceCount === 0
                             ? "Todos los usuarios ya están en el espacio."
                             : `Marca quién entra a este espacio (${notInWorkspaceCount} disponibles).`}
@@ -434,7 +434,7 @@ export default function WorkspaceMembersModal({
                       </div>
 
                       <div className="relative">
-                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9e9e9e]">
+                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint">
                           <HugeiconsIcon icon={Search01Icon} size={16} />
                         </span>
                         <input
@@ -443,7 +443,7 @@ export default function WorkspaceMembersModal({
                           onChange={(e) => setSearch(e.target.value)}
                           placeholder="Buscar por nombre o correo…"
                           aria-label="Buscar usuarios de la empresa"
-                          className="w-full min-h-11 rounded-xl border border-[#e0e0e0] bg-white py-2.5 pl-9 pr-3 text-sm text-[#212121] placeholder:text-[#9ca3af] focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:border-[#3a3a3a] dark:bg-[#2a2a2a] dark:text-white"
+                          className="w-full min-h-11 rounded-xl border border-dash-line bg-white py-2.5 pl-9 pr-3 text-sm text-dash-ink placeholder:text-[#9ca3af] focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:bg-[#2a2a2a]"
                         />
                       </div>
 
@@ -452,12 +452,12 @@ export default function WorkspaceMembersModal({
                           {[1, 2].map((i) => (
                             <div
                               key={i}
-                              className="h-14 animate-pulse rounded-xl bg-[#f0f0f0] dark:bg-[#2a2a2a]"
+                              className="h-14 dash-shimmer rounded-xl"
                             />
                           ))}
                         </div>
                       ) : filteredDirectory.length === 0 ? (
-                        <p className="rounded-xl border border-dashed border-[#e0e0e0] px-4 py-6 text-center text-sm text-[#616161] dark:border-[#3a3a3a] dark:text-[#9e9e9e]">
+                        <p className="rounded-xl border border-dashed border-dash-line px-4 py-6 text-center text-sm text-dash-muted">
                           {sortedUsers.length === 0
                             ? "No hay usuarios en la empresa. Crea uno en la otra pestaña."
                             : `Nadie coincide con “${search.trim()}”.`}
@@ -475,18 +475,18 @@ export default function WorkspaceMembersModal({
                                 className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 ${
                                   inSpace
                                     ? "border-orange-500/40 bg-orange-500/[0.06] dark:bg-orange-500/10"
-                                    : "border-[#e8e8e8] dark:border-[#333]"
+                                    : "border-dash-line"
                                 }`}
                               >
-                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#f5f5f5] text-[11px] font-semibold text-[#616161] dark:bg-[#2a2a2a] dark:text-[#b0b0b0]">
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-dash-surface-2 text-[11px] font-semibold text-dash-muted">
                                   {initials(u.name, u.lastName)}
                                 </span>
                                 <div className="min-w-0 flex-1">
-                                  <p className="truncate text-sm font-medium text-[#212121] dark:text-white">
+                                  <p className="truncate text-sm font-medium text-dash-ink">
                                     {fullName}
                                   </p>
                                   {u.email && (
-                                    <p className="truncate text-xs text-[#616161] dark:text-[#9e9e9e]">
+                                    <p className="truncate text-xs text-dash-muted">
                                       {u.email}
                                     </p>
                                   )}
@@ -496,8 +496,8 @@ export default function WorkspaceMembersModal({
                                   onClick={() => toggle(u.id)}
                                   className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-colors ${
                                     inSpace
-                                      ? "bg-orange-500 text-white hover:bg-orange-600"
-                                      : "border border-[#e0e0e0] text-[#212121] hover:border-orange-500/40 hover:bg-orange-500/[0.04] dark:border-[#3a3a3a] dark:text-white"
+                                      ? "dash-grad-accent text-white hover:shadow-dash-accent-lift shadow-dash-accent"
+                                      : "border border-dash-line text-dash-ink hover:border-orange-500/40 hover:bg-orange-500/[0.04]"
                                   }`}
                                 >
                                   {inSpace ? (
@@ -521,7 +521,7 @@ export default function WorkspaceMembersModal({
 
                     <Link
                       href={Routes.panelAddCompanyUser}
-                      className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] text-sm font-medium text-[#616161] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a]"
+                      className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-dash-line text-sm font-medium text-dash-muted transition-colors hover:bg-dash-hover"
                     >
                       <HugeiconsIcon icon={LinkSquare02Icon} size={16} />
                       Abrir página completa de usuarios
@@ -531,7 +531,7 @@ export default function WorkspaceMembersModal({
 
                 {activeTab === "crear" && (
                   <div className="space-y-3">
-                    <p className="text-sm text-[#616161] dark:text-[#9e9e9e]">
+                    <p className="text-sm text-dash-muted">
                       {formEditingId
                         ? "Actualiza los datos del usuario. Si lo creaste para este espacio, ya queda marcado abajo al guardar miembros."
                         : "Crea un usuario de empresa. Al crearlo se agrega automáticamente a este espacio (confirma con Guardar miembros)."}
@@ -555,9 +555,9 @@ export default function WorkspaceMembersModal({
               </div>
 
               {/* Footer */}
-              <div className="shrink-0 border-t border-[#e0e0e0] px-4 py-3 dark:border-[#3a3a3a] sm:px-5">
+              <div className="shrink-0 border-t border-dash-line px-4 py-3 sm:px-5">
                 <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-center text-xs text-[#9e9e9e] sm:text-left">
+                  <p className="text-center text-xs text-dash-faint sm:text-left">
                     {selected.size}{" "}
                     {selected.size === 1 ? "miembro" : "miembros"} seleccionados
                   </p>
@@ -565,7 +565,7 @@ export default function WorkspaceMembersModal({
                     <button
                       type="button"
                       onClick={onClose}
-                      className="inline-flex min-h-11 items-center justify-center rounded-xl px-4 text-sm font-medium text-[#616161] transition-colors hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                      className="inline-flex min-h-11 items-center justify-center rounded-xl px-4 text-sm font-medium text-dash-muted transition-colors hover:bg-dash-hover"
                     >
                       Cancelar
                     </button>
@@ -573,7 +573,7 @@ export default function WorkspaceMembersModal({
                       type="button"
                       onClick={() => void handleSave()}
                       disabled={saving || wsLoading}
-                      className="inline-flex min-h-11 items-center justify-center rounded-xl bg-orange-500 px-5 text-sm font-semibold text-white shadow-sm shadow-orange-500/25 transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] hover:bg-orange-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex min-h-11 items-center justify-center rounded-full dash-grad-accent px-5 text-sm font-semibold text-white shadow-sm shadow-orange-500/25 transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] hover:shadow-dash-accent-lift active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 shadow-dash-accent"
                     >
                       {saving ? "Guardando…" : "Guardar miembros"}
                     </button>

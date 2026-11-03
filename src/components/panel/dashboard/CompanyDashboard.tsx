@@ -68,10 +68,10 @@ type CompanyDashboardProps = {
 };
 
 const panelClass =
-  "h-full rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm";
+  "h-full rounded-3xl border border-dash-line bg-dash-surface p-5 shadow-dash md:p-6";
 
 const kpiCellClass =
-  "relative z-0 hover:z-30 focus-within:z-30 h-full bg-white dark:bg-[#1e1e1e] px-3 py-3 overflow-visible";
+  "relative z-0 hover:z-30 focus-within:z-30 h-full bg-dash-surface px-3 py-3 overflow-visible";
 
 function pipelineShort(status: string | null | undefined): string {
   if (!status) return "Sin etapa";
@@ -118,11 +118,11 @@ function DashboardSkeleton() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
     >
-      <div className="h-20 rounded-2xl bg-[#ececec] dark:bg-[#1e1e1e] animate-pulse" />
-      <div className="h-24 rounded-2xl bg-[#ececec] dark:bg-[#1e1e1e] animate-pulse" />
+      <div className="h-20 rounded-2xl dark:bg-[#1e1e1e] dash-shimmer" />
+      <div className="h-24 rounded-2xl dark:bg-[#1e1e1e] dash-shimmer" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="h-52 rounded-2xl bg-[#ececec] dark:bg-[#1e1e1e] animate-pulse" />
-        <div className="h-52 rounded-2xl bg-[#ececec] dark:bg-[#1e1e1e] animate-pulse" />
+        <div className="h-52 rounded-2xl dark:bg-[#1e1e1e] dash-shimmer" />
+        <div className="h-52 rounded-2xl dark:bg-[#1e1e1e] dash-shimmer" />
       </div>
     </motion.div>
   );
@@ -144,16 +144,16 @@ function KpiCell({
   const deltaPositive = (delta?.value ?? 0) >= 0;
   const content = (
     <>
-      <p className="text-sm font-medium text-[#616161] dark:text-[#b0b0b0] flex items-center gap-1">
+      <p className="text-[13px] font-medium text-dash-muted flex items-center gap-1">
         {label}
         {hint ? <InfoTooltip text={hint} /> : null}
       </p>
-      <p className="mt-1 text-3xl leading-none font-semibold tabular-nums tracking-tight text-[#212121] dark:text-white">
+      <p className="mt-1.5 text-[1.75rem] leading-none font-bold tabular-nums tracking-[-0.045em] text-dash-ink sm:text-[2rem]">
         {value}
       </p>
       {delta !== undefined ? (
         delta == null || delta.value === 0 ? (
-          <p className="mt-1 text-sm text-[#9e9e9e] dark:text-[#7a7a7a]">
+          <p className="mt-1 text-sm text-dash-faint dark:text-[#7a7a7a]">
             vs. mes anterior
           </p>
         ) : (
@@ -182,7 +182,7 @@ function KpiCell({
     return (
       <Link
         href={href}
-        className="block rounded-lg p-1 -m-1 hover:bg-[#f7f7f7] dark:hover:bg-[#2a2a2a] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+        className="block rounded-[14px] p-1.5 -m-1.5 hover:bg-dash-hover transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
       >
         {content}
       </Link>
@@ -201,14 +201,14 @@ function SectionHead({
   hrefLabel?: string;
 }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 mb-3">
-      <h3 className="text-lg font-semibold text-[#212121] dark:text-white">
+    <div className="flex items-center justify-between gap-3 mb-4">
+      <h3 className="text-[17px] font-semibold tracking-[-0.02em] text-dash-ink">
         {title}
       </h3>
       {href ? (
         <Link
           href={href}
-          className="text-sm font-medium text-orange-600 dark:text-orange-400 hover:underline inline-flex items-center gap-1"
+          className="inline-flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-orange-500/10"
         >
           {hrefLabel ?? "Ver todo"}
           <HugeiconsIcon icon={ArrowRight01Icon} size={12} />
@@ -324,7 +324,7 @@ function QuickActions({ navCtx }: { navCtx: NavAccessContext }) {
             whileHover={reduce ? undefined : { y: -1 }}
             whileTap={reduce ? undefined : { scale: 0.98 }}
             transition={{ duration: 0.12, ease: DASHBOARD_EASE }}
-            className="inline-flex items-center gap-1.5 rounded-full border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 py-1.5 text-sm font-medium text-[#212121] dark:text-white hover:border-orange-500/60 hover:text-orange-600 dark:hover:text-orange-400"
+            className="inline-flex h-10 items-center gap-1.5 rounded-full border border-dash-line-strong bg-dash-surface px-3.5 text-sm font-semibold text-dash-ink transition-colors hover:border-orange-400"
           >
             <span className={action.ai ? "ai-urim-icon" : undefined}>
               <HugeiconsIcon icon={action.icon} size={16} />
@@ -385,7 +385,7 @@ function AttentionList({
     <DashboardInView>
       <section className={panelClass}>
         <div className="flex items-baseline justify-between gap-3 mb-2">
-          <h3 className="text-lg font-semibold text-[#212121] dark:text-white">
+          <h3 className="text-lg font-semibold text-dash-ink">
             Requiere atención
           </h3>
         </div>
@@ -406,10 +406,10 @@ function AttentionList({
                   <HugeiconsIcon icon={InformationCircleIcon} size={18} />
                 </span>
                 <span>
-                  <span className="block text-base font-medium text-[#212121] dark:text-white">
+                  <span className="block text-base font-medium text-dash-ink">
                     {item.label}
                   </span>
-                  <span className="block text-sm text-[#616161] dark:text-[#b0b0b0]">
+                  <span className="block text-sm text-dash-muted">
                     {item.detail}
                   </span>
                 </span>
@@ -471,11 +471,11 @@ export function CompanyDashboard({
     return (
       <div className="space-y-5">
         <DashboardInView>
-          <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/10 to-orange-600/5 dark:from-orange-500/20 dark:to-transparent px-5 py-4">
-            <h2 className="text-2xl font-bold text-[#212121] dark:text-white">
+          <div className="rounded-3xl border border-dash-line bg-dash-surface bg-[radial-gradient(60%_120%_at_100%_0%,rgba(247,148,94,0.14),transparent_60%)] p-6 shadow-dash xl:p-8">
+            <h2 className="text-2xl font-bold text-dash-ink">
               Hola, {firstName}
             </h2>
-            <p className="mt-0.5 text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-0.5 text-sm text-dash-muted">
               Crea tu empresa para ver el pulso de tus clientes, pipeline y
               cotizaciones.
             </p>
@@ -497,11 +497,11 @@ export function CompanyDashboard({
     return (
       <div className="space-y-4">
         <DashboardInView>
-          <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/10 to-orange-600/5 dark:from-orange-500/20 dark:to-transparent px-5 py-4">
-            <p className="text-sm capitalize text-[#616161] dark:text-[#b0b0b0]">
+          <div className="rounded-3xl border border-dash-line bg-dash-surface bg-[radial-gradient(60%_120%_at_100%_0%,rgba(247,148,94,0.14),transparent_60%)] p-6 shadow-dash xl:p-8">
+            <p className="text-[13px] font-semibold tracking-[0.02em] text-dash-muted first-letter:uppercase">
               {todayLabel}
             </p>
-            <h2 className="mt-0.5 text-2xl font-bold text-[#212121] dark:text-white">
+            <h2 className="mt-0.5 text-2xl font-bold text-dash-ink">
               Hola, {firstName}
             </h2>
           </div>
@@ -536,16 +536,16 @@ export function CompanyDashboard({
         </DashboardInView>
         <DashboardInView delay={0.05}>
           <div className={panelClass}>
-            <h2 className="text-lg font-semibold text-[#212121] dark:text-white">
+            <h2 className="text-lg font-semibold text-dash-ink">
               No se pudo cargar el dashboard
             </h2>
-            <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-1 text-sm text-dash-muted">
               Revisa tu conexión e inténtalo de nuevo.
             </p>
             <button
               type="button"
               onClick={() => void refetch()}
-              className="mt-4 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+              className="mt-4 rounded-full dash-grad-accent px-4 py-2 text-sm font-medium text-white hover:shadow-dash-accent-lift shadow-dash-accent"
             >
               Reintentar
             </button>
@@ -565,16 +565,16 @@ export function CompanyDashboard({
   return (
     <div className="space-y-4">
       <DashboardInView>
-        <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/10 to-orange-600/5 dark:from-orange-500/20 dark:to-transparent px-5 py-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="rounded-3xl border border-dash-line bg-dash-surface bg-[radial-gradient(60%_120%_at_100%_0%,rgba(247,148,94,0.14),transparent_60%)] p-6 shadow-dash xl:p-8">
+          <div className="flex flex-col gap-5">
             <div className="min-w-0">
-              <p className="text-sm capitalize text-[#616161] dark:text-[#b0b0b0]">
+              <p className="text-[13px] font-semibold tracking-[0.02em] text-dash-muted first-letter:uppercase">
                 {todayLabel}
               </p>
-              <h2 className="mt-0.5 text-2xl font-bold text-[#212121] dark:text-white">
-                Hola, {firstName}
+              <h2 className="mt-1 text-[clamp(1.6rem,1.2rem+1.6vw,2.25rem)] font-bold leading-[1.1] tracking-[-0.04em] text-dash-ink">
+                Hola, {firstName}.
               </h2>
-              <p className="mt-0.5 text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <p className="mt-0.5 text-sm text-dash-muted">
                 {scopeLabel}
                 {planName ? ` · ${planName}` : ""}
               </p>
@@ -598,7 +598,7 @@ export function CompanyDashboard({
       <DashboardInView delay={0.08}>
         <section className={cn(panelClass, "overflow-visible")}>
           <motion.div
-            className="grid grid-cols-2 lg:grid-cols-5 gap-px bg-[#ececec] dark:bg-[#2e2e2e] rounded-xl overflow-visible"
+            className="grid grid-cols-2 lg:grid-cols-5 gap-px bg-dash-surface-2 dark:bg-[#2e2e2e] rounded-xl overflow-visible"
             variants={staggerContainer(reduce, 0)}
             initial="hidden"
             whileInView="show"
@@ -667,34 +667,34 @@ export function CompanyDashboard({
           </motion.div>
         <dl className="mt-3 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-1.5">
           <div className="flex items-baseline gap-2">
-            <dt className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <dt className="text-sm text-dash-muted">
               Contactados
             </dt>
-            <dd className="text-base font-semibold tabular-nums text-[#212121] dark:text-white">
+            <dd className="text-base font-semibold tabular-nums text-dash-ink">
               {stats.contactedLeads}
             </dd>
           </div>
           <div className="flex items-baseline gap-2">
-            <dt className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <dt className="text-sm text-dash-muted">
               Conversión
             </dt>
-            <dd className="text-base font-semibold tabular-nums text-[#212121] dark:text-white">
+            <dd className="text-base font-semibold tabular-nums text-dash-ink">
               {formatPct(stats.conversionRate)}
             </dd>
           </div>
           <div className="flex items-baseline gap-2">
-            <dt className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <dt className="text-sm text-dash-muted">
               Valor ganado
             </dt>
-            <dd className="text-base font-semibold tabular-nums text-[#212121] dark:text-white">
+            <dd className="text-base font-semibold tabular-nums text-dash-ink">
               {formatCurrency(stats.wonPipelineValue)}
             </dd>
           </div>
           <div className="flex items-baseline gap-2">
-            <dt className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <dt className="text-sm text-dash-muted">
               Seguimientos vencidos
             </dt>
-            <dd className="text-base font-semibold tabular-nums text-[#212121] dark:text-white">
+            <dd className="text-base font-semibold tabular-nums text-dash-ink">
               {stats.overdueFollowUpsCount}
             </dd>
           </div>
@@ -715,7 +715,7 @@ export function CompanyDashboard({
             hrefLabel="Ir a clientes"
           />
           {stats.pipelineTruncated ? (
-            <p className="mb-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mb-2 text-sm text-dash-muted">
               Mostrando una muestra de{" "}
               {stats.pipelineBars.reduce((s, b) => s + b.count, 0)} de{" "}
               {stats.pipelineCount} estados.
@@ -745,7 +745,7 @@ export function CompanyDashboard({
             stats.followUpsToday.length +
             stats.followUpsUpcoming.length ===
           0 ? (
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="text-sm text-dash-muted">
               No hay seguimientos pendientes en los próximos 7 días. Programa el
               siguiente contacto desde el cliente.
             </p>
@@ -775,16 +775,16 @@ export function CompanyDashboard({
                       {task.businessLead && canClientes ? (
                         <Link
                           href={Routes.panelLead(task.businessLead.id)}
-                          className="text-base font-medium text-[#212121] dark:text-white hover:text-orange-600 dark:hover:text-orange-400 truncate block"
+                          className="text-base font-medium text-dash-ink hover:text-orange-600 dark:hover:text-orange-400 truncate block"
                         >
                           {task.businessLead.businessName}
                         </Link>
                       ) : (
-                        <p className="text-base font-medium text-[#212121] dark:text-white truncate">
+                        <p className="text-base font-medium text-dash-ink truncate">
                           {task.businessLead?.businessName ?? "Seguimiento"}
                         </p>
                       )}
-                      <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                      <p className="text-sm text-dash-muted mt-0.5">
                         {formatDateShort(task.scheduledDate, false)}
                         {task.assignedSeller
                           ? ` · ${task.assignedSeller.name}`
@@ -799,7 +799,7 @@ export function CompanyDashboard({
                         tone === "hoy" &&
                           "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200",
                         tone === "próximo" &&
-                          "bg-[#f3f3f3] text-[#616161] dark:bg-[#2a2a2a] dark:text-[#b0b0b0]",
+                          "bg-[#f3f3f3] text-dash-muted dark:bg-[#2a2a2a]",
                       )}
                     >
                       {tone === "vencido"
@@ -824,7 +824,7 @@ export function CompanyDashboard({
             }
           />
           {stats.recentLeads.length === 0 ? (
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="text-sm text-dash-muted">
               Todavía no hay clientes. Extrae negocios desde Extracción B2B para
               llenar el pipeline.
             </p>
@@ -841,16 +841,16 @@ export function CompanyDashboard({
                       {canClientes ? (
                         <Link
                           href={Routes.panelLead(lead.id)}
-                          className="text-base font-medium text-[#212121] dark:text-white hover:text-orange-600 dark:hover:text-orange-400 truncate block"
+                          className="text-base font-medium text-dash-ink hover:text-orange-600 dark:hover:text-orange-400 truncate block"
                         >
                           {lead.businessName}
                         </Link>
                       ) : (
-                        <p className="text-base font-medium text-[#212121] dark:text-white truncate">
+                        <p className="text-base font-medium text-dash-ink truncate">
                           {lead.businessName}
                         </p>
                       )}
-                      <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-0.5 truncate">
+                      <p className="text-sm text-dash-muted mt-0.5 truncate">
                         {[lead.category, lead.city]
                           .filter(Boolean)
                           .join(" · ") || "Sin categoría"}
@@ -863,8 +863,8 @@ export function CompanyDashboard({
                         "shrink-0 text-xs font-medium rounded-full px-2 py-0.5",
                         status
                           ? (PIPELINE_STATUS_COLORS[status] ??
-                              "bg-[#f3f3f3] text-[#616161]")
-                          : "bg-[#f3f3f3] text-[#616161] dark:bg-[#2a2a2a] dark:text-[#b0b0b0]",
+                              "bg-[#f3f3f3] text-dash-muted")
+                          : "bg-[#f3f3f3] text-dash-muted dark:bg-[#2a2a2a]",
                       )}
                     >
                       {pipelineShort(status)}
@@ -919,14 +919,14 @@ export function CompanyDashboard({
                 : undefined
             }
           />
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mb-3">
+          <p className="text-sm text-dash-muted mb-3">
             {stats.quotationsCount} en total
             {stats.acceptedQuotationValue > 0
               ? ` · aceptadas ${formatCurrency(stats.acceptedQuotationValue)}`
               : ""}
           </p>
           {stats.quotationsCount === 0 ? (
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="text-sm text-dash-muted">
               Cuando envíes una cotización, aquí verás montos y estados.
             </p>
           ) : (
@@ -944,7 +944,7 @@ export function CompanyDashboard({
                     {canCotizaciones ? (
                       <Link
                         href={Routes.panelQuotation(quotation.id)}
-                        className="text-base font-medium text-[#212121] dark:text-white hover:text-orange-600 dark:hover:text-orange-400 truncate"
+                        className="text-base font-medium text-dash-ink hover:text-orange-600 dark:hover:text-orange-400 truncate"
                       >
                         {quotation.quotationNumber}
                         {quotation.lead?.businessName
@@ -952,7 +952,7 @@ export function CompanyDashboard({
                           : ""}
                       </Link>
                     ) : (
-                      <span className="text-base font-medium text-[#212121] dark:text-white truncate">
+                      <span className="text-base font-medium text-dash-ink truncate">
                         {quotation.quotationNumber}
                         {quotation.lead?.businessName
                           ? ` · ${quotation.lead.businessName}`
@@ -966,7 +966,7 @@ export function CompanyDashboard({
                           ? QUOTATION_STATUS_COLORS[
                               quotation.status as keyof typeof QUOTATION_STATUS_COLORS
                             ]
-                          : "bg-[#f3f3f3] text-[#616161]",
+                          : "bg-[#f3f3f3] text-dash-muted",
                       )}
                     >
                       {formatCurrency(quotation.total ?? 0)}
@@ -987,11 +987,11 @@ export function CompanyDashboard({
               canProyectos ? `${Routes.panel}?tab=proyectos` : undefined
             }
           />
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mb-3">
+          <p className="text-sm text-dash-muted mb-3">
             {stats.projectsCount} en total
           </p>
           {stats.projectsCount === 0 ? (
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="text-sm text-dash-muted">
               Los proyectos aparecen cuando cierras un cliente y das seguimiento
               al trabajo.
             </p>
@@ -1010,12 +1010,12 @@ export function CompanyDashboard({
                     {canProyectos ? (
                       <Link
                         href={Routes.panelProject(project.id)}
-                        className="text-base font-medium text-[#212121] dark:text-white hover:text-orange-600 dark:hover:text-orange-400 truncate"
+                        className="text-base font-medium text-dash-ink hover:text-orange-600 dark:hover:text-orange-400 truncate"
                       >
                         {project.name}
                       </Link>
                     ) : (
-                      <span className="text-base font-medium text-[#212121] dark:text-white truncate">
+                      <span className="text-base font-medium text-dash-ink truncate">
                         {project.name}
                       </span>
                     )}
@@ -1024,7 +1024,7 @@ export function CompanyDashboard({
                         "text-xs font-medium rounded-full px-2 py-0.5",
                         project.status
                           ? PROJECT_STATUS_CLASSES[project.status]
-                          : "bg-[#f3f3f3] text-[#616161]",
+                          : "bg-[#f3f3f3] text-dash-muted",
                       )}
                     >
                       {project.status ?? "—"}
@@ -1052,7 +1052,7 @@ export function CompanyDashboard({
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
               <thead>
-                <tr className="text-sm text-[#616161] dark:text-[#b0b0b0] border-b border-[#ececec] dark:border-[#2e2e2e]">
+                <tr className="text-sm text-dash-muted border-b border-dash-line dark:border-[#2e2e2e]">
                   <th className="pb-2 font-medium">Vendedor</th>
                   <th className="pb-2 font-medium text-right tabular-nums">
                     Clientes
@@ -1071,7 +1071,7 @@ export function CompanyDashboard({
                     key={seller.id}
                     className="border-b border-[#f3f3f3] dark:border-[#2a2a2a] last:border-0"
                   >
-                    <td className="py-2 text-[#212121] dark:text-white">
+                    <td className="py-2 text-dash-ink">
                       {[seller.name, seller.lastName].filter(Boolean).join(" ")}
                     </td>
                     <td className="py-2 text-right tabular-nums">
@@ -1096,10 +1096,10 @@ export function CompanyDashboard({
       <section className={panelClass}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-[#212121] dark:text-white">
+            <h3 className="text-lg font-semibold text-dash-ink">
               Créditos de extracción
             </h3>
-            <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-1 text-sm text-dash-muted">
               {credits.loading
                 ? "Consultando saldo…"
                 : remainingQuota == null
@@ -1109,13 +1109,13 @@ export function CompanyDashboard({
           </div>
           <Link
             href={Routes.panelCredits}
-            className="inline-flex items-center justify-center rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors"
+            className="inline-flex items-center justify-center rounded-full dash-grad-accent px-4 py-2 text-sm font-medium text-white hover:shadow-dash-accent-lift transition-colors shadow-dash-accent"
           >
             Ver créditos
           </Link>
         </div>
         {remainingQuota != null && leadLimit != null && leadLimit > 0 ? (
-          <div className="mt-3 h-2 rounded-full bg-[#f0f0f0] dark:bg-[#2a2a2a] overflow-hidden">
+          <div className="mt-3 h-2 rounded-full bg-dash-surface-2 overflow-hidden">
             <div
               className={cn(
                 "h-full rounded-full dashboard-bar-grow",
@@ -1159,7 +1159,7 @@ export function CompanyDashboard({
         <div className="pt-1 flex justify-center">
           <Link
             href={Routes.panelAdmin}
-            className="text-xs text-[#616161] dark:text-[#b0b0b0] underline decoration-dotted opacity-70 hover:opacity-100 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+            className="text-xs text-dash-muted underline decoration-dotted opacity-70 hover:opacity-100 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
           >
             Operaciones
           </Link>

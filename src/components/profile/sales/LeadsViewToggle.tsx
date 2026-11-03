@@ -18,7 +18,7 @@ export default function LeadsViewToggle({
       role="group"
       aria-label="Forma de ver los clientes"
       data-tour="clientes-vista"
-      className="inline-flex w-full rounded-xl border border-[#e0e0e0] bg-[#f5f5f5] p-1 dark:border-[#3a3a3a] dark:bg-[#161616] sm:w-auto"
+      className="inline-flex w-full rounded-xl border border-dash-line bg-dash-surface-2 p-1 dark:bg-[#161616] sm:w-auto"
     >
       <ViewButton
         active={view === "list"}
@@ -55,8 +55,8 @@ function ViewButton({
       className={cn(
         "inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg px-3 text-sm font-medium transition-colors sm:flex-none sm:px-4",
         active
-          ? "bg-white text-[#212121] shadow-sm dark:bg-[#2a2a2a] dark:text-white"
-          : "text-[#616161] hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:text-white",
+          ? "bg-white text-dash-ink shadow-sm dark:bg-[#2a2a2a]"
+          : "text-dash-muted hover:text-dash-ink",
       )}
     >
       <HugeiconsIcon icon={icon} size={18} />

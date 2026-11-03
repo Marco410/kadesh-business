@@ -132,13 +132,13 @@ function CreditPriceLine({
         </span>
       )}
       <p className="flex items-baseline justify-center gap-1 whitespace-nowrap">
-        <span className="text-4xl font-bold tabular-nums tracking-tight text-[#212121] dark:text-[#ffffff]">
+        <span className="text-4xl font-bold tabular-nums tracking-tight text-dash-ink">
           {formatPrice(price, currency)}
         </span>
-        <span className="shrink-0 text-sm font-medium text-[#616161] dark:text-[#757575]">
+        <span className="shrink-0 text-sm font-medium text-dash-muted dark:text-[#757575]">
           {currency}
         </span>
-        <span className="shrink-0 text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <span className="shrink-0 text-sm text-dash-muted">
           {periodLabel}
         </span>
       </p>
@@ -163,7 +163,7 @@ function CreditFeatureRow({
         />
       </span>
       <HoverTooltip label={description} className="max-w-full">
-        <span className="cursor-help border-b border-dotted border-[#616161] text-left text-sm text-[#616161] dark:border-[#b0b0b0] dark:text-[#b0b0b0]">
+        <span className="cursor-help border-b border-dotted border-[#616161] text-left text-sm text-dash-muted dark:border-[#b0b0b0]">
           {name}
         </span>
       </HoverTooltip>
@@ -192,7 +192,7 @@ function CreditPackageCard({
         "relative rounded-2xl border p-6 sm:p-8",
         credit.bestSeller
           ? "border-orange-500 bg-orange-500/5 shadow-lg shadow-orange-500/10 dark:border-orange-500 dark:bg-orange-500/10"
-          : "border-[#e0e0e0] bg-white dark:border-[#3a3a3a] dark:bg-[#1e1e1e]",
+          : "border-dash-line bg-dash-surface",
       )}
     >
       {credit.bestSeller && (
@@ -202,16 +202,16 @@ function CreditPackageCard({
       )}
 
       <div className="text-center">
-        <h3 className="text-lg font-bold text-[#212121] dark:text-[#ffffff]">
+        <h3 className="text-lg font-bold text-dash-ink">
           {credit.name}
         </h3>
         {persona && (
-          <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1 text-xs text-dash-muted">
             {persona}
           </p>
         )}
         {!credit.active && (
-          <span className="mt-1 block text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <span className="mt-1 block text-xs text-dash-muted">
             No disponible
           </span>
         )}
@@ -226,9 +226,9 @@ function CreditPackageCard({
           />
         </div>
 
-        <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-2 text-sm text-dash-muted">
           Recibe{" "}
-          <strong className="text-[#212121] dark:text-[#e0e0e0]">
+          <strong className="text-dash-ink dark:text-[#e0e0e0]">
             {formatCredits(credit.creditsToAdd)}
           </strong>{" "}
           créditos extra para extraer leads
@@ -257,7 +257,7 @@ function CreditPackageCard({
           className={cn(
             "mt-8 w-full rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e]",
             credit.bestSeller
-              ? "bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-500 dark:hover:bg-orange-600"
+              ? "dash-grad-accent text-white hover:shadow-dash-accent-lift shadow-dash-accent"
               : "border-2 border-orange-600 text-orange-700 hover:bg-orange-500/10 dark:border-orange-500 dark:text-orange-400 dark:hover:bg-orange-500/20",
           )}
         >
@@ -315,7 +315,7 @@ export default function CreditsSection({
           <div className="mb-6">
             <Link
               href={Routes.panel}
-              className="inline-flex items-center gap-1.5 text-sm text-[#616161] hover:text-orange-700 dark:text-[#b0b0b0] dark:hover:text-orange-400"
+              className="inline-flex items-center gap-1.5 text-sm text-dash-muted hover:text-orange-700 dark:hover:text-orange-400"
             >
               <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
               Volver al panel
@@ -327,19 +327,19 @@ export default function CreditsSection({
           {sectionHeadingLevel === "h2" ? (
             <h2
               id={sectionTitleId}
-              className="text-3xl font-bold text-[#212121] dark:text-[#ffffff]"
+              className="text-3xl font-bold text-dash-ink"
             >
               {sectionTitle}
             </h2>
           ) : (
             <h1
               id={sectionTitleId}
-              className="text-3xl font-bold text-[#212121] dark:text-[#ffffff]"
+              className="text-3xl font-bold text-dash-ink"
             >
               {sectionTitle}
             </h1>
           )}
-          <p className="mt-2 text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-2 text-dash-muted">
             {sectionSubtitle}
           </p>
         </section>
@@ -357,7 +357,7 @@ export default function CreditsSection({
         )}
 
         {credits.length === 0 && !loading && (
-          <div className="rounded-2xl border border-[#e0e0e0] bg-[#f5f5f5] p-8 text-center text-[#616161] dark:border-[#3a3a3a] dark:bg-[#2a2a2a] dark:text-[#b0b0b0]">
+          <div className="rounded-2xl border border-dash-line bg-dash-surface-2 p-8 text-center text-dash-muted">
             No hay paquetes de créditos disponibles.
           </div>
         )}

@@ -349,7 +349,7 @@ export default function WhatsAppChatPanel({
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto min-h-0 px-4 py-4 space-y-3 bg-[#f5f5f5] dark:bg-[#161616]"
+        className="flex-1 overflow-y-auto min-h-0 px-4 py-4 space-y-3 bg-dash-surface-2 dark:bg-[#161616]"
       >
         {hasMore && messages.length > 0 ? (
           <div className="flex justify-center pb-1">
@@ -359,7 +359,7 @@ export default function WhatsAppChatPanel({
               <button
                 type="button"
                 onClick={() => void loadOlder()}
-                className="rounded-full bg-black/5 px-3 py-1 text-xs font-medium text-[#616161] hover:bg-black/10 dark:bg-white/10 dark:text-[#b0b0b0] dark:hover:bg-white/15"
+                className="rounded-full bg-dash-surface-2 px-3 py-1 text-xs font-medium text-dash-muted hover:bg-black/10 dark:hover:bg-white/15"
               >
                 Ver mensajes anteriores
               </button>
@@ -371,7 +371,7 @@ export default function WhatsAppChatPanel({
             <span className="animate-spin size-8 border-2 border-orange-500 border-t-transparent rounded-full" />
           </div>
         ) : messages.length === 0 ? (
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0] py-4 text-center">
+          <p className="text-sm text-dash-muted py-4 text-center">
             Todavía no hay mensajes en esta conversación.
           </p>
         ) : (
@@ -397,7 +397,7 @@ export default function WhatsAppChatPanel({
                   href={msg.mediaUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mb-1.5 flex items-center gap-2 rounded-lg bg-black/5 px-3 py-2 text-sm font-medium hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20"
+                  className="mb-1.5 flex items-center gap-2 rounded-lg bg-dash-surface-2 px-3 py-2 text-sm font-medium hover:bg-black/10 dark:hover:bg-white/20"
                 >
                   <HugeiconsIcon icon={FileAttachmentIcon} size={16} className="shrink-0" />
                   <span className="truncate">{msg.mediaFileName || "Documento"}</span>
@@ -407,19 +407,19 @@ export default function WhatsAppChatPanel({
             if (msg.direction === "unknown") {
               return (
                 <div key={msg.id} className="flex justify-center">
-                  <div className="max-w-[85%] rounded-2xl border border-dashed border-[#e0e0e0] bg-white/60 px-4 py-2 text-sm dark:border-[#3a3a3a] dark:bg-[#2a2a2a]/60">
+                  <div className="max-w-[85%] rounded-2xl border border-dashed border-dash-line bg-white/60 px-4 py-2 text-sm dark:bg-[#2a2a2a]/60">
                     {msg.senderLabel && (
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-dash-faint dark:text-[#888]">
                         {msg.senderLabel}
                       </p>
                     )}
                     {mediaContent}
                     {msg.body && (
-                      <p className="whitespace-pre-wrap break-words text-[#212121] dark:text-white">
+                      <p className="whitespace-pre-wrap break-words text-dash-ink">
                         {msg.body}
                       </p>
                     )}
-                    <p className="mt-1 text-[10px] text-[#616161] dark:text-[#9e9e9e]">
+                    <p className="mt-1 text-[10px] text-dash-muted">
                       {formatDateShort(msg.createdAt)}
                       {tagText}
                     </p>
@@ -437,13 +437,13 @@ export default function WhatsAppChatPanel({
                 <div
                   className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ${
                     isOutbound
-                      ? "bg-[#DCF8C6] dark:bg-emerald-900/40 text-[#212121] dark:text-white rounded-br-sm"
-                      : "bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-white rounded-bl-sm"
+                      ? "bg-[#DCF8C6] dark:bg-emerald-900/40 text-dash-ink rounded-br-sm"
+                      : "bg-white dark:bg-[#2a2a2a] text-dash-ink rounded-bl-sm"
                   }`}
                 >
                   {mediaContent}
                   {msg.body && <p className="whitespace-pre-wrap break-words">{msg.body}</p>}
-                  <p className="mt-1 text-[10px] text-[#616161] dark:text-[#9e9e9e]">
+                  <p className="mt-1 text-[10px] text-dash-muted">
                     {formatDateShort(msg.createdAt)}
                     {tagText}
                   </p>
@@ -455,11 +455,11 @@ export default function WhatsAppChatPanel({
       </div>
 
       {statusLoading && !statusData ? (
-        <div className="flex justify-center border-t border-[#e0e0e0] bg-white p-3 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
+        <div className="flex justify-center border-t border-dash-line bg-dash-surface p-3">
           <span className="size-5 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
         </div>
       ) : canReplyFreely ? (
-        <div className="p-3 border-t border-[#e0e0e0] dark:border-[#3a3a3a] flex items-end gap-2 bg-white dark:bg-[#1e1e1e]">
+        <div className="p-3 border-t border-dash-line flex items-end gap-2 bg-dash-surface">
           <input
             ref={fileInputRef}
             type="file"
@@ -474,7 +474,7 @@ export default function WhatsAppChatPanel({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={busy}
-            className="inline-flex items-center justify-center rounded-lg p-2.5 text-[#616161] transition-colors hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-60 dark:text-[#b0b0b0] dark:hover:bg-white/10"
+            className="inline-flex items-center justify-center rounded-lg p-2.5 text-dash-muted transition-colors hover:bg-dash-hover disabled:cursor-not-allowed disabled:opacity-60"
             aria-label="Adjuntar imagen o documento"
           >
             <HugeiconsIcon icon={Attachment01Icon} size={20} />
@@ -491,13 +491,13 @@ export default function WhatsAppChatPanel({
             rows={1}
             placeholder="Escribe un mensaje..."
             disabled={busy}
-            className="flex-1 resize-none rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] px-3 py-2 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-60"
+            className="flex-1 resize-none rounded-lg border border-dash-line bg-dash-surface px-3 py-2 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-60"
           />
           <button
             type="button"
             onClick={() => void handleSend()}
             disabled={busy || !draft.trim()}
-            className="inline-flex items-center justify-center rounded-lg bg-orange-500 p-2.5 text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-full dash-grad-accent p-2.5 text-white transition-colors hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 shadow-dash-accent"
             aria-label="Enviar mensaje"
           >
             {sending ? (
@@ -508,14 +508,14 @@ export default function WhatsAppChatPanel({
           </button>
         </div>
       ) : (
-        <div className="p-4 border-t border-[#e0e0e0] dark:border-[#3a3a3a] bg-white text-center dark:bg-[#1e1e1e]">
+        <div className="p-4 border-t border-dash-line bg-dash-surface text-center">
           {templateStatus === "approved" ? (
             <>
               <button
                 type="button"
                 onClick={() => setTemplatePickerOpen(true)}
                 disabled={starting || justStarted}
-                className="w-full rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full rounded-full dash-grad-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 shadow-dash-accent"
               >
                 {starting
                   ? "Enviando..."
@@ -523,14 +523,14 @@ export default function WhatsAppChatPanel({
                     ? "Mandar otro mensaje de inicio"
                     : "Iniciar conversación"}
               </button>
-              <p className="mt-2 text-xs text-[#9e9e9e] dark:text-[#888]">
+              <p className="mt-2 text-xs text-dash-faint dark:text-[#888]">
                 {alreadySentFirstMessage
                   ? "Ya le mandaste un mensaje de inicio. Podrás escribir libre en cuanto te conteste; si no contesta, puedes mandarle otro."
                   : "WhatsApp exige una plantilla aprobada para iniciar la plática; eliges cuál al dar clic."}
               </p>
             </>
           ) : (
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="text-sm text-dash-muted">
               {templateStatusMessage(templateStatus)}
             </p>
           )}

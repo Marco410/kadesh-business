@@ -233,7 +233,7 @@ export default function LeadsKanbanBoard({
         {Array.from({ length: 4 }, (_, index) => (
           <div
             key={index}
-            className="h-80 w-[17rem] shrink-0 animate-pulse rounded-2xl bg-[#ececec] dark:bg-[#2a2a2a]"
+            className="h-80 w-[17rem] shrink-0 dash-shimmer rounded-2xl"
           />
         ))}
       </div>
@@ -270,11 +270,11 @@ export default function LeadsKanbanBoard({
                 key={status}
                 data-pipeline={isDropTarget ? status : undefined}
                 className={cn(
-                  "flex shrink-0 flex-col overflow-hidden rounded-2xl border bg-[#fafafa] transition-[width] duration-200 dark:bg-[#181818]",
+                  "flex shrink-0 flex-col overflow-hidden rounded-2xl border bg-dash-surface-2 transition-[width] duration-200 dark:bg-[#181818]",
                   isCollapsed ? "w-12" : "w-[17rem]",
                   isOver
                     ? "border-orange-400 ring-2 ring-orange-400/70"
-                    : "border-[#e0e0e0] dark:border-[#3a3a3a]",
+                    : "border-dash-line",
                 )}
               >
                 <div className={cn("h-1 w-full", PIPELINE_BAR[status] ?? "bg-neutral-400")} />
@@ -287,23 +287,23 @@ export default function LeadsKanbanBoard({
                     onClick={() => toggleCollapsedColumn(status)}
                     className="flex min-h-11 w-full flex-col items-center gap-3 px-1 py-3"
                   >
-                    <span className="rounded-full bg-white px-1.5 py-0.5 text-xs font-semibold tabular-nums text-[#616161] dark:bg-[#252525] dark:text-[#b0b0b0]">
+                    <span className="rounded-full bg-white px-1.5 py-0.5 text-xs font-semibold tabular-nums text-dash-muted dark:bg-[#252525]">
                       {cards.length}
                     </span>
-                    <span className="max-h-40 overflow-hidden text-xs font-semibold tracking-wide text-[#212121] [writing-mode:vertical-rl] dark:text-white">
+                    <span className="max-h-40 overflow-hidden text-xs font-semibold tracking-wide text-dash-ink [writing-mode:vertical-rl]">
                       {isOver ? "Suelta aquí" : label}
                     </span>
                   </button>
                 ) : (
                   <>
-                    <header className="flex items-center gap-1 border-b border-[#e8e8e8] py-1 pr-1 pl-3 dark:border-[#2a2a2a]">
+                    <header className="flex items-center gap-1 border-b border-dash-line py-1 pr-1 pl-3">
                       <h3
-                        className="min-w-0 flex-1 truncate text-sm font-semibold text-[#212121] dark:text-white"
+                        className="min-w-0 flex-1 truncate text-sm font-semibold text-dash-ink"
                         title={label}
                       >
                         {label}
                       </h3>
-                      <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold tabular-nums text-[#616161] dark:bg-[#252525] dark:text-[#b0b0b0]">
+                      <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold tabular-nums text-dash-muted dark:bg-[#252525]">
                         {cards.length}
                       </span>
                       <button
@@ -312,7 +312,7 @@ export default function LeadsKanbanBoard({
                         aria-label={`Ocultar ${label}`}
                         title={`Ocultar ${label}`}
                         onClick={() => toggleCollapsedColumn(status)}
-                        className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-[#616161] hover:bg-[#f5f5f5] dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a]"
+                        className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover"
                       >
                         <HugeiconsIcon
                           icon={ArrowDown01Icon}
@@ -323,7 +323,7 @@ export default function LeadsKanbanBoard({
                     </header>
                     <div className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto p-2">
                   {cards.length === 0 ? (
-                    <p className="px-2 py-6 text-center text-xs text-[#9e9e9e] dark:text-[#777]">
+                    <p className="px-2 py-6 text-center text-xs text-dash-faint dark:text-[#777]">
                       {isOver ? "Suelta aquí" : "Sin clientes"}
                     </p>
                   ) : (
@@ -331,7 +331,7 @@ export default function LeadsKanbanBoard({
                       <article
                         key={lead.id}
                         className={cn(
-                          "rounded-xl border border-[#e8e8e8] bg-white p-2.5 shadow-sm dark:border-[#333] dark:bg-[#1e1e1e]",
+                          "rounded-xl border border-dash-line bg-dash-surface p-2.5 shadow-sm",
                           draggingId === lead.id && "pointer-events-none opacity-40",
                           selectedLeadIds?.has(lead.id) &&
                             "ring-2 ring-orange-400/80",
@@ -341,7 +341,7 @@ export default function LeadsKanbanBoard({
                           {canMoveLeads ? (
                           <button
                             type="button"
-                            className="inline-flex size-11 shrink-0 cursor-grab touch-none items-center justify-center rounded-lg text-[#9e9e9e] hover:bg-[#f5f5f5] active:cursor-grabbing dark:text-[#777] dark:hover:bg-[#2a2a2a]"
+                            className="inline-flex size-11 shrink-0 cursor-grab touch-none items-center justify-center rounded-lg text-dash-faint hover:bg-dash-hover active:cursor-grabbing dark:text-[#777]"
                             aria-label={`Mover ${lead.businessName || "cliente"}`}
                             aria-keyshortcuts="ArrowLeft ArrowRight"
                             disabled={Boolean(pipelineOverrides[lead.id])}
@@ -389,18 +389,18 @@ export default function LeadsKanbanBoard({
                                   type="checkbox"
                                   checked={selectedLeadIds?.has(lead.id) ?? false}
                                   onChange={() => onToggleLead?.(lead.id)}
-                                  className="mt-1 rounded border-[#e0e0e0] text-orange-500 focus:ring-orange-500 dark:border-[#3a3a3a]"
+                                  className="mt-1 rounded border-dash-line text-orange-500 focus:ring-orange-500"
                                   aria-label={`Seleccionar ${lead.businessName}`}
                                 />
                               ) : null}
                               <Link
                                 href={Routes.panelLead(lead.id)}
-                                className="min-w-0 flex-1 text-sm font-semibold text-[#212121] hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
+                                className="min-w-0 flex-1 text-sm font-semibold text-dash-ink hover:text-orange-600 dark:hover:text-orange-400"
                               >
                                 {lead.businessName || "Sin nombre"}
                               </Link>
                             </div>
-                            <p className="mt-1 truncate text-xs text-[#616161] dark:text-[#b0b0b0]">
+                            <p className="mt-1 truncate text-xs text-dash-muted">
                               {getCategoryLabel(lead.category)}
                             </p>
                             {lead.phone ? (
@@ -414,11 +414,11 @@ export default function LeadsKanbanBoard({
                                 <CopyPhoneButton phone={lead.phone} />
                               </p>
                             ) : null}
-                            <p className="mt-1 truncate text-xs text-[#9e9e9e] dark:text-[#777]">
+                            <p className="mt-1 truncate text-xs text-dash-faint dark:text-[#777]">
                               {[lead.city, lead.state].filter(Boolean).join(" · ") || "Sin ubicación"}
                             </p>
                             {showAssignee && assigneeLabel(lead) ? (
-                              <p className="mt-1 truncate text-xs text-[#616161] dark:text-[#b0b0b0]">
+                              <p className="mt-1 truncate text-xs text-dash-muted">
                                 {assigneeLabel(lead)}
                               </p>
                             ) : null}

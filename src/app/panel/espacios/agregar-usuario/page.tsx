@@ -1,16 +1,14 @@
 "use client";
 
-import { Footer, Navigation } from "kadesh/components/layout";
+import PanelShell from "kadesh/components/panel/PanelShell";
 import AgregarUsuarioCompanySection from "kadesh/components/profile/sales/workspaces/members/AgregarUsuarioCompanySection";
 
 export default function AgregarUsuarioCompanyPage() {
   return (
-    <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#121212]">
-      <Navigation />
-      <main className="pt-20 pb-12">
+    <PanelShell selectedTab="workspaces" title="Agregar usuario">
+      <div className="pb-6">
         <AgregarUsuarioCompanySection />
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </PanelShell>
   );
 }

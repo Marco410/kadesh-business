@@ -442,8 +442,8 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
 
   if (!companyId) {
     return (
-      <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8 shadow-sm">
-        <p className="text-[#616161] dark:text-[#b0b0b0]">
+      <div className="rounded-3xl border border-dash-line bg-dash-surface p-6 sm:p-8 shadow-sm">
+        <p className="text-dash-muted">
           No tienes una empresa asociada. Asocia un negocio desde la sección de ventas para ver el calendario.
         </p>
       </div>
@@ -458,7 +458,7 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
             type="button"
             data-tour="calendar-new-event"
             onClick={() => setEventModal({ open: true, event: null })}
-            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full dash-grad-accent px-5 py-3 text-sm font-semibold text-white transition-colors hover:shadow-dash-accent-lift shadow-dash-accent"
           >
             <HugeiconsIcon icon={Add01Icon} size={18} />
             Nuevo evento
@@ -472,25 +472,25 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
           aria-expanded={showGooglePanel}
           aria-controls="google-calendar-panel"
           onClick={() => setShowGooglePanel((v) => !v)}
-          className={`flex min-h-11 w-full items-center gap-3 rounded-xl border bg-white px-3 py-2.5 text-left transition-colors sm:w-auto sm:px-4 dark:bg-[#1e1e1e] ${
+          className={`flex min-h-11 w-full items-center gap-3 rounded-xl border bg-dash-surface px-3 py-2.5 text-left transition-colors sm:w-auto sm:px-4 ${
             showGooglePanel
               ? "border-[#1a73e8] ring-2 ring-[#1a73e8]/20"
-              : "border-[#e0e0e0] hover:border-[#1a73e8]/45 dark:border-[#3a3a3a]"
+              : "border-dash-line hover:border-[#1a73e8]/45"
           }`}
         >
           <GoogleCalendarLogo className="size-10 shrink-0" />
           <span className="min-w-0 flex-1 sm:flex-none">
-            <span className="block text-sm font-semibold text-[#212121] dark:text-[#ffffff]">
+            <span className="block text-sm font-semibold text-dash-ink">
               Google Calendar
             </span>
-            <span className="block text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <span className="block text-xs text-dash-muted">
               {googleStatus}
             </span>
           </span>
           <HugeiconsIcon
             icon={ArrowDown01Icon}
             size={18}
-            className={`shrink-0 text-[#616161] transition-transform duration-200 dark:text-[#b0b0b0] ${
+            className={`shrink-0 text-dash-muted transition-transform duration-200 ${
               showGooglePanel ? "rotate-180" : ""
             }`}
           />

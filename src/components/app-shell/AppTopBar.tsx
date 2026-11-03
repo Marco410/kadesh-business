@@ -4,23 +4,14 @@ import { Fragment, type ReactNode } from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Menu01Icon } from "@hugeicons/core-free-icons";
-import { Routes } from "kadesh/core/routes";
 import FontSizeSlider from "kadesh/components/layout/FontSizeSlider";
 import ThemeToggle from "kadesh/components/layout/ThemeToggle";
 import { NotificationBell } from "kadesh/components/notifications";
-import { useUser } from "kadesh/utils/UserContext";
-import { useIsClient } from "kadesh/utils/useIsClient";
-import { DashAvatar } from "./DashAvatar";
+import UserMenu from "./UserMenu";
+
+export { greetingFor } from "./greeting";
 
 export type AppCrumb = { label: string; href?: string };
-
-/** "Buenos días" hasta las 11:59, "Buenas tardes" hasta las 18:59, luego "Buenas noches". */
-export function greetingFor(date: Date): string {
-  const hour = date.getHours();
-  if (hour < 12) return "Buenos días";
-  if (hour < 19) return "Buenas tardes";
-  return "Buenas noches";
-}
 
 const roundIconButton =
   "flex size-10 items-center justify-center rounded-full bg-dash-surface-2 text-dash-soft transition-colors hover:bg-dash-surface-3 hover:text-dash-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
@@ -43,10 +34,7 @@ export default function AppTopBar({
   onOpenMenu: () => void;
   showNotifications: boolean;
 }) {
-  const { user } = useUser();
-  const mounted = useIsClient();
   const current = crumbs[crumbs.length - 1]?.label ?? "";
-  const fullName = [user?.name, user?.lastName].filter(Boolean).join(" ").trim();
 
   return (
     <header
@@ -102,21 +90,7 @@ export default function AppTopBar({
           <FontSizeSlider tone="panel" />
           <ThemeToggle className={roundIconButton} />
         </span>
-        <Link
-          href={Routes.panelProfile}
-          className="flex items-center gap-2.5 rounded-full py-0.5 pl-1 pr-0.5 transition-colors hover:bg-dash-hover xl:pl-3"
-          aria-label="Mi perfil"
-        >
-          {mounted ? (
-            <span className="hidden text-right leading-tight xl:block">
-              <small className="block text-xs text-dash-muted">{greetingFor(new Date())}</small>
-              <strong className="block max-w-[11rem] truncate text-sm font-semibold text-dash-ink">
-                {user?.name || "Kadesh"}
-              </strong>
-            </span>
-          ) : null}
-          <DashAvatar name={fullName || user?.email || "Kadesh"} imageUrl={user?.profileImage?.url} size="md" />
-        </Link>
+        <UserMenu />
       </div>
     </header>
   );

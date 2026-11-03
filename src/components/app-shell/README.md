@@ -25,11 +25,15 @@ Las variables `--dash-*` viven en `:root` / `.dark`, no dentro del shell. Así l
 ## Componentes
 
 - **`AppShell`**: `brandTitle`, `brandSubtitle`, `groups` (`AppNavGroup[]`), `crumbs`, `actions` (lo que va en la barra antes de la campana), `showNotifications` y `children`.
+  - `collapsibleStorageKey`: el menú se colapsa a iconos en escritorio y se recuerda (`useSidebarCollapsed`).
+  - `navDataTour`: ancla de tutorial para todo el menú.
+  - Cada `AppNavItem` acepta `dataTour`, `variant: "ai"` (degradado de Kadesh AI) y `extra` (etiqueta Beta, punto en vivo).
   - Escritorio (`lg`): grid `272px | contenido` con el menú fijo.
   - Móvil: el menú es un cajón. Se cierra con Escape, el ✕, el velo o al elegir una sección. Mientras está abierto, el resto queda inerte y sin scroll, y al cerrar el foco vuelve al botón.
   - Incluye "Saltar al contenido".
-- **`AppSidebar`**: grupos con título. La opción activa es una píldora blanca que se desliza (`layoutId`), con el icono en naranja y un globo rojo para pendientes. Abajo va la tarjeta del usuario (Ir al sitio, Salir).
-- **`AppTopBar`**: migas (en móvil solo la página actual), `actions`, campana (`NotificationBell variant="panel"`), tamaño de texto, tema y saludo con avatar (enlaza a Mi perfil).
+- **`AppSidebar`**: logo en cuadro con el degradado naranja (la K es blanca y llena su lienzo, por eso lleva aire alrededor), grupos con título. La opción activa es una píldora blanca que se desliza (`layoutId`), con el icono en naranja y un globo rojo para pendientes. Abajo va la tarjeta del usuario (Ir al sitio, Salir).
+- **`AppTopBar`**: migas (en móvil solo la página actual), `actions`, campana (`NotificationBell variant="panel"`), tamaño de texto, tema y saludo con avatar.
+- **`UserMenu`** (el avatar de la barra): Mi perfil, cambio entre **Panel de control** y **Operaciones** (esta última solo para admins de plataforma; la actual va marcada), Novedades, Ir al sitio y Cerrar sesión. Reemplaza el menú del avatar de la barra del sitio, que era el único camino a Operaciones.
 - **`AppPageHeader`**: eyebrow, título, descripción y acciones. El `h1` lleva `data-app-title`; quien navega le pasa el foco al cambiar de vista.
 - **`Reveal`**: fade-up al montar, con `index` para escalonar.
 - **`AnimatedNumber`**: cifra que cuenta hacia arriba. El lector de pantalla recibe el valor final.
@@ -46,9 +50,14 @@ Las variables `--dash-*` viven en `:root` / `.dark`, no dentro del shell. Así l
 - Indicadores: resorte (`indicatorTransition`). Menús: `popTransition`.
 - Movimiento reducido: el shell usa `<MotionConfig reducedMotion="user">` y `globals.css` apaga las animaciones CSS dentro de `.kd-dash`.
 
-## Siguiente paso: panel de clientes
+## Quién lo usa
 
-`PanelPageSection` / `PanelControlSection` / `DashboardSidebar` pueden montarse en `AppShell`. Hay que cuidar:
+- **Operaciones** (`AdminDashboard`).
+- **Panel de control de clientes** (`kadesh/components/panel/PanelShell`) y sus subrutas. Ver `src/components/panel/README.md`.
+
+## Notas del panel de clientes
+
+Ya montado (2026-11-03). Lo que se cuidó:
 
 - `scripts/check-tours.mjs` lee `navItems` de `DashboardSidebar.tsx` (ruta y formato fijos).
 - Los anclajes `data-tour="nav-*"` y `main-tab-*`, y los pasos `side: "right"`.

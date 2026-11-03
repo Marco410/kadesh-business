@@ -16,8 +16,8 @@ import { useGoogleCalendarAccounts } from "./useGoogleCalendarAccounts";
 import { accountDisplayLabel, calendarDisplayName } from "./labels";
 
 const INPUT_CLASS =
-  "w-full rounded-lg border border-[#e0e0e0] bg-white px-3 py-2 text-sm text-[#212121] outline-none focus:border-orange-500 dark:border-[#3a3a3a] dark:bg-[#252525] dark:text-[#ffffff]";
-const LABEL_CLASS = "mb-1 block text-xs font-semibold text-[#616161] dark:text-[#b0b0b0]";
+  "w-full rounded-lg border border-dash-line bg-white px-3 py-2 text-sm text-dash-ink outline-none focus:border-orange-500 dark:bg-[#252525]";
+const LABEL_CLASS = "mb-1 block text-xs font-semibold text-dash-muted";
 
 interface CalendarEventModalProps {
   isOpen: boolean;
@@ -203,17 +203,17 @@ function ModalBody({
         className="pointer-events-none fixed inset-0 z-[110] flex items-center justify-center p-4"
       >
         <div
-          className="pointer-events-auto flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white shadow-2xl dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+          className="pointer-events-auto flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-3xl border border-dash-line bg-dash-surface shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-center justify-between border-b border-[#e0e0e0] bg-[#f5f5f5] p-4 dark:border-[#3a3a3a] dark:bg-[#2a2a2a]">
-            <h4 className="text-lg font-bold text-[#212121] dark:text-[#ffffff]">
+          <div className="flex items-center justify-between border-b border-dash-line bg-dash-surface-2 p-4">
+            <h4 className="text-lg font-bold text-dash-ink">
               {event ? "Detalle del evento" : "Nuevo evento"}
             </h4>
             <button
               type="button"
               onClick={onClose}
-              className="flex size-8 items-center justify-center rounded-lg text-2xl font-bold text-[#616161] hover:bg-[#e5e5e5] dark:text-[#b0b0b0] dark:hover:bg-[#333]"
+              className="flex size-8 items-center justify-center rounded-lg text-2xl font-bold text-dash-muted hover:bg-[#e5e5e5] dark:hover:bg-[#333]"
               aria-label="Cerrar"
             >
               ×
@@ -223,22 +223,22 @@ function ModalBody({
           {event ? (
             <div className="space-y-4 overflow-y-auto p-4">
               <div>
-                <p className="text-base font-semibold text-[#212121] dark:text-[#ffffff]">
+                <p className="text-base font-semibold text-dash-ink">
                   {event.title}
                 </p>
-                <p className="mt-1 text-sm capitalize text-[#616161] dark:text-[#b0b0b0]">
+                <p className="mt-1 text-sm capitalize text-dash-muted">
                   {whenLabel}
                 </p>
               </div>
               {event.location ? (
-                <p className="text-sm text-[#212121] dark:text-[#e0e0e0]">📍 {event.location}</p>
+                <p className="text-sm text-dash-ink dark:text-[#e0e0e0]">📍 {event.location}</p>
               ) : null}
               {event.description ? (
-                <p className="whitespace-pre-wrap text-sm text-[#212121] dark:text-[#e0e0e0]">
+                <p className="whitespace-pre-wrap text-sm text-dash-ink dark:text-[#e0e0e0]">
                   {event.description}
                 </p>
               ) : null}
-              <p className="text-xs text-[#9e9e9e]">
+              <p className="text-xs text-dash-faint">
                 {event.googleLinks.length > 0
                   ? `Enviado a ${event.googleLinks.filter((l) => l.lastPushStatus === "success").length} de ${event.googleLinks.length} calendarios de Google.`
                   : "No se envió a Google (no hay calendarios seleccionados)."}
@@ -267,7 +267,7 @@ function ModalBody({
                 />
               </div>
 
-              <label className="flex cursor-pointer items-center gap-2 text-sm text-[#212121] dark:text-[#e0e0e0]">
+              <label className="flex cursor-pointer items-center gap-2 text-sm text-dash-ink dark:text-[#e0e0e0]">
                 <input
                   type="checkbox"
                   checked={allDay}
@@ -304,7 +304,7 @@ function ModalBody({
                 </div>
               </div>
               {!allDay ? (
-                <p className="-mt-2 text-xs text-[#9e9e9e]">Sin fin, el evento dura 1 hora.</p>
+                <p className="-mt-2 text-xs text-dash-faint">Sin fin, el evento dura 1 hora.</p>
               ) : null}
 
               <div>
@@ -330,19 +330,19 @@ function ModalBody({
                 />
               </div>
 
-              <fieldset className="rounded-lg border border-[#e0e0e0] p-3 dark:border-[#3a3a3a]">
-                <legend className="px-1 text-xs font-semibold text-[#616161] dark:text-[#b0b0b0]">
+              <fieldset className="rounded-lg border border-dash-line p-3">
+                <legend className="px-1 text-xs font-semibold text-dash-muted">
                   Enviar a Google Calendar
                 </legend>
                 {targetGroups.length === 0 ? (
-                  <p className="text-xs text-[#9e9e9e]">
+                  <p className="text-xs text-dash-faint">
                     No tienes calendarios de Google visibles. El evento se guardará solo en Kadesh.
                   </p>
                 ) : (
                   <div className="space-y-2.5">
                     {targetGroups.map(({ account, calendars }) => (
                       <div key={account.id}>
-                        <p className="mb-1 truncate text-[11px] text-[#9e9e9e]">
+                        <p className="mb-1 truncate text-[11px] text-dash-faint">
                           {accountDisplayLabel(account)}
                         </p>
                         <div className="flex flex-wrap gap-1.5">
@@ -354,8 +354,8 @@ function ModalBody({
                                 key={calendar.id}
                                 className={`inline-flex max-w-full cursor-pointer select-none items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
                                   on
-                                    ? "border-[#e0e0e0] bg-white text-[#212121] dark:border-[#3a3a3a] dark:bg-[#2a2a2a] dark:text-[#ffffff]"
-                                    : "border-dashed border-[#d0d0d0] text-[#9e9e9e] dark:border-[#444]"
+                                    ? "border-dash-line bg-white text-dash-ink dark:bg-[#2a2a2a]"
+                                    : "border-dashed border-dash-line-strong text-dash-faint dark:border-[#444]"
                                 }`}
                               >
                                 <input
@@ -391,7 +391,7 @@ function ModalBody({
               <button
                 type="submit"
                 disabled={creating}
-                className="w-full rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:opacity-60"
+                className="w-full rounded-full dash-grad-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:shadow-dash-accent-lift disabled:opacity-60 shadow-dash-accent"
               >
                 {creating ? "Guardando…" : "Crear evento"}
               </button>

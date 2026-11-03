@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
-import { Footer, Navigation } from "kadesh/components/layout";
+import PanelShell from "kadesh/components/panel/PanelShell";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
   type UserCompanyCategoriesResponse,
@@ -26,13 +26,11 @@ export default function QuotationDetailPage() {
   const companyId = userData?.user?.company?.id ?? null;
 
   return (
-    <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#121212]">
-      <Navigation />
+    <PanelShell selectedTab="cotizaciones" title="Cotización">
       <SubscriptionProvider companyId={companyId}>
         <QuotationDetail />
       </SubscriptionProvider>
-      <Footer />
-    </div>
+    </PanelShell>
   );
 }
 

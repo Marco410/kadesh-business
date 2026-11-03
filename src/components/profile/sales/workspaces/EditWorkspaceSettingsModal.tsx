@@ -31,7 +31,7 @@ import {
 import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
 
 const inputClassName =
-  "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#252525] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
+  "w-full rounded-xl border border-dash-line bg-white dark:bg-[#252525] px-3 py-2.5 text-sm text-dash-ink placeholder:text-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 
 type StatusRow = Pick<
   SaasWorkspaceCrmStatus,
@@ -482,20 +482,20 @@ export default function EditWorkspaceSettingsModal({
         className="fixed inset-0 z-[125] flex items-center justify-center p-4 pointer-events-none"
       >
         <div
-          className="pointer-events-auto w-full max-w-lg max-h-[min(90vh,720px)] overflow-y-auto rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] shadow-2xl"
+          className="pointer-events-auto w-full max-w-lg max-h-[min(90vh,720px)] overflow-y-auto rounded-3xl border border-dash-line bg-dash-surface shadow-2xl"
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
           aria-labelledby="edit-workspace-settings-title"
         >
-          <div className="sticky top-0 z-10 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-5 py-4">
+          <div className="sticky top-0 z-10 border-b border-dash-line bg-dash-surface px-5 py-4">
             <h2
               id="edit-workspace-settings-title"
-              className="text-lg font-semibold text-[#212121] dark:text-white"
+              className="text-lg font-semibold text-dash-ink"
             >
               Editar espacio de trabajo
             </h2>
-            <p className="mt-1 text-sm text-[#616161] dark:text-[#9e9e9e]">
+            <p className="mt-1 text-sm text-dash-muted">
               Nombre, visibilidad del tablero y estados CRM (nombre y color).
             </p>
           </div>
@@ -505,7 +505,7 @@ export default function EditWorkspaceSettingsModal({
               <span className="size-9 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
             </div>
           ) : !ws ? (
-            <p className="p-6 text-sm text-[#616161] dark:text-[#9e9e9e]">
+            <p className="p-6 text-sm text-dash-muted">
               No se pudo cargar el espacio.
             </p>
           ) : (
@@ -513,7 +513,7 @@ export default function EditWorkspaceSettingsModal({
               <div>
                 <label
                   htmlFor="ews-name"
-                  className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                  className="block text-sm font-medium text-dash-muted mb-1.5"
                 >
                   Nombre
                 </label>
@@ -526,8 +526,8 @@ export default function EditWorkspaceSettingsModal({
                 />
               </div>
 
-              <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#181818] p-4 space-y-3">
-                <p className="text-sm font-semibold text-[#212121] dark:text-white">
+              <div className="rounded-xl border border-dash-line bg-dash-surface-2 dark:bg-[#181818] p-4 space-y-3">
+                <p className="text-sm font-semibold text-dash-ink">
                   Mostrar en este workspace
                 </p>
                 <label className="flex items-start gap-3 cursor-pointer select-none">
@@ -535,13 +535,13 @@ export default function EditWorkspaceSettingsModal({
                     type="checkbox"
                     checked={showTasks}
                     onChange={(e) => setShowTasks(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-[#e0e0e0] dark:border-[#3a3a3a] accent-orange-500"
+                    className="mt-0.5 h-4 w-4 rounded border-dash-line accent-orange-500"
                   />
                   <span className="min-w-0">
-                    <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                    <span className="block text-sm font-medium text-dash-ink">
                       Tareas
                     </span>
-                    <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
+                    <span className="block text-xs text-dash-muted">
                       Pestaña y columnas de tareas generales del workspace
                     </span>
                   </span>
@@ -551,13 +551,13 @@ export default function EditWorkspaceSettingsModal({
                     type="checkbox"
                     checked={showActivities}
                     onChange={(e) => setShowActivities(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-[#e0e0e0] dark:border-[#3a3a3a] accent-orange-500"
+                    className="mt-0.5 h-4 w-4 rounded border-dash-line accent-orange-500"
                   />
                   <span className="min-w-0">
-                    <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                    <span className="block text-sm font-medium text-dash-ink">
                       Actividades
                     </span>
-                    <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
+                    <span className="block text-xs text-dash-muted">
                       Pestaña y columnas de actividades en el tablero
                     </span>
                   </span>
@@ -567,13 +567,13 @@ export default function EditWorkspaceSettingsModal({
                     type="checkbox"
                     checked={showFollowUpTasks}
                     onChange={(e) => setShowFollowUpTasks(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-[#e0e0e0] dark:border-[#3a3a3a] accent-orange-500"
+                    className="mt-0.5 h-4 w-4 rounded border-dash-line accent-orange-500"
                   />
                   <span className="min-w-0">
-                    <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                    <span className="block text-sm font-medium text-dash-ink">
                       Seguimientos
                     </span>
-                    <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
+                    <span className="block text-xs text-dash-muted">
                       Pestaña y columnas de seguimientos
                     </span>
                   </span>
@@ -583,13 +583,13 @@ export default function EditWorkspaceSettingsModal({
                     type="checkbox"
                     checked={showProposals}
                     onChange={(e) => setShowProposals(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-[#e0e0e0] dark:border-[#3a3a3a] accent-orange-500"
+                    className="mt-0.5 h-4 w-4 rounded border-dash-line accent-orange-500"
                   />
                   <span className="min-w-0">
-                    <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                    <span className="block text-sm font-medium text-dash-ink">
                       Propuestas
                     </span>
-                    <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
+                    <span className="block text-xs text-dash-muted">
                       Pestaña y columnas de propuestas
                     </span>
                   </span>
@@ -599,10 +599,10 @@ export default function EditWorkspaceSettingsModal({
               <div>
                 <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-[#212121] dark:text-white mb-2 sm:mb-1">
+                    <p className="text-sm font-semibold text-dash-ink mb-2 sm:mb-1">
                       Estados CRM
                     </p>
-                    <p className="text-xs text-[#616161] dark:text-[#9e9e9e]">
+                    <p className="text-xs text-dash-muted">
                       Agrega estados para categorizar tareas del espacio, actividades, seguimientos y
                       propuestas.
                     </p>
@@ -617,7 +617,7 @@ export default function EditWorkspaceSettingsModal({
                       isDeletingStatus ||
                       reorderSaving
                     }
-                    className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-[#e0e0e0] bg-white px-3 py-2 text-sm font-medium text-[#212121] hover:bg-[#f5f5f5] disabled:opacity-60 dark:border-[#3a3a3a] dark:bg-[#252525] dark:text-white dark:hover:bg-[#2a2a2a]"
+                    className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-dash-line bg-white px-3 py-2 text-sm font-medium text-dash-ink hover:bg-dash-hover disabled:opacity-60 dark:bg-[#252525]"
                   >
                     <HugeiconsIcon icon={Add01Icon} size={18} className="text-orange-500" />
                     Añadir estado
@@ -676,7 +676,7 @@ export default function EditWorkspaceSettingsModal({
                       className={`relative flex flex-col gap-2 rounded-xl border bg-white p-3 transition-[box-shadow,opacity] sm:flex-row sm:items-center sm:gap-3 dark:bg-[#252525] ${
                         draggingReorderId === row.id
                           ? "border-orange-300/80 opacity-60 dark:border-orange-500/40"
-                          : "border-[#e0e0e0] dark:border-[#3a3a3a]"
+                          : "border-dash-line"
                       } ${
                         draggingReorderId &&
                         reorderHoverRowId === row.id &&
@@ -722,7 +722,7 @@ export default function EditWorkspaceSettingsModal({
                           setReorderInsertBefore(null);
                           reorderDropHintRef.current = { hoverId: null, insertBefore: true };
                         }}
-                        className="flex h-10 w-10 shrink-0 cursor-grab touch-none items-center justify-center rounded-lg border border-transparent text-[#9e9e9e] hover:border-[#e0e0e0] hover:bg-[#f5f5f5] active:cursor-grabbing dark:hover:border-[#3a3a3a] dark:hover:bg-[#2a2a2a] disabled:cursor-not-allowed disabled:opacity-40"
+                        className="flex h-10 w-10 shrink-0 cursor-grab touch-none items-center justify-center rounded-lg border border-transparent text-dash-faint hover:border-[#e0e0e0] hover:bg-dash-hover active:cursor-grabbing dark:hover:border-[#3a3a3a] disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         <HugeiconsIcon icon={DragDropVerticalIcon} size={20} />
                       </div>
@@ -765,7 +765,7 @@ export default function EditWorkspaceSettingsModal({
                               ? "El estado por defecto no se puede eliminar"
                               : "Eliminar estado"
                           }
-                          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#e0e0e0] text-[#616161] hover:bg-red-50 hover:border-red-200 hover:text-red-600 disabled:pointer-events-none disabled:opacity-40 dark:border-[#3a3a3a] dark:text-[#9e9e9e] dark:hover:bg-red-950/40 dark:hover:border-red-900 dark:hover:text-red-400"
+                          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-dash-line text-dash-muted hover:bg-red-50 hover:border-red-200 hover:text-red-600 disabled:pointer-events-none disabled:opacity-40 dark:hover:bg-red-950/40 dark:hover:border-red-900 dark:hover:text-red-400"
                           aria-label={`Eliminar estado ${row.key}`}
                         >
                           {deletingStatusId === row.id ? (
@@ -780,18 +780,18 @@ export default function EditWorkspaceSettingsModal({
                 </ul>
               </div>
 
-              <div className="flex justify-end gap-2 border-t border-[#e0e0e0] dark:border-[#3a3a3a] pt-4">
+              <div className="flex justify-end gap-2 border-t border-dash-line pt-4">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="rounded-xl px-4 py-2 text-sm font-medium text-[#616161] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                  className="rounded-xl px-4 py-2 text-sm font-medium text-dash-muted hover:bg-dash-hover"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={saving || wsLoading || isDeletingStatus || reorderSaving}
-                  className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-60"
+                  className="rounded-full dash-grad-accent px-4 py-2 text-sm font-semibold text-white hover:shadow-dash-accent-lift disabled:opacity-60 shadow-dash-accent"
                 >
                   {saving ? "Guardando…" : reorderSaving ? "Guardando orden…" : "Guardar cambios"}
                 </button>
@@ -820,7 +820,7 @@ export default function EditWorkspaceSettingsModal({
             className="fixed inset-0 z-[135] flex items-center justify-center p-4 pointer-events-none"
           >
             <div
-              className="pointer-events-auto w-full max-w-md rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] shadow-2xl"
+              className="pointer-events-auto w-full max-w-md rounded-3xl border border-dash-line bg-dash-surface shadow-2xl"
               onClick={(e) => e.stopPropagation()}
               role="dialog"
               aria-modal="true"
@@ -830,18 +830,18 @@ export default function EditWorkspaceSettingsModal({
                 <div>
                   <h3
                     id="ews-add-crm-status-title"
-                    className="text-lg font-semibold text-[#212121] dark:text-white"
+                    className="text-lg font-semibold text-dash-ink"
                   >
                     Nuevo estado CRM
                   </h3>
-                  <p className="mt-1 text-sm text-[#616161] dark:text-[#9e9e9e]">
+                  <p className="mt-1 text-sm text-dash-muted">
                     Nombre y color. La clave interna se arma con el nombre.
                   </p>
                 </div>
                 <div>
                   <label
                     htmlFor="ews-new-crm-name"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Nombre
                   </label>
@@ -861,18 +861,18 @@ export default function EditWorkspaceSettingsModal({
                   disabled={creatingCrmStatus || isDeletingStatus || reorderSaving}
                   ariaLabel="Color del nuevo estado CRM"
                 />
-                <div className="flex justify-end gap-2 border-t border-[#e0e0e0] dark:border-[#3a3a3a] pt-4">
+                <div className="flex justify-end gap-2 border-t border-dash-line pt-4">
                   <button
                     type="button"
                     onClick={closeAddStatusModal}
-                    className="rounded-xl px-4 py-2 text-sm font-medium text-[#616161] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                    className="rounded-xl px-4 py-2 text-sm font-medium text-dash-muted hover:bg-dash-hover"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={creatingCrmStatus || isDeletingStatus || reorderSaving}
-                    className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-60"
+                    className="rounded-full dash-grad-accent px-4 py-2 text-sm font-semibold text-white hover:shadow-dash-accent-lift disabled:opacity-60 shadow-dash-accent"
                   >
                     {creatingCrmStatus ? "Creando…" : "Crear estado"}
                   </button>

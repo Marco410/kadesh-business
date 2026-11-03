@@ -150,18 +150,18 @@ export function AiRecommendationsCard({
     : "Sugerencias según tu perfil";
 
   return (
-    <section className="rounded-2xl border border-[#e0e0e0] bg-white p-4 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
+    <section className="rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span className="ai-urim-icon">
               <HugeiconsIcon icon={Idea01Icon} size={20} />
             </span>
-            <h3 className="text-base font-semibold text-[#212121] dark:text-white">
+            <h3 className="text-base font-semibold text-dash-ink">
               Recomendaciones para vender más
             </h3>
           </div>
-          <p className="mt-0.5 text-xs text-[#9e9e9e] dark:text-[#7a7a7a]">
+          <p className="mt-0.5 text-xs text-dash-faint dark:text-[#7a7a7a]">
             {subtitle}
           </p>
         </div>
@@ -171,7 +171,7 @@ export function AiRecommendationsCard({
             onClick={() => void runGenerate(true)}
             disabled={generating}
             title={isManaged ? creditHint : undefined}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#e0e0e0] px-2.5 py-1.5 text-xs font-medium text-[#616161] hover:border-violet-300 hover:text-violet-700 disabled:opacity-50 dark:border-[#3a3a3a] dark:text-[#b0b0b0] dark:hover:border-violet-500/50 dark:hover:text-violet-300"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-dash-line px-2.5 py-1.5 text-xs font-medium text-dash-muted hover:border-violet-300 hover:text-violet-700 disabled:opacity-50 dark:hover:border-violet-500/50 dark:hover:text-violet-300"
           >
             <HugeiconsIcon
               icon={RefreshIcon}
@@ -185,8 +185,8 @@ export function AiRecommendationsCard({
 
       {settingsQuery.loading && !company ? (
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="h-32 animate-pulse rounded-xl bg-[#ececec] dark:bg-[#2a2a2a]" />
-          <div className="h-32 animate-pulse rounded-xl bg-[#ececec] dark:bg-[#2a2a2a]" />
+          <div className="h-32 dash-shimmer rounded-xl" />
+          <div className="h-32 dash-shimmer rounded-xl" />
         </div>
       ) : generating ? (
         <AiThinking
@@ -195,7 +195,7 @@ export function AiRecommendationsCard({
         />
       ) : items.length === 0 ? (
         <div className="flex flex-col items-start gap-3 rounded-xl border border-dashed border-[#d6d6d6] p-4 dark:border-[#3a3a3a] sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="text-sm text-dash-muted">
             Responde las preguntas de tu negocio y aquí verás consejos para
             prospectar y cerrar en tu industria.
           </p>
@@ -203,7 +203,7 @@ export function AiRecommendationsCard({
             <button
               type="button"
               onClick={onOpenCompanyInfo}
-              className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-orange-500 px-3.5 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+              className="inline-flex shrink-0 items-center gap-1 rounded-full dash-grad-accent px-3.5 py-2 text-sm font-semibold text-white hover:shadow-dash-accent-lift shadow-dash-accent"
             >
               Responder preguntas
               <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
@@ -217,10 +217,10 @@ export function AiRecommendationsCard({
       {isAiLive && !fromAi && !generating && items.length > 0 ? (
         <div className="mt-4 flex flex-col gap-3 rounded-xl bg-violet-50/70 p-3 dark:bg-violet-500/10 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <p className="text-sm font-medium text-[#212121] dark:text-white">
+            <p className="text-sm font-medium text-dash-ink">
               Pide recomendaciones escritas para tu negocio
             </p>
-            <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <p className="text-xs text-dash-muted">
               {creditHint}
             </p>
           </div>
@@ -234,7 +234,7 @@ export function AiRecommendationsCard({
           </button>
         </div>
       ) : !isAiLive && items.length > 0 ? (
-        <p className="mt-3 text-xs text-[#9e9e9e] dark:text-[#7a7a7a]">
+        <p className="mt-3 text-xs text-dash-faint dark:text-[#7a7a7a]">
           Con {KADESH_URIM_AI_NAME} activa, estas recomendaciones se escriben
           para tu negocio en particular.
         </p>

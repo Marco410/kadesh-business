@@ -137,10 +137,10 @@ export default function WorkspacesTab({
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-semibold text-[#212121] dark:text-white">
+        <h2 className="text-xl font-semibold text-dash-ink">
           Espacios de trabajo
         </h2>
-        <p className="mt-1 text-sm text-[#616161] dark:text-[#9e9e9e] max-w-2xl">
+        <p className="mt-1 text-sm text-dash-muted max-w-2xl">
           Organiza tareas, actividades, seguimientos y propuestas por equipo o cliente. El
           selector también aplica en Ventas y Calendario cuando un espacio está
           activo.
@@ -186,7 +186,7 @@ export default function WorkspacesTab({
               <button
                 type="button"
                 onClick={() => setEditWorkspaceOpen(true)}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-4 py-2.5 text-sm font-medium text-[#212121] dark:text-white shadow-sm hover:border-orange-500/40 transition-colors"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-dash-line bg-dash-surface px-4 py-2.5 text-sm font-medium text-dash-ink shadow-sm hover:border-orange-500/40 transition-colors"
               >
                 <HugeiconsIcon icon={Edit02Icon} size={18} />
                 Editar espacio de trabajo
@@ -196,7 +196,7 @@ export default function WorkspacesTab({
               <button
                 type="button"
                 onClick={() => setMembersOpen(true)}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-4 py-2.5 text-sm font-medium text-[#212121] dark:text-white shadow-sm hover:border-orange-500/40 transition-colors"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-dash-line bg-dash-surface px-4 py-2.5 text-sm font-medium text-dash-ink shadow-sm hover:border-orange-500/40 transition-colors"
               >
                 <HugeiconsIcon icon={UserMultiple02Icon} size={18} />
                 Gestionar miembros
@@ -207,24 +207,24 @@ export default function WorkspacesTab({
       </div>
 
       {!currentWorkspaceId ? (
-        <div className="rounded-2xl border border-dashed border-[#d0d0d0] dark:border-[#404040] bg-[#fafafa] dark:bg-[#181818] p-5 sm:p-7">
+        <div className="rounded-2xl border border-dashed border-dash-line-strong dark:border-[#404040] bg-dash-surface-2 dark:bg-[#181818] p-5 sm:p-7">
           <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex min-w-0 gap-3.5">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400">
                 <HugeiconsIcon icon={DashboardSquare01Icon} size={22} />
               </span>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-[#212121] dark:text-white">
+                <p className="text-sm font-semibold text-dash-ink">
                   Vista general activa
                 </p>
-                <p className="mt-1 max-w-xl text-sm leading-relaxed text-[#616161] dark:text-[#9e9e9e]">
+                <p className="mt-1 max-w-xl text-sm leading-relaxed text-dash-muted">
                   Estás viendo todos los registros sin filtrar por espacio. Elige uno para enfocar
                   tareas, actividades, seguimientos y propuestas.
                 </p>
               </div>
             </div>
             {workspacePickerList.length > 0 && (
-              <span className="inline-flex shrink-0 self-start rounded-full border border-[#e0e0e0] bg-white px-3 py-1 text-xs font-medium text-[#616161] dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-[#9e9e9e]">
+              <span className="inline-flex shrink-0 self-start rounded-full border border-dash-line bg-dash-surface px-3 py-1 text-xs font-medium text-dash-muted">
                 {workspacePickerList.length}{" "}
                 {workspacePickerList.length === 1 ? "espacio" : "espacios"}
               </span>
@@ -236,25 +236,25 @@ export default function WorkspacesTab({
               {[0, 1].map((i) => (
                 <div
                   key={i}
-                  className="flex animate-pulse items-center gap-3 rounded-xl border border-[#e0e0e0] bg-white p-4 dark:border-[#2e2e2e] dark:bg-[#1a1a1a]"
+                  className="flex animate-pulse items-center gap-3 rounded-xl border border-dash-line bg-dash-surface p-4 dark:border-[#2e2e2e]"
                 >
-                  <div className="h-10 w-10 shrink-0 rounded-xl bg-[#e0e0e0] dark:bg-[#2e2e2e]" />
+                  <div className="h-10 w-10 shrink-0 rounded-xl bg-dash-surface-3 dark:bg-[#2e2e2e]" />
                   <div className="min-w-0 flex-1 space-y-2">
-                    <div className="h-4 w-32 rounded bg-[#e0e0e0] dark:bg-[#2e2e2e]" />
-                    <div className="h-3 w-20 rounded bg-[#e0e0e0] dark:bg-[#2e2e2e]" />
+                    <div className="h-4 w-32 rounded bg-dash-surface-3 dark:bg-[#2e2e2e]" />
+                    <div className="h-3 w-20 rounded bg-dash-surface-3 dark:bg-[#2e2e2e]" />
                   </div>
                 </div>
               ))}
             </div>
           ) : workspacePickerList.length === 0 ? (
-            <div className="flex flex-col items-center rounded-xl border border-[#e0e0e0] bg-white px-6 py-10 text-center dark:border-[#2e2e2e] dark:bg-[#1a1a1a]">
+            <div className="flex flex-col items-center rounded-xl border border-dash-line bg-dash-surface px-6 py-10 text-center dark:border-[#2e2e2e]">
               <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400">
                 <HugeiconsIcon icon={FolderIcon} size={24} />
               </span>
-              <p className="mt-4 text-sm font-semibold text-[#212121] dark:text-white">
+              <p className="mt-4 text-sm font-semibold text-dash-ink">
                 Aún no tienes espacios de trabajo
               </p>
-              <p className="mt-1 max-w-sm text-sm text-[#616161] dark:text-[#9e9e9e]">
+              <p className="mt-1 max-w-sm text-sm text-dash-muted">
                 Crea uno para organizar tareas, actividades, seguimientos y propuestas por equipo o
                 cliente.
               </p>
@@ -262,7 +262,7 @@ export default function WorkspacesTab({
                 <button
                   type="button"
                   onClick={onRequestCreateWorkspace}
-                  className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50"
+                  className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-full dash-grad-accent px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:shadow-dash-accent-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 shadow-dash-accent"
                 >
                   <HugeiconsIcon icon={Add01Icon} size={18} />
                   Crear espacio de trabajo
@@ -277,20 +277,20 @@ export default function WorkspacesTab({
                   type="button"
                   role="listitem"
                   onClick={() => setCurrentWorkspaceId(w.id)}
-                  className="group flex w-full items-center gap-3 rounded-xl border border-[#e0e0e0] bg-white p-3.5 text-left shadow-sm transition-all duration-150 hover:border-orange-400/60 hover:bg-orange-500/[0.02] hover:shadow-md hover:shadow-orange-500/5 dark:border-[#2e2e2e] dark:bg-[#1a1a1a] dark:hover:border-orange-500/40 dark:hover:bg-orange-500/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 sm:gap-4 sm:p-4"
+                  className="group flex w-full items-center gap-3 rounded-xl border border-dash-line bg-dash-surface p-3.5 text-left shadow-sm transition-all duration-150 hover:border-orange-400/60 hover:bg-orange-500/[0.02] hover:shadow-md hover:shadow-orange-500/5 dark:border-[#2e2e2e] dark:hover:border-orange-500/40 dark:hover:bg-orange-500/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 sm:gap-4 sm:p-4"
                 >
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-600 transition-colors group-hover:bg-orange-500/15 dark:text-orange-400">
                     <HugeiconsIcon icon={FolderIcon} size={20} />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-[#212121] dark:text-white">
+                    <p className="truncate text-sm font-semibold text-dash-ink">
                       {w.name}
                     </p>
-                    <p className="mt-0.5 text-xs text-[#9e9e9e] transition-colors group-hover:text-orange-600/80 dark:text-[#757575] dark:group-hover:text-orange-400/80">
+                    <p className="mt-0.5 text-xs text-dash-faint transition-colors group-hover:text-orange-600/80 dark:group-hover:text-orange-400/80">
                       Abrir espacio de trabajo
                     </p>
                   </span>
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#e8e8e8] bg-[#fafafa] text-[#9e9e9e] transition-all duration-150 group-hover:translate-x-0.5 group-hover:border-orange-400/40 group-hover:bg-orange-500/10 group-hover:text-orange-600 dark:border-[#333] dark:bg-[#222] dark:text-[#9e9e9e] dark:group-hover:border-orange-500/30 dark:group-hover:bg-orange-500/10 dark:group-hover:text-orange-400">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-dash-line bg-dash-surface-2 text-dash-faint transition-all duration-150 group-hover:translate-x-0.5 group-hover:border-orange-400/40 group-hover:bg-orange-500/10 group-hover:text-orange-600 dark:group-hover:border-orange-500/30 dark:group-hover:bg-orange-500/10 dark:group-hover:text-orange-400">
                     <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
                   </span>
                 </button>

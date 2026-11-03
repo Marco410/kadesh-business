@@ -3,7 +3,8 @@ export { default as AppPageHeader } from "./AppPageHeader";
 export { default as Reveal } from "./Reveal";
 export { default as AnimatedNumber } from "./AnimatedNumber";
 export { DashAvatar, initialsOf } from "./DashAvatar";
-export { greetingFor, type AppCrumb } from "./AppTopBar";
+export { type AppCrumb } from "./AppTopBar";
+export { greetingFor } from "./greeting";
 export type { AppNavGroup, AppNavItem } from "./AppSidebar";
 export { ColumnBars, HBarList, Sparkline, type ColumnPoint, type ColumnSegment, type HBarItem } from "./charts";
 export {

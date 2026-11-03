@@ -68,19 +68,19 @@ export default function LeadProjectsModal({
               role="dialog"
               aria-modal="true"
               aria-labelledby="lead-projects-modal-title"
-              className="pointer-events-auto w-full max-w-lg max-h-[min(85vh,640px)] flex flex-col rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] shadow-2xl overflow-hidden"
+              className="pointer-events-auto w-full max-w-lg max-h-[min(85vh,640px)] flex flex-col rounded-3xl border border-dash-line bg-dash-surface shadow-2xl overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a]">
+              <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-dash-line bg-dash-surface-2">
                 <div className="min-w-0">
                   <h2
                     id="lead-projects-modal-title"
-                    className="text-lg font-bold text-[#212121] dark:text-white"
+                    className="text-lg font-bold text-dash-ink"
                   >
                     Proyectos del cliente
                   </h2>
                   {leadBusinessName ? (
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5 truncate">
+                    <p className="text-xs text-dash-muted mt-0.5 truncate">
                       {leadBusinessName}
                     </p>
                   ) : null}
@@ -88,7 +88,7 @@ export default function LeadProjectsModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="shrink-0 p-2 rounded-lg text-[#616161] dark:text-[#b0b0b0] hover:bg-[#e5e5e5] dark:hover:bg-[#333] hover:text-[#212121] dark:hover:text-white transition-colors"
+                  className="shrink-0 p-2 rounded-lg text-dash-muted hover:bg-[#e5e5e5] dark:hover:bg-[#333] hover:text-dash-ink transition-colors"
                   aria-label="Cerrar"
                 >
                   <HugeiconsIcon icon={Cancel01Icon} size={22} />
@@ -97,14 +97,14 @@ export default function LeadProjectsModal({
 
               <div className="flex-1 overflow-y-auto px-5 py-4">
                 {list.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-[#e0e0e0] dark:border-[#3a3a3a] px-4 py-10 text-center">
+                  <div className="rounded-xl border border-dashed border-dash-line px-4 py-10 text-center">
                     <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500 mb-3">
                       <HugeiconsIcon icon={FolderIcon} size={24} />
                     </span>
-                    <p className="text-sm font-medium text-[#212121] dark:text-white">
+                    <p className="text-sm font-medium text-dash-ink">
                       Sin proyectos aún
                     </p>
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 max-w-xs mx-auto">
+                    <p className="text-xs text-dash-muted mt-1 max-w-xs mx-auto">
                       Crea un proyecto desde una propuesta comprada o desde la sección de proyectos.
                     </p>
                   </div>
@@ -113,18 +113,18 @@ export default function LeadProjectsModal({
                     {list.map((p) => {
                       const statusClass =
                         PROJECT_STATUS_CLASSES[p.status ?? ""] ??
-                        "bg-[#f0f0f0] text-[#616161] dark:bg-[#333] dark:text-[#b0b0b0]";
+                        "bg-dash-surface-2 text-dash-muted";
                       return (
                         <li
                           key={p.id}
-                          className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] p-4"
+                          className="rounded-xl border border-dash-line bg-dash-surface-2 p-4"
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0 flex-1">
-                              <p className="font-semibold text-[#212121] dark:text-white truncate">
+                              <p className="font-semibold text-dash-ink truncate">
                                 {p.name}
                               </p>
-                              <p className="text-[11px] text-[#9e9e9e] dark:text-[#888] mt-0.5">
+                              <p className="text-[11px] text-dash-faint dark:text-[#888] mt-0.5">
                                 Creado {formatDateShort(p.createdAt, false)}
                               </p>
                             </div>
@@ -137,7 +137,7 @@ export default function LeadProjectsModal({
                             ) : null}
                           </div>
                           {p.description ? (
-                            <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-2 line-clamp-2">
+                            <p className="text-xs text-dash-muted mt-2 line-clamp-2">
                               {p.description}
                             </p>
                           ) : null}
@@ -158,12 +158,12 @@ export default function LeadProjectsModal({
                 )}
               </div>
 
-              <div className="shrink-0 border-t border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-5 py-3">
+              <div className="shrink-0 border-t border-dash-line bg-dash-surface-2 px-5 py-3">
                 <button
                   type="button"
                   disabled={!canCreateProject}
                   onClick={() => setIsCreateProjectOpen(true)}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] disabled:pointer-events-none disabled:opacity-50 transition-colors"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full dash-grad-accent px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:shadow-dash-accent-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] disabled:pointer-events-none disabled:opacity-50 transition-colors shadow-dash-accent"
                 >
                   <HugeiconsIcon icon={Add01Icon} size={18} />
                   Crear proyecto

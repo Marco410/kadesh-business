@@ -20,10 +20,10 @@ export default function RoleAccessDeniedSection({
 }: RoleAccessDeniedSectionProps) {
   return (
     <div className="rounded-2xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/90 dark:bg-amber-950/35 p-6 sm:p-8 shadow-sm">
-      <h3 className="text-lg font-semibold text-[#212121] dark:text-white mb-2">
+      <h3 className="text-lg font-semibold text-dash-ink mb-2">
         {title}
       </h3>
-      <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mb-5 leading-relaxed">
+      <p className="text-sm text-dash-muted mb-5 leading-relaxed">
         {description}
       </p>
       <Link

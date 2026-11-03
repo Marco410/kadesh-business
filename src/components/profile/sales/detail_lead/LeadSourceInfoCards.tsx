@@ -85,14 +85,14 @@ export function LeadGoogleInfoCard({
         />
         {topReviews.length > 0 ? (
           <div className="pt-1.5">
-            <p className="text-[#616161] dark:text-[#b0b0b0] font-medium text-sm mb-1">
+            <p className="text-dash-muted font-medium text-sm mb-1">
               Reseñas destacadas
             </p>
-            <ul className="space-y-1.5 text-[#212121] dark:text-[#ffffff] text-sm">
+            <ul className="space-y-1.5 text-dash-ink text-sm">
               {topReviews.map((review, i) => (
                 <li
                   key={i}
-                  className="line-clamp-3 rounded-md bg-[#fafafa] dark:bg-[#252525] px-2 py-1.5"
+                  className="line-clamp-3 rounded-md bg-dash-surface-2 px-2 py-1.5"
                 >
                   {review}
                 </li>

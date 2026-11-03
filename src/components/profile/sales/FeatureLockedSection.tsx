@@ -147,7 +147,7 @@ export default function FeatureLockedSection({
   };
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-orange-500/25 bg-white shadow-sm dark:border-orange-500/30 dark:bg-[#1e1e1e]">
+    <div className="overflow-hidden rounded-2xl border border-orange-500/25 bg-dash-surface shadow-sm dark:border-orange-500/30">
       <div
         className="h-1 bg-gradient-to-r from-orange-500 via-amber-400 to-orange-500"
         aria-hidden
@@ -166,29 +166,29 @@ export default function FeatureLockedSection({
               <p className="text-xs font-semibold uppercase tracking-wide text-orange-600 dark:text-orange-400">
                 Función premium
               </p>
-              <h3 className="mt-1 text-xl font-bold text-[#212121] dark:text-white">
+              <h3 className="mt-1 text-xl font-bold text-dash-ink">
                 {copy.headline}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+              <p className="mt-2 text-sm leading-relaxed text-dash-muted">
                 {copy.description}
               </p>
             </div>
           </div>
 
           {planName && (
-            <div className="shrink-0 rounded-xl border border-[#e0e0e0] bg-[#f8f8f8] px-4 py-3 dark:border-[#3a3a3a] dark:bg-[#252525]">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+            <div className="shrink-0 rounded-xl border border-dash-line bg-dash-surface-2 px-4 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-dash-faint dark:text-[#888]">
                 Tu plan actual
               </p>
-              <p className="mt-0.5 text-sm font-bold text-[#212121] dark:text-white">
+              <p className="mt-0.5 text-sm font-bold text-dash-ink">
                 {planName}
               </p>
             </div>
           )}
         </div>
 
-        <div className="mt-6 rounded-xl border border-[#e0e0e0] bg-[#fafafa] p-4 dark:border-[#3a3a3a] dark:bg-[#252525]">
-          <p className="mb-3 text-sm font-semibold text-[#212121] dark:text-white">
+        <div className="mt-6 rounded-xl border border-dash-line bg-dash-surface-2 p-4">
+          <p className="mb-3 text-sm font-semibold text-dash-ink">
             Con un plan superior tendrás acceso a {sectionName}:
           </p>
           <ul className="space-y-2.5">
@@ -200,7 +200,7 @@ export default function FeatureLockedSection({
                   className="mt-0.5 shrink-0 text-orange-600 dark:text-orange-400"
                   aria-hidden
                 />
-                <span className="text-[#616161] dark:text-[#b0b0b0]">
+                <span className="text-dash-muted">
                   {benefit}
                 </span>
               </li>
@@ -212,7 +212,7 @@ export default function FeatureLockedSection({
           <Link
             href={Routes.panelPlans}
             onClick={() => trackUpgrade("planes")}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-orange-500/20 transition-colors hover:bg-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e]"
+            className="inline-flex items-center justify-center gap-2 rounded-full dash-grad-accent px-5 py-3 text-sm font-semibold text-white shadow-md shadow-orange-500/20 transition-colors hover:shadow-dash-accent-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] shadow-dash-accent"
           >
             Ver planes y actualizar
             <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
@@ -220,13 +220,13 @@ export default function FeatureLockedSection({
           <Link
             href={Routes.precios}
             onClick={() => trackUpgrade("comparar")}
-            className="inline-flex items-center justify-center rounded-xl border border-[#e0e0e0] px-5 py-3 text-sm font-semibold text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
+            className="inline-flex items-center justify-center rounded-xl border border-dash-line px-5 py-3 text-sm font-semibold text-dash-ink transition-colors hover:bg-dash-hover dark:text-[#e0e0e0]"
           >
             Comparar funciones
           </Link>
         </div>
 
-        <p className="mt-4 text-xs text-[#9e9e9e] dark:text-[#6f6f6f]">
+        <p className="mt-4 text-xs text-dash-faint dark:text-[#6f6f6f]">
           Sin compromisos ocultos. Elige el plan que mejor se adapte a tu
           volumen de prospección y actualiza cuando quieras.
         </p>

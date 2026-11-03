@@ -42,10 +42,10 @@ import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions"
 import RoleAccessDeniedSection from "../RoleAccessDeniedSection";
 
 const fieldClass =
-  "w-full min-h-11 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
+  "w-full min-h-11 rounded-xl border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-sm text-dash-ink placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 
 const labelClass =
-  "block text-sm font-medium text-[#212121] dark:text-[#e0e0e0] mb-1.5";
+  "block text-sm font-medium text-dash-ink dark:text-[#e0e0e0] mb-1.5";
 
 function initials(name: string, lastName: string | null | undefined): string {
   const a = name.trim().charAt(0);
@@ -424,23 +424,23 @@ export default function AgregarVendedorSection() {
       <div className="mb-6 space-y-3">
         <Link
           href={`${Routes.panel}?tab=vendedores`}
-          className="inline-flex min-h-11 items-center gap-1.5 text-sm text-[#616161] transition-colors hover:text-orange-500 dark:text-[#b0b0b0] dark:hover:text-orange-400"
+          className="inline-flex min-h-11 items-center gap-1.5 text-sm text-dash-muted transition-colors hover:text-orange-500 dark:hover:text-orange-400"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
           Volver a Vendedores
         </Link>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-[#212121] dark:text-white">
+            <h1 className="text-2xl font-bold tracking-tight text-dash-ink">
               Gestionar vendedores
             </h1>
-            <p className="mt-1 max-w-xl text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-1 max-w-xl text-sm text-dash-muted">
               Alta y edición de cuentas del equipo comercial
               {companyName ? ` de ${companyName}` : ""}. El correo será su
               acceso al panel.
             </p>
           </div>
-          <p className="text-sm tabular-nums text-[#9e9e9e] dark:text-[#888]">
+          <p className="text-sm tabular-nums text-dash-faint dark:text-[#888]">
             {vendedores.length}{" "}
             {vendedores.length === 1 ? "vendedor" : "vendedores"}
           </p>
@@ -460,13 +460,13 @@ export default function AgregarVendedorSection() {
                 <p className="text-xs font-semibold uppercase tracking-wide text-orange-700/80 dark:text-orange-300/80">
                   {isEditMode ? "Editando" : "Nueva alta"}
                 </p>
-                <h2 className="mt-0.5 truncate text-lg font-bold text-[#212121] dark:text-white">
+                <h2 className="mt-0.5 truncate text-lg font-bold text-dash-ink">
                   {isEditMode
                     ? editingName || "Editar vendedor"
                     : "Agregar vendedor"}
                 </h2>
                 {isEditMode && (
-                  <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-1 text-xs text-dash-muted">
                     Los cambios se aplican al guardar. La contraseña solo cambia
                     si escribes una nueva.
                   </p>
@@ -476,7 +476,7 @@ export default function AgregarVendedorSection() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl border border-[#e0e0e0] bg-white px-3 text-sm font-medium text-[#616161] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:bg-[#2a2a2a] dark:text-[#b0b0b0] dark:hover:bg-[#333]"
+                  className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-xl border border-dash-line bg-white px-3 text-sm font-medium text-dash-muted transition-colors hover:bg-dash-hover dark:bg-[#2a2a2a]"
                 >
                   <HugeiconsIcon icon={Cancel01Icon} size={16} />
                   Cancelar
@@ -490,7 +490,7 @@ export default function AgregarVendedorSection() {
 
             {!canCreateVendedores && !isEditMode ? (
               <div className="px-4 py-8 text-center sm:px-5">
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                <p className="text-sm text-dash-muted">
                   Puedes editar vendedores desde la lista
                   {canEditVendedores ? " a la derecha" : ""}. No tienes permiso
                   para crear altas nuevas.
@@ -499,7 +499,7 @@ export default function AgregarVendedorSection() {
             ) : (
               <div className="space-y-6 px-4 py-5 sm:px-5">
                 <section className="space-y-3">
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-dash-faint dark:text-[#888]">
                     Identidad
                   </h3>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -575,7 +575,7 @@ export default function AgregarVendedorSection() {
                 </section>
 
                 <section className="space-y-3">
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-dash-faint dark:text-[#888]">
                     Acceso al panel
                   </h3>
                   <div>
@@ -594,7 +594,7 @@ export default function AgregarVendedorSection() {
                       autoComplete="email"
                       className={fieldClass}
                     />
-                    <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <p className="mt-1.5 text-xs text-dash-muted">
                       Con este correo inicia sesión. Debe ser único.
                     </p>
                   </div>
@@ -656,7 +656,7 @@ export default function AgregarVendedorSection() {
                 </section>
 
                 <section className="space-y-3">
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-dash-faint dark:text-[#888]">
                     Comercial
                   </h3>
                   <div>
@@ -686,7 +686,7 @@ export default function AgregarVendedorSection() {
                   </div>
                   <label
                     htmlFor="agregar-vendedor-verified"
-                    className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border border-[#e0e0e0] bg-white/80 px-3 py-2.5 dark:border-[#3a3a3a] dark:bg-[#2a2a2a]/80"
+                    className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border border-dash-line bg-white/80 px-3 py-2.5 dark:bg-[#2a2a2a]/80"
                   >
                     <input
                       id="agregar-vendedor-verified"
@@ -695,9 +695,9 @@ export default function AgregarVendedorSection() {
                       onChange={(e) =>
                         setSalesPersonVerified(e.target.checked)
                       }
-                      className="size-4 rounded border-[#e0e0e0] text-orange-500 focus:ring-orange-500 dark:border-[#3a3a3a]"
+                      className="size-4 rounded border-dash-line text-orange-500 focus:ring-orange-500"
                     />
-                    <span className="text-sm font-medium text-[#212121] dark:text-[#e0e0e0]">
+                    <span className="text-sm font-medium text-dash-ink dark:text-[#e0e0e0]">
                       Marcar como vendedor verificado
                     </span>
                   </label>
@@ -710,12 +710,12 @@ export default function AgregarVendedorSection() {
                   </p>
                 )}
 
-                <div className="flex flex-col-reverse gap-2 border-t border-[#e8e8e8] pt-4 dark:border-[#333] sm:flex-row sm:justify-end">
+                <div className="flex flex-col-reverse gap-2 border-t border-dash-line pt-4 sm:flex-row sm:justify-end">
                   {isEditMode && (
                     <button
                       type="button"
                       onClick={resetForm}
-                      className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#e0e0e0] bg-white px-4 text-sm font-medium text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:bg-[#2a2a2a] dark:text-[#e0e0e0] dark:hover:bg-[#333]"
+                      className="inline-flex min-h-11 items-center justify-center rounded-xl border border-dash-line bg-white px-4 text-sm font-medium text-dash-ink transition-colors hover:bg-dash-hover dark:bg-[#2a2a2a] dark:text-[#e0e0e0]"
                     >
                       Cancelar edición
                     </button>
@@ -723,7 +723,7 @@ export default function AgregarVendedorSection() {
                   <button
                     type="submit"
                     disabled={!canSubmit}
-                    className="inline-flex min-h-11 items-center justify-center rounded-xl bg-orange-500 px-5 text-sm font-semibold text-white shadow-sm shadow-orange-500/25 transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] hover:bg-orange-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full dash-grad-accent px-5 text-sm font-semibold text-white shadow-sm shadow-orange-500/25 transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] hover:shadow-dash-accent-lift active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 shadow-dash-accent"
                   >
                     {creating
                       ? "Agregando…"
@@ -741,16 +741,16 @@ export default function AgregarVendedorSection() {
 
         {/* Lista */}
         <aside className="order-2 lg:col-span-2 lg:order-2 lg:sticky lg:top-24">
-          <div className="overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
-            <div className="border-b border-[#e0e0e0] px-4 py-3 dark:border-[#3a3a3a]">
-              <h2 className="text-base font-bold text-[#212121] dark:text-white">
+          <div className="overflow-hidden rounded-3xl border border-dash-line bg-dash-surface shadow-sm">
+            <div className="border-b border-dash-line px-4 py-3">
+              <h2 className="text-base font-bold text-dash-ink">
                 Equipo actual
               </h2>
-              <p className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              <p className="mt-0.5 text-xs text-dash-muted">
                 Toca editar para cargar sus datos en el formulario.
               </p>
               <div className="relative mt-3">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9e9e9e]">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint">
                   <HugeiconsIcon icon={Search01Icon} size={16} />
                 </span>
                 <input
@@ -766,7 +766,7 @@ export default function AgregarVendedorSection() {
 
             <div className="max-h-[min(60vh,520px)] overflow-y-auto overscroll-contain p-3">
               {!companyId ? (
-                <p className="px-2 py-6 text-center text-sm text-[#616161] dark:text-[#b0b0b0]">
+                <p className="px-2 py-6 text-center text-sm text-dash-muted">
                   Sin empresa asignada. No se pueden listar vendedores.
                 </p>
               ) : listLoading ? (
@@ -774,21 +774,21 @@ export default function AgregarVendedorSection() {
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div
                       key={i}
-                      className="h-16 animate-pulse rounded-xl bg-[#f0f0f0] dark:bg-[#2a2a2a]"
+                      className="h-16 dash-shimmer rounded-xl"
                     />
                   ))}
                 </div>
               ) : vendedores.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-[#e0e0e0] px-4 py-8 text-center dark:border-[#3a3a3a]">
-                  <p className="text-sm font-medium text-[#212121] dark:text-white">
+                <div className="rounded-xl border border-dashed border-dash-line px-4 py-8 text-center">
+                  <p className="text-sm font-medium text-dash-ink">
                     Aún no hay vendedores
                   </p>
-                  <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-1 text-xs text-dash-muted">
                     Completa el formulario para dar de alta al primero.
                   </p>
                 </div>
               ) : filteredVendedores.length === 0 ? (
-                <p className="px-2 py-6 text-center text-sm text-[#616161] dark:text-[#b0b0b0]">
+                <p className="px-2 py-6 text-center text-sm text-dash-muted">
                   Nadie coincide con “{listSearch.trim()}”.
                 </p>
               ) : (
@@ -803,16 +803,16 @@ export default function AgregarVendedorSection() {
                         className={`rounded-xl border p-3 transition-colors ${
                           selected
                             ? "border-orange-500 bg-orange-500/[0.06] dark:bg-orange-500/10"
-                            : "border-[#e8e8e8] bg-[#fafafa] dark:border-[#333] dark:bg-[#252525]"
+                            : "border-dash-line bg-dash-surface-2"
                         }`}
                       >
                         <div className="flex items-start gap-3">
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-xs font-semibold text-orange-600 dark:bg-orange-500/20 dark:text-orange-300">
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-500/10 text-xs font-semibold text-orange-600 dark:bg-orange-500/20 dark:text-orange-300">
                             {initials(v.name ?? "", v.lastName)}
                           </span>
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-1.5">
-                              <p className="truncate text-sm font-semibold text-[#212121] dark:text-white">
+                              <p className="truncate text-sm font-semibold text-dash-ink">
                                 {fullName}
                               </p>
                               {user?.id === v.id && (
@@ -830,20 +830,20 @@ export default function AgregarVendedorSection() {
                               )}
                             </div>
                             {v.email && (
-                              <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-[#616161] dark:text-[#b0b0b0]">
+                              <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-dash-muted">
                                 <HugeiconsIcon icon={Mail01Icon} size={12} />
                                 {v.email}
                               </p>
                             )}
                             {v.phone && (
-                              <p className="mt-0.5 flex items-center gap-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                              <p className="mt-0.5 flex items-center gap-1 text-xs text-dash-muted">
                                 <HugeiconsIcon icon={CallIcon} size={12} />
                                 {v.phone}
                               </p>
                             )}
                             <div className="mt-2 flex flex-wrap items-center gap-2">
                               {v.salesComission != null && (
-                                <span className="rounded-md bg-[#eee] px-2 py-0.5 text-xs font-medium text-[#616161] dark:bg-[#333] dark:text-[#b0b0b0]">
+                                <span className="rounded-md bg-dash-surface-2 px-2 py-0.5 text-xs font-medium text-dash-muted">
                                   {v.salesComission}% comisión
                                 </span>
                               )}

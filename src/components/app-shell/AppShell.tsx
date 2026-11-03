@@ -5,6 +5,7 @@ import { MotionConfig } from "framer-motion";
 import { cn } from "kadesh/utils/cn";
 import AppSidebar, { type AppNavGroup } from "./AppSidebar";
 import AppTopBar, { type AppCrumb } from "./AppTopBar";
+import { useSidebarCollapsed } from "./useSidebarCollapsed";
 
 /**
  * Shell de los paneles internos (hoy Operaciones; después el panel de clientes): menú lateral
@@ -22,6 +23,8 @@ export default function AppShell({
   crumbs,
   actions,
   showNotifications = false,
+  collapsibleStorageKey,
+  navDataTour,
   children,
 }: {
   brandTitle: string;
@@ -30,9 +33,14 @@ export default function AppShell({
   crumbs: AppCrumb[];
   actions?: ReactNode;
   showNotifications?: boolean;
+  /** Con una llave, el menú se puede colapsar a solo iconos en escritorio y se recuerda. */
+  collapsibleStorageKey?: string;
+  /** Ancla de tutorial para todo el menú. */
+  navDataTour?: string;
   children: ReactNode;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [collapsed, setCollapsed] = useSidebarCollapsed(collapsibleStorageKey);
   const wasOpen = useRef(false);
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
@@ -66,7 +74,12 @@ export default function AppShell({
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="kd-dash font-dash min-h-dvh lg:grid lg:grid-cols-[272px_minmax(0,1fr)]">
+      <div
+        className={cn(
+          "kd-dash font-dash min-h-dvh lg:grid lg:transition-[grid-template-columns] lg:duration-300",
+          collapsed ? "lg:grid-cols-[84px_minmax(0,1fr)]" : "lg:grid-cols-[272px_minmax(0,1fr)]",
+        )}
+      >
         <a
           href="#app-content"
           className="fixed left-3 top-3 z-[70] -translate-y-[160%] rounded-full bg-dash-ink px-4 py-2 text-sm font-semibold text-dash-on-ink transition-transform focus:translate-y-0"
@@ -81,6 +94,9 @@ export default function AppShell({
           open={menuOpen}
           onClose={closeMenu}
           layoutGroupId="app-nav"
+          collapsed={collapsed}
+          onToggleCollapsed={collapsibleStorageKey ? () => setCollapsed(!collapsed) : undefined}
+          navDataTour={navDataTour}
         />
 
         <div

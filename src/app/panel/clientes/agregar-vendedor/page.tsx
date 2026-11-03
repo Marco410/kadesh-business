@@ -1,16 +1,14 @@
 "use client";
 
-import { Footer, Navigation } from "kadesh/components/layout";
+import PanelShell from "kadesh/components/panel/PanelShell";
 import AgregarVendedorSection from "kadesh/components/profile/sales/agregar-vendedor/AgregarVendedorSection";
 
 export default function AgregarVendedorPage() {
   return (
-    <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#121212]">
-      <Navigation />
-      <main className="pt-20 pb-12">
+    <PanelShell selectedTab="vendedores" title="Agregar vendedor">
+      <div className="pb-6">
         <AgregarVendedorSection />
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </PanelShell>
   );
 }
