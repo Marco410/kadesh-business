@@ -62,7 +62,7 @@ function ComponentBars({
         const points = health.components[part.key];
         return (
           <div key={part.key} title={`${part.label}: ${points} de ${part.max}`} className="min-w-0">
-            <div className="h-1.5 overflow-hidden rounded-full bg-[#f0f0f0] dark:bg-[#2a2a2a]">
+            <div className="h-1.5 overflow-hidden rounded-full bg-dash-surface-2">
               <div
                 className={cn(
                   "h-full rounded-full",
@@ -76,7 +76,7 @@ function ComponentBars({
               />
             </div>
             {showLabels ? (
-              <p className="mt-1 truncate text-[10px] text-[#9e9e9e]">{part.label}</p>
+              <p className="mt-1 truncate text-[10px] text-dash-faint">{part.label}</p>
             ) : null}
           </div>
         );
@@ -238,8 +238,8 @@ export default function HealthPanel() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="font-semibold text-[#212121] dark:text-white">{health.companyName}</p>
-                      <p className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <p className="font-semibold text-dash-ink">{health.companyName}</p>
+                      <p className="mt-0.5 text-xs text-dash-muted">
                         {health.planName ?? "Sin plan"}
                       </p>
                     </div>
@@ -257,7 +257,7 @@ export default function HealthPanel() {
                   <div className="mt-3">
                     <ComponentBars health={health} />
                   </div>
-                  <p className="mt-2 text-xs text-[#9e9e9e]">{teamLine(health)}</p>
+                  <p className="mt-2 text-xs text-dash-faint">{teamLine(health)}</p>
                 </button>
               </li>
             ))}
@@ -265,7 +265,7 @@ export default function HealthPanel() {
 
           <div className={cn(surfaceClass, "relative hidden overflow-x-auto lg:block")}>
             <table className="w-full min-w-[1040px] text-left text-sm">
-              <thead className="border-b border-[#e8e8e8] text-xs uppercase tracking-wide text-[#616161] dark:border-[#333] dark:text-[#b0b0b0]">
+              <thead className="border-b border-dash-line text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                 <tr>
                   <th className="px-4 py-3">Empresa</th>
                   <th className="px-4 py-3">
@@ -301,7 +301,7 @@ export default function HealthPanel() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+              <tbody className="divide-y divide-dash-line">
                 {rows.map((health) => (
                   <tr
                     key={health.companyId}
@@ -315,18 +315,18 @@ export default function HealthPanel() {
                           e.stopPropagation();
                           openCompany(health.companyId);
                         }}
-                        className="rounded text-left font-semibold text-[#212121] hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:text-white dark:hover:text-orange-400 cursor-pointer"
+                        className="rounded text-left font-semibold text-dash-ink hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:hover:text-orange-400 cursor-pointer"
                       >
                         {health.companyName}
                       </button>
                       <div className="mt-1 flex flex-wrap items-center gap-2">
-                        <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                        <span className="text-xs text-dash-muted">
                           {health.planName ?? "Sin plan"}
                         </span>
                         <SubscriptionStatusBadge status={health.subscriptionStatus} />
                       </div>
                       {health.accountManager ? (
-                        <p className="mt-1 text-xs text-[#9e9e9e]">
+                        <p className="mt-1 text-xs text-dash-faint">
                           Cuenta de {formatPersonName(health.accountManager.name, health.accountManager.lastName)}
                         </p>
                       ) : null}
@@ -341,21 +341,21 @@ export default function HealthPanel() {
                       {health.flags.length ? (
                         <HealthSignals flags={health.flags} />
                       ) : (
-                        <span className="text-xs text-[#9e9e9e]">—</span>
+                        <span className="text-xs text-dash-faint">—</span>
                       )}
                     </td>
                     <td className="px-4 py-3 align-top">
                       <ComponentBars health={health} showLabels={false} />
                     </td>
-                    <td className="px-4 py-3 align-top text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <td className="px-4 py-3 align-top text-xs text-dash-muted">
                       <p className="tabular-nums">
                         {health.activeUsers} de {health.teamSize} entraron
                       </p>
-                      <p className="mt-0.5 text-[#9e9e9e]">
+                      <p className="mt-0.5 text-dash-faint">
                         {health.lastSeenAt ? formatDate(health.lastSeenAt) : "Nadie ha entrado"}
                       </p>
                     </td>
-                    <td className="px-2 py-3 align-top text-[#9e9e9e]">
+                    <td className="px-2 py-3 align-top text-dash-faint">
                       <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
                     </td>
                   </tr>

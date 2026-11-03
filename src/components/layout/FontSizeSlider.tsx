@@ -18,8 +18,8 @@ import {
 const PANEL_WIDTH_PX = 252;
 
 type FontSizeSliderProps = {
-  /** Nav over a dark/orange field vs. light bar. */
-  tone: "onDark" | "onLight";
+  /** Nav over a dark/orange field vs. light bar; `panel` = barra de los paneles (app-shell). */
+  tone: "onDark" | "onLight" | "panel";
   className?: string;
 };
 
@@ -96,6 +96,7 @@ export default function FontSizeSlider({
   }, [open]);
 
   const onDark = tone === "onDark";
+  const inPanel = tone === "panel";
   const percent = Math.round(scale * 100);
 
   const panel =
@@ -178,12 +179,14 @@ export default function FontSizeSlider({
         aria-haspopup="dialog"
         className={cn(
           "inline-flex shrink-0 items-center justify-center rounded-lg font-semibold leading-none transition-colors disabled:opacity-60",
-          onDark
-            ? "text-white hover:bg-white/10"
-            : "text-gray-800 hover:bg-gray-100",
+          inPanel
+            ? "rounded-full bg-dash-surface-2 text-dash-soft hover:bg-dash-surface-3 hover:text-dash-ink"
+            : onDark
+              ? "text-white hover:bg-white/10"
+              : "text-gray-800 hover:bg-gray-100",
           className,
         )}
-        style={{ width: 36, height: 36, fontSize: 13 }}
+        style={{ width: inPanel ? 40 : 36, height: inPanel ? 40 : 36, fontSize: 13 }}
       >
         <span aria-hidden className="flex items-end gap-px">
           <span style={{ fontSize: 11 }}>A</span>

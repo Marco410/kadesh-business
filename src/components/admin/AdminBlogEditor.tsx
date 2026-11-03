@@ -517,7 +517,7 @@ export default function AdminBlogEditor({
       onValueChange={(next) => onChange(next as BlogDocument)}
     >
       <div
-        className={`overflow-hidden rounded-xl border border-[#e0e0e0] bg-white dark:border-[#3a3a3a] dark:bg-[#1e1e1e] ${
+        className={`overflow-hidden rounded-xl border border-dash-line bg-dash-surface ${
           expanded ? "min-h-[70vh]" : ""
         }`}
       >
@@ -530,7 +530,7 @@ export default function AdminBlogEditor({
           renderLeaf={renderLeaf}
           placeholder="Escribe el artículo…"
           spellCheck
-          className="min-h-56 px-3 py-3 text-sm leading-relaxed text-[#212121] outline-none dark:text-white [&_a]:text-orange-600 [&_a]:underline [&_blockquote]:my-3 [&_blockquote]:border-l-2 [&_blockquote]:border-orange-500 [&_blockquote]:pl-3 [&_h1]:mb-2 [&_h1]:mt-4 [&_h1]:text-2xl [&_h1]:font-bold [&_h2]:mb-2 [&_h2]:mt-3 [&_h2]:text-xl [&_h2]:font-bold [&_h3]:mb-1 [&_h3]:mt-3 [&_h3]:text-lg [&_h3]:font-bold [&_h4]:mt-2 [&_h4]:text-base [&_h4]:font-bold [&_li]:my-1 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_pre]:my-3 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-black/5 [&_pre]:p-3 [&_pre]:font-mono [&_pre]:text-[13px] dark:[&_pre]:bg-white/10 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5"
+          className="min-h-56 px-3 py-3 text-sm leading-relaxed text-dash-ink outline-none [&_a]:text-orange-600 [&_a]:underline [&_blockquote]:my-3 [&_blockquote]:border-l-2 [&_blockquote]:border-orange-500 [&_blockquote]:pl-3 [&_h1]:mb-2 [&_h1]:mt-4 [&_h1]:text-2xl [&_h1]:font-bold [&_h2]:mb-2 [&_h2]:mt-3 [&_h2]:text-xl [&_h2]:font-bold [&_h3]:mb-1 [&_h3]:mt-3 [&_h3]:text-lg [&_h3]:font-bold [&_h4]:mt-2 [&_h4]:text-base [&_h4]:font-bold [&_li]:my-1 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_pre]:my-3 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-black/5 [&_pre]:p-3 [&_pre]:font-mono [&_pre]:text-[13px] dark:[&_pre]:bg-white/10 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5"
           onKeyDown={(event) => {
             if (!(event.metaKey || event.ctrlKey)) return;
             if (event.key.toLowerCase() === "b") {
@@ -590,7 +590,7 @@ function Toolbar({
   }
 
   return (
-    <div className="border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
+    <div className="border-b border-dash-line">
       <div className="flex flex-wrap items-center gap-1 p-1">
         <div className="relative shrink-0">
           <button
@@ -602,12 +602,12 @@ function Toolbar({
               setBlockOpen((open) => !open);
               setMoreOpen(false);
             }}
-            className="h-11 min-w-28 rounded-lg px-3 text-left text-sm font-semibold text-[#212121] dark:text-white cursor-pointer hover:bg-black/5 dark:hover:bg-white/10"
+            className="h-11 min-w-28 rounded-lg px-3 text-left text-sm font-semibold text-dash-ink cursor-pointer hover:bg-dash-hover"
           >
             {blockLabel}
           </button>
           {blockOpen ? (
-            <div className="absolute left-0 top-12 z-20 w-40 rounded-xl border border-[#e0e0e0] bg-white p-1 shadow-lg dark:border-[#3a3a3a] dark:bg-[#2a2a2a]">
+            <div className="absolute left-0 top-12 z-20 w-40 rounded-2xl border border-dash-line bg-dash-surface p-1 shadow-dash-lift">
               {BLOCKS.map((item) => (
                 <button
                   key={item.id}
@@ -617,7 +617,7 @@ function Toolbar({
                     run(() => setBlock(editor, item.id));
                     setBlockOpen(false);
                   }}
-                  className="flex h-11 w-full items-center rounded-lg px-3 text-left text-sm font-medium text-[#212121] hover:bg-black/5 dark:text-white dark:hover:bg-white/10 cursor-pointer"
+                  className="flex h-11 w-full items-center rounded-lg px-3 text-left text-sm font-medium text-dash-ink hover:bg-dash-hover cursor-pointer"
                 >
                   {item.label}
                 </button>
@@ -653,7 +653,7 @@ function Toolbar({
             <span className="text-base font-bold leading-none">…</span>
           </ToolButton>
           {moreOpen ? (
-            <div className="absolute left-0 top-12 z-20 w-44 rounded-xl border border-[#e0e0e0] bg-white p-1 shadow-lg dark:border-[#3a3a3a] dark:bg-[#2a2a2a]">
+            <div className="absolute left-0 top-12 z-20 w-44 rounded-2xl border border-dash-line bg-dash-surface p-1 shadow-dash-lift">
               <MenuMark editor={editor} mark="underline" label="Subrayado" icon={TextUnderlineIcon} onDone={() => setMoreOpen(false)} />
               <MenuMark editor={editor} mark="strikethrough" label="Tachado" icon={TextStrikethroughIcon} onDone={() => setMoreOpen(false)} />
               <MenuMark editor={editor} mark="code" label="Código" icon={CodeIcon} onDone={() => setMoreOpen(false)} />
@@ -663,7 +663,7 @@ function Toolbar({
           ) : null}
         </div>
 
-        <span className="mx-1 h-6 w-px shrink-0 bg-[#e0e0e0] dark:bg-[#3a3a3a]" />
+        <span className="mx-1 h-6 w-px shrink-0 bg-dash-surface-3" />
 
         <ToolButton
           label="Lista"
@@ -680,7 +680,7 @@ function Toolbar({
           <HugeiconsIcon icon={LeftToRightListNumberIcon} size={18} />
         </ToolButton>
 
-        <span className="mx-1 h-6 w-px shrink-0 bg-[#e0e0e0] dark:bg-[#3a3a3a]" />
+        <span className="mx-1 h-6 w-px shrink-0 bg-dash-surface-3" />
 
         <ToolButton label="Separador" onClick={() => run(() => insertDivider(editor))}>
           <HugeiconsIcon icon={MinusSignIcon} size={18} />
@@ -707,7 +707,7 @@ function Toolbar({
           <HugeiconsIcon icon={CodeIcon} size={18} />
         </ToolButton>
 
-        <span className="mx-1 h-6 w-px shrink-0 bg-[#e0e0e0] dark:bg-[#3a3a3a]" />
+        <span className="mx-1 h-6 w-px shrink-0 bg-dash-surface-3" />
 
         <ToolButton
           label={expanded ? "Reducir editor" : "Ampliar editor"}
@@ -719,7 +719,7 @@ function Toolbar({
       </div>
 
       {linkOpen ? (
-        <div className="flex flex-col gap-2 border-t border-[#e0e0e0] p-2 sm:flex-row dark:border-[#3a3a3a]">
+        <div className="flex flex-col gap-2 border-t border-dash-line p-2 sm:flex-row">
           <label className="sr-only" htmlFor="blog-link-href">
             Dirección del enlace
           </label>
@@ -734,7 +734,7 @@ function Toolbar({
               setLinkOpen(false);
             }}
             placeholder="https://"
-            className="h-11 min-w-0 flex-1 rounded-lg border border-[#e0e0e0] bg-white px-3 text-sm text-[#212121] dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white"
+            className="h-11 min-w-0 flex-1 rounded-lg border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink"
           />
           <button
             type="button"
@@ -755,7 +755,7 @@ function Toolbar({
                 run(() => removeLink(editor));
                 setLinkOpen(false);
               }}
-              className="h-11 rounded-lg px-3 text-sm font-semibold text-[#616161] cursor-pointer"
+              className="h-11 rounded-lg px-3 text-sm font-semibold text-dash-muted cursor-pointer"
             >
               Quitar
             </button>
@@ -788,7 +788,7 @@ function ToolButton({
       className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 ${
         selected
           ? "bg-orange-500/15 text-orange-700 dark:text-orange-300"
-          : "text-[#424242] hover:bg-black/5 dark:text-[#e0e0e0] dark:hover:bg-white/10"
+          : "text-dash-soft hover:bg-dash-hover"
       }`}
     >
       {children}
@@ -821,7 +821,7 @@ function MenuMark({
       className={`flex h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-sm font-medium cursor-pointer ${
         isMarkActive(editor, mark)
           ? "bg-orange-500/15 text-orange-700 dark:text-orange-300"
-          : "text-[#212121] hover:bg-black/5 dark:text-white dark:hover:bg-white/10"
+          : "text-dash-ink hover:bg-dash-hover"
       }`}
     >
       {icon ? <HugeiconsIcon icon={icon} size={16} /> : null}
@@ -870,7 +870,7 @@ function renderElement({ attributes, children, element }: RenderElementProps) {
     case "divider":
       return (
         <div {...attributes} className="py-2">
-          <hr contentEditable={false} className="border-[#e0e0e0] dark:border-[#3a3a3a]" />
+          <hr contentEditable={false} className="border-dash-line" />
           {children}
         </div>
       );
@@ -891,7 +891,7 @@ function renderLeaf({ attributes, children, leaf }: RenderLeafProps) {
   if (leaf.strikethrough) content = <s>{content}</s>;
   if (leaf.code) {
     content = (
-      <code className="rounded bg-black/5 px-1 font-mono text-[0.92em] dark:bg-white/10">
+      <code className="rounded bg-dash-surface-2 px-1 font-mono text-[0.92em]">
         {content}
       </code>
     );

@@ -28,10 +28,10 @@ import {
 } from "./ui";
 
 const fieldClass =
-  "h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
+  "h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
 
 const labelClass =
-  "block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1";
+  "block text-xs font-medium text-dash-muted mb-1";
 
 /**
  * Nombre y descripción globales: lista + editor (no una tarjeta por módulo).
@@ -194,7 +194,7 @@ function AdminPlanModulesForm({
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+      <p className="text-sm text-dash-muted">
         Texto único para precios y todos los planes. Elige un módulo, edítalo y
         guarda cuando termines.
       </p>
@@ -208,17 +208,17 @@ function AdminPlanModulesForm({
         {/* Lista */}
         <div
           className={cn(
-            "flex flex-col border-[#e0e0e0] dark:border-[#3a3a3a] lg:border-r",
+            "flex flex-col border-dash-line lg:border-r",
             mobileEditing ? "hidden lg:flex" : "flex",
           )}
         >
-          <div className="p-3 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
+          <div className="p-3 border-b border-dash-line">
             <AdminSearchInput
               value={search}
               onChange={setSearch}
               placeholder="Buscar módulo"
             />
-            <p className="mt-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <p className="mt-2 text-xs text-dash-muted">
               {filtered.length} de {draft.length}
               {dirtyKeys.size > 0
                 ? ` · ${dirtyKeys.size} sin guardar`
@@ -226,12 +226,12 @@ function AdminPlanModulesForm({
             </p>
           </div>
           <ul
-            className="flex-1 overflow-y-auto max-h-[50vh] lg:max-h-none divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]"
+            className="flex-1 overflow-y-auto max-h-[50vh] lg:max-h-none divide-y divide-dash-line"
             role="listbox"
             aria-label="Módulos"
           >
             {filtered.length === 0 ? (
-              <li className="px-4 py-8 text-sm text-center text-[#616161] dark:text-[#b0b0b0]">
+              <li className="px-4 py-8 text-sm text-center text-dash-muted">
                 Ningún módulo coincide con la búsqueda.
               </li>
             ) : (
@@ -259,12 +259,12 @@ function AdminPlanModulesForm({
                               "block text-sm font-semibold truncate",
                               active
                                 ? "text-orange-700 dark:text-orange-300"
-                                : "text-[#212121] dark:text-white",
+                                : "text-dash-ink",
                             )}
                           >
                             {f.name || "Sin nombre"}
                           </span>
-                          <span className="block text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5 line-clamp-2">
+                          <span className="block text-xs text-dash-muted mt-0.5 line-clamp-2">
                             {f.description || "Sin descripción"}
                           </span>
                         </span>
@@ -293,34 +293,34 @@ function AdminPlanModulesForm({
         >
           {selected ? (
             <>
-              <div className="px-4 sm:px-5 py-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a] flex items-start gap-3">
+              <div className="px-4 sm:px-5 py-4 border-b border-dash-line flex items-start gap-3">
                 <button
                   type="button"
                   onClick={() => setMobileEditing(false)}
-                  className="lg:hidden h-11 w-11 shrink-0 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] inline-flex items-center justify-center cursor-pointer"
+                  className="lg:hidden h-11 w-11 shrink-0 rounded-xl border border-dash-line inline-flex items-center justify-center cursor-pointer"
                   aria-label="Volver a la lista"
                 >
                   <HugeiconsIcon icon={ArrowLeft01Icon} size={18} />
                 </button>
                 <div className="min-w-0 flex-1">
-                  <h2 className="text-lg font-bold text-[#212121] dark:text-white truncate">
+                  <h2 className="text-lg font-bold text-dash-ink truncate">
                     {selected.name || "Sin nombre"}
                   </h2>
                   {includedIn.length > 0 ? (
                     <div className="mt-2 flex flex-wrap gap-1.5">
-                      <span className="text-xs text-[#616161] dark:text-[#b0b0b0] self-center mr-0.5">
+                      <span className="text-xs text-dash-muted self-center mr-0.5">
                         Incluido en
                       </span>
                       {includedIn.map((name) => (
                         <AdminStatusBadge
                           key={name}
                           label={name}
-                          className="bg-black/5 dark:bg-white/10 text-[#616161] dark:text-[#b0b0b0]"
+                          className="bg-dash-surface-2 text-dash-muted"
                         />
                       ))}
                     </div>
                   ) : (
-                    <p className="mt-1 text-xs text-[#9e9e9e]">
+                    <p className="mt-1 text-xs text-dash-faint">
                       Ningún plan lo tiene incluido todavía
                     </p>
                   )}
@@ -361,16 +361,16 @@ function AdminPlanModulesForm({
                     }
                     disabled={saving}
                     rows={5}
-                    className="w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 resize-y min-h-[8rem]"
+                    className="w-full rounded-xl border border-dash-line bg-dash-surface px-3 py-2.5 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 resize-y min-h-[8rem]"
                   />
-                  <p className="mt-1.5 text-xs text-[#9e9e9e]">
+                  <p className="mt-1.5 text-xs text-dash-faint">
                     Este texto se ve igual en Free, Starter, Pro y Agencia.
                   </p>
                 </label>
               </div>
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center p-8 text-sm text-[#616161] dark:text-[#b0b0b0]">
+            <div className="flex-1 flex items-center justify-center p-8 text-sm text-dash-muted">
               Elige un módulo de la lista.
             </div>
           )}
@@ -385,7 +385,7 @@ function AdminPlanModulesForm({
           isDirty && "border-orange-300 dark:border-orange-600",
         )}
       >
-        <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <p className="text-sm text-dash-muted">
           {isDirty
             ? `${dirtyKeys.size} módulo${dirtyKeys.size === 1 ? "" : "s"} con cambios. Se aplican a todos los planes.`
             : "Sin cambios pendientes."}
@@ -395,7 +395,7 @@ function AdminPlanModulesForm({
             type="button"
             onClick={discard}
             disabled={saving || !isDirty}
-            className="h-11 rounded-xl px-4 text-sm font-semibold border border-[#e0e0e0] dark:border-[#3a3a3a] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            className="h-11 rounded-full px-4 text-sm font-semibold border border-dash-line cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Descartar
           </button>
@@ -403,7 +403,7 @@ function AdminPlanModulesForm({
             type="button"
             disabled={saving || !isDirty || anyEmptyName}
             onClick={() => void handleSave()}
-            className="h-11 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer"
+            className="h-11 rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer shadow-dash-accent"
           >
             {saving ? "Guardando..." : "Guardar en todos los planes"}
           </button>

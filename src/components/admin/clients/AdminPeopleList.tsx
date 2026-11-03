@@ -41,7 +41,7 @@ const COMPANY_FILTERS = [
 type CompanyFilter = (typeof COMPANY_FILTERS)[number]["value"];
 
 const roleBadgeClass =
-  "bg-black/5 dark:bg-white/10 text-[#424242] dark:text-[#e0e0e0]";
+  "bg-dash-surface-2 text-dash-soft";
 
 export default function AdminPeopleList() {
   const { searchParams, setParams } = useAdminNavigation();
@@ -131,13 +131,13 @@ export default function AdminPeopleList() {
                   onClick={() => openPerson(user.id, user.company?.id)}
                   className={`${surfaceClass} w-full p-4 text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400`}
                 >
-                  <p className="font-semibold text-[#212121] dark:text-white">
+                  <p className="font-semibold text-dash-ink">
                     {formatPersonName(user.name, user.lastName, user.secondLastName)}
                   </p>
-                  <p className="mt-0.5 break-all text-sm text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-0.5 break-all text-sm text-dash-muted">
                     {user.email ?? "Sin correo"}
                   </p>
-                  <p className="mt-2 text-sm text-[#212121] dark:text-white">
+                  <p className="mt-2 text-sm text-dash-ink">
                     {user.company?.name ?? "Sin empresa"}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-1.5">
@@ -149,7 +149,7 @@ export default function AdminPeopleList() {
                       />
                     ))}
                   </div>
-                  <p className="mt-3 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-3 text-xs text-dash-muted">
                     Alta {formatDateShort(user.createdAt, false)} ·{" "}
                     {user.lastLoginAt
                       ? `Último acceso ${formatDate(user.lastLoginAt)}`
@@ -163,7 +163,7 @@ export default function AdminPeopleList() {
           <div className={`${surfaceClass} relative hidden overflow-x-auto md:block`}>
             <table className="w-full min-w-[860px] text-sm">
               <thead>
-                <tr className="border-b border-[#e8e8e8] text-left text-xs uppercase tracking-wide text-[#616161] dark:border-[#333] dark:text-[#b0b0b0]">
+                <tr className="border-b border-dash-line text-left text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                   <th className="px-4 py-3">Persona</th>
                   <th className="px-4 py-3">Rol</th>
                   <th className="px-4 py-3">Empresa</th>
@@ -179,7 +179,7 @@ export default function AdminPeopleList() {
                   <tr
                     key={user.id}
                     onClick={() => openPerson(user.id, user.company?.id)}
-                    className="cursor-pointer border-b border-[#f0f0f0] last:border-0 hover:bg-black/[0.03] dark:border-[#2a2a2a] dark:hover:bg-white/5"
+                    className="cursor-pointer border-b border-dash-line last:border-0 hover:bg-black/[0.03] dark:hover:bg-white/5"
                   >
                     <td className="px-4 py-3 align-top">
                       <button
@@ -188,18 +188,18 @@ export default function AdminPeopleList() {
                           e.stopPropagation();
                           openPerson(user.id, user.company?.id);
                         }}
-                        className="text-left font-semibold text-[#212121] hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 rounded dark:text-white dark:hover:text-orange-400 cursor-pointer"
+                        className="text-left font-semibold text-dash-ink hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 rounded dark:hover:text-orange-400 cursor-pointer"
                       >
                         {formatPersonName(user.name, user.lastName, user.secondLastName)}
                       </button>
-                      <div className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <div className="mt-0.5 text-xs text-dash-muted">
                         {user.email ?? "—"}
                       </div>
                     </td>
                     <td className="px-4 py-3 align-top">
                       <div className="flex flex-wrap gap-1">
                         {(user.roles ?? []).length === 0 ? (
-                          <span className="text-[#9e9e9e]">—</span>
+                          <span className="text-dash-faint">—</span>
                         ) : (
                           user.roles.map((r) => (
                             <AdminStatusBadge
@@ -211,16 +211,16 @@ export default function AdminPeopleList() {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 align-top text-[#212121] dark:text-white">
-                      {user.company?.name ?? <span className="text-[#9e9e9e]">Sin empresa</span>}
+                    <td className="px-4 py-3 align-top text-dash-ink">
+                      {user.company?.name ?? <span className="text-dash-faint">Sin empresa</span>}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 align-top text-[#616161] dark:text-[#b0b0b0]">
+                    <td className="whitespace-nowrap px-4 py-3 align-top text-dash-muted">
                       {formatDateShort(user.createdAt, false)}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 align-top text-[#616161] dark:text-[#b0b0b0]">
+                    <td className="whitespace-nowrap px-4 py-3 align-top text-dash-muted">
                       {user.lastLoginAt ? formatDate(user.lastLoginAt) : "Nunca"}
                     </td>
-                    <td className="px-2 py-3 align-top text-[#9e9e9e]">
+                    <td className="px-2 py-3 align-top text-dash-faint">
                       <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
                     </td>
                   </tr>

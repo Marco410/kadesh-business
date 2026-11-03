@@ -53,7 +53,7 @@ const TYPE_STYLE: Record<string, { icon: IconType; tone: string }> = {
     tone: "bg-green-500/15 text-green-700 dark:text-green-300",
   },
   calendar: { icon: Calendar03Icon, tone: "bg-blue-500/15 text-blue-700 dark:text-blue-300" },
-  admin: { icon: Shield01Icon, tone: "bg-black/5 text-[#424242] dark:bg-white/10 dark:text-[#e0e0e0]" },
+  admin: { icon: Shield01Icon, tone: "bg-dash-surface-2 text-dash-soft" },
   team: { icon: UserSettings01Icon, tone: "bg-teal-500/15 text-teal-700 dark:text-teal-300" },
   product: {
     icon: CursorPointer01Icon,
@@ -252,7 +252,7 @@ function TimelineRow({
             onClick={() => expandable && setOpen((v) => !v)}
             aria-expanded={expandable ? open : undefined}
             className={cn(
-              "min-w-0 text-left text-sm font-medium text-[#212121] dark:text-white",
+              "min-w-0 text-left text-sm font-medium text-dash-ink",
               expandable && "cursor-pointer hover:text-orange-600 dark:hover:text-orange-400",
             )}
           >
@@ -267,7 +267,7 @@ function TimelineRow({
           <time
             dateTime={item.occurredAt}
             title={formatDateShort(item.occurredAt, true)}
-            className="shrink-0 text-xs text-[#9e9e9e]"
+            className="shrink-0 text-xs text-dash-faint"
           >
             {time.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
           </time>
@@ -275,14 +275,14 @@ function TimelineRow({
         {item.detail ? (
           <p
             className={cn(
-              "mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]",
+              "mt-0.5 text-xs text-dash-muted",
               !open && "line-clamp-2",
             )}
           >
             {item.detail}
           </p>
         ) : null}
-        <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-[#9e9e9e]">
+        <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-dash-faint">
           <span>{ACTIVITY_TYPE_LABELS[item.type] ?? item.type}</span>
           {item.actor ? (
             <>
@@ -291,12 +291,12 @@ function TimelineRow({
                 <button
                   type="button"
                   onClick={() => onOpenPerson(item.actor!.id, item.company?.id ?? null)}
-                  className="cursor-pointer font-medium text-[#616161] hover:text-orange-600 dark:text-[#b0b0b0] dark:hover:text-orange-400"
+                  className="cursor-pointer font-medium text-dash-muted hover:text-orange-600 dark:hover:text-orange-400"
                 >
                   {formatPersonName(item.actor.name, item.actor.lastName)}
                 </button>
               ) : (
-                <span className="font-medium text-[#616161] dark:text-[#b0b0b0]">
+                <span className="font-medium text-dash-muted">
                   {formatPersonName(item.actor.name, item.actor.lastName)}
                 </span>
               )}
@@ -309,7 +309,7 @@ function TimelineRow({
                 <button
                   type="button"
                   onClick={() => onOpenCompany(item.company!.id)}
-                  className="cursor-pointer font-medium text-[#616161] hover:text-orange-600 dark:text-[#b0b0b0] dark:hover:text-orange-400"
+                  className="cursor-pointer font-medium text-dash-muted hover:text-orange-600 dark:hover:text-orange-400"
                 >
                   {item.company.name}
                 </button>
@@ -320,11 +320,11 @@ function TimelineRow({
           ) : null}
         </p>
         {open && rows.length ? (
-          <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 rounded-xl bg-[#fafafa] p-3 text-xs dark:bg-[#252525] sm:grid-cols-3">
+          <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 rounded-xl bg-dash-surface-2 p-3 text-xs sm:grid-cols-3">
             {rows.map((row) => (
               <div key={row.key} className="min-w-0">
-                <dt className="text-[#9e9e9e]">{row.label}</dt>
-                <dd className="break-words text-[#212121] dark:text-white">{row.value}</dd>
+                <dt className="text-dash-faint">{row.label}</dt>
+                <dd className="break-words text-dash-ink">{row.value}</dd>
               </div>
             ))}
           </dl>
@@ -376,10 +376,10 @@ export default function ActivityTimeline({
       <div className={cn(surfaceClass, "space-y-3 p-4")} aria-hidden>
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="flex gap-3">
-            <div className="h-9 w-9 rounded-full bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
+            <div className="h-9 w-9 rounded-full dash-shimmer" />
             <div className="flex-1 space-y-2 py-1">
-              <div className="h-3 w-2/3 rounded bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
-              <div className="h-3 w-1/3 rounded bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
+              <div className="h-3 w-2/3 rounded dash-shimmer" />
+              <div className="h-3 w-1/3 rounded dash-shimmer" />
             </div>
           </div>
         ))}
@@ -388,7 +388,7 @@ export default function ActivityTimeline({
   }
   if (items.length === 0) {
     if (bare) {
-      return <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">{emptyDescription}</p>;
+      return <p className="text-sm text-dash-muted">{emptyDescription}</p>;
     }
     return <AdminEmptyState title={emptyTitle} description={emptyDescription} />;
   }
@@ -409,14 +409,14 @@ export default function ActivityTimeline({
           <section key={group.label} className="py-1">
             <h4
               className={cn(
-                "pt-2 pb-1 text-xs font-semibold uppercase tracking-wide text-[#9e9e9e]",
+                "pt-2 pb-1 text-xs font-semibold uppercase tracking-wide text-dash-faint",
                 !bare &&
-                  "sticky top-0 z-[1] -mx-4 bg-white/95 px-4 backdrop-blur dark:bg-[#1e1e1e]/95 sm:-mx-5 sm:px-5",
+                  "sticky top-[3.85rem] z-[1] -mx-4 bg-dash-surface/95 px-4 backdrop-blur sm:-mx-5 sm:px-5 lg:top-[4.75rem]",
               )}
             >
               {group.label}
             </h4>
-            <ul className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+            <ul className="divide-y divide-dash-line">
               {group.items.map((item) => (
                 <TimelineRow
                   key={item.id}

@@ -24,10 +24,10 @@ const MONTH_OPTIONS = [
 function cellClass(ratio: number) {
   if (ratio >= 0.8) return "bg-orange-600 text-white";
   if (ratio >= 0.6) return "bg-orange-500 text-white";
-  if (ratio >= 0.4) return "bg-orange-400/80 text-[#212121]";
-  if (ratio >= 0.2) return "bg-orange-300/60 text-[#212121] dark:text-white";
-  if (ratio > 0) return "bg-orange-200/50 text-[#212121] dark:bg-orange-300/20 dark:text-white";
-  return "bg-[#f5f5f5] text-[#9e9e9e] dark:bg-[#2a2a2a]";
+  if (ratio >= 0.4) return "bg-orange-400/80 text-dash-ink";
+  if (ratio >= 0.2) return "bg-orange-300/60 text-dash-ink";
+  if (ratio > 0) return "bg-orange-200/50 text-dash-ink dark:bg-orange-300/20";
+  return "bg-dash-surface-2 text-dash-faint";
 }
 
 /**
@@ -72,7 +72,7 @@ export default function RetentionPanel() {
         >
           <div className="relative -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
             <table className="w-full min-w-[560px] border-separate border-spacing-1 text-left text-sm">
-              <thead className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+              <thead className="text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                 <tr>
                   <th className="py-1 pr-2 font-medium">Registro</th>
                   <th className="py-1 pr-2 font-medium">Empresas</th>
@@ -88,10 +88,10 @@ export default function RetentionPanel() {
                   const [year, month] = row.month.split("-").map(Number);
                   return (
                     <tr key={row.month}>
-                      <td className="whitespace-nowrap py-1 pr-2 capitalize text-[#212121] dark:text-white">
+                      <td className="whitespace-nowrap py-1 pr-2 capitalize text-dash-ink">
                         {monthLabel(year, month)}
                       </td>
-                      <td className="py-1 pr-2 tabular-nums text-[#616161] dark:text-[#b0b0b0]">{row.size}</td>
+                      <td className="py-1 pr-2 tabular-nums text-dash-muted">{row.size}</td>
                       {Array.from({ length: columns }, (_, index) => {
                         if (index >= row.active.length) return <td key={index} aria-hidden />;
                         const active = row.active[index];
@@ -102,7 +102,7 @@ export default function RetentionPanel() {
                             title={`${active} de ${row.size}`}
                             className={cn(
                               "h-9 min-w-12 rounded-md text-center text-xs font-semibold tabular-nums",
-                              row.size ? cellClass(ratio) : "text-[#9e9e9e]",
+                              row.size ? cellClass(ratio) : "text-dash-faint",
                             )}
                           >
                             {row.size ? `${Math.round(ratio * 100)}%` : "—"}
@@ -115,7 +115,7 @@ export default function RetentionPanel() {
               </tbody>
             </table>
           </div>
-          <p className="mt-3 text-xs text-[#9e9e9e]">
+          <p className="mt-3 text-xs text-dash-faint">
             El mes actual va a medias. Las cuentas de prueba interna no cuentan.
           </p>
         </AdminSectionCard>

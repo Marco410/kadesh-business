@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@apollo/client";
-import { ShareBars } from "kadesh/components/panel/dashboard";
+import { ColumnBars, HBarList } from "kadesh/components/app-shell";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { cn } from "kadesh/utils/cn";
 import { PANEL_SECTION_LABELS, PRODUCT_MODULE_LABELS } from "../constants";
@@ -27,37 +27,28 @@ const DAY_OPTIONS = [
 
 const dayLabel = (day: string) => formatDateShort(`${day}T12:00:00`, false);
 
-/** Barras por día sin etiqueta en cada una (con 30–90 días no caben): fechas de los extremos abajo. */
+/** Barras por día: con 30–90 días no cabe una fecha en cada una, solo las de los extremos. */
 function DailyBars({ series }: { series: Array<{ day: string; users: number }> }) {
-  const max = Math.max(1, ...series.map((point) => point.users));
   if (series.length === 0) return null;
   return (
-    <div>
-      <div className="flex h-32 items-end gap-px sm:gap-0.5" role="img" aria-label="Personas activas por día">
-        {series.map((point) => (
-          <div
-            key={point.day}
-            title={`${dayLabel(point.day)}: ${point.users} persona${point.users === 1 ? "" : "s"}`}
-            className={cn(
-              "flex-1 rounded-t-sm",
-              point.users > 0 ? "bg-orange-500/85 dark:bg-orange-400/80" : "bg-[#e8e8e8] dark:bg-[#2a2a2a]",
-            )}
-            style={{ height: `${Math.max((point.users / max) * 100, point.users > 0 ? 6 : 2)}%` }}
-          />
-        ))}
-      </div>
-      <div className="mt-1.5 flex justify-between text-xs text-[#9e9e9e]">
-        <span>{dayLabel(series[0].day)}</span>
-        <span>{dayLabel(series[series.length - 1].day)}</span>
-      </div>
-    </div>
+    <ColumnBars
+      points={series.map((point) => ({
+        key: point.day,
+        label: dayLabel(point.day),
+        value: point.users,
+        title: `${dayLabel(point.day)}: ${point.users} persona${point.users === 1 ? "" : "s"}`,
+      }))}
+      ariaLabel="Personas activas por día"
+      unitLabel="personas"
+      heightClass="h-40"
+    />
   );
 }
 
 function adoptionClass(ratio: number) {
   if (ratio >= 0.6) return "text-emerald-700 dark:text-emerald-400";
-  if (ratio >= 0.3) return "text-[#212121] dark:text-white";
-  return "text-[#9e9e9e]";
+  if (ratio >= 0.3) return "text-dash-ink";
+  return "text-dash-faint";
 }
 
 export default function EngagementPanel() {
@@ -129,11 +120,11 @@ export default function EngagementPanel() {
           description="Empresas activas o en prueba que usaron cada módulo en los últimos 30 días."
         >
           {engagement.plans.length === 0 ? (
-            <p className="text-sm text-[#9e9e9e]">No hay empresas activas o en prueba.</p>
+            <p className="text-sm text-dash-faint">No hay empresas activas o en prueba.</p>
           ) : (
             <div className="relative -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
               <table className="w-full min-w-[520px] text-left text-sm">
-                <thead className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                <thead className="text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                   <tr>
                     <th className="py-2 pr-3 font-medium">Plan</th>
                     {moduleKeys.map((key) => (
@@ -143,12 +134,12 @@ export default function EngagementPanel() {
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+                <tbody className="divide-y divide-dash-line">
                   {engagement.plans.map((plan) => (
                     <tr key={plan.planName}>
-                      <td className="whitespace-nowrap py-2 pr-3 text-[#212121] dark:text-white">
+                      <td className="whitespace-nowrap py-2 pr-3 text-dash-ink">
                         {plan.planName}
-                        <span className="ml-1 text-xs text-[#9e9e9e]">({plan.companies})</span>
+                        <span className="ml-1 text-xs text-dash-faint">({plan.companies})</span>
                       </td>
                       {plan.modules.map((module) => {
                         const ratio = plan.companies ? module.companies / plan.companies : 0;
@@ -175,7 +166,7 @@ export default function EngagementPanel() {
           description="Veces que se abrió cada sección en los últimos 30 días."
           help={HELP.sections}
         >
-          <ShareBars items={sections} emptyLabel="Todavía no hay visitas registradas." />
+          <HBarList items={sections} emptyLabel="Todavía no hay visitas registradas." />
         </AdminSectionCard>
       </div>
     </div>

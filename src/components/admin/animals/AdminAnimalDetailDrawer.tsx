@@ -36,7 +36,7 @@ import {
 } from "./constants";
 
 const actionLink =
-  "inline-flex h-10 items-center justify-center rounded-xl border border-[#e0e0e0] px-4 text-sm font-semibold text-[#212121] transition-colors hover:border-orange-400 dark:border-[#3a3a3a] dark:text-white";
+  "inline-flex h-10 items-center justify-center rounded-full border border-dash-line px-4 text-sm font-semibold text-dash-ink transition-colors hover:border-orange-400";
 const dangerText = "text-xs font-medium text-red-700 hover:underline disabled:opacity-40 dark:text-red-400";
 
 function personLabel(person: AdminPersonRef | null): string {
@@ -121,7 +121,7 @@ export default function AdminAnimalDetailDrawer({
               type="button"
               onClick={() => void onPublish(animal).then(() => refetch())}
               disabled={publishing}
-              className="inline-flex h-10 items-center justify-center rounded-xl bg-[#1877F2] px-4 text-sm font-semibold text-white hover:bg-[#166FE5] disabled:opacity-50"
+              className="inline-flex h-10 items-center justify-center rounded-full bg-[#1877F2] px-4 text-sm font-semibold text-white hover:bg-[#166FE5] disabled:opacity-50"
             >
               {animal.facebookPublishedAt ? "Volver a publicar en Facebook" : "Publicar en Facebook"}
             </button>
@@ -178,7 +178,7 @@ export default function AdminAnimalDetailDrawer({
               ))}
             </div>
             {detail.viewStats.recentViewers.length > 0 ? (
-              <p className="mt-3 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              <p className="mt-3 text-xs text-dash-muted">
                 Lo vieron hace poco: {detail.viewStats.recentViewers.map(personLabel).join(", ")}
               </p>
             ) : null}
@@ -234,7 +234,7 @@ export default function AdminAnimalDetailDrawer({
               ]}
             />
             {detail.physicalDescription ? (
-              <p className="mt-3 whitespace-pre-line text-sm text-[#424242] dark:text-[#d6d6d6]">
+              <p className="mt-3 whitespace-pre-line text-sm text-dash-soft">
                 {detail.physicalDescription}
               </p>
             ) : null}
@@ -252,19 +252,19 @@ export default function AdminAnimalDetailDrawer({
 
           <AdminSectionCard title="Etapas" description="La más reciente arriba.">
             {detail.logs.length === 0 ? (
-              <p className="text-sm text-[#757575]">Sin etapas.</p>
+              <p className="text-sm text-dash-muted">Sin etapas.</p>
             ) : (
               <ol className="flex flex-col gap-3">
                 {detail.logs.map((log) => (
                   <li key={log.id} className="text-sm">
-                    <span className="font-medium text-[#212121] dark:text-white">
+                    <span className="font-medium text-dash-ink">
                       {ANIMAL_STATUS_LABELS[log.status ?? ""] ?? log.status ?? "—"}
                     </span>
-                    <span className="text-[#9e9e9e]"> · {formatDateShort(log.createdAt)}</span>
-                    <span className="block text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <span className="text-dash-faint"> · {formatDateShort(log.createdAt)}</span>
+                    <span className="block text-xs text-dash-muted">
                       {[log.address, log.city, log.state].filter(Boolean).join(", ")}
                     </span>
-                    {log.notes ? <span className="block text-xs text-[#616161] dark:text-[#b0b0b0]">{log.notes}</span> : null}
+                    {log.notes ? <span className="block text-xs text-dash-muted">{log.notes}</span> : null}
                   </li>
                 ))}
               </ol>
@@ -273,15 +273,15 @@ export default function AdminAnimalDetailDrawer({
 
           <AdminSectionCard title={`Comentarios (${detail.comments.length})`}>
             {detail.comments.length === 0 ? (
-              <p className="text-sm text-[#757575]">Sin comentarios.</p>
+              <p className="text-sm text-dash-muted">Sin comentarios.</p>
             ) : (
               <ul className="flex flex-col gap-3">
                 {detail.comments.map((comment) => (
                   <li key={comment.id} className="flex items-start justify-between gap-3 text-sm">
                     <span className="min-w-0">
-                      <span className="font-medium text-[#212121] dark:text-white">{personLabel(comment.user)}</span>
-                      <span className="text-xs text-[#9e9e9e]"> · {formatDateShort(comment.createdAt)}</span>
-                      <span className="block whitespace-pre-line text-[#424242] [overflow-wrap:anywhere] dark:text-[#d6d6d6]">
+                      <span className="font-medium text-dash-ink">{personLabel(comment.user)}</span>
+                      <span className="text-xs text-dash-faint"> · {formatDateShort(comment.createdAt)}</span>
+                      <span className="block whitespace-pre-line text-dash-soft [overflow-wrap:anywhere]">
                         {comment.comment}
                       </span>
                     </span>
@@ -308,14 +308,14 @@ export default function AdminAnimalDetailDrawer({
 
           <AdminSectionCard title={`Favoritos (${detail.favoritesList.length})`}>
             {detail.favoritesList.length === 0 ? (
-              <p className="text-sm text-[#757575]">Nadie lo ha guardado.</p>
+              <p className="text-sm text-dash-muted">Nadie lo ha guardado.</p>
             ) : (
               <ul className="flex flex-col gap-2">
                 {detail.favoritesList.map((favorite) => (
                   <li key={favorite.id} className="flex items-center justify-between gap-3 text-sm">
                     <span>
-                      <span className="text-[#212121] dark:text-white">{personLabel(favorite.user)}</span>
-                      <span className="text-xs text-[#9e9e9e]"> · {formatDateShort(favorite.createdAt)}</span>
+                      <span className="text-dash-ink">{personLabel(favorite.user)}</span>
+                      <span className="text-xs text-dash-faint"> · {formatDateShort(favorite.createdAt)}</span>
                     </span>
                     <button
                       type="button"

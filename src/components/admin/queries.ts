@@ -102,6 +102,22 @@ const PET_PLACE_SERVICE_FIELDS = gql`
   }
 `;
 
+/** Globos del menú lateral de Operaciones: fichas y servicios esperando revisión. */
+export const ADMIN_NAV_COUNTS_QUERY = gql`
+  query AdminNavCounts(
+    $pendingWhere: PetPlaceWhereInput!
+    $pendingServiceWhere: PetPlaceServiceWhereInput!
+  ) {
+    pendingPlaces: petPlacesCount(where: $pendingWhere)
+    pendingServices: petPlaceServicesCount(where: $pendingServiceWhere)
+  }
+`;
+
+export type AdminNavCountsResponse = {
+  pendingPlaces: number | null;
+  pendingServices: number | null;
+};
+
 export const ADMIN_OVERVIEW_QUERY = gql`
   ${PET_PLACE_FIELDS}
   ${PET_PLACE_SERVICE_FIELDS}

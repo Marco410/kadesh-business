@@ -47,7 +47,7 @@ function ConnectedBadge({ on }: { on: boolean }) {
       className={
         on
           ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-          : "bg-black/5 text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]"
+          : "bg-dash-surface-2 text-dash-muted"
       }
     />
   );
@@ -138,19 +138,19 @@ export default function CompanyIntegrations({
         action={<ConnectedBadge on={accounts.some((a) => a.isActive)} />}
       >
         {accounts.length === 0 ? (
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">Ninguna cuenta conectada.</p>
+          <p className="text-sm text-dash-muted">Ninguna cuenta conectada.</p>
         ) : (
-          <ul className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+          <ul className="divide-y divide-dash-line">
             {accounts.map((a) => (
               <li key={a.id} className="flex flex-col gap-1 py-2 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-[#212121] dark:text-white">
+                  <p className="text-sm font-medium text-dash-ink">
                     {a.googleAccountEmail || "Cuenta de Google"}
-                    <span className="ml-2 text-xs font-normal text-[#9e9e9e]">
+                    <span className="ml-2 text-xs font-normal text-dash-faint">
                       {a.scopeType === "company" ? "Compartida" : "Personal"}
                     </span>
                   </p>
-                  <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="text-xs text-dash-muted">
                     {a.user ? formatPersonName(a.user.name, a.user.lastName) : null}
                     {a.connectedByUser
                       ? ` · conectó ${formatPersonName(a.connectedByUser.name, a.connectedByUser.lastName)}`
@@ -166,7 +166,7 @@ export default function CompanyIntegrations({
                   className={
                     a.isActive
                       ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                      : "bg-black/5 text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]"
+                      : "bg-dash-surface-2 text-dash-muted"
                   }
                 />
               </li>
@@ -175,17 +175,17 @@ export default function CompanyIntegrations({
         )}
         {logs.length ? (
           <div className="mt-4">
-            <p className="text-xs text-[#9e9e9e]">Últimas sincronizaciones</p>
-            <ul className="mt-1.5 divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+            <p className="text-xs text-dash-faint">Últimas sincronizaciones</p>
+            <ul className="mt-1.5 divide-y divide-dash-line">
               {logs.map((log) => (
                 <li key={log.id} className="flex items-center justify-between gap-3 py-1.5 text-xs">
-                  <span className="text-[#212121] dark:text-white">
+                  <span className="text-dash-ink">
                     {OPERATION_LABELS[log.operation ?? ""] ?? log.operation}
                     {log.errorMessage ? (
                       <span className="ml-1 text-red-700 dark:text-red-300">· {log.errorMessage}</span>
                     ) : null}
                   </span>
-                  <span className="shrink-0 text-[#9e9e9e]">
+                  <span className="shrink-0 text-dash-faint">
                     {log.success ? "OK" : "Falló"} · {formatDateShort(log.createdAt, true)}
                   </span>
                 </li>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { DASH_EASE } from "kadesh/components/app-shell";
 import {
   type PlanFeatureKey,
   PLAN_FEATURE_KEYS,
@@ -124,26 +125,26 @@ export default function AdminSubscriptionEditor({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50"
+            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50"
             onClick={onClose}
           />
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 24, scale: 0.98 }}
+            transition={{ duration: 0.3, ease: DASH_EASE }}
             className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none"
           >
             <div
-              className="bg-white dark:bg-[#1e1e1e] rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
+              className="bg-dash-surface rounded-t-3xl sm:rounded-3xl shadow-dash-lift font-dash text-dash-ink w-full max-w-3xl max-h-[92vh] overflow-y-auto pointer-events-auto border border-dash-line"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="sticky top-0 bg-white dark:bg-[#1e1e1e] px-4 sm:px-6 py-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a] flex items-start justify-between gap-3">
+              <div className="sticky top-0 z-[1] bg-dash-surface/95 backdrop-blur px-4 sm:px-6 py-4 border-b border-dash-line flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h3 className="text-xl font-bold text-[#212121] dark:text-white">
+                  <h3 className="text-xl font-bold text-dash-ink">
                     {subscription.company?.name ?? "Empresa sin nombre"}
                   </h3>
-                  <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1">
+                  <p className="text-sm text-dash-muted mt-1">
                     {formatPersonName(contact?.name, contact?.lastName)}
                     {contact?.email ? ` · ${contact.email}` : ""}
                   </p>
@@ -151,7 +152,7 @@ export default function AdminSubscriptionEditor({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="h-11 w-11 rounded-xl text-2xl text-[#616161] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] cursor-pointer"
+                  className="flex size-11 shrink-0 items-center justify-center rounded-full text-2xl leading-none text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-ink cursor-pointer"
                   aria-label="Cerrar"
                 >
                   ×
@@ -160,14 +161,14 @@ export default function AdminSubscriptionEditor({
 
               <div className="px-4 sm:px-6 py-5 flex flex-col gap-5">
                 <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <div className="rounded-xl bg-dash-surface-2 p-3">
+                    <p className="text-xs text-dash-muted">
                       Plan
                     </p>
-                    <p className="mt-1 font-semibold text-[#212121] dark:text-white">
+                    <p className="mt-1 font-semibold text-dash-ink">
                       {subscription.planName ?? "—"}
                     </p>
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1">
+                    <p className="text-xs text-dash-muted mt-1">
                       {formatMoney(
                         subscription.planCost,
                         subscription.planCurrency,
@@ -175,29 +176,29 @@ export default function AdminSubscriptionEditor({
                       {formatPlanFrequency(subscription.planFrequency)}
                     </p>
                   </div>
-                  <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <div className="rounded-xl bg-dash-surface-2 p-3">
+                    <p className="text-xs text-dash-muted">
                       Estado
                     </p>
                     <span
                       className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
                         SUBSCRIPTION_STATUS_CLASSES[
                           subscription.status ?? ""
-                        ] ?? "bg-[#e0e0e0] dark:bg-[#3a3a3a] text-[#616161]"
+                        ] ?? "bg-dash-surface-3 text-dash-muted"
                       }`}
                     >
                       {statusLabel}
                     </span>
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-2">
+                    <p className="text-xs text-dash-muted mt-2">
                       Del plan: {formatCredits(subscription.planLeadLimit)}{" "}
                       / mes
                     </p>
                   </div>
-                  <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <div className="rounded-xl bg-dash-surface-2 p-3">
+                    <p className="text-xs text-dash-muted">
                       Periodo actual
                     </p>
-                    <p className="mt-1 text-sm font-semibold text-[#212121] dark:text-white">
+                    <p className="mt-1 text-sm font-semibold text-dash-ink">
                       {formatDateShort(subscription.activatedAt, false)} →{" "}
                       {formatDateShort(subscription.currentPeriodEnd, false)}
                     </p>
@@ -205,49 +206,49 @@ export default function AdminSubscriptionEditor({
                 </section>
 
                 <section>
-                  <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+                  <h4 className="text-sm font-semibold text-dash-ink">
                     Créditos de este mes
                   </h4>
-                  <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+                  <p className="text-xs text-dash-muted mt-1 mb-3">
                     Los extra se suman ahora y se mantienen cada mes, igual
                     que una recarga.
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-                    <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
-                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <div className="rounded-xl bg-dash-surface-2 p-3">
+                      <p className="text-xs text-dash-muted">
                         Disponibles
                       </p>
-                      <p className="mt-1 text-lg font-semibold text-[#212121] dark:text-white">
+                      <p className="mt-1 text-lg font-semibold text-dash-ink">
                         {formatCredits(credits.remaining)}
                       </p>
                     </div>
-                    <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
-                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <div className="rounded-xl bg-dash-surface-2 p-3">
+                      <p className="text-xs text-dash-muted">
                         Del plan
                       </p>
-                      <p className="mt-1 text-lg font-semibold text-[#212121] dark:text-white">
+                      <p className="mt-1 text-lg font-semibold text-dash-ink">
                         {formatCredits(credits.plan)}
                       </p>
                     </div>
-                    <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
-                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <div className="rounded-xl bg-dash-surface-2 p-3">
+                      <p className="text-xs text-dash-muted">
                         Extra
                       </p>
-                      <p className="mt-1 text-lg font-semibold text-[#212121] dark:text-white">
+                      <p className="mt-1 text-lg font-semibold text-dash-ink">
                         {formatCredits(credits.bonus)}
                       </p>
                     </div>
-                    <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
-                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <div className="rounded-xl bg-dash-surface-2 p-3">
+                      <p className="text-xs text-dash-muted">
                         Usados
                       </p>
-                      <p className="mt-1 text-lg font-semibold text-[#212121] dark:text-white">
+                      <p className="mt-1 text-lg font-semibold text-dash-ink">
                         {formatCredits(credits.used)}
                       </p>
                     </div>
                   </div>
                   <label className="block">
-                    <span className="block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1">
+                    <span className="block text-xs font-medium text-dash-muted mb-1">
                       Agregar créditos extra
                     </span>
                     <input
@@ -260,7 +261,7 @@ export default function AdminSubscriptionEditor({
                       onChange={(e) => setCreditsToAdd(e.target.value)}
                       disabled={saving}
                       placeholder="Ej. 250"
-                      className="h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm"
+                      className="h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm"
                     />
                   </label>
                   {creditsToAddError ? (
@@ -275,7 +276,7 @@ export default function AdminSubscriptionEditor({
                         type="button"
                         disabled={saving}
                         onClick={() => setCreditsToAdd(String(amount))}
-                        className="h-11 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-4 text-sm font-semibold hover:border-orange-300 cursor-pointer disabled:opacity-60"
+                        className="h-11 rounded-full border border-dash-line px-4 text-sm font-semibold hover:border-orange-300 cursor-pointer disabled:opacity-60"
                       >
                         +{formatCredits(amount)}
                       </button>
@@ -284,15 +285,15 @@ export default function AdminSubscriptionEditor({
                 </section>
 
                 <section>
-                  <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+                  <h4 className="text-sm font-semibold text-dash-ink">
                     Fechas del periodo
                   </h4>
-                  <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+                  <p className="text-xs text-dash-muted mt-1 mb-3">
                     Úsalas si el cobro ya pasó y hay que alinear el ciclo.
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <label className="block">
-                      <span className="block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1">
+                      <span className="block text-xs font-medium text-dash-muted mb-1">
                         Inicio
                       </span>
                       <input
@@ -300,11 +301,11 @@ export default function AdminSubscriptionEditor({
                         value={activatedAtLocal}
                         onChange={(e) => setActivatedAtLocal(e.target.value)}
                         disabled={saving}
-                        className="h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm"
+                        className="h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm"
                       />
                     </label>
                     <label className="block">
-                      <span className="block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1">
+                      <span className="block text-xs font-medium text-dash-muted mb-1">
                         Vence
                       </span>
                       <input
@@ -314,17 +315,17 @@ export default function AdminSubscriptionEditor({
                           setCurrentPeriodEndLocal(e.target.value)
                         }
                         disabled={saving}
-                        className="h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm"
+                        className="h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm"
                       />
                     </label>
                   </div>
                 </section>
 
                 <section>
-                  <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+                  <h4 className="text-sm font-semibold text-dash-ink">
                     Qué incluye este plan
                   </h4>
-                  <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+                  <p className="text-xs text-dash-muted mt-1 mb-3">
                     Activa o quita módulos. El cambio aplica al instante para
                     esa empresa.
                   </p>
@@ -335,7 +336,7 @@ export default function AdminSubscriptionEditor({
                       return (
                         <label
                           key={key}
-                          className="flex items-start gap-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-3 py-3 cursor-pointer min-h-11"
+                          className="flex items-start gap-3 rounded-xl border border-dash-line bg-dash-surface-2 px-3 py-3 cursor-pointer min-h-11"
                         >
                           <input
                             type="checkbox"
@@ -350,11 +351,11 @@ export default function AdminSubscriptionEditor({
                             className="mt-1 h-4 w-4 accent-orange-500"
                           />
                           <span>
-                            <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                            <span className="block text-sm font-medium text-dash-ink">
                               {meta?.name ?? key}
                             </span>
                             {meta?.description ? (
-                              <span className="block text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                              <span className="block text-xs text-dash-muted mt-0.5">
                                 {meta.description}
                               </span>
                             ) : null}
@@ -369,7 +370,7 @@ export default function AdminSubscriptionEditor({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="h-11 rounded-xl px-4 text-sm font-semibold border border-[#e0e0e0] dark:border-[#3a3a3a] cursor-pointer"
+                    className="h-11 rounded-full px-4 text-sm font-semibold border border-dash-line cursor-pointer"
                   >
                     Cancelar
                   </button>
@@ -392,7 +393,7 @@ export default function AdminSubscriptionEditor({
                           : undefined,
                       });
                     }}
-                    className="h-11 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer"
+                    className="h-11 rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer shadow-dash-accent"
                   >
                     {saving ? "Guardando..." : "Guardar cambios"}
                   </button>

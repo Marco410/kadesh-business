@@ -52,10 +52,10 @@ import {
 } from "kadesh/constants/constans";
 
 const fieldClass =
-  "h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
+  "h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
 
 const actionIconClass =
-  "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#424242] dark:text-[#e0e0e0] hover:border-orange-300 dark:hover:border-orange-500 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
+  "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-dash-line text-dash-soft hover:border-orange-300 dark:hover:border-orange-500 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
 
 async function copyText(value: string) {
   await navigator.clipboard.writeText(value);
@@ -144,8 +144,8 @@ function PlaceActionButtons({
         onClick={onReview}
         className={
           fullWidthReview
-            ? "h-11 flex-1 rounded-xl bg-orange-500 text-white text-sm font-semibold cursor-pointer"
-            : "h-11 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-4 text-xs font-semibold hover:border-orange-300 cursor-pointer"
+            ? "h-11 flex-1 rounded-full bg-orange-500 text-white text-sm font-semibold cursor-pointer"
+            : "h-11 rounded-full border border-dash-line px-4 text-xs font-semibold hover:border-orange-300 cursor-pointer"
         }
       >
         Revisar
@@ -269,10 +269,10 @@ export default function AdminPetPlacesPanel({
   };
 
   const [verifyPetPlace] = useMutation(VERIFY_PET_PLACE_MUTATION, {
-    refetchQueries: [{ query: ADMIN_OVERVIEW_QUERY, variables: overviewVariables }],
+    refetchQueries: [{ query: ADMIN_OVERVIEW_QUERY, variables: overviewVariables }, "AdminNavCounts"],
   });
   const [updatePetPlace] = useMutation(UPDATE_PET_PLACE_MUTATION, {
-    refetchQueries: [{ query: ADMIN_OVERVIEW_QUERY, variables: overviewVariables }],
+    refetchQueries: [{ query: ADMIN_OVERVIEW_QUERY, variables: overviewVariables }, "AdminNavCounts"],
   });
 
   const { data: selectedData } = useQuery<{ petPlace: AdminPetPlaceRow | null }>(
@@ -471,10 +471,10 @@ export default function AdminPetPlacesPanel({
               <article key={place.id} className={`${surfaceClass} p-4`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-semibold text-[#212121] dark:text-white">
+                    <p className="font-semibold text-dash-ink">
                       {place.name}
                     </p>
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                    <p className="text-xs text-dash-muted mt-0.5">
                       {[place.municipality, place.state]
                         .filter(Boolean)
                         .join(", ") || "Sin ubicación"}
@@ -490,7 +490,7 @@ export default function AdminPetPlacesPanel({
                     }
                   />
                 </div>
-                <p className="mt-3 text-sm text-[#424242] dark:text-[#e0e0e0]">
+                <p className="mt-3 text-sm text-dash-soft">
                   {place.user
                     ? formatPersonName(place.user.name, place.user.lastName)
                     : "Sin solicitante"}
@@ -502,7 +502,7 @@ export default function AdminPetPlacesPanel({
                   className="mt-3 w-full"
                 />
                 {place.phone?.trim() ? (
-                  <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-2 text-sm text-dash-muted">
                     Tel. {place.phone}
                   </p>
                 ) : null}
@@ -521,7 +521,7 @@ export default function AdminPetPlacesPanel({
           <div className={`${surfaceClass} hidden md:block overflow-x-auto`}>
             <table className="min-w-[1080px] w-full text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] border-b border-[#e8e8e8] dark:border-[#333]">
+                <tr className="text-left text-dash-muted border-b border-dash-line text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                   <th className="px-4 py-3">Clínica</th>
                   <th className="px-4 py-3">Solicitante</th>
                   <th className="px-4 py-3">Estado</th>
@@ -534,13 +534,13 @@ export default function AdminPetPlacesPanel({
                 {places.map((place) => (
                   <tr
                     key={place.id}
-                    className="border-b border-[#f0f0f0] dark:border-[#2a2a2a] last:border-0"
+                    className="border-b border-dash-line last:border-0"
                   >
                     <td className="px-4 py-3 align-top">
-                      <div className="font-semibold text-[#212121] dark:text-white">
+                      <div className="font-semibold text-dash-ink">
                         {place.name}
                       </div>
-                      <div className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                      <div className="text-xs text-dash-muted mt-0.5">
                         {[place.municipality, place.state]
                           .filter(Boolean)
                           .join(", ") || "—"}
@@ -549,18 +549,18 @@ export default function AdminPetPlacesPanel({
                     <td className="px-4 py-3 align-top">
                       {place.user ? (
                         <>
-                          <div className="text-[#212121] dark:text-white">
+                          <div className="text-dash-ink">
                             {formatPersonName(
                               place.user.name,
                               place.user.lastName,
                             )}
                           </div>
-                          <div className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                          <div className="text-xs text-dash-muted mt-0.5">
                             {place.user.email ?? "—"}
                           </div>
                         </>
                       ) : (
-                        <span className="text-[#9e9e9e]">Sin solicitante</span>
+                        <span className="text-dash-faint">Sin solicitante</span>
                       )}
                     </td>
                     <td className="px-4 py-3 align-top">
@@ -581,7 +581,7 @@ export default function AdminPetPlacesPanel({
                         onChange={changePipeline}
                       />
                     </td>
-                    <td className="px-4 py-3 align-top text-sm text-[#212121] dark:text-white">
+                    <td className="px-4 py-3 align-top text-sm text-dash-ink">
                       {place.verified ? "Sí" : "No"}
                     </td>
                     <td className="px-4 py-3 align-top text-right">

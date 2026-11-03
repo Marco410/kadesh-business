@@ -44,10 +44,10 @@ export default function AdminUserBlogSubscriptions({
 
   return (
     <section>
-      <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+      <h4 className="text-sm font-semibold text-dash-ink">
         Suscripción al blog
       </h4>
-      <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+      <p className="text-xs text-dash-muted mt-1 mb-3">
         Cada blog se guarda por separado. Si está pausada, no recibe avisos de
         nuevos artículos.
       </p>
@@ -55,8 +55,8 @@ export default function AdminUserBlogSubscriptions({
         <AdminErrorState message="No se pudieron cargar las suscripciones." />
       ) : !subscriptions ? (
         <div className="space-y-3" aria-hidden>
-          <div className="h-40 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
-          <div className="h-40 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
+          <div className="h-40 rounded-xl dash-shimmer" />
+          <div className="h-40 rounded-xl dash-shimmer" />
         </div>
       ) : (
         <div className="flex flex-col gap-3">
@@ -156,13 +156,13 @@ function SubscriptionCard({
   }
 
   return (
-    <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] p-4">
+    <div className="rounded-xl border border-dash-line bg-dash-surface-2 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-[#212121] dark:text-white">
+          <p className="text-sm font-semibold text-dash-ink">
             {product.label}
           </p>
-          <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+          <p className="text-xs text-dash-muted mt-0.5">
             {product.description}
           </p>
         </div>
@@ -178,13 +178,13 @@ function SubscriptionCard({
         ) : (
           <AdminStatusBadge
             label="Sin suscripción"
-            className="bg-[#e0e0e0] dark:bg-[#3a3a3a] text-[#616161] dark:text-[#b0b0b0]"
+            className="bg-dash-surface-3 text-dash-muted"
           />
         )}
       </div>
 
       {subscription ? (
-        <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-2">
+        <p className="text-xs text-dash-muted mt-2">
           Desde {formatDateShort(subscription.createdAt, false)}
           {isLinked
             ? ""
@@ -193,7 +193,7 @@ function SubscriptionCard({
       ) : null}
 
       <label className="block mt-3">
-        <span className="block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1">
+        <span className="block text-xs font-medium text-dash-muted mb-1">
           Correo de la suscripción
         </span>
         <input
@@ -202,7 +202,7 @@ function SubscriptionCard({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={saving}
-          className="h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm"
+          className="h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm"
         />
       </label>
       {emailError ? (
@@ -219,7 +219,7 @@ function SubscriptionCard({
           onChange={(e) => setActive(e.target.checked)}
           className="h-4 w-4 accent-orange-500"
         />
-        <span className="text-sm text-[#212121] dark:text-white">
+        <span className="text-sm text-dash-ink">
           Recibir avisos de nuevos artículos
         </span>
       </label>
@@ -228,7 +228,7 @@ function SubscriptionCard({
         type="button"
         disabled={!canSave}
         onClick={handleSave}
-        className="mt-3 h-11 w-full sm:w-auto rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+        className="mt-3 h-11 w-full sm:w-auto rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed shadow-dash-accent"
       >
         {saving ? "Guardando..." : subscription ? "Guardar suscripción" : "Suscribir"}
       </button>

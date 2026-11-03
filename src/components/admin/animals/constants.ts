@@ -26,7 +26,7 @@ export const ANIMAL_STATUS_CLASS: Record<string, string> = {
 };
 
 export const ANIMAL_STATUS_DEFAULT_CLASS =
-  "bg-[#eeeeee] text-[#424242] dark:bg-[#2a2a2a] dark:text-[#d6d6d6]";
+  "bg-dash-surface-2 text-dash-soft";
 
 /** Sin bitácora o con un valor que no está en `ANIMAL_LOGS_OPTIONS` (lo devuelve `adminPetSummary`). */
 export const ANIMAL_STATUS_NONE = "none";

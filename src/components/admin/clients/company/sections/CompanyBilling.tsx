@@ -45,7 +45,7 @@ const PAYMENT_STATUS_LABELS: Record<string, { label: string; className: string }
   succeeded: { label: "Cobrado", className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" },
   failed: { label: "Rechazado", className: "bg-red-500/15 text-red-700 dark:text-red-300" },
   refunded: { label: "Reembolsado", className: "bg-amber-500/15 text-amber-700 dark:text-amber-300" },
-  cancelled: { label: "Cancelado", className: "bg-black/5 text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]" },
+  cancelled: { label: "Cancelado", className: "bg-dash-surface-2 text-dash-muted" },
   pending: { label: "Pendiente", className: "bg-blue-500/15 text-blue-700 dark:text-blue-300" },
   processing: { label: "En proceso", className: "bg-blue-500/15 text-blue-700 dark:text-blue-300" },
 };
@@ -58,11 +58,11 @@ const COMMISSION_STATUS_LABELS: Record<string, string> = {
 };
 
 function List({ children }: { children: ReactNode }) {
-  return <ul className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">{children}</ul>;
+  return <ul className="divide-y divide-dash-line">{children}</ul>;
 }
 
 function Empty({ text }: { text: string }) {
-  return <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">{text}</p>;
+  return <p className="text-sm text-dash-muted">{text}</p>;
 }
 
 /** Suscripción vigente y su historia: contratos, intentos de pago, cobros, tarjetas y referidos. */
@@ -97,7 +97,7 @@ export default function CompanyBilling({
             <button
               type="button"
               onClick={onAdjustPlan}
-              className="h-10 rounded-xl border border-[#e0e0e0] px-4 text-sm font-semibold text-[#212121] hover:border-orange-300 dark:border-[#3a3a3a] dark:text-white cursor-pointer"
+              className="h-10 rounded-full border border-dash-line px-4 text-sm font-semibold text-dash-ink hover:border-orange-300 cursor-pointer"
             >
               Ajustar plan
             </button>
@@ -109,35 +109,35 @@ export default function CompanyBilling({
         ) : (
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-lg font-semibold text-[#212121] dark:text-white">
+              <p className="text-lg font-semibold text-dash-ink">
                 {current.planName || "Plan"}
               </p>
               <SubscriptionStatusBadge status={current.status} />
             </div>
             <dl className="grid grid-cols-1 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
               <div>
-                <dt className="text-xs text-[#9e9e9e]">Precio</dt>
-                <dd className="text-[#212121] dark:text-white">
+                <dt className="text-xs text-dash-faint">Precio</dt>
+                <dd className="text-dash-ink">
                   {current.planCost
                     ? `${formatMoney(current.planCost, current.planCurrency)} ${formatPlanFrequency(current.planFrequency)}`
                     : "Gratis"}
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-[#9e9e9e]">Periodo</dt>
-                <dd className="text-[#212121] dark:text-white">
+                <dt className="text-xs text-dash-faint">Periodo</dt>
+                <dd className="text-dash-ink">
                   {formatDateShort(current.activatedAt, false)} → {formatDateShort(current.currentPeriodEnd, false)}
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-[#9e9e9e]">Créditos del plan</dt>
-                <dd className="text-[#212121] dark:text-white">
+                <dt className="text-xs text-dash-faint">Créditos del plan</dt>
+                <dd className="text-dash-ink">
                   {current.planLeadLimit != null ? `${formatCredits(current.planLeadLimit)} al mes` : "—"}
                 </dd>
               </div>
             </dl>
             <div>
-              <p className="text-xs text-[#9e9e9e]">
+              <p className="text-xs text-dash-faint">
                 Módulos incluidos ({includedCount} de {features.length})
               </p>
               <ul className="mt-2 flex flex-wrap gap-1.5">
@@ -149,7 +149,7 @@ export default function CompanyBilling({
                       "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium",
                       f.included
                         ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300"
-                        : "bg-black/5 text-[#9e9e9e] line-through dark:bg-white/5",
+                        : "bg-dash-surface-2 text-dash-faint line-through",
                     )}
                   >
                     {f.included ? <HugeiconsIcon icon={CheckmarkCircle02Icon} size={12} /> : null}
@@ -172,11 +172,11 @@ export default function CompanyBilling({
               {subscriptions.map((s) => (
                 <li key={s.id} className="flex items-start justify-between gap-3 py-2">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-[#212121] dark:text-white">
+                    <p className="text-sm font-medium text-dash-ink">
                       {s.planName || "Plan"}
                       {s.planCost ? ` · ${formatMoney(s.planCost, s.planCurrency)}` : ""}
                     </p>
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <p className="text-xs text-dash-muted">
                       {formatDateShort(s.activatedAt ?? s.createdAt, false)} →{" "}
                       {formatDateShort(s.currentPeriodEnd, false)}
                     </p>
@@ -199,11 +199,11 @@ export default function CompanyBilling({
               {data.saasSubscriptionLogs.map((log) => (
                 <li key={log.id} className="flex items-start justify-between gap-3 py-2">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-[#212121] dark:text-white">
+                    <p className="text-sm font-medium text-dash-ink">
                       {STEP_LABELS[log.step ?? ""] ?? log.step ?? "Intento"}
                       {log.plan?.name ? ` · ${log.plan.name}` : ""}
                     </p>
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <p className="text-xs text-dash-muted">
                       {formatDateShort(log.createdAt, true)}
                       {log.user ? ` · ${formatPersonName(log.user.name, log.user.lastName)}` : ""}
                       {log.totalSubmitted ? ` · $${log.totalSubmitted}` : ""}
@@ -239,23 +239,23 @@ export default function CompanyBilling({
                 return (
                   <li key={p.id} className="flex items-start justify-between gap-3 py-2">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-[#212121] dark:text-white">
+                      <p className="text-sm font-medium text-dash-ink">
                         {formatMoney(p.amount == null ? null : Number(p.amount), "MXN")}
                         {p.plan?.name ? ` · ${p.plan.name}` : ""}
                       </p>
-                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <p className="text-xs text-dash-muted">
                         {formatDateShort(p.createdAt, true)}
                         {p.paymentMethodType ? ` · ${p.paymentMethodType}` : ""}
                       </p>
                       {p.stripeErrorMessage || p.notes ? (
-                        <p className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                        <p className="mt-0.5 text-xs text-dash-muted">
                           {p.stripeErrorMessage ?? p.notes}
                         </p>
                       ) : null}
                     </div>
                     <AdminStatusBadge
                       label={status?.label ?? p.status ?? "—"}
-                      className={status?.className ?? "bg-black/5 text-[#616161] dark:bg-white/10"}
+                      className={status?.className ?? "bg-dash-surface-2 text-dash-muted"}
                     />
                   </li>
                 );
@@ -272,10 +272,10 @@ export default function CompanyBilling({
               {data.saasPaymentMethods.map((m) => (
                 <li key={m.id} className="flex items-center justify-between gap-3 py-2">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium capitalize text-[#212121] dark:text-white">
+                    <p className="text-sm font-medium capitalize text-dash-ink">
                       {m.cardType ?? "Tarjeta"} ···· {m.lastFourDigits ?? "—"}
                     </p>
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <p className="text-xs text-dash-muted">
                       {m.ownerName ?? (m.user ? formatPersonName(m.user.name, m.user.lastName) : "—")}
                       {m.expMonth && m.expYear ? ` · vence ${m.expMonth}/${m.expYear}` : ""}
                     </p>
@@ -296,12 +296,12 @@ export default function CompanyBilling({
             {data.saasReferralCommissions.map((c) => (
               <li key={c.id} className="flex items-start justify-between gap-3 py-2">
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-[#212121] dark:text-white">
+                  <p className="text-sm font-medium text-dash-ink">
                     {formatMoney(c.amount, c.currency)}
                     {c.percentage != null ? ` · ${c.percentage}%` : ""}
                     {c.type === "UPFRONT" ? " · inicial" : c.type === "RECURRING" ? " · recurrente" : ""}
                   </p>
-                  <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="text-xs text-dash-muted">
                     {c.referrer ? formatPersonName(c.referrer.name, c.referrer.lastName) : "—"}
                     {c.periodStart ? ` · ${formatDateShort(c.periodStart, false)}` : ""}
                     {c.periodEnd ? ` → ${formatDateShort(c.periodEnd, false)}` : ""}
@@ -309,7 +309,7 @@ export default function CompanyBilling({
                 </div>
                 <AdminStatusBadge
                   label={COMMISSION_STATUS_LABELS[c.status ?? ""] ?? c.status ?? "—"}
-                  className="bg-black/5 text-[#424242] dark:bg-white/10 dark:text-[#e0e0e0]"
+                  className="bg-dash-surface-2 text-dash-soft"
                 />
               </li>
             ))}

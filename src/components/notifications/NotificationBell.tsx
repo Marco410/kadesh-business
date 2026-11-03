@@ -26,7 +26,14 @@ import {
  * Campana de notificaciones. El contador se revisa cada minuto; la lista se pide al abrir.
  * Clic en un aviso: lo marca como leído y lleva a la sección que lo resuelve.
  */
-export default function NotificationBell({ light = false }: { light?: boolean }) {
+export default function NotificationBell({
+  light = false,
+  variant = "site",
+}: {
+  light?: boolean;
+  /** `panel`: barra de los paneles (`app-shell`), con sus colores; `site`: barra del sitio. */
+  variant?: "site" | "panel";
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -97,7 +104,11 @@ export default function NotificationBell({ light = false }: { light?: boolean })
         aria-label={unread > 0 ? `Notificaciones: ${unread} sin leer` : "Notificaciones"}
         aria-expanded={open}
         className={`relative flex size-10 items-center justify-center rounded-full transition-colors ${
-          light ? "bg-gray-200 text-gray-800 hover:bg-gray-300" : "bg-white/10 text-white hover:bg-white/20"
+          variant === "panel"
+            ? "bg-dash-surface-2 text-dash-soft hover:bg-dash-surface-3 hover:text-dash-ink"
+            : light
+              ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              : "bg-white/10 text-white hover:bg-white/20"
         }`}
       >
         <HugeiconsIcon icon={Notification01Icon} size={20} />
@@ -109,9 +120,13 @@ export default function NotificationBell({ light = false }: { light?: boolean })
       </button>
 
       {open ? (
-        <div className="fixed inset-x-4 top-20 z-50 overflow-hidden rounded-2xl border border-[#e8e8e8] bg-white shadow-2xl sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 dark:border-[#2a2a2a] dark:bg-[#1e1e1e]">
-          <div className="flex items-center justify-between gap-2 border-b border-[#eee] px-4 py-3 dark:border-[#2a2a2a]">
-            <p className="text-sm font-semibold text-[#212121] dark:text-white">Notificaciones</p>
+        <div
+          className={`fixed inset-x-4 z-50 overflow-hidden rounded-3xl border border-dash-line bg-dash-surface font-dash shadow-dash-lift sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 ${
+            variant === "panel" ? "top-16" : "top-20"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2 border-b border-dash-line px-4 py-3">
+            <p className="text-sm font-semibold text-dash-ink">Notificaciones</p>
             {unread > 0 ? (
               <button
                 type="button"
@@ -126,9 +141,9 @@ export default function NotificationBell({ light = false }: { light?: boolean })
 
           <ul className="max-h-[60vh] overflow-y-auto">
             {loading && items.length === 0 ? (
-              <li className="px-4 py-6 text-center text-sm text-[#757575]">Cargando…</li>
+              <li className="px-4 py-6 text-center text-sm text-dash-muted">Cargando…</li>
             ) : items.length === 0 ? (
-              <li className="px-4 py-8 text-center text-sm text-[#757575] dark:text-[#9e9e9e]">
+              <li className="px-4 py-8 text-center text-sm text-dash-muted">
                 No tienes notificaciones.
               </li>
             ) : (
@@ -137,7 +152,7 @@ export default function NotificationBell({ light = false }: { light?: boolean })
                   <button
                     type="button"
                     onClick={() => void openItem(item)}
-                    className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f5f5f5] dark:hover:bg-[#262626] ${
+                    className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-dash-hover ${
                       item.readAt ? "" : "bg-orange-50/60 dark:bg-orange-500/[0.06]"
                     }`}
                   >
@@ -145,15 +160,15 @@ export default function NotificationBell({ light = false }: { light?: boolean })
                       <HugeiconsIcon icon={notificationIcon(item.type)} size={18} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                      <span className="block text-sm font-medium text-dash-ink">
                         {item.title}
                       </span>
                       {item.body ? (
-                        <span className="mt-0.5 block truncate text-xs text-[#616161] dark:text-[#b0b0b0]">
+                        <span className="mt-0.5 block truncate text-xs text-dash-muted">
                           {item.body}
                         </span>
                       ) : null}
-                      <span className="mt-1 block text-[11px] text-[#9e9e9e]">
+                      <span className="mt-1 block text-[11px] text-dash-faint">
                         {formatDateShort(item.createdAt)}
                       </span>
                     </span>

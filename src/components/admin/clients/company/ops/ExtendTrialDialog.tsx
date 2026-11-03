@@ -58,7 +58,7 @@ export default function ExtendTrialDialog({
       subtitle={companyName}
     >
       <div className="flex flex-col gap-5">
-        <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <p className="text-sm text-dash-muted">
           {trialEnd
             ? `La prueba termina (o terminó) el ${formatDateShort(trialEnd, false)}.`
             : "La prueba no tiene fecha de fin guardada."}{" "}
@@ -67,7 +67,7 @@ export default function ExtendTrialDialog({
         </p>
 
         <div>
-          <p className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">Sumar días</p>
+          <p className="text-xs font-medium text-dash-muted">Sumar días</p>
           <div className="mt-2 grid grid-cols-3 gap-2">
             {QUICK_DAYS.map((days) => (
               <button
@@ -75,7 +75,7 @@ export default function ExtendTrialDialog({
                 type="button"
                 disabled={loading}
                 onClick={() => run({ days })}
-                className="h-11 rounded-xl border border-[#e0e0e0] text-sm font-semibold text-[#212121] hover:border-orange-300 disabled:opacity-60 dark:border-[#3a3a3a] dark:text-white cursor-pointer"
+                className="h-11 rounded-full border border-dash-line text-sm font-semibold text-dash-ink hover:border-orange-300 disabled:opacity-60 cursor-pointer"
               >
                 +{days} días
               </button>
@@ -90,7 +90,7 @@ export default function ExtendTrialDialog({
           }}
           className="flex flex-col gap-2"
         >
-          <label htmlFor="extend-trial-until" className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+          <label htmlFor="extend-trial-until" className="text-xs font-medium text-dash-muted">
             O hasta una fecha
           </label>
           <div className="flex flex-col gap-2 sm:flex-row">
@@ -99,12 +99,12 @@ export default function ExtendTrialDialog({
               type="date"
               value={until}
               onChange={(e) => setUntil(e.target.value)}
-              className="h-11 flex-1 rounded-xl border border-[#e0e0e0] bg-white px-3 text-sm text-[#212121] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white"
+              className="h-11 flex-1 rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
             />
             <button
               type="submit"
               disabled={loading || !until}
-              className="h-11 rounded-xl bg-orange-500 px-5 text-sm font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+              className="h-11 rounded-full dash-grad-accent px-5 text-sm font-semibold text-white hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer shadow-dash-accent"
             >
               Extender
             </button>

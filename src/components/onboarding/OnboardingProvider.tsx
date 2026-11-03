@@ -15,6 +15,7 @@ import { driver, type Driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import "./tour.css";
 import { useUser } from "kadesh/utils/UserContext";
+import { Routes } from "kadesh/core/routes";
 import { TRACK_EVENT, trackActivity } from "kadesh/utils/activity";
 import { isImpersonating } from "kadesh/components/impersonation";
 import {
@@ -262,6 +263,8 @@ export function OnboardingProvider({
       autoStartedRef.current ||
       !userId ||
       !pathname?.startsWith("/panel") ||
+      // Operaciones es del equipo de Kadesh: no tiene los anclajes del tour de bienvenida.
+      pathname.startsWith(Routes.panelAdmin) ||
       isImpersonating()
     ) {
       return;

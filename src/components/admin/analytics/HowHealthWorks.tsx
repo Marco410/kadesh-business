@@ -5,11 +5,11 @@ import { surfaceClass } from "../ui";
 export default function HowHealthWorks() {
   return (
     <details className={`${surfaceClass} group p-4 sm:p-5`}>
-      <summary className="cursor-pointer list-none text-sm font-semibold text-[#212121] dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 rounded">
+      <summary className="cursor-pointer list-none text-sm font-semibold text-dash-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 rounded">
         ¿Cómo se calcula la salud?
-        <span className="ml-1 font-normal text-[#9e9e9e] group-open:hidden">(ver)</span>
+        <span className="ml-1 font-normal text-dash-faint group-open:hidden">(ver)</span>
       </summary>
-      <div className="mt-3 flex flex-col gap-3 text-sm text-[#616161] dark:text-[#b0b0b0]">
+      <div className="mt-3 flex flex-col gap-3 text-sm text-dash-muted">
         <p>
           Suma de 5 partes con lo que hizo la empresa en las últimas 4 semanas. Las metas se
           ajustan a su antigüedad: una empresa de 5 días no puede tener 16 días activos.
@@ -18,7 +18,7 @@ export default function HowHealthWorks() {
           {HEALTH_COMPONENTS.map((part) => (
             <li key={part.key} className="flex items-baseline justify-between gap-3">
               <span>
-                <strong className="text-[#212121] dark:text-white">{part.label}</strong> · {part.hint}
+                <strong className="text-dash-ink">{part.label}</strong> · {part.hint}
               </span>
               <span className="shrink-0 tabular-nums">hasta {part.max}</span>
             </li>
