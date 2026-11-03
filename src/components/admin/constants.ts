@@ -585,6 +585,14 @@ export const ADMIN_SCOPED_PARAMS = [
   "meses",
   "umbral",
   "producto",
+  // Kadesh Pet: animal abierto, filtro de Facebook y controles del Resumen.
+  "animal",
+  "facebook",
+  "rango",
+  "agrupar",
+  "desglose",
+  "metrica",
+  "tipo_lugar",
 ] as const;
 
 /** Arma un enlace interno de Operaciones (siempre sobre `Routes.panelAdmin`). */

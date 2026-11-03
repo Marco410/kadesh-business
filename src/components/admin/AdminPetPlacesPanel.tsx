@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -33,13 +34,10 @@ import type { AdminPetPlaceRow } from "./types";
 import { useDebouncedValue } from "./hooks/useDebouncedValue";
 import AdminPetPlaceEditor from "./AdminPetPlaceEditor";
 import AdminPetPlaceReviewModal from "./AdminPetPlaceReviewModal";
-import AdminPetPlaceServicesPanel from "./AdminPetPlaceServicesPanel";
-import AdminAnimalsPanel from "./animals/AdminAnimalsPanel";
 import {
   AdminEmptyState,
   AdminErrorState,
   AdminFilterChips,
-  AdminSegmented,
   AdminLoadingRows,
   AdminPagination,
   AdminSearchInput,
@@ -187,26 +185,28 @@ function PipelineSelect({
   );
 }
 
-/** Subpestañas de Kadesh Pet. "animales" es la de entrada. */
-export type PetPlacesVista = "animales" | "fichas" | "servicios";
+/** `?estado=` con un estado de reclamo válido (p. ej. "pending" desde el Resumen de Kadesh Pet). */
+function initialClaimStatus(value: string | null): PetPlaceClaimStatus | "all" {
+  const match = PET_PLACE_CLAIM_STATUS_OPTIONS.find((option) => option.value === value);
+  return match ? match.value : "all";
+}
 
+/**
+ * Kadesh Pet → Veterinarias: fichas del directorio con filtros, revisión de reclamos, pipeline y
+ * edición. La navegación entre vistas de Kadesh Pet vive en `pet/AdminPetSection`.
+ */
 export default function AdminPetPlacesPanel({
   initialPlaceId,
   onConsumedInitialPlace,
-  vista = "animales",
-  onVistaChange,
-  initialServiceId,
-  onConsumedInitialService,
 }: {
   initialPlaceId?: string | null;
   onConsumedInitialPlace?: () => void;
-  vista?: PetPlacesVista;
-  onVistaChange?: (vista: PetPlacesVista) => void;
-  initialServiceId?: string | null;
-  onConsumedInitialService?: () => void;
 }) {
+  const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<PetPlaceClaimStatus | "all">("all");
+  const [status, setStatus] = useState<PetPlaceClaimStatus | "all">(() =>
+    initialClaimStatus(searchParams.get("estado")),
+  );
   const [city, setCity] = useState("");
   const [pipeline, setPipeline] = useState("all");
   const [page, setPage] = useState(1);
@@ -256,7 +256,6 @@ export default function AdminPetPlacesPanel({
     {
       variables: queryVariables,
       fetchPolicy: "network-only",
-      skip: vista === "servicios",
     },
   );
 
@@ -384,26 +383,6 @@ export default function AdminPetPlacesPanel({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <AdminSegmented
-        ariaLabel="Secciones de Kadesh Pet"
-        items={[
-          { id: "animales" as const, label: "Animales" },
-          { id: "fichas" as const, label: "Veterinarias" },
-          { id: "servicios" as const, label: "Servicios" },
-        ]}
-        value={vista}
-        onChange={(next) => onVistaChange?.(next)}
-      />
-
-      {vista === "animales" ? (
-        <AdminAnimalsPanel />
-      ) : vista === "servicios" ? (
-        <AdminPetPlaceServicesPanel
-          initialServiceId={initialServiceId}
-          onConsumedInitialService={onConsumedInitialService}
-        />
-      ) : (
     <div className="flex flex-col gap-4">
       <AdminPetPlaceReviewModal
         isOpen={Boolean(selectedId)}
@@ -625,8 +604,6 @@ export default function AdminPetPlacesPanel({
             onPageChange={setPage}
           />
         </>
-      )}
-    </div>
       )}
     </div>
   );
