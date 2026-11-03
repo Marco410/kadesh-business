@@ -37,8 +37,8 @@ function LayerCheckbox({
     <label
       className={`inline-flex max-w-full cursor-pointer select-none items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
         checked
-          ? "border-[#e0e0e0] bg-white text-[#212121] dark:border-[#3a3a3a] dark:bg-[#2a2a2a] dark:text-[#ffffff]"
-          : "border-dashed border-[#d0d0d0] text-[#9e9e9e] hover:text-[#616161] dark:border-[#444] dark:hover:text-[#b0b0b0]"
+          ? "border-dash-line bg-white text-dash-ink dark:bg-[#2a2a2a]"
+          : "border-dashed border-dash-line-strong text-dash-faint hover:text-[#616161] dark:border-[#444] dark:hover:text-[#b0b0b0]"
       }`}
     >
       <input type="checkbox" checked={checked} onChange={onToggle} className="sr-only" />
@@ -74,7 +74,7 @@ export default function CalendarLayersBar({
   return (
     <div
       data-tour="calendar-filters"
-      className="min-w-0 flex-1 space-y-2.5 rounded-xl border border-[#e0e0e0] bg-white p-3 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+      className="min-w-0 flex-1 space-y-2.5 rounded-xl border border-dash-line bg-dash-surface p-3"
     >
       {groups.map((group) => {
         const allShown = group.layers.every((l) => !hiddenKeys.has(l.key));
@@ -82,7 +82,7 @@ export default function CalendarLayersBar({
           <div key={group.id} className="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:gap-3">
             <div className="flex shrink-0 items-center gap-2 sm:w-48">
               <span
-                className="max-w-full truncate text-[11px] font-semibold uppercase tracking-wide text-[#9e9e9e]"
+                className="max-w-full truncate text-[11px] font-semibold uppercase tracking-wide text-dash-faint"
                 title={group.label}
               >
                 {group.label}

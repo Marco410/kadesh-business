@@ -30,7 +30,7 @@ export default function CompanyHealthCard({ companyId }: { companyId: string }) 
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <HealthTrend trend={health.trend} changePct={health.changePct} />
-          <span className="text-xs text-[#9e9e9e]">contra las 2 semanas anteriores</span>
+          <span className="text-xs text-dash-faint">contra las 2 semanas anteriores</span>
         </div>
         {health.flags.length ? <HealthSignals flags={health.flags} /> : null}
         <ul className="grid grid-cols-1 gap-2 sm:grid-cols-5">
@@ -40,12 +40,12 @@ export default function CompanyHealthCard({ companyId }: { companyId: string }) 
             return (
               <li key={part.key} className="min-w-0" title={part.hint}>
                 <div className="flex items-baseline justify-between gap-2 text-xs">
-                  <span className="text-[#616161] dark:text-[#b0b0b0]">{part.label}</span>
-                  <span className="tabular-nums text-[#212121] dark:text-white">
+                  <span className="text-dash-muted">{part.label}</span>
+                  <span className="tabular-nums text-dash-ink">
                     {points}/{part.max}
                   </span>
                 </div>
-                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#f0f0f0] dark:bg-[#2a2a2a]">
+                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-dash-surface-2">
                   <div
                     className={cn(
                       "h-full rounded-full",

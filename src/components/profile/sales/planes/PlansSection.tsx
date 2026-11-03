@@ -167,20 +167,20 @@ function PlanPriceLine({
       className={cn("flex flex-col gap-1", alignClass)}
     >
       {showOldPrice && (
-        <span className="text-lg font-medium tabular-nums text-[#757575] line-through decoration-1 dark:text-[#9e9e9e]">
+        <span className="text-lg font-medium tabular-nums text-dash-muted line-through decoration-1">
           {formatPrice(oldPrice, currency, "monthly")}
         </span>
       )}
       <p
         className={cn("flex items-baseline gap-1 whitespace-nowrap", rowClass)}
       >
-        <span className="text-4xl font-bold tabular-nums tracking-tight text-[#212121] dark:text-[#ffffff]">
+        <span className="text-4xl font-bold tabular-nums tracking-tight text-dash-ink">
           {formatPrice(price, currency, "monthly")}
         </span>
-        <span className="shrink-0 text-sm font-medium text-[#616161] dark:text-[#757575]">
+        <span className="shrink-0 text-sm font-medium text-dash-muted dark:text-[#757575]">
           {currency}
         </span>
-        <span className="shrink-0 text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <span className="shrink-0 text-sm text-dash-muted">
           {periodLabel}
         </span>
       </p>
@@ -244,7 +244,7 @@ function BillingToggle({
       "rounded-full px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#121212]",
       active
         ? "bg-orange-800 text-white shadow-sm"
-        : "text-[#616161] hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:text-white",
+        : "text-dash-muted hover:text-dash-ink",
     );
 
   return (
@@ -253,7 +253,7 @@ function BillingToggle({
       role="group"
       aria-label="Periodo de facturación"
     >
-      <div className="inline-flex flex-wrap items-center justify-center gap-1 rounded-full border border-[#e0e0e0] bg-[#f5f5f5] p-1 dark:border-[#3a3a3a] dark:bg-[#2a2a2a]">
+      <div className="inline-flex flex-wrap items-center justify-center gap-1 rounded-full border border-dash-line bg-dash-surface-2 p-1">
         <button
           type="button"
           className={segmentClass(value === "monthly")}
@@ -389,7 +389,7 @@ function PairedPlanCard({
         "relative rounded-2xl border p-6 sm:p-8",
         highlighted
           ? "border-orange-500 dark:border-orange-500 bg-orange-500/5 dark:bg-orange-500/10 shadow-lg shadow-orange-500/10"
-          : "border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e]",
+          : "border-dash-line bg-dash-surface",
       )}
     >
       {bestSeller && (
@@ -406,16 +406,16 @@ function PairedPlanCard({
       )}
 
       <div className="text-center">
-        <h3 className="text-lg font-bold text-[#212121] dark:text-[#ffffff]">
+        <h3 className="text-lg font-bold text-dash-ink">
           {displayName}
         </h3>
         {persona && (
-          <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1 text-xs text-dash-muted">
             {persona}
           </p>
         )}
         {!isActive && !isCurrentPlan && (
-          <span className="mt-1 block text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <span className="mt-1 block text-xs text-dash-muted">
             No disponible
           </span>
         )}
@@ -441,12 +441,12 @@ function PairedPlanCard({
               )}
               {((billingPeriod === "monthly" && !monthly) ||
                 (billingPeriod === "annual" && !annual)) && (
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                <p className="text-sm text-dash-muted">
                   {missingPlanCopy}
                 </p>
               )}
               {billingPeriod === "annual" && annual && annualDisclaimer && (
-                <p className="mx-auto mt-2 max-w-[280px] text-xs leading-relaxed text-[#616161] dark:text-[#8a8a8a]">
+                <p className="mx-auto mt-2 max-w-[280px] text-xs leading-relaxed text-dash-muted dark:text-[#8a8a8a]">
                   {annualDisclaimer}
                 </p>
               )}
@@ -455,9 +455,9 @@ function PairedPlanCard({
         </div>
 
         {leadLimit != null && (
-          <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-2 text-sm text-dash-muted">
             Cada mes tienes{" "}
-            <strong className="text-[#212121] dark:text-[#e0e0e0]">
+            <strong className="text-dash-ink dark:text-[#e0e0e0]">
               {leadLimit}
             </strong>{" "}
             créditos al mes para extraer leads. Kadesh AI administrada usa esa
@@ -515,11 +515,11 @@ function FreePlanLayout({
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h3 className="text-lg font-bold text-[#212121] dark:text-[#ffffff]">
+          <h3 className="text-lg font-bold text-dash-ink">
             Gratis
           </h3>
           {!isActive && !isCurrentPlan && (
-            <span className="mt-1 block text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <span className="mt-1 block text-xs text-dash-muted">
               No disponible
             </span>
           )}
@@ -527,10 +527,10 @@ function FreePlanLayout({
             aria-label="Plan Gratis de Kadesh: 0 pesos durante 7 días de prueba"
             className="mt-2 flex items-baseline gap-2"
           >
-            <span className="text-4xl font-bold tabular-nums tracking-tight text-[#212121] dark:text-[#ffffff]">
+            <span className="text-4xl font-bold tabular-nums tracking-tight text-dash-ink">
               $0
             </span>
-            <span className="text-base font-medium text-[#616161] dark:text-[#b0b0b0]">
+            <span className="text-base font-medium text-dash-muted">
               · 7 días
             </span>
           </p>
@@ -542,16 +542,16 @@ function FreePlanLayout({
         )}
       </div>
 
-      <p className="text-base leading-relaxed text-[#424242] dark:text-[#d6d6d6]">
+      <p className="text-base leading-relaxed text-dash-soft">
         Prueba Kadesh completo durante 7 días, con {credits} créditos para
         sacar prospectos y usar {KADESH_URIM_AI_NAME}.
       </p>
 
       <div className="rounded-xl border border-orange-500/25 bg-orange-500/5 px-4 py-3 dark:border-orange-500/30 dark:bg-orange-500/10">
-        <p className="text-sm font-semibold text-[#212121] dark:text-white">
+        <p className="text-sm font-semibold text-dash-ink">
           Todo Kadesh, sin límites de funciones.
         </p>
-        <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-1 text-sm leading-relaxed text-dash-muted">
           Usas lo mismo que en los planes de pago. Lo único que cuenta son tus{" "}
           {credits} créditos: 1 por cada prospecto que extraes; el resumen
           diario de {KADESH_URIM_AI_NAME} usa unos 4.
@@ -566,14 +566,14 @@ function FreePlanLayout({
 
       {/* Solo visitantes: quien ya tiene cuenta no necesita registrarse. Mismo texto que el botón principal de la landing. */}
       {!user?.id && (
-        <div className="flex flex-col items-stretch gap-3 border-t border-[#e0e0e0] pt-5 dark:border-[#3a3a3a] sm:flex-row sm:items-center sm:gap-4">
+        <div className="flex flex-col items-stretch gap-3 border-t border-dash-line pt-5 sm:flex-row sm:items-center sm:gap-4">
           <Link
             href={Routes.auth.register}
             className="inline-flex h-12 items-center justify-center rounded-xl bg-orange-800 px-7 font-semibold text-white transition-colors hover:bg-orange-900 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e]"
           >
             Probar gratis 7 días
           </Link>
-          <p className="text-center text-sm text-[#616161] dark:text-[#b0b0b0] sm:text-left">
+          <p className="text-center text-sm text-dash-muted sm:text-left">
             Sin tarjeta · Sin compromiso
           </p>
         </div>
@@ -605,16 +605,16 @@ function PlanCard({
   const headerBlock = (
     <>
       <div className={isVertical ? "text-center" : "text-left"}>
-        <h3 className="text-lg font-bold text-[#212121] dark:text-[#ffffff]">
+        <h3 className="text-lg font-bold text-dash-ink">
           {plan.name}
         </h3>
         {persona && (
-          <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1 text-xs text-dash-muted">
             {persona}
           </p>
         )}
         {!isActive && !isCurrentPlan && (
-          <span className="mt-1 block text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <span className="mt-1 block text-xs text-dash-muted">
             No disponible
           </span>
         )}
@@ -628,9 +628,9 @@ function PlanCard({
           />
         </div>
         {plan.leadLimit != null && (
-          <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-2 text-sm text-dash-muted">
             Cada mes tienes{" "}
-            <strong className="text-[#212121] dark:text-[#e0e0e0]">
+            <strong className="text-dash-ink dark:text-[#e0e0e0]">
               {plan.leadLimit}
             </strong>{" "}
             créditos al mes para extraer leads. Kadesh AI administrada usa esa
@@ -677,7 +677,7 @@ function PlanCard({
         "relative rounded-2xl border p-6 sm:p-8",
         highlighted
           ? "border-orange-500 dark:border-orange-500 bg-orange-500/5 dark:bg-orange-500/10 shadow-lg shadow-orange-500/10"
-          : "border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e]",
+          : "border-dash-line bg-dash-surface",
       )}
     >
       {plan.bestSeller === true && (
@@ -705,16 +705,16 @@ function PlanCard({
         <div className="flex flex-col gap-8 sm:flex-row sm:items-start">
           <div className="flex-1 shrink-0">
             <div className="text-left">
-              <h3 className="text-lg font-bold text-[#212121] dark:text-[#ffffff]">
+              <h3 className="text-lg font-bold text-dash-ink">
                 {plan.name}
               </h3>
               {persona && (
-                <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                <p className="mt-1 text-xs text-dash-muted">
                   {persona}
                 </p>
               )}
               {!isActive && !isCurrentPlan && (
-                <span className="mt-1 block text-xs text-[#616161] dark:text-[#b0b0b0]">
+                <span className="mt-1 block text-xs text-dash-muted">
                   No disponible
                 </span>
               )}
@@ -729,9 +729,9 @@ function PlanCard({
                 />
               </div>
               {plan.leadLimit != null && plan.cost !== 0 && (
-                <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
+                <p className="mt-2 text-sm text-dash-muted">
                   Cada mes tienes{" "}
-                  <strong className="text-[#212121] dark:text-[#e0e0e0]">
+                  <strong className="text-dash-ink dark:text-[#e0e0e0]">
                     {plan.leadLimit}
                   </strong>{" "}
                   créditos/mes. Kadesh AI administrada usa esa misma bolsa.
@@ -750,7 +750,7 @@ function PlanCard({
                   {plan.leadLimit != null && (
                     <p className="text-xs font-semibold text-[#18653c] dark:text-green-400">
                       Incluye{" "}
-                      <strong className="text-[#212121] dark:text-[#e0e0e0]">
+                      <strong className="text-dash-ink dark:text-[#e0e0e0]">
                         {plan.leadLimit}
                       </strong>{" "}
                       créditos en el periodo de prueba
@@ -837,7 +837,7 @@ export default function PlansSection({
         <div className="mb-6">
           <Link
             href={`${Routes.panel}?tab=clientes`}
-            className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-700 dark:hover:text-orange-400"
+            className="inline-flex items-center gap-1.5 text-sm text-dash-muted hover:text-orange-700 dark:hover:text-orange-400"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
             Volver a Clientes
@@ -858,19 +858,19 @@ export default function PlansSection({
         {sectionHeadingLevel === "h2" ? (
           <h2
             id={sectionTitleId}
-            className="text-3xl font-bold text-[#212121] dark:text-[#ffffff]"
+            className="text-3xl font-bold text-dash-ink"
           >
             {sectionTitle}
           </h2>
         ) : (
           <h1
             id={sectionTitleId}
-            className="text-3xl font-bold text-[#212121] dark:text-[#ffffff]"
+            className="text-3xl font-bold text-dash-ink"
           >
             {sectionTitle}
           </h1>
         )}
-        <p className="mt-2 text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-2 text-dash-muted">
           {sectionSubtitle}
         </p>
       </section>
@@ -888,7 +888,7 @@ export default function PlansSection({
       )}
 
       {plans.length === 0 && !loading && (
-        <div className="rounded-2xl border border-[#e0e0e0] bg-[#f5f5f5] p-8 text-center text-[#616161] dark:border-[#3a3a3a] dark:bg-[#2a2a2a] dark:text-[#b0b0b0]">
+        <div className="rounded-2xl border border-dash-line bg-dash-surface-2 p-8 text-center text-dash-muted">
           No hay planes disponibles.
         </div>
       )}

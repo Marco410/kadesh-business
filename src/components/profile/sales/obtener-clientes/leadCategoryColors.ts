@@ -137,7 +137,7 @@ function colorForCategory(category: string): {
 
 const UNCATEGORIZED_COLOR = {
   hex: "#9e9e9e",
-  badge: "bg-[#f0f0f0] text-[#616161] dark:bg-[#333] dark:text-[#b0b0b0]",
+  badge: "bg-dash-surface-2 text-dash-muted",
 };
 
 export const UNCATEGORIZED_LEAD_CATEGORY = "sin_categoria";

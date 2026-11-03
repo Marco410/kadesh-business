@@ -123,7 +123,7 @@ export default function AdminCompany360({ companyId }: { companyId: string }) {
     <button
       type="button"
       onClick={back}
-      className="inline-flex min-h-10 items-center gap-1.5 self-start text-sm text-[#616161] hover:text-orange-500 dark:text-[#b0b0b0] cursor-pointer"
+      className="inline-flex min-h-10 items-center gap-1.5 self-start text-sm text-dash-muted hover:text-orange-500 cursor-pointer"
     >
       <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
       Clientes

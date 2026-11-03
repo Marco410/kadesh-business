@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useIsClient } from "kadesh/utils/useIsClient";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Logo from "../shared/Logo";
 import Link from "next/link";
@@ -12,7 +12,8 @@ import { Routes } from "kadesh/core/routes";
 import { useUser } from "kadesh/utils/UserContext";
 import { isPlatformAdminUser } from "kadesh/utils/user-roles";
 import { NICHE_TARGET_MAPPING } from "kadesh/constants/constans";
-import { trackLogout } from "kadesh/utils/activity";
+import { useLogout } from "kadesh/utils/useLogout";
+import ThemeToggle from "./ThemeToggle";
 import FontSizeSlider from "./FontSizeSlider";
 import { NotificationBell } from "kadesh/components/notifications";
 
@@ -50,12 +51,11 @@ export default function Navigation({ overDarkHero = false }: { overDarkHero?: bo
   const [nicheDropdownOpen, setNicheDropdownOpen] = useState(false);
   const [nicheMobileOpen, setNicheMobileOpen] = useState(false);
   const [avatarDropdownOpen, setAvatarDropdownOpen] = useState(false);
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const mounted = useIsClient();
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const nicheDropdownRef = useRef<HTMLDivElement>(null);
   const avatarDropdownRef = useRef<HTMLDivElement>(null);
@@ -136,37 +136,10 @@ export default function Navigation({ overDarkHero = false }: { overDarkHero?: bo
     setOpened(false);
   };
 
-  const toggleTheme = () => {
-    if (!mounted) return;
-    const currentTheme = resolvedTheme || theme || "light";
-    const newTheme = currentTheme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-  };
-
-  const handleLogout = async () => {
-    try {
-      // Registrar la salida antes de borrar el token (la petición lo necesita).
-      trackLogout();
-
-      // Limpiar token del localStorage
-      localStorage.removeItem("keystonejs-session-token");
-
-      // Limpiar cookies de sesión
-      document.cookie.split(";").forEach((c) => {
-        document.cookie = c
-          .replace(/^ +/, "")
-          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-      });
-
-      // Limpiar el usuario del contexto
-      setUser(undefined);
-
-      // Redirigir a home
-      router.push(Routes.home);
-      setAvatarDropdownOpen(false);
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-    }
+  const logout = useLogout();
+  const handleLogout = () => {
+    logout();
+    setAvatarDropdownOpen(false);
   };
 
   const isDark = mounted && resolvedTheme === "dark";
@@ -294,46 +267,9 @@ export default function Navigation({ overDarkHero = false }: { overDarkHero?: bo
           <FontSizeSlider tone={atTopLight ? "onLight" : "onDark"} />
 
           {/* Theme Toggle Button */}
-          {mounted && (
-            <button
-              onClick={toggleTheme}
-              type="button"
-              className={`p-2 rounded-lg transition-colors duration-200 ${atTopLight ? "text-gray-800 hover:bg-gray-100" : "text-white hover:bg-white/10"}`}
-              aria-label="Toggle theme"
-            >
-              {(resolvedTheme || theme) === "dark" ? (
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                  />
-                </svg>
-              )}
-            </button>
-          )}
+          <ThemeToggle
+            className={`p-2 rounded-lg ${atTopLight ? "text-gray-800 hover:bg-gray-100" : "text-white hover:bg-white/10"}`}
+          />
 
           {/* Campana: solo admins de plataforma en esta fase (avisos de Kadesh Pet y Operaciones). */}
           {user?.id && isPlatformAdminUser(user) ? <NotificationBell light={atTopLight} /> : null}
@@ -505,46 +441,10 @@ export default function Navigation({ overDarkHero = false }: { overDarkHero?: bo
                   <div className="flex items-center gap-4">
                     <FontSizeSlider tone="onDark" />
                     {/* Theme Toggle Button Mobile */}
-                    {mounted && (
-                      <button
-                        onClick={toggleTheme}
-                        type="button"
-                        className="text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
-                        aria-label="Toggle theme"
-                      >
-                        {(resolvedTheme || theme) === "dark" ? (
-                          <svg
-                            className="w-6 h-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                            />
-                          </svg>
-                        ) : (
-                          <svg
-                            className="w-6 h-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                            />
-                          </svg>
-                        )}
-                      </button>
-                    )}
+                    <ThemeToggle
+                      className="text-white p-2 rounded-lg hover:bg-white/10"
+                      iconClassName="w-6 h-6"
+                    />
                     <button
                       onClick={() => setOpened(false)}
                       className="text-white text-2xl font-bold"

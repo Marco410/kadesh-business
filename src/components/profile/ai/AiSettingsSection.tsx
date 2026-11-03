@@ -55,7 +55,7 @@ import {
 } from "./motion";
 
 const INPUT_CLASS =
-  "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
+  "w-full px-4 py-3 rounded-lg border border-dash-line bg-dash-surface text-dash-ink placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
 
 function formatCreditPeriod(year: number | null, month: number | null): string {
   if (!year || !month) return "";
@@ -305,7 +305,7 @@ export function AiSettingsSection({
           type="button"
           onClick={() => void handleSave()}
           disabled={busy || !isDirty}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center justify-center gap-2 rounded-full dash-grad-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 shadow-dash-accent"
         >
           {saving ? (
             <>
@@ -320,7 +320,7 @@ export function AiSettingsSection({
           type="button"
           onClick={() => void handleTestConnection()}
           disabled={busy || isDirty}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#e0e0e0] px-5 py-2.5 text-sm font-semibold text-[#212121] transition-colors hover:bg-[#f5f5f5] disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-dash-line px-5 py-2.5 text-sm font-semibold text-dash-ink transition-colors hover:bg-dash-hover disabled:cursor-not-allowed disabled:opacity-60 dark:text-[#e0e0e0]"
         >
           {testing ? (
             <>
@@ -336,7 +336,7 @@ export function AiSettingsSection({
         </button>
       </div>
       {isDirty && (
-        <p className="mt-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-2 text-xs text-dash-muted">
           Guarda los cambios para poder probar la conexión con la configuración
           nueva.
         </p>
@@ -371,11 +371,11 @@ export function AiSettingsSection({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.2 }}
-        className="flex items-center justify-center rounded-2xl border border-[#e0e0e0] bg-white py-16 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+        className="flex items-center justify-center rounded-3xl border border-dash-line bg-dash-surface py-16"
       >
         <div className="text-center">
           <span className="mx-auto block size-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
-          <p className="mt-3 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-3 text-sm text-dash-muted">
             Cargando {KADESH_URIM_AI_NAME}...
           </p>
         </div>
@@ -395,20 +395,20 @@ export function AiSettingsSection({
         transition={aiMotionTransition(reduce)}
         className={`rounded-2xl border p-5 sm:p-6 ${
           contextComplete
-            ? "border-[#e0e0e0] bg-white dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+            ? "border-dash-line bg-dash-surface"
             : "border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/30"
         }`}
       >
-        <h3 className="text-sm font-semibold text-[#212121] dark:text-white">
+        <h3 className="text-sm font-semibold text-dash-ink">
           Contexto de tu negocio
         </h3>
-        <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-1 text-sm leading-relaxed text-dash-muted">
           {contextComplete
             ? `${KADESH_URIM_AI_NAME} ya tiene el perfil de tu empresa: oferta, cliente ideal, ticket y cómo vendes.`
             : `Cuéntale a ${KADESH_URIM_AI_NAME} qué vendes, a quién y cómo cierras. Lo que agregues aquí y lo que uses en Kadesh es lo que ya sabe de tu negocio.`}
         </p>
         {!contextComplete && (
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-dash-muted">
             {missingContext.map((label) => (
               <li key={label}>{label}</li>
             ))}
@@ -437,7 +437,7 @@ export function AiSettingsSection({
       <motion.div
         variants={fadeUp}
         transition={aiMotionTransition(reduce, 0.04)}
-        className="h-full min-h-0 rounded-2xl border border-[#e0e0e0] bg-white p-6 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-8"
+        className="h-full min-h-0 rounded-3xl border border-dash-line bg-dash-surface p-6 shadow-sm sm:p-8"
       >
         <AnimatePresence>
           {formError ? (
@@ -454,7 +454,7 @@ export function AiSettingsSection({
         </AnimatePresence>
 
         <fieldset className="min-w-0">
-          <legend className="text-sm font-semibold text-[#212121] dark:text-white">
+          <legend className="text-sm font-semibold text-dash-ink">
             Cómo paga tu empresa la IA
           </legend>
           <div
@@ -475,13 +475,13 @@ export function AiSettingsSection({
                   className={`h-full min-h-0 rounded-xl border p-4 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#1e1e1e] ${
                     selected
                       ? "border-orange-500 bg-orange-500/10 dark:bg-orange-500/15"
-                      : "border-[#e0e0e0] bg-white hover:border-orange-300 dark:border-[#3a3a3a] dark:bg-[#161616] dark:hover:border-orange-500/50"
+                      : "border-dash-line bg-white hover:border-orange-300 dark:bg-[#161616] dark:hover:border-orange-500/50"
                   }`}
                 >
-                  <span className="block text-sm font-semibold text-[#212121] dark:text-white">
+                  <span className="block text-sm font-semibold text-dash-ink">
                     {option.label}
                   </span>
-                  <span className="mt-1 block text-xs leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+                  <span className="mt-1 block text-xs leading-relaxed text-dash-muted">
                     {option.description}
                   </span>
                 </button>
@@ -492,68 +492,68 @@ export function AiSettingsSection({
 
         {isManaged ? (
           <>
-            <div className="mt-8 rounded-xl border border-[#e0e0e0] bg-[#fafafa] p-5 dark:border-[#3a3a3a] dark:bg-[#252525]">
-              <p className="text-sm font-semibold text-[#212121] dark:text-white">
+            <div className="mt-8 rounded-xl border border-dash-line bg-dash-surface-2 p-5">
+              <p className="text-sm font-semibold text-dash-ink">
                 Saldo de créditos
               </p>
-              <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+              <p className="mt-1 text-sm leading-relaxed text-dash-muted">
                 Es la misma bolsa que usas para extraer leads. Probar la
                 conexión no cobra.
               </p>
-              <p className="mt-4 text-3xl font-bold tabular-nums text-[#212121] dark:text-white">
+              <p className="mt-4 text-3xl font-bold tabular-nums text-dash-ink">
                 {creditsLoading ? "…" : (remainingQuota ?? "—")}
-                <span className="ml-2 text-sm font-medium text-[#616161] dark:text-[#b0b0b0]">
+                <span className="ml-2 text-sm font-medium text-dash-muted">
                   créditos disponibles
                 </span>
               </p>
               <dl className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
                 {planLeadLimit != null && (
                   <div>
-                    <dt className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                    <dt className="text-xs font-medium uppercase tracking-wide text-dash-faint dark:text-[#888]">
                       Incluidos en el plan
                     </dt>
-                    <dd className="font-semibold tabular-nums text-[#212121] dark:text-white">
+                    <dd className="font-semibold tabular-nums text-dash-ink">
                       {planLeadLimit}
                     </dd>
                   </div>
                 )}
                 {extraCredits != null && (
                   <div>
-                    <dt className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                    <dt className="text-xs font-medium uppercase tracking-wide text-dash-faint dark:text-[#888]">
                       Recargas extra
                     </dt>
-                    <dd className="font-semibold tabular-nums text-[#212121] dark:text-white">
+                    <dd className="font-semibold tabular-nums text-dash-ink">
                       {extraCredits}
                     </dd>
                   </div>
                 )}
                 {creditPeriod && (
                   <div className="sm:col-span-2">
-                    <dt className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                    <dt className="text-xs font-medium uppercase tracking-wide text-dash-faint dark:text-[#888]">
                       Periodo
                     </dt>
-                    <dd className="capitalize text-[#212121] dark:text-white">
+                    <dd className="capitalize text-dash-ink">
                       {creditPeriod}
                     </dd>
                   </div>
                 )}
               </dl>
-              <div className="mt-4 space-y-3 border-t border-[#ececec] pt-4 dark:border-[#2a2a2a]">
+              <div className="mt-4 space-y-3 border-t border-dash-line pt-4">
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                  <p className="text-xs font-medium uppercase tracking-wide text-dash-faint dark:text-[#888]">
                     Cómo se cobra
                   </p>
-                  <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-1 text-sm leading-relaxed text-dash-muted">
                     1 crédito cubre{" "}
                     {AI_TOKENS_PER_CREDIT.toLocaleString("es-MX")} tokens. Los
                     tokens es lo que le mandamos a {KADESH_URIM_AI_NAME}.
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-[#9e9e9e] dark:text-[#888]">
+                  <p className="text-xs font-medium uppercase tracking-wide text-dash-faint dark:text-[#888]">
                     Tope de uso
                   </p>
-                  <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+                  <p className="mt-1 text-sm leading-relaxed text-dash-muted">
                     Hasta {AI_MANAGED_MAX_PER_MINUTE} consultas por minuto y{" "}
                     {AI_MANAGED_MAX_PER_DAY} al día. Si se llena, espera un
                     momento o usa tu API key: ahí no hay este tope ni se
@@ -577,7 +577,7 @@ export function AiSettingsSection({
               <div>
                 <label
                   htmlFor="ai-provider"
-                  className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]"
+                  className="mb-2 block text-sm font-semibold text-dash-muted"
                 >
                   Proveedor
                 </label>
@@ -600,7 +600,7 @@ export function AiSettingsSection({
               <div>
                 <label
                   htmlFor="ai-api-key"
-                  className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]"
+                  className="mb-2 block text-sm font-semibold text-dash-muted"
                 >
                   API key
                 </label>
@@ -626,7 +626,7 @@ export function AiSettingsSection({
                   <button
                     type="button"
                     onClick={() => setShowApiKey((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#616161] transition-colors hover:bg-[#f0f0f0] hover:text-[#212121] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a] dark:hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-dash-muted transition-colors hover:bg-[#f0f0f0] hover:text-dash-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:hover:bg-[#2a2a2a]"
                     aria-label={
                       showApiKey ? "Ocultar API key" : "Mostrar API key"
                     }
@@ -637,12 +637,12 @@ export function AiSettingsSection({
                     />
                   </button>
                 </div>
-                <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                <p className="mt-1.5 text-xs text-dash-muted">
                   La key nunca se muestra completa. Déjala vacía para conservar
                   la actual; escríbela solo si quieres reemplazarla.
                 </p>
                 {hasSavedKey && saved?.aiKeyUpdatedAt && (
-                  <p className="mt-1 text-xs text-[#9e9e9e] dark:text-[#888]">
+                  <p className="mt-1 text-xs text-dash-faint dark:text-[#888]">
                     Actualizada {formatDateShort(saved.aiKeyUpdatedAt)}.
                   </p>
                 )}
@@ -650,7 +650,7 @@ export function AiSettingsSection({
                   <div className="mt-3">
                     {confirmClearKey ? (
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                        <span className="text-sm text-dash-muted">
                           ¿Quitar la API key guardada?
                         </span>
                         <button
@@ -665,7 +665,7 @@ export function AiSettingsSection({
                           type="button"
                           onClick={() => setConfirmClearKey(false)}
                           disabled={busy}
-                          className="rounded-lg border border-[#e0e0e0] px-3 py-1.5 text-sm font-medium text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
+                          className="rounded-lg border border-dash-line px-3 py-1.5 text-sm font-medium text-dash-ink transition-colors hover:bg-dash-hover dark:text-[#e0e0e0]"
                         >
                           Cancelar
                         </button>
@@ -688,7 +688,7 @@ export function AiSettingsSection({
               <div>
                 <label
                   htmlFor="ai-model"
-                  className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]"
+                  className="mb-2 block text-sm font-semibold text-dash-muted"
                 >
                   Modelo (opcional)
                 </label>
@@ -701,7 +701,7 @@ export function AiSettingsSection({
                   placeholder={modelPlaceholder}
                   className={INPUT_CLASS}
                 />
-                <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                <p className="mt-1.5 text-xs text-dash-muted">
                   Vacío usa el default del proveedor
                   {isAiProviderKey(provider)
                     ? ` (${DEFAULT_AI_MODELS[provider as AiProviderKey]})`

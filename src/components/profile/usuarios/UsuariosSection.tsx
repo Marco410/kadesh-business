@@ -141,8 +141,8 @@ export default function UsuariosSection() {
 
   if (!companyId) {
     return (
-      <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8 shadow-sm">
-        <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+      <div className="rounded-3xl border border-dash-line bg-dash-surface p-6 sm:p-8 shadow-sm">
+        <p className="text-sm text-dash-muted">
           Asocia una empresa a tu cuenta para gestionar usuarios.
         </p>
       </div>
@@ -176,16 +176,16 @@ export default function UsuariosSection() {
               <HugeiconsIcon icon={UserMultiple02Icon} size={22} />
             </span>
             <div className="min-w-0">
-              <h2 className="text-xl font-bold text-[#212121] dark:text-white">
+              <h2 className="text-xl font-bold text-dash-ink">
                 Usuarios
                 {!listLoading || users.length > 0 ? (
-                  <span className="ml-2 text-base font-semibold text-[#9e9e9e] dark:text-[#7a7a7a]">
+                  <span className="ml-2 text-base font-semibold text-dash-faint dark:text-[#7a7a7a]">
                     ({filteredUsers.length}
                     {searchInput.trim() ? ` de ${users.length}` : ""})
                   </span>
                 ) : null}
               </h2>
-              <p className="mt-0.5 text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <p className="mt-0.5 text-sm text-dash-muted">
                 Personas de tu empresa, roles y acceso a módulos.
               </p>
             </div>
@@ -193,7 +193,7 @@ export default function UsuariosSection() {
         </div>
         <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
           <div className="relative w-full sm:w-64">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9e9e9e]">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint">
               <HugeiconsIcon icon={Search01Icon} size={18} />
             </span>
             <input
@@ -201,7 +201,7 @@ export default function UsuariosSection() {
               placeholder="Buscar por nombre o correo…"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full min-h-11 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] py-2.5 pl-10 pr-3 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full min-h-11 rounded-xl border border-dash-line bg-dash-surface py-2.5 pl-10 pr-3 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus:ring-2 focus:ring-orange-500"
               aria-label="Buscar usuarios"
             />
           </div>
@@ -212,7 +212,7 @@ export default function UsuariosSection() {
               setEditingUser(null);
               setMode("create");
             }}
-            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#121212]"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full dash-grad-accent px-4 py-2.5 text-sm font-semibold text-white hover:shadow-dash-accent-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#121212] shadow-dash-accent"
           >
             <HugeiconsIcon icon={Add01Icon} size={18} />
             Nuevo usuario
@@ -225,19 +225,19 @@ export default function UsuariosSection() {
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className="h-40 animate-pulse rounded-2xl bg-[#ececec] dark:bg-[#1e1e1e]"
+              className="h-40 dash-shimmer rounded-2xl dark:bg-[#1e1e1e]"
             />
           ))}
         </div>
       ) : users.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#d0d0d0] dark:border-[#444] bg-white dark:bg-[#1e1e1e] px-6 py-12 text-center shadow-sm">
+        <div className="rounded-2xl border border-dashed border-dash-line-strong dark:border-[#444] bg-dash-surface px-6 py-12 text-center shadow-sm">
           <span className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500">
             <HugeiconsIcon icon={UserMultiple02Icon} size={28} />
           </span>
-          <p className="text-lg font-semibold text-[#212121] dark:text-white">
+          <p className="text-lg font-semibold text-dash-ink">
             Aún no hay usuarios
           </p>
-          <p className="mx-auto mt-1 max-w-sm text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mx-auto mt-1 max-w-sm text-sm text-dash-muted">
             Crea el primero para asignarle rol, permisos y sumarlo a un espacio
             de trabajo.
           </p>
@@ -247,15 +247,15 @@ export default function UsuariosSection() {
               setEditingUser(null);
               setMode("create");
             }}
-            className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-600"
+            className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-full dash-grad-accent px-4 py-2.5 text-sm font-semibold text-white hover:shadow-dash-accent-lift shadow-dash-accent"
           >
             <HugeiconsIcon icon={Add01Icon} size={18} />
             Crear usuario
           </button>
         </div>
       ) : filteredUsers.length === 0 ? (
-        <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-6 py-10 text-center shadow-sm">
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <div className="rounded-3xl border border-dash-line bg-dash-surface px-6 py-10 text-center shadow-sm">
+          <p className="text-sm text-dash-muted">
             Nadie coincide con &quot;{searchInput.trim()}&quot;.
           </p>
         </div>
@@ -278,7 +278,7 @@ export default function UsuariosSection() {
               <li key={row.id}>
                 <article
                   className={cn(
-                    "flex h-full flex-col rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm transition-colors",
+                    "flex h-full flex-col rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm transition-colors",
                     canEdit &&
                       "hover:border-orange-500/40 dark:hover:border-orange-500/40",
                   )}
@@ -293,15 +293,15 @@ export default function UsuariosSection() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="truncate font-semibold text-[#212121] dark:text-white">
+                          <p className="truncate font-semibold text-dash-ink">
                             {formatName(row)}
                             {isSelf ? (
-                              <span className="ml-1.5 text-xs font-medium text-[#9e9e9e]">
+                              <span className="ml-1.5 text-xs font-medium text-dash-faint">
                                 (tú)
                               </span>
                             ) : null}
                           </p>
-                          <p className="mt-0.5 truncate text-sm text-[#616161] dark:text-[#b0b0b0]">
+                          <p className="mt-0.5 truncate text-sm text-dash-muted">
                             {row.email ?? "Sin correo"}
                           </p>
                         </div>
@@ -312,13 +312,13 @@ export default function UsuariosSection() {
                               setEditingUser(row);
                               setMode("edit");
                             }}
-                            className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#616161] dark:text-[#b0b0b0] hover:border-orange-500/50 hover:text-orange-600 dark:hover:text-orange-400"
+                            className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-dash-line text-dash-muted hover:border-orange-500/50 hover:text-orange-600 dark:hover:text-orange-400"
                             aria-label={`Editar ${formatName(row)}`}
                           >
                             <HugeiconsIcon icon={Edit02Icon} size={18} />
                           </button>
                         ) : (
-                          <span className="shrink-0 rounded-full bg-[#f3f3f3] px-2 py-1 text-[11px] font-medium text-[#616161] dark:bg-[#2a2a2a] dark:text-[#9e9e9e]">
+                          <span className="shrink-0 rounded-full bg-[#f3f3f3] px-2 py-1 text-[11px] font-medium text-dash-muted dark:bg-[#2a2a2a]">
                             Protegido
                           </span>
                         )}
@@ -337,13 +337,13 @@ export default function UsuariosSection() {
                         </span>
                       ))
                     ) : (
-                      <span className="rounded-full bg-[#f3f3f3] px-2.5 py-1 text-xs font-medium text-[#616161] dark:bg-[#2a2a2a] dark:text-[#9e9e9e]">
+                      <span className="rounded-full bg-[#f3f3f3] px-2.5 py-1 text-xs font-medium text-dash-muted dark:bg-[#2a2a2a]">
                         {roleLabels(row)}
                       </span>
                     )}
                   </div>
 
-                  <p className="mt-auto pt-3 text-xs text-[#9e9e9e] dark:text-[#7a7a7a]">
+                  <p className="mt-auto pt-3 text-xs text-dash-faint dark:text-[#7a7a7a]">
                     {perms
                       ? `${perms.length} permiso${perms.length === 1 ? "" : "s"} asignado${perms.length === 1 ? "" : "s"}`
                       : "Acceso por rol (sin lista)"}

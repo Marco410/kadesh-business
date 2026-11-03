@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { AnimatePresence, motion } from "framer-motion";
+import { DASH_EASE } from "kadesh/components/app-shell";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import {
@@ -94,37 +95,37 @@ export default function AdminPetPlaceServiceReviewModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50"
+            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50"
             onClick={onClose}
           />
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 24, scale: 0.98 }}
+            transition={{ duration: 0.3, ease: DASH_EASE }}
             className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none"
           >
             <div
-              className="bg-white dark:bg-[#1e1e1e] rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-xl max-h-[92vh] overflow-y-auto pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
+              className="bg-dash-surface rounded-t-3xl sm:rounded-3xl shadow-dash-lift font-dash text-dash-ink w-full max-w-xl max-h-[92vh] overflow-y-auto pointer-events-auto border border-dash-line"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="sticky top-0 bg-white dark:bg-[#1e1e1e] px-4 sm:px-6 py-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a] flex items-start justify-between gap-3">
+              <div className="sticky top-0 z-[1] bg-dash-surface/95 backdrop-blur px-4 sm:px-6 py-4 border-b border-dash-line flex items-start justify-between gap-3">
                 {service ? (
                   <div className="min-w-0">
-                    <h3 className="text-xl font-bold text-[#212121] dark:text-white">
+                    <h3 className="text-xl font-bold text-dash-ink">
                       {service.name ?? "Servicio"}
                     </h3>
-                    <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1">
+                    <p className="text-sm text-dash-muted mt-1">
                       Pedido {formatDateShort(service.createdAt, false)}
                     </p>
                   </div>
                 ) : (
-                  <div className="h-12 w-48 rounded-lg bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
+                  <div className="h-12 w-48 rounded-lg dash-shimmer" />
                 )}
                 <button
                   type="button"
                   onClick={onClose}
-                  className="h-11 w-11 rounded-xl text-2xl text-[#616161] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] cursor-pointer"
+                  className="flex size-11 shrink-0 items-center justify-center rounded-full text-2xl leading-none text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-ink cursor-pointer"
                   aria-label="Cerrar"
                 >
                   ×
@@ -134,57 +135,57 @@ export default function AdminPetPlaceServiceReviewModal({
               <div className="px-4 sm:px-6 py-5 flex flex-col gap-4">
                 {!service ? (
                   <div className="space-y-3" aria-hidden>
-                    <div className="h-24 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
+                    <div className="h-24 rounded-xl dash-shimmer" />
                   </div>
                 ) : (
                   <>
-                    <section className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-4">
-                      <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+                    <section className="rounded-xl bg-dash-surface-2 p-4">
+                      <h4 className="text-sm font-semibold text-dash-ink">
                         Quién lo pidió
                       </h4>
-                      <p className="mt-2 text-sm text-[#212121] dark:text-white">
+                      <p className="mt-2 text-sm text-dash-ink">
                         {formatPersonName(
                           service.requestedBy?.name,
                           service.requestedBy?.lastName,
                         )}
                       </p>
                       {service.requestedBy?.email ? (
-                        <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5 break-all">
+                        <p className="text-xs text-dash-muted mt-0.5 break-all">
                           {service.requestedBy.email}
                         </p>
                       ) : null}
                     </section>
 
                     <section>
-                      <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+                      <h4 className="text-sm font-semibold text-dash-ink">
                         Descripción
                       </h4>
-                      <p className="mt-2 whitespace-pre-wrap rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] p-3 text-sm text-[#424242] dark:text-[#e0e0e0] min-h-16">
+                      <p className="mt-2 whitespace-pre-wrap rounded-xl border border-dash-line p-3 text-sm text-dash-soft min-h-16">
                         {service.description?.trim() || "No dejó descripción."}
                       </p>
                     </section>
 
                     {isPending ? (
                       <section>
-                        <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+                        <h4 className="text-sm font-semibold text-dash-ink">
                           Asignar a la ficha
                         </h4>
-                        <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+                        <p className="text-xs text-dash-muted mt-1 mb-3">
                           Al aprobarlo entra al catálogo y se marca en esta clínica.
                         </p>
                         {selectedPlace ? (
                           <div className="rounded-xl border border-orange-200 dark:border-orange-800/60 bg-orange-50/70 dark:bg-orange-950/20 px-3 py-3 mb-3">
-                            <p className="text-sm font-semibold text-[#212121] dark:text-white">
+                            <p className="text-sm font-semibold text-dash-ink">
                               {selectedPlace.name ?? "Clínica"}
                             </p>
-                            <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                            <p className="text-xs text-dash-muted mt-0.5">
                               {[selectedPlace.municipality, selectedPlace.state]
                                 .filter(Boolean)
                                 .join(", ") || "Sin ubicación"}
                             </p>
                           </div>
                         ) : (
-                          <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mb-3">
+                          <p className="text-sm text-dash-muted mb-3">
                             Elige la clínica a la que se va a conectar.
                           </p>
                         )}
@@ -194,13 +195,13 @@ export default function AdminPetPlaceServiceReviewModal({
                           placeholder="Buscar otra clínica por nombre o municipio"
                         />
                         {searchWhere ? (
-                          <ul className="mt-2 max-h-48 overflow-y-auto rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+                          <ul className="mt-2 max-h-48 overflow-y-auto rounded-xl border border-dash-line divide-y divide-dash-line">
                             {searchLoading ? (
-                              <li className="px-3 py-3 text-sm text-[#616161] dark:text-[#b0b0b0]">
+                              <li className="px-3 py-3 text-sm text-dash-muted">
                                 Buscando...
                               </li>
                             ) : results.length === 0 ? (
-                              <li className="px-3 py-3 text-sm text-[#616161] dark:text-[#b0b0b0]">
+                              <li className="px-3 py-3 text-sm text-dash-muted">
                                 No hay clínicas con ese nombre.
                               </li>
                             ) : (
@@ -212,7 +213,7 @@ export default function AdminPetPlaceServiceReviewModal({
                                       setSelectedPlace(place);
                                       setSearch("");
                                     }}
-                                    className="w-full text-left px-3 py-3 text-sm hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
+                                    className="w-full text-left px-3 py-3 text-sm hover:bg-dash-hover cursor-pointer"
                                   >
                                     {placeLabel(place)}
                                   </button>
@@ -235,7 +236,7 @@ export default function AdminPetPlaceServiceReviewModal({
                                 ? onApprove(selectedPlace.id)
                                 : Promise.resolve()
                             }
-                            className="h-11 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold disabled:opacity-60 cursor-pointer"
+                            className="h-11 rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white text-sm font-semibold disabled:opacity-60 cursor-pointer shadow-dash-accent"
                           >
                             {busy ? "Guardando..." : "Aprobar y asignar a la ficha"}
                           </button>
@@ -249,7 +250,7 @@ export default function AdminPetPlaceServiceReviewModal({
                           </button>
                         </>
                       ) : (
-                        <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                        <p className="text-sm text-dash-muted">
                           Esta solicitud ya se resolvió.
                         </p>
                       )}

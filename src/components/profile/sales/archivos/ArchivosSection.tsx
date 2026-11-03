@@ -172,14 +172,14 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
 
   if (!companyId) {
     return (
-      <div className="rounded-2xl border border-[#e5e5e5] dark:border-[#333] bg-white dark:bg-[#1a1a1a] p-8 shadow-sm">
+      <div className="rounded-2xl border border-[#e5e5e5] dark:border-[#333] bg-dash-surface p-8 shadow-sm">
         <div className="flex items-start gap-4">
           <span className="flex-shrink-0 w-12 h-12 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center">
             <HugeiconsIcon icon={FileAttachmentIcon} size={24} className="text-amber-500 dark:text-amber-400" />
           </span>
           <div>
             <h3 className="text-lg font-semibold text-[#1a1a1a] dark:text-white mb-1">Sin empresa asociada</h3>
-            <p className="text-[#616161] dark:text-[#a0a0a0] text-sm leading-relaxed">
+            <p className="text-dash-muted text-sm leading-relaxed">
               Asocia una empresa a tu cuenta para poder subir y gestionar archivos (PDF, DOC, etc.).
             </p>
           </div>
@@ -191,10 +191,10 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
   return (
     <div className="space-y-8">
       {canUpload && (
-        <div className="rounded-2xl border border-[#e5e5e5] dark:border-[#333] bg-white dark:bg-[#1a1a1a] shadow-sm overflow-hidden">
-          <div className="border-l-4 border-orange-500 bg-[#fafafa] dark:bg-[#222] px-6 py-4">
+        <div className="rounded-2xl border border-[#e5e5e5] dark:border-[#333] bg-dash-surface shadow-sm overflow-hidden">
+          <div className="border-l-4 border-orange-500 bg-dash-surface-2 px-6 py-4">
             <h2 className="text-lg font-semibold text-[#1a1a1a] dark:text-white">Subir archivo</h2>
-            <p className="text-sm text-[#616161] dark:text-[#a0a0a0] mt-0.5">
+            <p className="text-sm text-dash-muted mt-0.5">
               PDF, DOC, DOCX, XLS, XLSX o imágenes. Completa los datos y selecciona el archivo.
             </p>
           </div>
@@ -257,7 +257,7 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
                 className={`flex flex-col items-center justify-center w-full min-h-[140px] rounded-xl border-2 border-dashed cursor-pointer transition-colors ${
                   selectedFile
                     ? "border-orange-500 bg-orange-500/5 dark:bg-orange-500/10"
-                    : "border-[#d1d5db] dark:border-[#404040] hover:border-orange-400 dark:hover:border-orange-500/60 hover:bg-[#fafafa] dark:hover:bg-[#252525]"
+                    : "border-[#d1d5db] dark:border-[#404040] hover:border-orange-400 dark:hover:border-orange-500/60 hover:bg-dash-hover"
                 } ${uploading ? "opacity-60 pointer-events-none" : ""}`}
               >
                 <input
@@ -273,7 +273,7 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
                     <span className="text-sm font-medium text-[#1a1a1a] dark:text-white truncate max-w-[280px] px-2 text-center">
                       {selectedFile.name}
                     </span>
-                    <span className="text-xs text-[#616161] dark:text-[#a0a0a0] mt-1">Haz clic para cambiar</span>
+                    <span className="text-xs text-dash-muted mt-1">Haz clic para cambiar</span>
                   </>
                 ) : (
                   <>
@@ -288,7 +288,7 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
             <button
               type="submit"
               disabled={uploading || !selectedFile}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow-sm hover:shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white font-semibold shadow-sm hover:shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-sm shadow-dash-accent"
             >
               {uploading ? (
                 <>
@@ -306,18 +306,18 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
         </div>
       )}
 
-      <div className="rounded-2xl border border-[#e5e5e5] dark:border-[#333] bg-white dark:bg-[#1a1a1a] shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-[#e5e5e5] dark:border-[#333] bg-dash-surface shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-[#e5e5e5] dark:border-[#333] flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-[#1a1a1a] dark:text-white">Tus archivos</h2>
           {!loadingFiles && files.length > 0 && (
-            <span className="text-sm text-[#616161] dark:text-[#a0a0a0] bg-[#f3f4f6] dark:bg-[#2a2a2a] px-3 py-1 rounded-full font-medium">
+            <span className="text-sm text-dash-muted bg-[#f3f4f6] dark:bg-[#2a2a2a] px-3 py-1 rounded-full font-medium">
               {files.length} {files.length === 1 ? "archivo" : "archivos"}
             </span>
           )}
         </div>
         <div className="p-6 sm:p-8">
           {loadingFiles ? (
-            <div className="flex items-center justify-center gap-3 py-12 text-[#616161] dark:text-[#a0a0a0]">
+            <div className="flex items-center justify-center gap-3 py-12 text-dash-muted">
               <span className="size-6 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
               <span>Cargando archivos...</span>
             </div>
@@ -336,7 +336,7 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
               {files.map((file) => (
                 <li
                   key={file.id}
-                  className="w-full rounded-xl border border-[#e5e5e5] dark:border-[#333] bg-[#fafafa] dark:bg-[#222] p-4 hover:border-[#d1d5db] dark:hover:border-[#404040] transition-colors"
+                  className="w-full rounded-xl border border-[#e5e5e5] dark:border-[#333] bg-dash-surface-2 p-4 hover:border-[#d1d5db] dark:hover:border-[#404040] transition-colors"
                 >
                   <div className="flex flex-col h-full">
                     <span className="flex-shrink-0 w-14 h-14 rounded-xl bg-orange-500/10 dark:bg-orange-500/20 flex items-center justify-center mb-4">

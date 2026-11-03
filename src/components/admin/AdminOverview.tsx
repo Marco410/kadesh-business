@@ -1,14 +1,27 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
-import { formatDate } from "kadesh/utils/format-date";
 import {
-  ADMIN_OVERVIEW_QUERY,
-  type AdminOverviewResponse,
-} from "./queries";
+  Alert02Icon,
+  ArrowRight01Icon,
+  Building06Icon,
+  CheckmarkCircle02Icon,
+  Clock01Icon,
+  CreditCardIcon,
+  Search01Icon,
+  Stethoscope02Icon,
+  Task01Icon,
+  UserGroupIcon,
+} from "@hugeicons/core-free-icons";
+import { Reveal, greetingFor } from "kadesh/components/app-shell";
+import { formatDate } from "kadesh/utils/format-date";
+import { useIsClient } from "kadesh/utils/useIsClient";
+import { useUser } from "kadesh/utils/UserContext";
+import { cn } from "kadesh/utils/cn";
+import { SUBSCRIPTION_STATUS } from "kadesh/constants/constans";
+import { ADMIN_OVERVIEW_QUERY, type AdminOverviewResponse } from "./queries";
 import {
   ADMIN_TABS,
   ATTENTION_REASON_LABELS,
@@ -31,6 +44,7 @@ import {
 import { useActivityFeed } from "./activity/useActivityFeed";
 import { useAdminNavigation } from "./hooks/useAdminNavigation";
 import {
+  AdminButton,
   AdminErrorState,
   AdminSectionCard,
   AdminStatTile,
@@ -38,16 +52,42 @@ import {
   formatCredits,
   formatMoney,
   formatPersonName,
-  surfaceClass,
 } from "./ui";
-import { cn } from "kadesh/utils/cn";
-import { SUBSCRIPTION_STATUS } from "kadesh/constants/constans";
 
-const SEVERITY_CLASS: Record<AdminAttentionItem["severity"], string> = {
-  high: "bg-red-500/15 text-red-700 dark:text-red-300",
-  medium: "bg-amber-500/15 text-amber-800 dark:text-amber-300",
-  low: "bg-black/5 text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]",
+const SEVERITY_ICON_CLASS: Record<AdminAttentionItem["severity"], string> = {
+  high: "text-red-600 dark:text-red-400",
+  medium: "text-amber-600 dark:text-amber-400",
+  low: "text-dash-muted",
 };
+
+/** Cuántas filas de "Requiere atención" se ven antes de "Ver más". */
+const ATTENTION_PREVIEW = 5;
+
+const rowButton =
+  "flex w-full min-h-12 cursor-pointer items-center gap-3 rounded-[14px] bg-dash-surface-2 px-3.5 py-2.5 text-left text-sm transition-colors hover:bg-dash-surface-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
+
+function SkeletonRows({ count, height = "h-12" }: { count: number; height?: string }) {
+  return (
+    <div className="space-y-2" aria-hidden>
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className={cn("dash-shimmer rounded-[14px]", height)} />
+      ))}
+    </div>
+  );
+}
+
+function LinkButton({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex h-9 cursor-pointer items-center gap-1 rounded-full px-3 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-orange-500/10"
+    >
+      {label}
+      <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
+    </button>
+  );
+}
 
 /**
  * Cuántos leads del mes salieron de la base de Kadesh (ya existían) contra los que se tuvieron
@@ -57,48 +97,51 @@ function SearchSavingsCard({
   reused,
   created,
   loading,
+  index,
 }: {
   reused: number;
   created: number;
   loading: boolean;
+  index: number;
 }) {
   const total = reused + created;
   const pct = total > 0 ? Math.round((reused / total) * 100) : 0;
   return (
     <AdminSectionCard
+      index={index}
       title="Ahorro en búsquedas"
-      description="Cuando un negocio ya está en Kadesh se le da al cliente desde la base, sin pagarle otra vez a Google Maps ni a INEGI."
+      description="Negocios que ya estaban en Kadesh: se entregan desde la base, sin pagarle otra vez a Google Maps ni a INEGI."
     >
       {loading ? (
-        <div className="h-16 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" aria-hidden />
+        <SkeletonRows count={1} height="h-20" />
       ) : total === 0 ? (
-        <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
-          Todavía no hay extracciones este mes.
-        </p>
+        <p className="text-sm text-dash-muted">Todavía no hay extracciones este mes.</p>
       ) : (
-        <div className="flex flex-col gap-3">
-          <p className="text-sm text-[#212121] dark:text-white">
-            <span className="text-2xl font-bold tabular-nums">{pct}%</span>{" "}
-            de los leads de este mes salieron de la base:{" "}
-            <strong className="tabular-nums">{formatCredits(reused)}</strong> de{" "}
+        <div className="flex flex-col gap-4">
+          <p className="text-sm leading-relaxed text-dash-soft">
+            <span className="mr-1 block text-[2.25rem] font-bold leading-none tracking-[-0.045em] tabular-nums text-dash-ink">
+              {pct}%
+            </span>
+            de los leads del mes salieron de la base:{" "}
+            <strong className="tabular-nums text-dash-ink">{formatCredits(reused)}</strong> de{" "}
             <span className="tabular-nums">{formatCredits(total)}</span>.
           </p>
           <div
             role="img"
             aria-label={`${pct}% desde la base, ${100 - pct}% nuevos`}
-            className="flex h-3 w-full overflow-hidden rounded-full bg-[#f0f0f0] dark:bg-[#2a2a2a]"
+            className="flex h-3 w-full gap-1 overflow-hidden"
           >
-            <div className="h-full bg-emerald-500" style={{ width: `${pct}%` }} />
-            <div className="h-full bg-orange-400" style={{ width: `${100 - pct}%` }} />
+            <div className="dashboard-bar-grow h-full rounded-full bg-green-500" style={{ width: `${pct}%` }} />
+            <div className="dash-hatch h-full flex-1 rounded-full bg-orange-50 text-orange-300 dark:bg-orange-500/10 dark:text-orange-500/50" />
           </div>
-          <ul className="flex flex-col gap-1 text-xs text-[#616161] dark:text-[#b0b0b0] sm:flex-row sm:gap-4">
-            <li className="flex items-center gap-1.5">
-              <span aria-hidden className="h-2 w-2 rounded-full bg-emerald-500" />
-              Desde la base (sin pagar API): {formatCredits(reused)}
+          <ul className="flex flex-col gap-1.5 text-[13px] text-dash-muted">
+            <li className="flex items-center gap-2">
+              <span aria-hidden className="size-2 rounded-full bg-green-500" />
+              Desde la base (sin pagar API): <strong className="tabular-nums text-dash-ink">{formatCredits(reused)}</strong>
             </li>
-            <li className="flex items-center gap-1.5">
-              <span aria-hidden className="h-2 w-2 rounded-full bg-orange-400" />
-              Nuevos (se buscaron en Google Maps o INEGI): {formatCredits(created)}
+            <li className="flex items-center gap-2">
+              <span aria-hidden className="size-2 rounded-full bg-orange-400" />
+              Nuevos (Google Maps o INEGI): <strong className="tabular-nums text-dash-ink">{formatCredits(created)}</strong>
             </li>
           </ul>
         </div>
@@ -107,177 +150,338 @@ function SearchSavingsCard({
   );
 }
 
-/** KPIs del SaaS, lo que requiere atención y la actividad más reciente. */
-function OpsSummary() {
+/** Tarjeta de saludo: cómo va todo en una oración y atajos (estilo del Resumen de ICARM). */
+function GreetingCard({
+  summary,
+  loading,
+  activeCompanies,
+  attentionCount,
+  pendingPlaces,
+  pendingServices,
+  onOpenTab,
+}: {
+  summary: AdminOpsSummaryResponse["adminOpsSummary"] | undefined;
+  loading: boolean;
+  activeCompanies: number;
+  attentionCount: number;
+  pendingPlaces: number | null;
+  pendingServices: number | null;
+  onOpenTab: (tab: AdminTab, vista?: string) => void;
+}) {
+  const { user } = useUser();
+  const mounted = useIsClient();
+  const { goTo } = useAdminNavigation();
+  const name = user?.name?.split(" ")[0] ?? "";
+  const greeting = mounted ? greetingFor(new Date()) : "Hola";
+
+  return (
+    <Reveal
+      as="section"
+      className="relative flex min-w-0 flex-col overflow-hidden rounded-3xl border border-dash-line bg-dash-surface bg-[radial-gradient(60%_120%_at_100%_0%,rgba(247,148,94,0.13),transparent_60%)] p-6 shadow-dash xl:p-8"
+    >
+      <h2 className="text-[clamp(1.6rem,1.2rem+1.6vw,2.25rem)] font-bold leading-[1.1] tracking-[-0.04em] text-dash-ink">
+        {greeting}
+        {name ? `, ${name}` : ""}.
+      </h2>
+      <p className="mt-3 max-w-[60ch] text-[17px] leading-relaxed text-dash-soft">
+        {loading && !summary ? (
+          "Cargando cómo va Kadesh…"
+        ) : (
+          <>
+            <strong className="font-semibold tabular-nums text-dash-ink">{formatCredits(activeCompanies)}</strong>{" "}
+            empresa{activeCompanies === 1 ? "" : "s"} activa{activeCompanies === 1 ? "" : "s"},{" "}
+            <strong className="font-semibold tabular-nums text-dash-ink">{formatCredits(summary?.newUsers7d ?? 0)}</strong>{" "}
+            registros en 7 días y{" "}
+            <strong className="font-semibold tabular-nums text-dash-ink">{formatCredits(summary?.syncs24h ?? 0)}</strong>{" "}
+            extracciones en 24 h.{" "}
+            {attentionCount > 0 ? (
+              <span className="font-semibold text-red-700 dark:text-red-400">
+                {attentionCount} {attentionCount === 1 ? "cosa necesita" : "cosas necesitan"} atención.
+              </span>
+            ) : (
+              <span className="font-semibold text-green-700 dark:text-green-400">Todo en orden.</span>
+            )}
+          </>
+        )}
+      </p>
+      <div className="mt-5 flex flex-wrap gap-2">
+        <AdminButton variant="dark" icon={Search01Icon} onClick={() => goTo(ADMIN_TABS.CLIENTS)}>
+          Buscar cliente
+        </AdminButton>
+        <AdminButton variant="outline" onClick={() => onOpenTab(ADMIN_TABS.PET_PLACES)}>
+          Kadesh Pet
+        </AdminButton>
+      </div>
+
+      <div className="mt-auto pt-6">
+        <p className="mb-2.5 text-[12px] font-bold uppercase tracking-[0.12em] text-dash-muted">Esperan revisión</p>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <button
+            type="button"
+            onClick={() => onOpenTab(ADMIN_TABS.PET_PLACES, "fichas")}
+            className="flex cursor-pointer flex-col items-start rounded-[14px] bg-dash-surface-2 px-3.5 py-3 text-left transition-colors hover:bg-dash-surface-3"
+          >
+            <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-dash-muted">Fichas Pet</span>
+            <span className="mt-0.5 text-[22px] font-bold leading-none tabular-nums text-dash-ink">{pendingPlaces ?? "—"}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onOpenTab(ADMIN_TABS.PET_PLACES, "servicios")}
+            className="flex cursor-pointer flex-col items-start rounded-[14px] bg-dash-surface-2 px-3.5 py-3 text-left transition-colors hover:bg-dash-surface-3"
+          >
+            <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-dash-muted">Servicios</span>
+            <span className="mt-0.5 text-[22px] font-bold leading-none tabular-nums text-dash-ink">{pendingServices ?? "—"}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => goTo(ADMIN_TABS.CLIENTS, { estado: SUBSCRIPTION_STATUS.TRIALING })}
+            className={cn(
+              "flex cursor-pointer flex-col items-start rounded-[14px] px-3.5 py-3 text-left transition-colors",
+              summary?.trialsEndingSoon
+                ? "bg-dash-ink text-dash-on-ink hover:opacity-90"
+                : "bg-dash-surface-2 hover:bg-dash-surface-3",
+            )}
+          >
+            <span
+              className={cn(
+                "text-[11px] font-semibold uppercase tracking-[0.06em]",
+                summary?.trialsEndingSoon ? "opacity-70" : "text-dash-muted",
+              )}
+            >
+              Pruebas por vencer
+            </span>
+            <span className="mt-0.5 text-[22px] font-bold leading-none tabular-nums">
+              {summary ? summary.trialsEndingSoon : "—"}
+            </span>
+          </button>
+        </div>
+      </div>
+    </Reveal>
+  );
+}
+
+function AttentionCard({
+  items,
+  loading,
+}: {
+  items: AdminAttentionItem[];
+  loading: boolean;
+}) {
+  const { openCompany } = useAdminNavigation();
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? items : items.slice(0, ATTENTION_PREVIEW);
+
+  return (
+    <AdminSectionCard
+      index={1}
+      title="Requiere atención"
+      description="Pagos, pruebas, créditos, errores y riesgo de baja."
+      help={HELP.attention}
+    >
+      {loading ? (
+        <SkeletonRows count={4} />
+      ) : items.length === 0 ? (
+        <p className="flex items-center gap-2 py-2 text-sm font-semibold text-green-700 dark:text-green-400">
+          <HugeiconsIcon icon={CheckmarkCircle02Icon} size={18} />
+          Todo en orden. Las empresas están al corriente.
+        </p>
+      ) : (
+        <>
+          <ul className="flex flex-col gap-2">
+            {visible.map((item) => (
+              <li key={`${item.companyId}-${item.reason}`}>
+                <button type="button" onClick={() => openCompany(item.companyId)} className={rowButton}>
+                  <HugeiconsIcon icon={Alert02Icon} size={18} className={cn("shrink-0", SEVERITY_ICON_CLASS[item.severity])} />
+                  <span className="min-w-0 flex-1 leading-snug">
+                    <span className="font-semibold text-dash-ink">{item.companyName}</span>
+                    <span className="text-dash-soft">
+                      {" · "}
+                      {ATTENTION_REASON_LABELS[item.reason] ?? item.reason}
+                    </span>
+                    {item.detail || item.at ? (
+                      <span className="mt-0.5 block truncate text-[13px] text-dash-muted">
+                        {item.detail ?? (item.at ? formatDate(item.at) : "")}
+                      </span>
+                    ) : null}
+                  </span>
+                  <HugeiconsIcon icon={ArrowRight01Icon} size={16} className="shrink-0 text-dash-faint" />
+                </button>
+              </li>
+            ))}
+          </ul>
+          {items.length > ATTENTION_PREVIEW ? (
+            <div className="mt-2">
+              <LinkButton
+                label={expanded ? "Ver menos" : `Ver ${items.length - ATTENTION_PREVIEW} más`}
+                onClick={() => setExpanded((value) => !value)}
+              />
+            </div>
+          ) : null}
+        </>
+      )}
+    </AdminSectionCard>
+  );
+}
+
+/** Inicio de Operaciones: saludo, lo que requiere atención, KPIs, actividad y colas de Kadesh Pet. */
+export default function AdminOverview({
+  onOpenTab,
+  onReviewPlace,
+  onReviewService,
+}: {
+  onOpenTab: (tab: AdminTab, vista?: string) => void;
+  onReviewPlace: (placeId: string) => void;
+  onReviewService: (serviceId: string) => void;
+}) {
   const { goTo, openCompany } = useAdminNavigation();
-  const { data, loading, error } = useQuery<AdminOpsSummaryResponse>(ADMIN_OPS_SUMMARY_QUERY, {
-    fetchPolicy: "cache-and-network",
+  const { data: opsData, loading: opsLoading, error: opsError } = useQuery<AdminOpsSummaryResponse>(
+    ADMIN_OPS_SUMMARY_QUERY,
+    { fetchPolicy: "cache-and-network" },
+  );
+  const { data, loading, error } = useQuery<AdminOverviewResponse>(ADMIN_OVERVIEW_QUERY, {
+    fetchPolicy: "network-only",
+    variables: {
+      pendingWhere: { claimStatus: { equals: PET_PLACE_CLAIM_STATUS.PENDING } },
+      verifiedWhere: { verified: { equals: true } },
+      pendingServiceWhere: { status: { equals: PET_PLACE_SERVICE_STATUS.PENDING } },
+    },
   });
   const feedInput = useMemo(() => ({ take: 8 }), []);
   const feed = useActivityFeed(feedInput);
-  const summary = data?.adminOpsSummary;
-  const statusCount = (key: string) =>
-    summary?.statusCounts.find((s) => s.key === key)?.count ?? 0;
-  const value = (n: number | undefined) => (loading && !summary ? "—" : formatCredits(n ?? 0));
-  const mrr = summary?.mrr ?? [];
 
-  if (error) {
-    return <AdminErrorState message="No se pudieron cargar los indicadores de operación." />;
-  }
+  const summary = opsData?.adminOpsSummary;
+  const opsPending = opsLoading && !summary;
+  const statusCount = (key: string) => summary?.statusCounts.find((s) => s.key === key)?.count ?? 0;
+  const num = (n: number | undefined) => (opsPending ? "—" : (n ?? 0));
+  const mrr = summary?.mrr ?? [];
+  const attention = summary?.attention ?? [];
+  const activeCompanies = statusCount(SUBSCRIPTION_STATUS.ACTIVE);
+  const pendingPlaces = data?.pendingPetPlaces ?? [];
+  const pendingServices = data?.pendingPetPlaceServices ?? [];
+
+  const mrrValue =
+    opsPending ? "—" : mrr.length === 0 ? 0 : mrr.length === 1 ? mrr[0].amount : mrr.map((m) => formatMoney(m.amount, m.currency)).join(" · ");
+  const mrrCurrency = mrr[0]?.currency ?? "MXN";
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <AdminStatTile
-          label="Empresas activas"
-          help={HELP.activeCompanies}
-          value={value(statusCount(SUBSCRIPTION_STATUS.ACTIVE))}
-          hint={
-            summary
-              ? `de ${formatCredits(summary.companiesTotal)} empresa${summary.companiesTotal === 1 ? "" : "s"}`
-              : undefined
-          }
-          onClick={() => goTo(ADMIN_TABS.CLIENTS, { estado: SUBSCRIPTION_STATUS.ACTIVE })}
+    <div className="flex flex-col gap-4">
+      {opsError ? <AdminErrorState message="No se pudieron cargar los indicadores de operación." /> : null}
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <GreetingCard
+          summary={summary}
+          loading={opsLoading}
+          activeCompanies={activeCompanies}
+          attentionCount={attention.length}
+          pendingPlaces={data ? (data.pendingPlaces ?? 0) : null}
+          pendingServices={data ? (data.pendingServices ?? 0) : null}
+          onOpenTab={onOpenTab}
         />
-        <AdminStatTile
-          label="En prueba"
-          help={HELP.trialCompanies}
-          value={value(statusCount(SUBSCRIPTION_STATUS.TRIALING))}
-          hint={
-            summary?.trialsEndingSoon
-              ? `${summary.trialsEndingSoon} vence${summary.trialsEndingSoon === 1 ? "" : "n"} en ≤3 días`
-              : undefined
-          }
-          tone={summary?.trialsEndingSoon ? "warning" : "default"}
-          onClick={() => goTo(ADMIN_TABS.CLIENTS, { estado: SUBSCRIPTION_STATUS.TRIALING })}
-        />
-        <AdminStatTile
-          label="Pagos con problema"
-          help={HELP.paymentIssues}
-          value={value(summary?.paymentIssues)}
-          hint="Vencidas o no pagadas"
-          tone={summary?.paymentIssues ? "danger" : "default"}
-          onClick={() => goTo(ADMIN_TABS.CLIENTS, { estado: SUBSCRIPTION_STATUS.PAST_DUE })}
-        />
-        <AdminStatTile
-          label="MRR estimado"
-          help={HELP.mrr}
-          value={
-            mrr.length === 0
-              ? loading && !summary
-                ? "—"
-                : formatMoney(0, "MXN")
-              : mrr.map((m) => formatMoney(m.amount, m.currency)).join(" · ")
-          }
-          hint="Planes activos, a mes"
-        />
-        <AdminStatTile
-          label="Registros (7 días)"
-          help={HELP.signups}
-          value={value(summary?.newUsers7d)}
-          hint={
-            summary
-              ? `${summary.newCompanies7d} empresa${summary.newCompanies7d === 1 ? " nueva" : "s nuevas"}`
-              : undefined
-          }
-          onClick={() => goTo(ADMIN_TABS.CLIENTS, { vista: CLIENTS_VISTAS.PEOPLE })}
-        />
-        <AdminStatTile
-          label="Con acceso (7 días)"
-          help={HELP.activeUsers7d}
-          value={value(summary?.activeUsers7d)}
-          hint="Personas que entraron"
-          onClick={() => goTo(ADMIN_TABS.CLIENTS, { vista: CLIENTS_VISTAS.PEOPLE })}
-        />
-        <AdminStatTile
-          label="Extracciones (24 h)"
-          help={HELP.extractions24h}
-          value={value(summary?.syncs24h)}
-          hint={summary?.failedSyncs24h ? `${summary.failedSyncs24h} con error` : "Sin errores"}
-          tone={summary?.failedSyncs24h ? "warning" : "default"}
-          onClick={() =>
-            goTo(ADMIN_TABS.ACTIVITY, {
-              tipo: "extraccion",
-              error: summary?.failedSyncs24h ? "1" : null,
-            })
-          }
-        />
-        <AdminStatTile
-          label="Créditos del mes"
-          help={HELP.creditsMonth}
-          value={value(summary?.creditsConsumedMonth)}
-          hint={
-            summary
-              ? `${formatCredits(summary.aiCalls7d)} llamada${summary.aiCalls7d === 1 ? "" : "s"} a IA en 7 días`
-              : "Extracción e IA"
-          }
-          onClick={() => goTo(ADMIN_TABS.ACTIVITY, { tipo: "ia" })}
-        />
+        <AttentionCard items={attention} loading={opsPending} />
       </div>
 
-      <SearchSavingsCard
-        reused={summary?.leadsReusedMonth ?? 0}
-        created={summary?.leadsCreatedMonth ?? 0}
-        loading={loading && !summary}
-      />
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <Reveal index={2} className="h-full">
+          <AdminStatTile
+            variant="dark"
+            icon={Building06Icon}
+            label="Empresas activas"
+            help={HELP.activeCompanies}
+            value={num(activeCompanies)}
+            hint={summary ? `de ${formatCredits(summary.companiesTotal)} empresa${summary.companiesTotal === 1 ? "" : "s"}` : undefined}
+            onClick={() => goTo(ADMIN_TABS.CLIENTS, { estado: SUBSCRIPTION_STATUS.ACTIVE })}
+          />
+        </Reveal>
+        <Reveal index={3} className="h-full">
+          <AdminStatTile
+            variant="tint"
+            icon={CreditCardIcon}
+            label="MRR estimado"
+            help={HELP.mrr}
+            value={mrrValue}
+            formatValue={(n) => formatMoney(n, mrrCurrency)}
+            hint="Planes activos, a mes"
+          />
+        </Reveal>
+        <Reveal index={4} className="h-full">
+          <AdminStatTile
+            icon={UserGroupIcon}
+            label="Registros · 7 días"
+            help={HELP.signups}
+            value={num(summary?.newUsers7d)}
+            hint={summary ? `${summary.newCompanies7d} empresa${summary.newCompanies7d === 1 ? " nueva" : "s nuevas"}` : undefined}
+            onClick={() => goTo(ADMIN_TABS.CLIENTS, { vista: CLIENTS_VISTAS.PEOPLE })}
+          />
+        </Reveal>
+        <Reveal index={5} className="h-full">
+          <AdminStatTile
+            icon={Clock01Icon}
+            label="Extracciones · 24 h"
+            help={HELP.extractions24h}
+            value={num(summary?.syncs24h)}
+            tone={summary?.failedSyncs24h ? "warning" : "default"}
+            hint={summary?.failedSyncs24h ? `${summary.failedSyncs24h} con error` : "Sin errores"}
+            onClick={() =>
+              goTo(ADMIN_TABS.ACTIVITY, { tipo: "extraccion", error: summary?.failedSyncs24h ? "1" : null })
+            }
+          />
+        </Reveal>
+      </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
-        <AdminSectionCard
-          title="Requiere atención"
-          description="Empresas con pagos, pruebas, créditos o errores que revisar."
-          help={HELP.attention}
-        >
-          {loading && !summary ? (
-            <div className="space-y-2" aria-hidden>
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-12 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
-              ))}
-            </div>
-          ) : (summary?.attention ?? []).length === 0 ? (
-            <p className="py-6 text-center text-sm text-[#616161] dark:text-[#b0b0b0]">
-              Nada pendiente. Las empresas están al corriente.
-            </p>
-          ) : (
-            <ul className="flex flex-col gap-2">
-              {summary!.attention.map((item) => (
-                <li key={`${item.companyId}-${item.reason}`}>
-                  <button
-                    type="button"
-                    onClick={() => openCompany(item.companyId)}
-                    className="flex w-full items-start justify-between gap-3 rounded-xl border border-[#e8e8e8] p-3 text-left transition-colors hover:border-orange-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:border-[#333] dark:hover:border-orange-500 cursor-pointer"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold text-[#212121] dark:text-white">
-                        {item.companyName}
-                      </p>
-                      <p className="mt-0.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
-                        {item.detail ?? ""}
-                        {item.at && !item.detail ? formatDate(item.at) : ""}
-                      </p>
-                    </div>
-                    <AdminStatusBadge
-                      label={ATTENTION_REASON_LABELS[item.reason] ?? item.reason}
-                      className={cn("shrink-0", SEVERITY_CLASS[item.severity])}
-                    />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </AdminSectionCard>
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+        <Reveal index={6} className="h-full">
+          <AdminStatTile
+            label="En prueba"
+            help={HELP.trialCompanies}
+            value={num(statusCount(SUBSCRIPTION_STATUS.TRIALING))}
+            tone={summary?.trialsEndingSoon ? "warning" : "default"}
+            hint={
+              summary?.trialsEndingSoon
+                ? `${summary.trialsEndingSoon} vence${summary.trialsEndingSoon === 1 ? "" : "n"} en ≤3 días`
+                : undefined
+            }
+            onClick={() => goTo(ADMIN_TABS.CLIENTS, { estado: SUBSCRIPTION_STATUS.TRIALING })}
+          />
+        </Reveal>
+        <Reveal index={7} className="h-full">
+          <AdminStatTile
+            label="Pagos con problema"
+            help={HELP.paymentIssues}
+            value={num(summary?.paymentIssues)}
+            tone={summary?.paymentIssues ? "danger" : "default"}
+            hint="Vencidas o no pagadas"
+            onClick={() => goTo(ADMIN_TABS.CLIENTS, { estado: SUBSCRIPTION_STATUS.PAST_DUE })}
+          />
+        </Reveal>
+        <Reveal index={8} className="h-full">
+          <AdminStatTile
+            label="Con acceso · 7 días"
+            help={HELP.activeUsers7d}
+            value={num(summary?.activeUsers7d)}
+            hint="Personas que entraron"
+            onClick={() => goTo(ADMIN_TABS.CLIENTS, { vista: CLIENTS_VISTAS.PEOPLE })}
+          />
+        </Reveal>
+        <Reveal index={8} className="h-full">
+          <AdminStatTile
+            label="Créditos del mes"
+            help={HELP.creditsMonth}
+            value={num(summary?.creditsConsumedMonth)}
+            hint={
+              summary
+                ? `${formatCredits(summary.aiCalls7d)} llamada${summary.aiCalls7d === 1 ? "" : "s"} a IA en 7 días`
+                : "Extracción e IA"
+            }
+            onClick={() => goTo(ADMIN_TABS.ACTIVITY, { tipo: "ia" })}
+          />
+        </Reveal>
+      </div>
 
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:items-start">
         <AdminSectionCard
+          index={2}
           title="Actividad reciente"
-          action={
-            <button
-              type="button"
-              onClick={() => goTo(ADMIN_TABS.ACTIVITY)}
-              className="inline-flex items-center gap-1 text-sm font-semibold text-orange-600 hover:underline dark:text-orange-400 cursor-pointer"
-            >
-              Ver toda
-              <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
-            </button>
-          }
+          action={<LinkButton label="Ver toda" onClick={() => goTo(ADMIN_TABS.ACTIVITY)} />}
         >
           <ActivityTimeline
             items={feed.items}
@@ -290,206 +494,91 @@ function OpsSummary() {
             bare
           />
         </AdminSectionCard>
+        <SearchSavingsCard
+          index={3}
+          reused={summary?.leadsReusedMonth ?? 0}
+          created={summary?.leadsCreatedMonth ?? 0}
+          loading={opsPending}
+        />
       </div>
-    </div>
-  );
-}
 
-export default function AdminOverview({
-  onOpenTab,
-  onReviewPlace,
-  onReviewService,
-}: {
-  onOpenTab: (tab: AdminTab, vista?: string) => void;
-  onReviewPlace: (placeId: string) => void;
-  onReviewService: (serviceId: string) => void;
-}) {
-  const { data, loading, error } = useQuery<AdminOverviewResponse>(
-    ADMIN_OVERVIEW_QUERY,
-    {
-      fetchPolicy: "network-only",
-      variables: {
-        pendingWhere: {
-          claimStatus: { equals: PET_PLACE_CLAIM_STATUS.PENDING },
-        },
-        verifiedWhere: { verified: { equals: true } },
-        pendingServiceWhere: {
-          status: { equals: PET_PLACE_SERVICE_STATUS.PENDING },
-        },
-      },
-    },
-  );
+      {error ? <AdminErrorState message="No se pudieron cargar las fichas por revisar." /> : null}
 
-  if (error) {
-    return (
-      <div className="flex flex-col gap-6">
-        <OpsSummary />
-        <AdminErrorState message="No se pudieron cargar las fichas por revisar." />
-      </div>
-    );
-  }
-
-  const pending = data?.pendingPetPlaces ?? [];
-
-  return (
-    <div className="flex flex-col gap-6">
-      <OpsSummary />
-
-      <section className={cn(surfaceClass, "p-4 sm:p-5")}>
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div>
-            <h2 className="text-lg font-bold text-[#212121] dark:text-white">
-              Reclamos por revisar
-            </h2>
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1">
-              Alguien pidió la ficha. Confirma que es suya antes de verificarla.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => onOpenTab(ADMIN_TABS.PET_PLACES, "fichas")}
-            className="hidden sm:inline-flex h-11 items-center gap-1 rounded-xl px-3 text-sm font-semibold text-orange-600 dark:text-orange-400 hover:underline cursor-pointer"
-          >
-            Ver todas
-            <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="space-y-2">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-16 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse"
-              />
-            ))}
-          </div>
-        ) : pending.length === 0 ? (
-          <p className="py-8 text-sm text-center text-[#616161] dark:text-[#b0b0b0]">
-            No hay fichas en revisión. Las nuevas solicitudes aparecerán aquí.
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-2">
-            {pending.map((place) => (
-              <li key={place.id}>
-                <button
-                  type="button"
-                  onClick={() => onReviewPlace(place.id)}
-                  className="w-full rounded-xl border border-[#e8e8e8] dark:border-[#333] p-3 text-left hover:border-orange-300 dark:hover:border-orange-500 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
-                >
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="min-w-0">
-                      <p className="font-semibold text-[#212121] dark:text-white truncate">
-                        {place.name}
-                      </p>
-                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
-                        {[place.municipality, place.state]
-                          .filter(Boolean)
-                          .join(", ") || "Sin ubicación"}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
+        <AdminSectionCard
+          index={4}
+          title="Reclamos por revisar"
+          description="Alguien pidió una ficha de Kadesh Pet. Confirma que es suya antes de verificarla."
+          action={<LinkButton label="Ver todas" onClick={() => onOpenTab(ADMIN_TABS.PET_PLACES, "fichas")} />}
+        >
+          {loading ? (
+            <SkeletonRows count={3} height="h-16" />
+          ) : pendingPlaces.length === 0 ? (
+            <p className="py-4 text-sm text-dash-muted">No hay fichas en revisión. Las nuevas solicitudes aparecerán aquí.</p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {pendingPlaces.map((place) => (
+                <li key={place.id}>
+                  <button type="button" onClick={() => onReviewPlace(place.id)} className={rowButton}>
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-dash-surface text-orange-700 dark:text-orange-300">
+                      <HugeiconsIcon icon={Stethoscope02Icon} size={18} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-semibold text-dash-ink">{place.name}</span>
+                      <span className="mt-0.5 block truncate text-[13px] text-dash-muted">
+                        {[place.municipality, place.state].filter(Boolean).join(", ") || "Sin ubicación"}
                         {" · "}
                         {formatPersonName(place.user?.name, place.user?.lastName)}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <AdminStatusBadge
-                        label={
-                          PET_PLACE_CLAIM_STATUS_LABELS[place.claimStatus ?? ""] ??
-                          "Sin estado"
-                        }
-                        className={
-                          PET_PLACE_CLAIM_STATUS_CLASSES[place.claimStatus ?? ""]
-                        }
-                      />
-                      <span className="text-sm font-semibold text-orange-600 dark:text-orange-400">
-                        Revisar
                       </span>
-                    </div>
-                  </div>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+                    </span>
+                    <AdminStatusBadge
+                      label={PET_PLACE_CLAIM_STATUS_LABELS[place.claimStatus ?? ""] ?? "Sin estado"}
+                      className={PET_PLACE_CLAIM_STATUS_CLASSES[place.claimStatus ?? ""]}
+                    />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </AdminSectionCard>
 
-      <section className={cn(surfaceClass, "p-4 sm:p-5")}>
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div>
-            <h2 className="text-lg font-bold text-[#212121] dark:text-white">
-              Servicios por aprobar
-            </h2>
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1">
-              Un dueño pidió un servicio que no estaba en el catálogo. Al
-              aprobarlo, se marca en su ficha.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => onOpenTab(ADMIN_TABS.PET_PLACES, "servicios")}
-            className="hidden sm:inline-flex h-11 items-center gap-1 rounded-xl px-3 text-sm font-semibold text-orange-600 dark:text-orange-400 hover:underline cursor-pointer"
-          >
-            Ver todos
-            <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="space-y-2">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-16 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse"
-              />
-            ))}
-          </div>
-        ) : (data?.pendingPetPlaceServices ?? []).length === 0 ? (
-          <p className="py-8 text-sm text-center text-[#616161] dark:text-[#b0b0b0]">
-            No hay servicios pendientes.
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-2">
-            {(data?.pendingPetPlaceServices ?? []).map((service) => (
-              <li key={service.id}>
-                <button
-                  type="button"
-                  onClick={() => onReviewService(service.id)}
-                  className="w-full rounded-xl border border-[#e8e8e8] dark:border-[#333] p-3 text-left hover:border-orange-300 dark:hover:border-orange-500 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
-                >
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="min-w-0">
-                      <p className="font-semibold text-[#212121] dark:text-white truncate">
-                        {service.name ?? "Servicio"}
-                      </p>
-                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+        <AdminSectionCard
+          index={5}
+          title="Servicios por aprobar"
+          description="Un dueño pidió un servicio que no estaba en el catálogo. Al aprobarlo se marca en su ficha."
+          action={<LinkButton label="Ver todos" onClick={() => onOpenTab(ADMIN_TABS.PET_PLACES, "servicios")} />}
+        >
+          {loading ? (
+            <SkeletonRows count={3} height="h-16" />
+          ) : pendingServices.length === 0 ? (
+            <p className="py-4 text-sm text-dash-muted">No hay servicios pendientes.</p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {pendingServices.map((service) => (
+                <li key={service.id}>
+                  <button type="button" onClick={() => onReviewService(service.id)} className={rowButton}>
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-dash-surface text-orange-700 dark:text-orange-300">
+                      <HugeiconsIcon icon={Task01Icon} size={18} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-semibold text-dash-ink">{service.name ?? "Servicio"}</span>
+                      <span className="mt-0.5 block truncate text-[13px] text-dash-muted">
                         {service.requestedFor?.name ?? "Sin clínica"}
                         {" · "}
-                        {formatPersonName(
-                          service.requestedBy?.name,
-                          service.requestedBy?.lastName,
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <AdminStatusBadge
-                        label={
-                          PET_PLACE_SERVICE_STATUS_LABELS[service.status ?? ""] ??
-                          "Pendiente"
-                        }
-                        className={
-                          PET_PLACE_SERVICE_STATUS_CLASSES[service.status ?? ""]
-                        }
-                      />
-                      <span className="text-sm font-semibold text-orange-600 dark:text-orange-400">
-                        Revisar
+                        {formatPersonName(service.requestedBy?.name, service.requestedBy?.lastName)}
                       </span>
-                    </div>
-                  </div>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+                    </span>
+                    <AdminStatusBadge
+                      label={PET_PLACE_SERVICE_STATUS_LABELS[service.status ?? ""] ?? "Pendiente"}
+                      className={PET_PLACE_SERVICE_STATUS_CLASSES[service.status ?? ""]}
+                    />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </AdminSectionCard>
+      </div>
     </div>
   );
 }

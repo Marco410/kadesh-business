@@ -15,3 +15,8 @@ No promete “accesibilidad certificada”: es un control de comodidad.
 ## Barra sobre un hero oscuro (2026-10-14)
 
 La home renderiza `<Navigation overDarkHero />`. Con esa prop, la barra va en blanco desde el primer render: logo sin invertir y enlaces blancos. Antes se decidía con `usePathname() === "/"`, pero cuando Vercel regenera la home en segundo plano (ISR, desde que la home pide las cifras con `revalidate`) la ruta no llegaba como `/`. El servidor pintaba la barra como página clara y React no corrige clases distintas al hidratar, así que en modo oscuro el logo y los enlaces se perdían. Una página nueva con hero oscuro debe pasar la prop, no depender de la ruta.
+
+## Tema y cierre de sesión compartidos (2026-11-03)
+
+`ThemeToggle.tsx` (claro / oscuro) y `kadesh/utils/useLogout.ts` (registra la salida, borra el token y las cookies, limpia el usuario y manda a la home) salieron de `Navigation` para que también los use la barra de los paneles (`app-shell`). `Navigation` se ve y se comporta igual. `FontSizeSlider` acepta `tone="panel"` y `NotificationBell` acepta `variant="panel"`.
+

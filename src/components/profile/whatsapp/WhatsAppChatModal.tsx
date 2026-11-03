@@ -37,17 +37,17 @@ export default function WhatsAppChatModal({
               className="fixed inset-0 z-[90] flex items-center justify-center p-4 pointer-events-none"
             >
               <div
-                className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-lg w-full max-h-[min(90vh,700px)] flex flex-col overflow-hidden pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
+                className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-lg w-full max-h-[min(90vh,700px)] flex flex-col overflow-hidden pointer-events-auto border border-dash-line"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex justify-between items-start p-6 pb-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
-                  <h3 className="text-xl font-bold text-[#212121] dark:text-[#ffffff] pr-4">
+                <div className="flex justify-between items-start p-6 pb-4 border-b border-dash-line">
+                  <h3 className="text-xl font-bold text-dash-ink pr-4">
                     WhatsApp{leadName ? ` — ${leadName}` : ""}
                   </h3>
                   <button
                     type="button"
                     onClick={onClose}
-                    className="text-2xl font-bold text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#ffffff] transition-colors flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                    className="text-2xl font-bold text-dash-muted hover:text-dash-ink dark:hover:text-[#ffffff] transition-colors flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-dash-hover"
                     aria-label="Cerrar"
                   >
                     ×

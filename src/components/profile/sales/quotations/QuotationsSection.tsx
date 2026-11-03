@@ -28,10 +28,10 @@ export default function QuotationsSection({ userId }: QuotationsSectionProps) {
         variants={fadeUp}
         transition={quotationMotionTransition(reduce)}
       >
-        <h3 className="text-xl font-bold tracking-tight text-[#212121] dark:text-white">
+        <h3 className="text-xl font-bold tracking-tight text-dash-ink">
           Cotizaciones
         </h3>
-        <p className="mt-1 max-w-prose text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-1 max-w-prose text-sm leading-relaxed text-dash-muted">
           Crea propuestas con folio y total, y da seguimiento hasta que el
           cliente las acepte o rechace.
         </p>

@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { DASH_EASE } from "kadesh/components/app-shell";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Alert02Icon,
@@ -47,28 +48,28 @@ export default function AdminStripeCheckDialog({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-[70]"
+            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[70]"
             onClick={saving ? undefined : onClose}
           />
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 24, scale: 0.98 }}
+            transition={{ duration: 0.3, ease: DASH_EASE }}
             className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none"
           >
             <div
               role="dialog"
               aria-modal="true"
               aria-label={`Verificar ${planName} con Stripe`}
-              className="bg-white dark:bg-[#1e1e1e] rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
+              className="bg-dash-surface rounded-t-3xl sm:rounded-3xl shadow-dash-lift font-dash text-dash-ink w-full max-w-2xl max-h-[92vh] overflow-y-auto pointer-events-auto border border-dash-line"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="px-4 sm:px-6 py-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
-                <h3 className="text-lg font-bold text-[#212121] dark:text-white">
+              <div className="px-4 sm:px-6 py-4 border-b border-dash-line">
+                <h3 className="text-lg font-bold text-dash-ink">
                   Verificar {planName} con Stripe
                 </h3>
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1">
+                <p className="text-sm text-dash-muted mt-1">
                   Así se ve este plan en Kadesh y así está en Stripe. Nada se
                   guarda hasta que confirmes.
                 </p>
@@ -78,7 +79,7 @@ export default function AdminStripeCheckDialog({
                 {loading ? (
                   <div className="flex items-center justify-center gap-3 py-10">
                     <span className="animate-spin rounded-full h-6 w-6 border-2 border-orange-500 border-t-transparent" />
-                    <span className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                    <span className="text-sm text-dash-muted">
                       Consultando Stripe...
                     </span>
                   </div>
@@ -133,10 +134,10 @@ export default function AdminStripeCheckDialog({
                       </div>
                     </div>
 
-                    <div className="overflow-hidden rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a]">
+                    <div className="overflow-hidden rounded-xl border border-dash-line">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="text-left text-xs uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] bg-[#fafafa] dark:bg-[#252525]">
+                          <tr className="text-left text-dash-muted bg-dash-surface-2 text-[12px] font-semibold uppercase tracking-[0.04em]">
                             <th className="px-3 py-2 font-medium">Dato</th>
                             <th className="px-3 py-2 font-medium">
                               Vas a guardar
@@ -148,19 +149,19 @@ export default function AdminStripeCheckDialog({
                           {result.fields.map((f) => (
                             <tr
                               key={f.field}
-                              className="border-t border-[#f0f0f0] dark:border-[#2a2a2a]"
+                              className="border-t border-dash-line"
                             >
-                              <td className="px-3 py-2.5 text-[#616161] dark:text-[#b0b0b0]">
+                              <td className="px-3 py-2.5 text-dash-muted">
                                 {f.label}
                               </td>
-                              <td className="px-3 py-2.5 font-medium text-[#212121] dark:text-white break-all">
+                              <td className="px-3 py-2.5 font-medium text-dash-ink break-all">
                                 {f.local ?? "—"}
                               </td>
                               <td className="px-3 py-2.5">
                                 <span
                                   className={`inline-flex items-start gap-1.5 font-medium break-all ${
                                     f.match
-                                      ? "text-[#212121] dark:text-white"
+                                      ? "text-dash-ink"
                                       : "text-red-700 dark:text-red-400"
                                   }`}
                                 >
@@ -182,7 +183,7 @@ export default function AdminStripeCheckDialog({
                       </table>
                     </div>
 
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-dash-muted">
                       {result.productName ? (
                         <span>Producto: {result.productName}</span>
                       ) : null}
@@ -200,7 +201,7 @@ export default function AdminStripeCheckDialog({
                     </div>
 
                     {!result.allMatch && result.subscriptionsCount ? (
-                      <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <p className="text-xs text-dash-muted">
                         Quien ya está suscrito sigue pagando lo que dice Stripe,
                         no lo que guardes aquí. Guardar solo cambia lo que se
                         muestra y lo que se cobra a quien contrate de ahora en
@@ -211,12 +212,12 @@ export default function AdminStripeCheckDialog({
                 ) : null}
               </div>
 
-              <div className="px-4 sm:px-6 py-4 border-t border-[#e0e0e0] dark:border-[#3a3a3a] flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+              <div className="px-4 sm:px-6 py-4 border-t border-dash-line flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
                 <button
                   type="button"
                   onClick={onClose}
                   disabled={saving}
-                  className="h-11 rounded-xl px-4 text-sm font-semibold border border-[#e0e0e0] dark:border-[#3a3a3a] cursor-pointer disabled:opacity-60"
+                  className="h-11 rounded-full px-4 text-sm font-semibold border border-dash-line cursor-pointer disabled:opacity-60"
                 >
                   {onConfirm ? "Cancelar" : "Cerrar"}
                 </button>
@@ -225,7 +226,7 @@ export default function AdminStripeCheckDialog({
                     type="button"
                     onClick={onConfirm}
                     disabled={loading || saving || blocked}
-                    className="h-11 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer"
+                    className="h-11 rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer shadow-dash-accent"
                   >
                     {saving
                       ? "Guardando..."

@@ -18,12 +18,12 @@ import { RELEASE_AUDIENCE, RELEASE_PRODUCT_ITEMS } from "./constants";
 type Product = AdminRelease["product"];
 
 const fieldClass =
-  "w-full rounded-xl border border-[#e0e0e0] bg-white px-3 py-2.5 text-sm text-[#212121] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white";
-const labelClass = "flex items-center gap-1 text-xs font-medium text-[#616161] dark:text-[#b0b0b0]";
+  "w-full rounded-xl border border-dash-line bg-dash-surface px-3 py-2.5 text-sm text-dash-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
+const labelClass = "flex items-center gap-1 text-xs font-medium text-dash-muted";
 const secondaryButton =
-  "h-11 rounded-xl border border-[#e0e0e0] px-4 text-sm font-semibold text-[#212121] hover:border-orange-300 disabled:opacity-60 dark:border-[#3a3a3a] dark:text-white cursor-pointer";
+  "h-11 rounded-full border border-dash-line px-4 text-sm font-semibold text-dash-ink hover:border-orange-300 disabled:opacity-60 cursor-pointer";
 const primaryButton =
-  "h-11 rounded-xl bg-orange-500 px-4 text-sm font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer";
+  "h-11 rounded-full dash-grad-accent px-4 text-sm font-semibold text-white hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer shadow-dash-accent";
 
 const todayYmd = () => new Date().toLocaleDateString("en-CA");
 /** Mediodía del día elegido: así la fecha no se corre por la zona horaria. */
@@ -214,23 +214,23 @@ export default function ReleaseEditor({
               className={fieldClass}
             />
           ) : (
-            <div className="min-h-[14rem] rounded-xl border border-[#e0e0e0] p-4 dark:border-[#3a3a3a]">
+            <div className="min-h-[14rem] rounded-xl border border-dash-line p-4">
               <p className="font-mono text-xs font-bold text-orange-600 dark:text-orange-300">v{draft.version || "0.0.0"}</p>
-              <p className="mt-1 text-lg font-bold text-[#212121] dark:text-white">
+              <p className="mt-1 text-lg font-bold text-dash-ink">
                 {draft.title.trim() || `Versión ${draft.version || "…"}`}
               </p>
               <div className="mt-3">
                 {draft.body.trim() ? (
                   <ChangelogReleaseBody body={draft.body} />
                 ) : (
-                  <p className="text-sm text-[#9e9e9e]">Escribe las notas para ver cómo quedan.</p>
+                  <p className="text-sm text-dash-faint">Escribe las notas para ver cómo quedan.</p>
                 )}
               </div>
             </div>
           )}
         </div>
 
-        <label className="flex items-start gap-2 text-sm text-[#424242] dark:text-[#e0e0e0] cursor-pointer">
+        <label className="flex items-start gap-2 text-sm text-dash-soft cursor-pointer">
           <input
             type="checkbox"
             checked={draft.notifyByEmail}
@@ -240,7 +240,7 @@ export default function ReleaseEditor({
           />
           <span>
             Avisar por correo al publicar
-            <span className="block text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <span className="block text-xs text-dash-muted">
               {emailed
                 ? `El correo ya se mandó el ${formatDateShort(release!.emailedAt!, false)}. No se vuelve a mandar.`
                 : published
@@ -282,7 +282,7 @@ export default function ReleaseEditor({
           </div>
         ) : null}
 
-        <div className="flex flex-col-reverse gap-2 border-t border-[#f0f0f0] pt-4 dark:border-[#2a2a2a] sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col-reverse gap-2 border-t border-dash-line pt-4 sm:flex-row sm:items-center sm:justify-between">
           {release && !confirmDelete ? (
             <button type="button" onClick={() => setConfirmDelete(true)} className="h-11 rounded-xl px-2 text-sm font-semibold text-red-600 hover:underline dark:text-red-400 cursor-pointer">
               Eliminar

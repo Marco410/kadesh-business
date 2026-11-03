@@ -47,19 +47,19 @@ export function ByokApiKeyGuide({
   return (
     <div
       className={cn(
-        "h-fit w-full rounded-xl border border-[#e0e0e0] bg-[#fafafa] p-5 sm:p-6 dark:border-[#3a3a3a] dark:bg-[#252525]",
+        "h-fit w-full rounded-xl border border-dash-line bg-dash-surface-2 p-5 sm:p-6",
         className,
       )}
     >
       <div className="flex items-start gap-2.5">
-        <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-[#8b5cf6] shadow-sm dark:bg-[#1e1e1e]">
+        <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-dash-surface text-[#8b5cf6] shadow-sm">
           <HugeiconsIcon icon={Key01Icon} size={16} />
         </span>
         <div>
-          <h3 className="text-sm font-semibold text-[#212121] dark:text-white">
+          <h3 className="text-sm font-semibold text-dash-ink">
             Cómo conseguir tu API key
           </h3>
-          <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1 text-sm leading-relaxed text-dash-muted">
             Crea una key en la consola del proveedor, elige ese proveedor a la
             izquierda y pégala. En esta modalidad Kadesh no descuenta créditos.
           </p>
@@ -81,10 +81,10 @@ export function ByokApiKeyGuide({
               variants={fadeUp}
               transition={aiMotionTransition(reduce)}
               className={cn(
-                "relative rounded-xl border bg-white p-4 dark:bg-[#1e1e1e]",
+                "relative rounded-xl border bg-dash-surface p-4",
                 selected
                   ? "border-[var(--ai-urim-purple)] shadow-[0_6px_14px_rgba(139,92,246,0.18)]"
-                  : "border-[#ececec] hover:border-orange-300 dark:border-[#3a3a3a] dark:hover:border-orange-500/50",
+                  : "border-dash-line hover:border-orange-300 dark:border-[#3a3a3a] dark:hover:border-orange-500/50",
               )}
             >
               <button
@@ -99,7 +99,7 @@ export function ByokApiKeyGuide({
               />
               <div className="pointer-events-none relative z-[1]">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-[#212121] dark:text-white">
+                  <p className="text-sm font-semibold text-dash-ink">
                     {guide.name}
                   </p>
                   {selected ? (
@@ -113,7 +113,7 @@ export function ByokApiKeyGuide({
                     </span>
                   )}
                 </div>
-                <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+                <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-dash-muted">
                   {guide.steps.map((step) => (
                     <li key={step}>{step}</li>
                   ))}

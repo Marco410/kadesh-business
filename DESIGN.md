@@ -96,13 +96,24 @@ Kadesh AI: violeta `#8b5cf6` → azul `#38bdf8` (`ai-urim-fill`). El resto del p
 
 ## Typography
 
-Poppins es display y UI (se cargan 400 y 700; Inter es fallback). Títulos `font-bold` con `tracking-tight`, no display ultra-negro de landing. Cuerpo 18px, `leading-relaxed`, medida ~65ch en bloques de lectura. El usuario puede escalar con `--kadesh-font-scale`. Labels y CTAs a 14px / `font-semibold`.
+Poppins es display y UI del sitio (se cargan 400 y 700). Los paneles internos usan Inter variable (`font-dash`, todos los pesos). Títulos `font-bold` con `tracking-tight`, no display ultra-negro de landing. Cuerpo 18px, `leading-relaxed`, medida ~65ch en bloques de lectura. El usuario puede escalar con `--kadesh-font-scale`. Labels y CTAs a 14px / `font-semibold`.
 
 ## Layout
 
 Dos densidades. **Marketing:** `max-w-7xl` (hero, precios) o `max-w-6xl` (definición, FAQ); ritmo `py-16 sm:py-24`; más aire arriba del H2 que debajo. Home: hero campo de marca → diferenciadores → qué es → marquee de categorías → por qué → costo por lead → demo interactiva → datos reales → leads únicos → vitrina → Kadesh AI → personas → demo agendada → valor → prueba social → aliados → testimonios → precios → referidos → CTA final → FAQ.
 
 **Panel:** canvas `#f8f8f8` / `#0a0a0a`, navegación persistente, contenido por `?tab=` dentro del shell (no una ruta nueva por vista). Extracción a pantalla completa (mapa); control en tarjetas `rounded-2xl` con borde. Mobile-first; padding `px-4 sm:px-6 lg:px-8`.
+
+### Paneles internos (Operaciones, 2026-11)
+
+Operaciones usa el shell `kadesh/components/app-shell` (estilo del admin de ICARM, solo colores de Kadesh). El panel de clientes lo adoptará después.
+
+- **Estructura:** menú lateral agrupado, barra superior flotante de vidrio y encabezado con eyebrow y título grande (`clamp(2rem…2.85rem)`, `-0.04em`).
+- **Superficies:** fondo cálido `#f6f5f3` / `#0b0b0b` con brillos naranja, tarjetas `#fff` / `#171717` de 24 px con sombra suave.
+- **Tokens:** `--dash-*` en `globals.css` (`text-dash-ink`, `bg-dash-surface`, `border-dash-line`…), sin `dark:` repetido.
+- **Tipografía:** Inter variable (`font-dash`) con cifras tabulares.
+- **Indicadores:** uno oscuro con brillo naranja para la cifra principal, uno durazno para la segunda, el resto blancos.
+- **Controles:** chips activos en tinta (negro / blanco). Naranja (degradado `#f7945e → #c96b2c`) solo en la acción principal y en la barra pico de las gráficas.
 
 ## Elevation & Depth
 

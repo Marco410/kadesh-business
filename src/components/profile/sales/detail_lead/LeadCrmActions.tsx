@@ -199,10 +199,10 @@ export default function LeadCrmActions({
           <>
             <HugeiconsIcon icon={card.icon} size={18} className="shrink-0" />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[11px] font-medium text-[#616161] dark:text-[#b0b0b0]">
+              <span className="block truncate text-[11px] font-medium text-dash-muted">
                 {card.label}
               </span>
-              <span className="tabular-nums text-lg font-bold leading-none text-[#212121] dark:text-white">
+              <span className="tabular-nums text-lg font-bold leading-none text-dash-ink">
                 {count}
               </span>
             </span>

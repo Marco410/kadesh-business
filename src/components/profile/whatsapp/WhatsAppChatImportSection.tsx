@@ -130,18 +130,18 @@ export function WhatsAppChatImportSection() {
   };
 
   return (
-    <div className="mt-8 rounded-xl border border-[#e0e0e0] bg-white p-5 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
-      <h3 className="text-sm font-semibold text-[#212121] dark:text-white">
+    <div className="mt-8 rounded-xl border border-dash-line bg-dash-surface p-5">
+      <h3 className="text-sm font-semibold text-dash-ink">
         Importar historial de chats
       </h3>
-      <p className="mt-1 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+      <p className="mt-1 text-sm leading-relaxed text-dash-muted">
         Sube el .txt que exporta WhatsApp por conversación (en el chat, menú → Más → Exportar
         chat). Elige a qué lead pertenece cada archivo antes de importar. Si todavía no
         conectaste tu número arriba, exporta tus chats ahora — después de conectarlo a la Cloud
         API ya no vas a poder sacarlos desde la app de WhatsApp.
       </p>
 
-      <label className="mt-4 flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#e0e0e0] px-4 py-2.5 text-sm font-medium text-[#616161] transition-colors hover:border-orange-400 hover:text-orange-600 dark:border-[#3a3a3a] dark:text-[#b0b0b0] dark:hover:text-orange-400">
+      <label className="mt-4 flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed border-dash-line px-4 py-2.5 text-sm font-medium text-dash-muted transition-colors hover:border-orange-400 hover:text-orange-600 dark:hover:text-orange-400">
         <HugeiconsIcon icon={Upload02Icon} size={18} />
         Elegir archivos .txt
         <input
@@ -161,10 +161,10 @@ export function WhatsAppChatImportSection() {
           {rows.map((row) => (
             <div
               key={row.rowId}
-              className="rounded-lg border border-[#e0e0e0] p-4 dark:border-[#3a3a3a]"
+              className="rounded-lg border border-dash-line p-4"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="truncate text-sm font-medium text-[#212121] dark:text-white">
+                <span className="truncate text-sm font-medium text-dash-ink">
                   {row.file.name}
                 </span>
                 {row.status === "done" && (
@@ -176,11 +176,11 @@ export function WhatsAppChatImportSection() {
               </div>
 
               {row.previewLoading ? (
-                <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">Leyendo...</p>
+                <p className="mt-1 text-xs text-dash-muted">Leyendo...</p>
               ) : row.previewError ? (
                 <p className="mt-1 text-xs text-red-600 dark:text-red-400">{row.previewError}</p>
               ) : (
-                <p className="mt-1 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                <p className="mt-1 text-xs text-dash-muted">
                   {row.messageCount} mensajes detectados
                 </p>
               )}
@@ -196,13 +196,13 @@ export function WhatsAppChatImportSection() {
                   />
                   {row.senderNames.length > 0 && (
                     <div>
-                      <label className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]">
+                      <label className="mb-2 block text-sm font-semibold text-dash-muted">
                         ¿Cuál de estos eres tú? (opcional)
                       </label>
                       <select
                         value={row.selectedSender}
                         onChange={(e) => updateRow(row.rowId, { selectedSender: e.target.value })}
-                        className="w-full rounded-lg border border-[#e0e0e0] bg-white px-3 py-2.5 text-sm text-[#212121] dark:border-[#3a3a3a] dark:bg-[#121212] dark:text-white"
+                        className="w-full rounded-lg border border-dash-line bg-dash-surface px-3 py-2.5 text-sm text-dash-ink"
                       >
                         <option value="">Sin identificar</option>
                         {row.senderNames.map((name) => (
@@ -234,7 +234,7 @@ export function WhatsAppChatImportSection() {
             type="button"
             onClick={() => void handleImportAll()}
             disabled={importing || readyRows.length === 0}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-full dash-grad-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 shadow-dash-accent"
           >
             {importing ? (
               <>

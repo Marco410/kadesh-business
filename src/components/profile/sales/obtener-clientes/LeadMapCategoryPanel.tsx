@@ -64,10 +64,10 @@ export default function LeadMapCategoryPanel({
     <div className="pointer-events-none absolute bottom-4 left-4 z-10 w-[min(17.5rem,calc(100%-5.5rem))] sm:bottom-6 sm:left-6">
       <div className="pointer-events-auto flex max-h-[min(22rem,46vh)] flex-col overflow-hidden rounded-2xl border border-black/8 bg-white/92 shadow-[0_10px_30px_rgba(0,0,0,0.14)] backdrop-blur-md dark:border-white/10 dark:bg-[#171717]/92 dark:shadow-[0_14px_36px_rgba(0,0,0,0.45)]">
         <div className="flex items-center gap-2 pr-1 pl-3">
-          <p className="text-[11px] font-semibold tracking-wide text-[#757575] dark:text-[#a3a3a3]">
+          <p className="text-[11px] font-semibold tracking-wide text-dash-muted dark:text-[#a3a3a3]">
             Categorías
           </p>
-          <p className="ml-auto text-[11px] font-medium tabular-nums text-[#9e9e9e] dark:text-[#8a8a8a]">
+          <p className="ml-auto text-[11px] font-medium tabular-nums text-dash-faint">
             {visibleCount} en el mapa
           </p>
           <button
@@ -75,7 +75,7 @@ export default function LeadMapCategoryPanel({
             aria-expanded={!isCollapsed}
             aria-controls="lead-map-categories"
             onClick={() => setIsCollapsed((collapsed) => !collapsed)}
-            className={`flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-xl text-[#616161] motion-safe:transition-colors motion-safe:duration-150 hover:bg-black/5 dark:text-[#c7c7c7] dark:hover:bg-white/6 ${FOCUS_RING}`}
+            className={`flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-xl text-dash-muted motion-safe:transition-colors motion-safe:duration-150 hover:bg-dash-hover dark:text-[#c7c7c7] dark:hover:bg-white/6 ${FOCUS_RING}`}
           >
             <HugeiconsIcon
               icon={isCollapsed ? ArrowUp01Icon : ArrowDown01Icon}
@@ -105,7 +105,7 @@ export default function LeadMapCategoryPanel({
                   role="switch"
                   aria-checked={isVisible}
                   onClick={() => onToggle(item.category)}
-                  className={`flex min-h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl px-2 text-left motion-safe:transition-colors motion-safe:duration-150 hover:bg-black/5 dark:hover:bg-white/6 ${FOCUS_RING}`}
+                  className={`flex min-h-11 w-full cursor-pointer items-center gap-2.5 rounded-xl px-2 text-left motion-safe:transition-colors motion-safe:duration-150 hover:bg-dash-hover dark:hover:bg-white/6 ${FOCUS_RING}`}
                 >
                   <span
                     className={`size-2.5 shrink-0 rounded-full motion-safe:transition-opacity motion-safe:duration-200 ${
@@ -117,8 +117,8 @@ export default function LeadMapCategoryPanel({
                   <span
                     className={`min-w-0 flex-1 break-words text-sm font-medium ${
                       isVisible
-                        ? "text-[#212121] dark:text-white"
-                        : "text-[#9e9e9e] dark:text-[#8a8a8a]"
+                        ? "text-dash-ink"
+                        : "text-dash-faint"
                     }`}
                   >
                     {label}
@@ -126,7 +126,7 @@ export default function LeadMapCategoryPanel({
                   <span
                     className={`shrink-0 text-xs font-semibold tabular-nums ${
                       isVisible
-                        ? "text-[#616161] dark:text-[#c7c7c7]"
+                        ? "text-dash-muted dark:text-[#c7c7c7]"
                         : "text-[#bdbdbd] dark:text-[#6b6b6b]"
                     }`}
                   >
@@ -143,7 +143,7 @@ export default function LeadMapCategoryPanel({
             type="button"
             onClick={onHideAll}
             disabled={allHidden}
-            className={`min-h-11 cursor-pointer text-xs font-semibold text-[#424242] motion-safe:transition-colors motion-safe:duration-150 hover:bg-black/5 disabled:cursor-default disabled:opacity-35 dark:text-[#e0e0e0] dark:hover:bg-white/6 ${FOCUS_RING}`}
+            className={`min-h-11 cursor-pointer text-xs font-semibold text-dash-soft motion-safe:transition-colors motion-safe:duration-150 hover:bg-dash-hover disabled:cursor-default disabled:opacity-35 dark:hover:bg-white/6 ${FOCUS_RING}`}
           >
             Quitar todos
           </button>
@@ -151,7 +151,7 @@ export default function LeadMapCategoryPanel({
             type="button"
             onClick={onShowAll}
             disabled={allVisible}
-            className={`min-h-11 cursor-pointer border-l border-black/6 text-xs font-semibold text-[#424242] motion-safe:transition-colors motion-safe:duration-150 hover:bg-black/5 disabled:cursor-default disabled:opacity-35 dark:border-white/8 dark:text-[#e0e0e0] dark:hover:bg-white/6 ${FOCUS_RING}`}
+            className={`min-h-11 cursor-pointer border-l border-black/6 text-xs font-semibold text-dash-soft motion-safe:transition-colors motion-safe:duration-150 hover:bg-dash-hover disabled:cursor-default disabled:opacity-35 dark:border-white/8 dark:hover:bg-white/6 ${FOCUS_RING}`}
           >
             Ver todos
           </button>

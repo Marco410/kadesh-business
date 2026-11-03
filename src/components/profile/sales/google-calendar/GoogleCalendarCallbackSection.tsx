@@ -83,7 +83,7 @@ export default function GoogleCalendarCallbackSection() {
   }, [userLoading, user, searchParams, connect, router]);
 
   return (
-    <div className="rounded-2xl border border-[#e0e0e0] bg-white p-8 text-center shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
+    <div className="rounded-3xl border border-dash-line bg-dash-surface p-8 text-center shadow-sm">
       {status === "working" ? (
         <span className="mx-auto block size-10 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
       ) : (
@@ -100,18 +100,18 @@ export default function GoogleCalendarCallbackSection() {
           />
         </div>
       )}
-      <h1 className="mt-6 text-2xl font-bold text-[#212121] dark:text-[#ffffff]">
+      <h1 className="mt-6 text-2xl font-bold text-dash-ink">
         {status === "success"
           ? "Cuenta conectada"
           : status === "error"
             ? "No se pudo conectar"
             : "Conectando Google Calendar"}
       </h1>
-      <p className="mt-2 text-[#616161] dark:text-[#b0b0b0]">{message}</p>
+      <p className="mt-2 text-dash-muted">{message}</p>
       {status !== "working" ? (
         <Link
           href={Routes.panelCalendar}
-          className="mt-8 inline-block w-full rounded-xl bg-orange-500 px-6 py-3 text-center text-sm font-semibold text-white hover:bg-orange-600"
+          className="mt-8 inline-block w-full rounded-full dash-grad-accent px-6 py-3 text-center text-sm font-semibold text-white hover:shadow-dash-accent-lift shadow-dash-accent"
         >
           Ir a mi calendario
         </Link>

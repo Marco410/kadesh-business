@@ -3,7 +3,8 @@
 import { useMemo } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Alert02Icon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
-import { PipelineBars, WeeklyBars } from "kadesh/components/panel/dashboard";
+import { PipelineBars } from "kadesh/components/panel/dashboard";
+import { ColumnBars } from "kadesh/components/app-shell";
 import { cn } from "kadesh/utils/cn";
 import { formatDateShort } from "kadesh/utils/format-date";
 import ActivityTimeline from "../../../activity/ActivityTimeline";
@@ -117,17 +118,17 @@ function RankList({
 }) {
   return (
     <div className="min-w-0">
-      <h4 className="text-xs font-semibold uppercase tracking-wide text-[#9e9e9e]">{title}</h4>
+      <h4 className="text-xs font-semibold uppercase tracking-wide text-dash-faint">{title}</h4>
       {rows.length === 0 ? (
-        <p className="mt-2 text-sm text-[#9e9e9e]">{empty}</p>
+        <p className="mt-2 text-sm text-dash-faint">{empty}</p>
       ) : (
         <ol className="mt-2 flex flex-col gap-1.5">
           {rows.slice(0, 5).map((row) => (
             <li key={row.key} className="flex items-center justify-between gap-3 text-sm">
-              <span className="min-w-0 truncate text-[#212121] dark:text-white">
+              <span className="min-w-0 truncate text-dash-ink">
                 {labels?.[row.key] ?? row.key}
               </span>
-              <span className="shrink-0 tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+              <span className="shrink-0 tabular-nums text-dash-muted">
                 {formatCredits(row.count)}
               </span>
             </li>
@@ -323,10 +324,11 @@ export default function CompanySummary({
           title="Créditos gastados por semana"
           description="Últimas 4 semanas · extracción + IA."
         >
-          <WeeklyBars
-            bars={creditWeeks}
+          <ColumnBars
+            points={creditWeeks.map((bar) => ({ key: bar.weekStart, label: bar.label, value: bar.count }))}
             ariaLabel="Créditos gastados por semana"
             unitLabel="créditos"
+            heightClass="h-40"
           />
         </AdminSectionCard>
       </div>

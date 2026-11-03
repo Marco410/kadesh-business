@@ -100,7 +100,7 @@ export default function ExtractionsView({
         <>
           <div className={`${surfaceClass} relative overflow-x-auto`}>
             <table className="w-full min-w-[960px] text-left text-sm">
-              <thead className="whitespace-nowrap border-b border-[#e8e8e8] text-xs uppercase tracking-wide text-[#616161] dark:border-[#333] dark:text-[#b0b0b0]">
+              <thead className="whitespace-nowrap border-b border-dash-line text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                 <tr>
                   <th className="px-4 py-3">Fecha</th>
                   <th className="px-4 py-3">Estado</th>
@@ -113,7 +113,7 @@ export default function ExtractionsView({
                   <th className="px-4 py-3">Mensaje</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+              <tbody className="divide-y divide-dash-line">
                 {rows.map((row) => {
                   const expanded = expandedId === row.id;
                   return (
@@ -121,7 +121,7 @@ export default function ExtractionsView({
                       key={row.id}
                       className={row.success ? undefined : "bg-red-500/[0.04] dark:bg-red-500/[0.06]"}
                     >
-                      <td className="whitespace-nowrap px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                      <td className="whitespace-nowrap px-4 py-3 text-dash-muted">
                         {formatDateShort(row.createdAt, true)}
                       </td>
                       <td className="px-4 py-3">
@@ -134,23 +134,23 @@ export default function ExtractionsView({
                           }
                         />
                       </td>
-                      <td className="px-4 py-3 text-[#212121] dark:text-white">
+                      <td className="px-4 py-3 text-dash-ink">
                         {row.user ? formatPersonName(row.user.name, row.user.lastName) : "—"}
                       </td>
-                      <td className="px-4 py-3 text-[#616161] dark:text-[#b0b0b0]">
+                      <td className="px-4 py-3 text-dash-muted">
                         {row.category || "—"}
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <td className="whitespace-nowrap px-4 py-3 text-xs text-dash-muted">
                         {zoneLabel(row)}
                       </td>
                       <td className="px-4 py-3 tabular-nums">{row.created ?? 0}</td>
                       <td className="px-4 py-3 tabular-nums">{row.alreadyInDb ?? 0}</td>
-                      <td className="px-4 py-3 text-xs tabular-nums text-[#9e9e9e]">
+                      <td className="px-4 py-3 text-xs tabular-nums text-dash-faint">
                         {row.syncedCount != null || row.leadLimit != null
                           ? `${row.syncedCount ?? "—"} / ${row.leadLimit ?? "—"}`
                           : "—"}
                       </td>
-                      <td className="max-w-[260px] px-4 py-3 text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <td className="max-w-[260px] px-4 py-3 text-xs text-dash-muted">
                         {row.message ? (
                           <button
                             type="button"

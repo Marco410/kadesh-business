@@ -43,8 +43,8 @@ export default function WorkspacesView({ companyId }: { companyId: string }) {
         return (
           <li key={ws.id} className={`${surfaceClass} p-4 sm:p-5`}>
             <div className="flex items-start justify-between gap-3">
-              <h3 className="font-semibold text-[#212121] dark:text-white">{ws.name}</h3>
-              <p className="text-xs text-[#9e9e9e]">
+              <h3 className="font-semibold text-dash-ink">{ws.name}</h3>
+              <p className="text-xs text-dash-faint">
                 {ws.members.length} miembro{ws.members.length === 1 ? "" : "s"}
               </p>
             </div>
@@ -53,7 +53,7 @@ export default function WorkspacesView({ companyId }: { companyId: string }) {
                 {ws.members.map((m) => (
                   <li
                     key={m.id}
-                    className="flex items-center gap-1.5 rounded-full bg-black/5 py-0.5 pl-0.5 pr-2.5 text-xs text-[#424242] dark:bg-white/10 dark:text-[#e0e0e0]"
+                    className="flex items-center gap-1.5 rounded-full bg-dash-surface-2 py-0.5 pl-0.5 pr-2.5 text-xs text-dash-soft"
                   >
                     <AdminAvatar name={m.name} lastName={m.lastName} size={22} />
                     {formatPersonName(m.name, m.lastName)}
@@ -69,11 +69,11 @@ export default function WorkspacesView({ companyId }: { companyId: string }) {
                 { label: "Tareas", value: ws.tasksCount, on: ws.showTasks },
               ].map((item) => (
                 <div key={item.label}>
-                  <dt className="text-xs text-[#9e9e9e]">
+                  <dt className="text-xs text-dash-faint">
                     {item.label}
                     {item.on === false ? " (oculto)" : ""}
                   </dt>
-                  <dd className="font-semibold tabular-nums text-[#212121] dark:text-white">
+                  <dd className="font-semibold tabular-nums text-dash-ink">
                     {item.value ?? 0}
                   </dd>
                 </div>
@@ -81,12 +81,12 @@ export default function WorkspacesView({ companyId }: { companyId: string }) {
             </dl>
             {columns.length ? (
               <div className="mt-4">
-                <p className="text-xs text-[#9e9e9e]">Columnas del tablero</p>
+                <p className="text-xs text-dash-faint">Columnas del tablero</p>
                 <ul className="mt-1.5 flex flex-wrap gap-1.5">
                   {columns.map((col) => (
                     <li
                       key={col.id}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-[#e8e8e8] px-2.5 py-0.5 text-xs text-[#424242] dark:border-[#333] dark:text-[#e0e0e0]"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-dash-line px-2.5 py-0.5 text-xs text-dash-soft"
                     >
                       <span
                         aria-hidden

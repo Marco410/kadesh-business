@@ -29,10 +29,10 @@ import {
 } from "./ui";
 
 const fieldClass =
-  "h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
+  "h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
 
 const labelClass =
-  "block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1";
+  "block text-xs font-medium text-dash-muted mb-1";
 
 export default function AdminBlogCategoriesPanel() {
   const [editing, setEditing] = useState<AdminBlogCategoryRow | null>(null);
@@ -125,10 +125,10 @@ export default function AdminBlogCategoriesPanel() {
         className={`${surfaceClass} p-4 sm:p-5 flex flex-col gap-4`}
       >
         <div>
-          <h2 className="text-lg font-bold text-[#212121] dark:text-white">
+          <h2 className="text-lg font-bold text-dash-ink">
             {editing ? "Editar categoría" : "Nueva categoría"}
           </h2>
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1">
+          <p className="text-sm text-dash-muted mt-1">
             El nombre es el que ve la gente. La dirección se arma sola. Si ya
             tiene artículos, el nombre se queda para no cambiar esa dirección.
           </p>
@@ -159,7 +159,7 @@ export default function AdminBlogCategoriesPanel() {
                   className={`h-11 rounded-xl border text-sm font-semibold cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 ${
                     selected
                       ? "border-orange-500 bg-orange-500/10 text-orange-700 dark:text-orange-300"
-                      : "border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-white"
+                      : "border-dash-line text-dash-ink"
                   }`}
                 >
                   {option.label}
@@ -178,7 +178,7 @@ export default function AdminBlogCategoriesPanel() {
               className="mb-3 h-24 w-24 rounded-xl object-cover"
             />
           ) : null}
-          <label className="inline-flex h-11 max-w-full cursor-pointer items-center truncate rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-4 text-sm font-semibold text-[#212121] dark:text-white">
+          <label className="inline-flex h-11 max-w-full cursor-pointer items-center truncate rounded-full border border-dash-line px-4 text-sm font-semibold text-dash-ink">
             {imageFile ? imageFile.name : "Elegir imagen"}
             <input
               type="file"
@@ -195,7 +195,7 @@ export default function AdminBlogCategoriesPanel() {
               type="button"
               onClick={resetForm}
               disabled={saving}
-              className="h-11 rounded-xl px-5 text-sm font-semibold text-[#616161] dark:text-[#b0b0b0] cursor-pointer"
+              className="h-11 rounded-full px-5 text-sm font-semibold text-dash-muted cursor-pointer"
             >
               Cancelar
             </button>
@@ -203,7 +203,7 @@ export default function AdminBlogCategoriesPanel() {
           <button
             type="submit"
             disabled={saving}
-            className="h-11 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+            className="h-11 rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed shadow-dash-accent"
           >
             {saving
               ? "Guardando..."
@@ -235,10 +235,10 @@ export default function AdminBlogCategoriesPanel() {
                     className="h-14 w-14 shrink-0 rounded-xl object-cover"
                   />
                 ) : (
-                  <div className="h-14 w-14 shrink-0 rounded-xl bg-[#f5f5f5] dark:bg-[#2a2a2a]" />
+                  <div className="h-14 w-14 shrink-0 rounded-xl bg-dash-surface-2" />
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-[#212121] dark:text-white truncate">
+                  <p className="font-semibold text-dash-ink truncate">
                     {getCategoryLabel(category.name)}
                   </p>
                   <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -253,7 +253,7 @@ export default function AdminBlogCategoriesPanel() {
                         POST_PRODUCT_BADGE.all
                       }
                     />
-                    <span className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <span className="text-xs text-dash-muted">
                       {category.postsCount ?? 0} artículos
                     </span>
                   </div>

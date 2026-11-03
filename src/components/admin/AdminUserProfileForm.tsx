@@ -43,7 +43,7 @@ function sameIds(a: string[], b: string[]) {
 }
 
 const inputClass =
-  "h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm text-[#212121] dark:text-white";
+  "h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink";
 
 /**
  * Datos, roles y suscripción al blog de una persona. Vive dentro del panel de la persona
@@ -152,9 +152,9 @@ export default function AdminUserProfileForm({ userId }: { userId: string }) {
           <AdminErrorState message="No se pudo cargar el usuario." />
         ) : !user || !draft ? (
           <div className="space-y-3" aria-hidden>
-            <div className="h-24 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
-            <div className="h-40 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
-            <div className="h-40 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
+            <div className="h-24 rounded-xl dash-shimmer" />
+            <div className="h-40 rounded-xl dash-shimmer" />
+            <div className="h-40 rounded-xl dash-shimmer" />
           </div>
         ) : (
           <>
@@ -168,7 +168,7 @@ export default function AdminUserProfileForm({ userId }: { userId: string }) {
             </section>
 
             <section>
-              <h4 className="text-sm font-semibold text-[#212121] dark:text-white mb-3">
+              <h4 className="text-sm font-semibold text-dash-ink mb-3">
                 Datos del usuario
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -233,24 +233,24 @@ export default function AdminUserProfileForm({ userId }: { userId: string }) {
                   onChange={(e) => patch({ verified: e.target.checked })}
                   className="h-4 w-4 accent-orange-500"
                 />
-                <span className="text-sm text-[#212121] dark:text-white">
+                <span className="text-sm text-dash-ink">
                   Cuenta verificada
                 </span>
               </label>
             </section>
 
             <section>
-              <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+              <h4 className="text-sm font-semibold text-dash-ink">
                 Roles
               </h4>
-              <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+              <p className="text-xs text-dash-muted mt-1 mb-3">
                 Definen a qué partes de la plataforma entra esta persona.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {roleOptions.map((role) => (
                   <label
                     key={role.id}
-                    className="flex items-center gap-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-3 py-3 cursor-pointer min-h-11"
+                    className="flex items-center gap-3 rounded-xl border border-dash-line bg-dash-surface-2 px-3 py-3 cursor-pointer min-h-11"
                   >
                     <input
                       type="checkbox"
@@ -259,7 +259,7 @@ export default function AdminUserProfileForm({ userId }: { userId: string }) {
                       onChange={() => toggleRole(role.id)}
                       className="h-4 w-4 accent-orange-500"
                     />
-                    <span className="text-sm font-medium text-[#212121] dark:text-white">
+                    <span className="text-sm font-medium text-dash-ink">
                       {ROLE_LABELS[role.name] ?? role.name}
                     </span>
                   </label>
@@ -272,7 +272,7 @@ export default function AdminUserProfileForm({ userId }: { userId: string }) {
                 type="button"
                 disabled={!hasChanges || saving}
                 onClick={() => setEdits({})}
-                className="h-11 rounded-xl px-4 text-sm font-semibold border border-[#e0e0e0] dark:border-[#3a3a3a] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                className="h-11 rounded-full px-4 text-sm font-semibold border border-dash-line cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 Descartar cambios
               </button>
@@ -280,13 +280,13 @@ export default function AdminUserProfileForm({ userId }: { userId: string }) {
                 type="button"
                 disabled={!canSave}
                 onClick={handleSave}
-                className="h-11 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+                className="h-11 rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed shadow-dash-accent"
               >
                 {saving ? "Guardando..." : "Guardar usuario"}
               </button>
             </div>
 
-            <div className="border-t border-[#e0e0e0] dark:border-[#3a3a3a] pt-6 pb-2">
+            <div className="border-t border-dash-line pt-6 pb-2">
               <AdminUserBlogSubscriptions
                 userId={user.id}
                 userEmail={user.email}
@@ -301,9 +301,9 @@ export default function AdminUserProfileForm({ userId }: { userId: string }) {
 
 function InfoTile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-[#fafafa] dark:bg-[#252525] p-3">
-      <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-[#212121] dark:text-white break-words">
+    <div className="rounded-xl bg-dash-surface-2 p-3">
+      <p className="text-xs text-dash-muted">{label}</p>
+      <p className="mt-1 text-sm font-semibold text-dash-ink break-words">
         {value}
       </p>
     </div>
@@ -321,7 +321,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1">
+      <span className="block text-xs font-medium text-dash-muted mb-1">
         {label}
       </span>
       {children}

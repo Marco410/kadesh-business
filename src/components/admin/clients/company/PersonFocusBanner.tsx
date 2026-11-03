@@ -40,22 +40,22 @@ export default function PersonFocusBanner({
         <AdminAvatar name={person.name} lastName={person.lastName} size={40} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <p className="font-semibold text-[#212121] dark:text-white">
+            <p className="font-semibold text-dash-ink">
               {formatPersonName(person.name, person.lastName, person.secondLastName)}
             </p>
             {person.roles.map((r) => (
               <AdminStatusBadge
                 key={r.name}
                 label={ROLE_LABELS[r.name] ?? r.name}
-                className="bg-black/5 px-2 py-0.5 text-[#424242] dark:bg-white/10 dark:text-[#e0e0e0]"
+                className="bg-dash-surface-2 px-2 py-0.5 text-dash-soft"
               />
             ))}
           </div>
-          <p className="mt-0.5 break-all text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-0.5 break-all text-sm text-dash-muted">
             {person.email ?? "Sin correo"}
             {person.phone ? ` · ${person.phone}` : ""}
           </p>
-          <p className="mt-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-2 text-xs text-dash-muted">
             {person.lastLoginAt
               ? `Último acceso: ${formatDate(person.lastLoginAt)}`
               : "Nunca ha entrado"}
@@ -76,7 +76,7 @@ export default function PersonFocusBanner({
             <button
               type="button"
               onClick={onShowActivity}
-              className="h-10 rounded-xl border border-[#e0e0e0] px-4 text-sm font-semibold text-[#212121] hover:border-orange-300 dark:border-[#3a3a3a] dark:text-white cursor-pointer"
+              className="h-10 rounded-full border border-dash-line px-4 text-sm font-semibold text-dash-ink hover:border-orange-300 cursor-pointer"
             >
               Ver su actividad
             </button>
@@ -86,7 +86,7 @@ export default function PersonFocusBanner({
           type="button"
           onClick={onClear}
           aria-label="Quitar a la persona del foco"
-          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[#616161] hover:bg-black/5 dark:text-[#b0b0b0] dark:hover:bg-white/10 cursor-pointer"
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-dash-muted hover:bg-dash-hover cursor-pointer"
         >
           <HugeiconsIcon icon={Cancel01Icon} size={18} />
         </button>

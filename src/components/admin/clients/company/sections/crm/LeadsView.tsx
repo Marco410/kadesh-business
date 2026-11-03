@@ -24,7 +24,7 @@ import {
 import { pipelineLabel, sortByPipeline } from "../../format";
 import LeadQuickView from "../../LeadQuickView";
 
-const neutralBadge = "bg-[#e0e0e0] text-[#616161] dark:bg-[#3a3a3a] dark:text-[#b0b0b0]";
+const neutralBadge = "bg-dash-surface-3 text-dash-muted";
 
 export default function LeadsView({
   companyId,
@@ -120,12 +120,12 @@ export default function LeadsView({
         />
       ) : (
         <>
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="text-sm text-dash-muted">
             {total} lead{total === 1 ? "" : "s"}. Toca uno para ver su historial en esta empresa.
           </p>
           <div className={`${surfaceClass} relative overflow-x-auto`}>
             <table className="w-full min-w-[880px] text-left text-sm">
-              <thead className="border-b border-[#e8e8e8] text-xs uppercase tracking-wide text-[#616161] dark:border-[#333] dark:text-[#b0b0b0]">
+              <thead className="border-b border-dash-line text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                 <tr>
                   <th className="px-4 py-3">Negocio</th>
                   <th className="px-4 py-3">Etapa</th>
@@ -136,7 +136,7 @@ export default function LeadsView({
                   <th className="px-4 py-3">Alta</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+              <tbody className="divide-y divide-dash-line">
                 {rows.map((lead) => {
                   const status = lead.status[0];
                   return (
@@ -152,11 +152,11 @@ export default function LeadsView({
                             e.stopPropagation();
                             setOpenLeadId(lead.id);
                           }}
-                          className="text-left font-medium text-[#212121] hover:text-orange-600 dark:text-white dark:hover:text-orange-400 cursor-pointer"
+                          className="text-left font-medium text-dash-ink hover:text-orange-600 dark:hover:text-orange-400 cursor-pointer"
                         >
                           {lead.businessName}
                         </button>
-                        <p className="text-xs text-[#9e9e9e]">{lead.category || "—"}</p>
+                        <p className="text-xs text-dash-faint">{lead.category || "—"}</p>
                       </td>
                       <td className="px-4 py-3 align-top">
                         <AdminStatusBadge
@@ -168,28 +168,28 @@ export default function LeadsView({
                           }
                         />
                         {status?.opportunityLevel ? (
-                          <p className="mt-1 text-xs text-[#9e9e9e]">
+                          <p className="mt-1 text-xs text-dash-faint">
                             Oportunidad {status.opportunityLevel.toLowerCase()}
                           </p>
                         ) : null}
                       </td>
-                      <td className="px-4 py-3 align-top text-[#616161] dark:text-[#b0b0b0]">
+                      <td className="px-4 py-3 align-top text-dash-muted">
                         {lead.salesPerson.length
                           ? lead.salesPerson
                               .map((seller) => formatPersonName(seller.name, seller.lastName))
                               .join(", ")
                           : "Sin asignar"}
                       </td>
-                      <td className="px-4 py-3 align-top tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+                      <td className="px-4 py-3 align-top tabular-nums text-dash-muted">
                         {lead.phone || "—"}
                       </td>
-                      <td className="px-4 py-3 align-top text-[#616161] dark:text-[#b0b0b0]">
+                      <td className="px-4 py-3 align-top text-dash-muted">
                         {[lead.city, lead.state].filter(Boolean).join(", ") || "—"}
                       </td>
-                      <td className="px-4 py-3 align-top text-[#616161] dark:text-[#b0b0b0]">
+                      <td className="px-4 py-3 align-top text-dash-muted">
                         {lead.source || "—"}
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 align-top text-xs text-[#9e9e9e]">
+                      <td className="whitespace-nowrap px-4 py-3 align-top text-xs text-dash-faint">
                         {formatDateShort(lead.createdAt, false)}
                       </td>
                     </tr>

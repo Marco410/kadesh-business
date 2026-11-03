@@ -31,11 +31,11 @@ function AcquisitionTable({
   keyLabel: string;
   empty: string;
 }) {
-  if (rows.length === 0) return <p className="text-sm text-[#9e9e9e]">{empty}</p>;
+  if (rows.length === 0) return <p className="text-sm text-dash-faint">{empty}</p>;
   return (
     <div className="relative -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
       <table className="w-full min-w-[420px] text-left text-sm">
-        <thead className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <thead className="text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
           <tr>
             <th className="py-2 pr-3 font-medium">{keyLabel}</th>
             <th className="py-2 pr-3 font-medium">Empresas</th>
@@ -43,17 +43,17 @@ function AcquisitionTable({
             <th className="py-2 font-medium">Pagaron</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+        <tbody className="divide-y divide-dash-line">
           {rows.map((row) => (
             <tr key={row.key}>
-              <td className="max-w-[16rem] truncate py-2 pr-3 text-[#212121] dark:text-white" title={row.key}>
+              <td className="max-w-[16rem] truncate py-2 pr-3 text-dash-ink" title={row.key}>
                 {row.key}
               </td>
-              <td className="py-2 pr-3 tabular-nums text-[#212121] dark:text-white">{row.companies}</td>
-              <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+              <td className="py-2 pr-3 tabular-nums text-dash-ink">{row.companies}</td>
+              <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-dash-muted">
                 {pct(row.activated, row.companies)} <span className="text-xs">({row.activated})</span>
               </td>
-              <td className="whitespace-nowrap py-2 tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+              <td className="whitespace-nowrap py-2 tabular-nums text-dash-muted">
                 <span className="font-medium text-emerald-700 dark:text-emerald-400">{pct(row.paid, row.companies)}</span>{" "}
                 <span className="text-xs">({row.paid})</span>
               </td>

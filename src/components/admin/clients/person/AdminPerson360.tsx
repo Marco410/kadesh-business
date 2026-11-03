@@ -47,7 +47,7 @@ export default function AdminPerson360({ userId }: { userId: string }) {
       <button
         type="button"
         onClick={back}
-        className="inline-flex min-h-10 items-center gap-1.5 self-start text-sm text-[#616161] hover:text-orange-500 dark:text-[#b0b0b0] cursor-pointer"
+        className="inline-flex min-h-10 items-center gap-1.5 self-start text-sm text-dash-muted hover:text-orange-500 cursor-pointer"
       >
         <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
         Clientes
@@ -68,10 +68,10 @@ export default function AdminPerson360({ userId }: { userId: string }) {
             <div className="flex items-start gap-3">
               <AdminAvatar name={person.name} lastName={person.lastName} size={44} />
               <div className="min-w-0">
-                <h2 className="text-xl font-bold text-[#212121] dark:text-white">
+                <h2 className="text-xl font-bold text-dash-ink">
                   {formatPersonName(person.name, person.lastName, person.secondLastName)}
                 </h2>
-                <p className="break-all text-sm text-[#616161] dark:text-[#b0b0b0]">
+                <p className="break-all text-sm text-dash-muted">
                   {person.email ?? "Sin correo"}
                 </p>
               </div>
@@ -81,7 +81,7 @@ export default function AdminPerson360({ userId }: { userId: string }) {
                 <AdminStatusBadge
                   key={r.name}
                   label={ROLE_LABELS[r.name] ?? r.name}
-                  className="bg-black/5 text-[#424242] dark:bg-white/10 dark:text-[#e0e0e0]"
+                  className="bg-dash-surface-2 text-dash-soft"
                 />
               ))}
               {person.verified ? (
@@ -93,8 +93,8 @@ export default function AdminPerson360({ userId }: { userId: string }) {
             </div>
             <dl className="mt-4 space-y-2 text-sm">
               <div>
-                <dt className="text-xs text-[#9e9e9e]">Empresa</dt>
-                <dd className="text-[#212121] dark:text-white">
+                <dt className="text-xs text-dash-faint">Empresa</dt>
+                <dd className="text-dash-ink">
                   {person.company ? (
                     <button
                       type="button"
@@ -109,21 +109,21 @@ export default function AdminPerson360({ userId }: { userId: string }) {
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-[#9e9e9e]">Alta</dt>
-                <dd className="text-[#212121] dark:text-white">
+                <dt className="text-xs text-dash-faint">Alta</dt>
+                <dd className="text-dash-ink">
                   {formatDateShort(person.createdAt, false)}
                 </dd>
               </div>
               <div>
-                <dt className="text-xs text-[#9e9e9e]">Último acceso</dt>
-                <dd className="text-[#212121] dark:text-white">
+                <dt className="text-xs text-dash-faint">Último acceso</dt>
+                <dd className="text-dash-ink">
                   {person.lastLoginAt ? formatDate(person.lastLoginAt) : "Nunca"}
                 </dd>
               </div>
               {person.phone ? (
                 <div>
-                  <dt className="text-xs text-[#9e9e9e]">Teléfono</dt>
-                  <dd className="text-[#212121] dark:text-white">{person.phone}</dd>
+                  <dt className="text-xs text-dash-faint">Teléfono</dt>
+                  <dd className="text-dash-ink">{person.phone}</dd>
                 </div>
               ) : null}
             </dl>

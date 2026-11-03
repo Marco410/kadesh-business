@@ -77,10 +77,10 @@ const STEPS = [
 ] as const;
 
 const inputClassName =
-  "w-full px-3 py-2.5 text-sm rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#9e9e9e] dark:placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 transition-[box-shadow,border-color] duration-150";
+  "w-full px-3 py-2.5 text-sm rounded-lg border border-dash-line bg-dash-surface text-dash-ink placeholder:text-dash-faint dark:placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 transition-[box-shadow,border-color] duration-150";
 
 const labelClassName =
-  "block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5";
+  "block text-xs font-medium text-dash-muted mb-1.5";
 
 function Field({
   label,
@@ -265,20 +265,20 @@ export default function AddLeadSection() {
       <div className="mb-6">
         <Link
           href={`${Routes.panel}?tab=clientes`}
-          className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-dash-muted hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
           Volver a Clientes
         </Link>
       </div>
 
-      <div className="rounded-xl border border-orange-200/60 dark:border-orange-900/40 bg-white dark:bg-[#1e1e1e] shadow-sm">
-        <div className="flex items-start justify-between gap-3 px-6 py-5 border-b border-[#e0e0e0] dark:border-[#3a3a3a] bg-gradient-to-br from-orange-500/[0.07] to-transparent dark:from-orange-500/10">
+      <div className="rounded-xl border border-orange-200/60 dark:border-orange-900/40 bg-dash-surface shadow-sm">
+        <div className="flex items-start justify-between gap-3 px-6 py-5 border-b border-dash-line bg-gradient-to-br from-orange-500/[0.07] to-transparent dark:from-orange-500/10">
           <div>
-            <h1 className="text-xl font-bold text-[#212121] dark:text-white">
+            <h1 className="text-xl font-bold text-dash-ink">
               Agregar cliente
             </h1>
-            <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1">
+            <p className="text-sm text-dash-muted mt-1">
               Paso {step} de 3. Con nombre y categoría ya puedes guardar.
             </p>
           </div>
@@ -287,7 +287,7 @@ export default function AddLeadSection() {
 
         <nav
           aria-label="Pasos del formulario"
-          className="px-4 sm:px-6 py-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a]"
+          className="px-4 sm:px-6 py-4 border-b border-dash-line"
         >
           <ol className="grid grid-cols-3 gap-2">
             {STEPS.map((item, index) => {
@@ -309,7 +309,7 @@ export default function AddLeadSection() {
                           ? "bg-emerald-500 text-white"
                           : isCurrent
                             ? "bg-orange-500 text-white"
-                            : "bg-[#ececec] dark:bg-[#2a2a2a] text-[#616161] dark:text-[#b0b0b0]"
+                            : "bg-dash-surface-2 text-dash-muted"
                       }`}
                     >
                       {isDone ? (
@@ -319,14 +319,14 @@ export default function AddLeadSection() {
                       )}
                     </span>
                     <span className="min-w-0 hidden sm:block">
-                      <span className="block text-xs font-semibold text-[#212121] dark:text-white truncate">
+                      <span className="block text-xs font-semibold text-dash-ink truncate">
                         {index + 1}. {item.title}
                       </span>
-                      <span className="block text-[11px] text-[#9e9e9e] dark:text-[#777]">
+                      <span className="block text-[11px] text-dash-faint dark:text-[#777]">
                         {item.hint}
                       </span>
                     </span>
-                    <span className="sm:hidden text-xs font-semibold text-[#212121] dark:text-white">
+                    <span className="sm:hidden text-xs font-semibold text-dash-ink">
                       {item.id}
                     </span>
                   </button>
@@ -416,7 +416,7 @@ export default function AddLeadSection() {
                           className={`inline-flex px-2.5 py-1.5 rounded-md text-xs font-medium transition-[transform,background-color,color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] hover:scale-[1.03] active:scale-[0.97] ${
                             selected
                               ? "bg-orange-500 text-white shadow-sm shadow-orange-500/25"
-                              : "bg-[#f5f5f5] dark:bg-[#2a2a2a] text-[#616161] dark:text-[#b0b0b0] hover:bg-orange-500/10"
+                              : "bg-dash-surface-2 text-dash-muted hover:bg-orange-500/10"
                           }`}
                         >
                           {o.label}
@@ -446,7 +446,7 @@ export default function AddLeadSection() {
                           className={`rounded-lg px-3 py-2.5 text-sm font-semibold transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.2,0,0,1)] active:scale-[0.97] ${
                             selected
                               ? o.active
-                              : "bg-[#f5f5f5] dark:bg-[#2a2a2a] text-[#616161] dark:text-[#b0b0b0] hover:bg-orange-500/10"
+                              : "bg-dash-surface-2 text-dash-muted hover:bg-orange-500/10"
                           }`}
                         >
                           {o.label}
@@ -460,7 +460,7 @@ export default function AddLeadSection() {
 
             {step === 2 && (
               <div className="space-y-4">
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+                <p className="text-sm text-dash-muted">
                   Puedes saltar este paso. El mapa rellena dirección, ciudad y
                   país.
                 </p>
@@ -555,8 +555,8 @@ export default function AddLeadSection() {
 
             {step === 3 && (
               <div className="space-y-5">
-                <div className="rounded-lg border border-orange-200/50 dark:border-orange-900/30 bg-orange-500/[0.05] px-3 py-2.5 text-sm text-[#616161] dark:text-[#b0b0b0]">
-                  <span className="font-semibold text-[#212121] dark:text-white">
+                <div className="rounded-lg border border-orange-200/50 dark:border-orange-900/30 bg-orange-500/[0.05] px-3 py-2.5 text-sm text-dash-muted">
+                  <span className="font-semibold text-dash-ink">
                     {businessName.trim() || "Sin nombre"}
                   </span>
                   {phone ? ` · ${phone}` : ""}
@@ -669,7 +669,7 @@ export default function AddLeadSection() {
                         <button
                           type="button"
                           onClick={() => setReviews((prev) => [...prev, ""])}
-                          className="inline-flex items-center gap-1 text-xs font-medium text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-dash-muted hover:text-orange-500"
                         >
                           <HugeiconsIcon icon={Add01Icon} size={14} />
                           Otra reseña
@@ -682,11 +682,11 @@ export default function AddLeadSection() {
             )}
           </div>
 
-          <div className="sticky bottom-0 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2 px-6 py-4 border-t border-[#e0e0e0] dark:border-[#3a3a3a] bg-white/95 dark:bg-[#1e1e1e]/95 backdrop-blur-sm">
+          <div className="sticky bottom-0 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2 px-6 py-4 border-t border-dash-line bg-white/95 dark:bg-[#1e1e1e]/95 backdrop-blur-sm">
             <button
               type="button"
               onClick={() => (step === 1 ? router.back() : goBack())}
-              className="px-4 py-2.5 text-sm font-medium rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] text-[#616161] dark:text-[#b0b0b0] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] active:scale-[0.98] transition-[transform,background-color] duration-150"
+              className="px-4 py-2.5 text-sm font-medium rounded-lg border border-dash-line text-dash-muted hover:bg-dash-hover active:scale-[0.98] transition-[transform,background-color] duration-150"
             >
               {step === 1 ? "Cancelar" : "Atrás"}
             </button>
@@ -705,7 +705,7 @@ export default function AddLeadSection() {
                 <button
                   type="button"
                   onClick={goNext}
-                  className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-sm font-semibold rounded-lg text-white bg-orange-500 hover:bg-orange-600 hover:-translate-y-px active:scale-[0.98] shadow-sm shadow-orange-500/25 transition-[transform,background-color] duration-150"
+                  className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-sm font-semibold rounded-full text-white dash-grad-accent hover:shadow-dash-accent-lift hover:-translate-y-px active:scale-[0.98] shadow-sm shadow-orange-500/25 transition-[transform,background-color] duration-150 shadow-dash-accent"
                 >
                   Continuar
                   <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
@@ -715,7 +715,7 @@ export default function AddLeadSection() {
                   type="button"
                   disabled={loading || !canSave}
                   onClick={() => void saveLead()}
-                  className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-lg text-white bg-orange-500 hover:bg-orange-600 hover:-translate-y-px active:scale-[0.98] shadow-sm shadow-orange-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-[transform,background-color] duration-150"
+                  className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-semibold rounded-full text-white dash-grad-accent hover:shadow-dash-accent-lift hover:-translate-y-px active:scale-[0.98] shadow-sm shadow-orange-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-[transform,background-color] duration-150 shadow-dash-accent"
                 >
                   {loading ? "Guardando…" : "Agregar cliente"}
                 </button>

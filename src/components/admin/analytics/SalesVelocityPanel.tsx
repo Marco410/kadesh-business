@@ -151,11 +151,11 @@ export default function SalesVelocityPanel() {
 
           <AdminSectionCard title="Etapas del pipeline" help={HELP.salesStages}>
             {v.stages.length === 0 ? (
-              <p className="text-sm text-[#9e9e9e]">Ningún lead cambió de etapa en el periodo.</p>
+              <p className="text-sm text-dash-faint">Ningún lead cambió de etapa en el periodo.</p>
             ) : (
               <div className="relative -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
                 <table className="w-full min-w-[640px] text-left text-sm">
-                  <thead className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <thead className="text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                     <tr>
                       <Th label="Etapa" />
                       <Th label="Entraron" help={HELP.stageEntered} />
@@ -165,31 +165,31 @@ export default function SalesVelocityPanel() {
                       <Th label="Estancados" help={HELP.stageStalled} className="pr-0" />
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+                  <tbody className="divide-y divide-dash-line">
                     {v.stages.map((row) => (
                       <tr key={row.stage}>
-                        <td className="py-2 pr-3 text-[#212121] dark:text-white">{pipelineLabel(row.stage)}</td>
-                        <td className="py-2 pr-3 tabular-nums text-[#212121] dark:text-white">{row.entered}</td>
-                        <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+                        <td className="py-2 pr-3 text-dash-ink">{pipelineLabel(row.stage)}</td>
+                        <td className="py-2 pr-3 tabular-nums text-dash-ink">{row.entered}</td>
+                        <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-dash-muted">
                           {FINAL_STAGES.has(row.stage) ? (
                             "—"
                           ) : (
                             <>
-                              <span className="text-[#212121] dark:text-white">{formatShare(row.advanced, row.entered)}</span>{" "}
+                              <span className="text-dash-ink">{formatShare(row.advanced, row.entered)}</span>{" "}
                               <span className="text-xs">({row.advanced})</span>
                             </>
                           )}
                         </td>
-                        <td className="py-2 pr-3 tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+                        <td className="py-2 pr-3 tabular-nums text-dash-muted">
                           {FINAL_STAGES.has(row.stage) ? "—" : row.lost}
                         </td>
-                        <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-[#616161] dark:text-[#b0b0b0]">
+                        <td className="whitespace-nowrap py-2 pr-3 tabular-nums text-dash-muted">
                           {formatDays(row.medianDays)}
                         </td>
                         <td
                           className={cn(
                             "py-2 tabular-nums",
-                            row.stalled ? "font-semibold text-amber-700 dark:text-amber-300" : "text-[#9e9e9e]",
+                            row.stalled ? "font-semibold text-amber-700 dark:text-amber-300" : "text-dash-faint",
                           )}
                         >
                           {row.stalled}
@@ -204,7 +204,7 @@ export default function SalesVelocityPanel() {
 
           <AdminSectionCard title="Por empresa" help={HELP.salesCompanies}>
             {v.companies.length === 0 ? (
-              <p className="text-sm text-[#9e9e9e]">Ninguna empresa movió leads en el periodo.</p>
+              <p className="text-sm text-dash-faint">Ninguna empresa movió leads en el periodo.</p>
             ) : (
               <>
                 <ul className="flex flex-col gap-2 md:hidden">
@@ -216,14 +216,14 @@ export default function SalesVelocityPanel() {
                         className={cn(surfaceClass, "w-full p-3 text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400")}
                       >
                         <span className="flex items-center justify-between gap-2">
-                          <span className="font-semibold text-[#212121] dark:text-white">{company.companyName}</span>
+                          <span className="font-semibold text-dash-ink">{company.companyName}</span>
                           {company.stalled ? (
                             <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:text-amber-300">
                               {company.stalled} estancados
                             </span>
                           ) : null}
                         </span>
-                        <span className="mt-1 block text-xs text-[#616161] dark:text-[#b0b0b0]">
+                        <span className="mt-1 block text-xs text-dash-muted">
                           Cierre {formatRate(company.winRate)} · ciclo {formatDays(company.medianCycleDays)} · primer
                           contacto {formatHours(company.medianFirstContactHours)}
                         </span>
@@ -233,7 +233,7 @@ export default function SalesVelocityPanel() {
                 </ul>
                 <div className="relative hidden overflow-x-auto md:block">
                   <table className="w-full min-w-[760px] text-left text-sm">
-                    <thead className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <thead className="text-dash-muted text-[12px] font-semibold uppercase tracking-[0.04em] bg-dash-surface-2/60">
                       <tr>
                         <Th label="Empresa" />
                         <Th label="Leads nuevos" help={HELP.stageEntered} />
@@ -247,7 +247,7 @@ export default function SalesVelocityPanel() {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+                    <tbody className="divide-y divide-dash-line">
                       {v.companies.map((company) => (
                         <tr
                           key={company.companyId}
@@ -261,7 +261,7 @@ export default function SalesVelocityPanel() {
                                 e.stopPropagation();
                                 openCompany(company.companyId);
                               }}
-                              className="rounded text-left font-semibold text-[#212121] hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:text-white dark:hover:text-orange-400 cursor-pointer"
+                              className="rounded text-left font-semibold text-dash-ink hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:hover:text-orange-400 cursor-pointer"
                             >
                               {company.companyName}
                             </button>
@@ -274,12 +274,12 @@ export default function SalesVelocityPanel() {
                           <td
                             className={cn(
                               "py-2 pr-3 tabular-nums",
-                              company.stalled ? "font-semibold text-amber-700 dark:text-amber-300" : "text-[#9e9e9e]",
+                              company.stalled ? "font-semibold text-amber-700 dark:text-amber-300" : "text-dash-faint",
                             )}
                           >
                             {company.stalled}
                           </td>
-                          <td className="py-2 text-[#9e9e9e]">
+                          <td className="py-2 text-dash-faint">
                             <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
                           </td>
                         </tr>

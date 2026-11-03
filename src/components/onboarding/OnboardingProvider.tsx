@@ -15,6 +15,7 @@ import { driver, type Driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import "./tour.css";
 import { useUser } from "kadesh/utils/UserContext";
+import { Routes } from "kadesh/core/routes";
 import { TRACK_EVENT, trackActivity } from "kadesh/utils/activity";
 import { isImpersonating } from "kadesh/components/impersonation";
 import {
@@ -76,15 +77,29 @@ function isAtHref(href: string): boolean {
   );
 }
 
+/**
+ * Visible de verdad: el menú de los paneles en móvil es un cajón cerrado (`visibility: hidden`) y
+ * sus anclas existen en el DOM; resaltarlas apuntaría a algo que no se ve, así que el paso se salta.
+ */
+function isShown(el: Element): boolean {
+  return el.getClientRects().length > 0 && window.getComputedStyle(el).visibility !== "hidden";
+}
+
 function waitForElement(
   selector: string,
   timeoutMs: number,
 ): Promise<Element | null> {
   return new Promise((resolve) => {
     const startedAt = Date.now();
+    let hiddenSince: number | null = null;
     const check = () => {
       const el = document.querySelector(selector);
-      if (el) return resolve(el);
+      if (el && isShown(el)) return resolve(el);
+      // Existe pero oculto (menú cerrado en móvil): tras un momento se da por no disponible.
+      if (el) {
+        hiddenSince ??= Date.now();
+        if (Date.now() - hiddenSince >= 600) return resolve(null);
+      }
       if (Date.now() - startedAt >= timeoutMs) return resolve(null);
       window.setTimeout(check, 100);
     };
@@ -262,6 +277,8 @@ export function OnboardingProvider({
       autoStartedRef.current ||
       !userId ||
       !pathname?.startsWith("/panel") ||
+      // Operaciones es del equipo de Kadesh: no tiene los anclajes del tour de bienvenida.
+      pathname.startsWith(Routes.panelAdmin) ||
       isImpersonating()
     ) {
       return;

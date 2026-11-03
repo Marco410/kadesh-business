@@ -66,13 +66,13 @@ export default function LeadQuickView({
                 label={pipelineLabel(status?.pipelineStatus)}
                 className={
                   (status?.pipelineStatus && PIPELINE_STATUS_COLORS[status.pipelineStatus]) ??
-                  "bg-[#e0e0e0] text-[#616161] dark:bg-[#3a3a3a] dark:text-[#b0b0b0]"
+                  "bg-dash-surface-3 text-dash-muted"
                 }
               />
               {status?.opportunityLevel ? (
                 <AdminStatusBadge
                   label={`Oportunidad ${status.opportunityLevel.toLowerCase()}`}
-                  className="bg-black/5 text-[#424242] dark:bg-white/10 dark:text-[#e0e0e0]"
+                  className="bg-dash-surface-2 text-dash-soft"
                 />
               ) : null}
             </div>
@@ -99,7 +99,7 @@ export default function LeadQuickView({
               ]}
             />
             {status?.notes ? (
-              <p className="mt-3 whitespace-pre-line rounded-xl bg-[#fafafa] p-3 text-sm text-[#616161] dark:bg-[#252525] dark:text-[#b0b0b0]">
+              <p className="mt-3 whitespace-pre-line rounded-xl bg-dash-surface-2 p-3 text-sm text-dash-muted">
                 {status.notes}
               </p>
             ) : null}
@@ -138,16 +138,16 @@ export default function LeadQuickView({
 
           <AdminSectionCard title={`Actividades (${lead.activities.length})`}>
             {lead.activities.length === 0 ? (
-              <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">Sin actividades registradas.</p>
+              <p className="text-sm text-dash-muted">Sin actividades registradas.</p>
             ) : (
-              <ul className="divide-y divide-[#f0f0f0] dark:divide-[#2a2a2a]">
+              <ul className="divide-y divide-dash-line">
                 {lead.activities.map((a) => (
                   <li key={a.id} className="py-2">
-                    <p className="text-sm font-medium text-[#212121] dark:text-white">
+                    <p className="text-sm font-medium text-dash-ink">
                       {a.type}
                       {a.title ? ` · ${a.title}` : ""}
                     </p>
-                    <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+                    <p className="text-xs text-dash-muted">
                       {formatDateShort(a.activityDate, true)}
                       {a.assignedSeller
                         ? ` · ${formatPersonName(a.assignedSeller.name, a.assignedSeller.lastName)}`
@@ -163,14 +163,14 @@ export default function LeadQuickView({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <AdminSectionCard title={`Seguimientos (${lead.followUpTasks.length})`}>
               {lead.followUpTasks.length === 0 ? (
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">Ninguno.</p>
+                <p className="text-sm text-dash-muted">Ninguno.</p>
               ) : (
                 <ul className="space-y-2">
                   {lead.followUpTasks.map((f) => (
-                    <li key={f.id} className="text-sm text-[#212121] dark:text-white">
+                    <li key={f.id} className="text-sm text-dash-ink">
                       {formatDateShort(f.scheduledDate, false)} · {f.status ?? "—"}
                       {f.notes ? (
-                        <span className="block text-xs text-[#616161] dark:text-[#b0b0b0]">{f.notes}</span>
+                        <span className="block text-xs text-dash-muted">{f.notes}</span>
                       ) : null}
                     </li>
                   ))}
@@ -179,13 +179,13 @@ export default function LeadQuickView({
             </AdminSectionCard>
             <AdminSectionCard title={`Propuestas (${lead.proposals.length})`}>
               {lead.proposals.length === 0 ? (
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">Ninguna.</p>
+                <p className="text-sm text-dash-muted">Ninguna.</p>
               ) : (
                 <ul className="space-y-2">
                   {lead.proposals.map((pr) => (
-                    <li key={pr.id} className="text-sm text-[#212121] dark:text-white">
+                    <li key={pr.id} className="text-sm text-dash-ink">
                       {formatMoney(pr.amount, "MXN")} · {pr.status ?? "—"}
-                      <span className="block text-xs text-[#616161] dark:text-[#b0b0b0]">
+                      <span className="block text-xs text-dash-muted">
                         {[pr.product, formatDateShort(pr.sentDate, false)].filter(Boolean).join(" · ")}
                       </span>
                     </li>
@@ -197,12 +197,12 @@ export default function LeadQuickView({
 
           <AdminSectionCard title={`Cotizaciones (${lead.quotations.length})`}>
             {lead.quotations.length === 0 ? (
-              <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">Ninguna.</p>
+              <p className="text-sm text-dash-muted">Ninguna.</p>
             ) : (
               <ul className="space-y-2">
                 {lead.quotations.map((q) => (
                   <li key={q.id} className="flex items-center justify-between gap-2 text-sm">
-                    <span className="text-[#212121] dark:text-white">
+                    <span className="text-dash-ink">
                       #{q.quotationNumber ?? "—"} · {formatMoney(q.total, q.currency)}
                     </span>
                     <AdminStatusBadge

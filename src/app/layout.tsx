@@ -16,9 +16,10 @@ import { ADSENSE_SCRIPT_SRC } from "kadesh/core/ads";
 
 export { metadata, viewport } from "./metadata";
 
+// Inter variable (un solo archivo con todos los pesos): es la fuente de los paneles
+// (`font-dash`), que usan 500 y 600; con pesos fijos 400/700 el navegador los simulaba.
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "700"],
   display: "swap",
   variable: "--font-inter",
 });

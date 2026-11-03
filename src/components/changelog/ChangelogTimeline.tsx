@@ -16,7 +16,7 @@ export default function ChangelogTimeline({ releases }: ChangelogTimelineProps) 
             className={`absolute left-0 top-6 z-10 flex h-[22px] w-[22px] items-center justify-center rounded-full border-2 sm:h-[30px] sm:w-[30px] sm:left-[1px] ${
               index === 0
                 ? "border-orange-500 bg-orange-500 shadow-md shadow-orange-500/30"
-                : "border-[#e0e0e0] bg-white dark:border-[#444] dark:bg-[#1a1a1a]"
+                : "border-dash-line bg-dash-surface dark:border-[#444]"
             }`}
             aria-hidden
           >

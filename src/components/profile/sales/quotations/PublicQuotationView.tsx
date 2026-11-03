@@ -80,7 +80,7 @@ function isExpired(iso: string | null | undefined): boolean {
 }
 
 const paperLinkClass =
-  "underline decoration-dotted underline-offset-2 hover:text-[#212121]";
+  "underline decoration-dotted underline-offset-2 hover:text-dash-ink";
 
 export function PublicQuotationMessage({
   title,
@@ -96,15 +96,15 @@ export function PublicQuotationMessage({
         initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={quotationMotionTransition(reduce)}
-        className="w-full max-w-md rounded-2xl border border-[#e0e0e0] bg-white p-6 text-center shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-8"
+        className="w-full max-w-md rounded-3xl border border-dash-line bg-dash-surface p-6 text-center shadow-sm sm:p-8"
       >
         <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500">
           <HugeiconsIcon icon={Invoice01Icon} size={24} />
         </span>
-        <h1 className="mt-4 text-lg font-bold tracking-tight text-[#212121] dark:text-white">
+        <h1 className="mt-4 text-lg font-bold tracking-tight text-dash-ink">
           {title}
         </h1>
-        <p className="mt-2 text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-2 text-sm leading-relaxed text-dash-muted">
           {children}
         </p>
       </motion.div>
@@ -115,16 +115,16 @@ export function PublicQuotationMessage({
 export function PublicQuotationSkeleton() {
   return (
     <main className="min-h-screen bg-[#f3f4f6] px-4 py-8 dark:bg-[#0a0a0a] sm:py-12">
-      <div className="mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white shadow-sm dark:border-[#3a3a3a]">
+      <div className="mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-dash-line bg-white shadow-sm">
         <div className="h-1.5 w-full bg-orange-500/40" />
         <div className="space-y-6 p-6 sm:p-10">
           <div className="flex justify-between gap-4">
-            <div className="h-10 w-36 rounded-lg bg-[#ececec] animate-pulse" />
-            <div className="h-8 w-24 rounded-lg bg-[#ececec] animate-pulse" />
+            <div className="h-10 w-36 rounded-lg dash-shimmer" />
+            <div className="h-8 w-24 rounded-lg dash-shimmer" />
           </div>
-          <div className="h-4 w-48 rounded bg-[#ececec] animate-pulse" />
-          <div className="h-40 rounded-xl bg-[#f5f5f5] animate-pulse" />
-          <div className="ml-auto h-24 w-48 rounded-xl bg-[#ececec] animate-pulse" />
+          <div className="h-4 w-48 rounded dash-shimmer" />
+          <div className="h-40 rounded-xl dash-shimmer" />
+          <div className="ml-auto h-24 w-48 rounded-xl dash-shimmer" />
         </div>
       </div>
       <p className="sr-only">Cargando cotización</p>
@@ -174,7 +174,7 @@ export default function PublicQuotationView({
           transition={quotationMotionTransition(reduce)}
           className="mb-4 flex flex-col gap-3 print:hidden sm:flex-row sm:items-center sm:justify-between"
         >
-          <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="text-sm text-dash-muted">
             Propuesta de {company?.name || "la empresa"}.
           </p>
           <div className="flex flex-wrap items-center gap-2">
@@ -183,7 +183,7 @@ export default function PublicQuotationView({
                 href={wa}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#e0e0e0] bg-white px-3.5 text-sm font-medium text-[#212121] hover:border-orange-500/40 dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-dash-line bg-dash-surface px-3.5 text-sm font-medium text-dash-ink hover:border-orange-500/40"
               >
                 <HugeiconsIcon icon={WhatsappIcon} size={16} />
                 WhatsApp
@@ -192,7 +192,7 @@ export default function PublicQuotationView({
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-orange-500 px-3.5 text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(231,124,58,0.55)] hover:bg-orange-600"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full dash-grad-accent px-3.5 text-sm font-semibold text-white shadow-[0_8px_20px_-8px_rgba(231,124,58,0.55)] hover:shadow-dash-accent-lift shadow-dash-accent"
             >
               <HugeiconsIcon icon={PrinterIcon} size={16} />
               Imprimir
@@ -203,7 +203,7 @@ export default function PublicQuotationView({
         <motion.article
           variants={fadeUp}
           transition={quotationMotionTransition(reduce)}
-          className="overflow-hidden rounded-2xl border border-[#e0e0e0] bg-white text-[#212121] shadow-[0_12px_40px_-24px_rgba(33,33,33,0.35)] print:max-w-none print:rounded-none print:border-0 print:shadow-none"
+          className="overflow-hidden rounded-2xl border border-dash-line bg-white text-dash-ink shadow-[0_12px_40px_-24px_rgba(33,33,33,0.35)] print:max-w-none print:rounded-none print:border-0 print:shadow-none"
         >
           <div
             className="h-1.5 w-full"
@@ -237,10 +237,10 @@ export default function PublicQuotationView({
                   <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
                     {company?.name || "Cotización"}
                   </h1>
-                  <p className="mt-0.5 text-sm text-[#616161]">
+                  <p className="mt-0.5 text-sm text-dash-muted">
                     Cotización {detail.quotationNumber}
                   </p>
-                  <p className="mt-1 text-xs text-[#616161]">
+                  <p className="mt-1 text-xs text-dash-muted">
                     {formatDateShort(detail.createdAt, false)}
                   </p>
                 </div>
@@ -253,7 +253,7 @@ export default function PublicQuotationView({
                 {detail.validUntil ? (
                   <p
                     className={`mt-1 text-xs font-medium ${
-                      expired ? "text-red-600" : "text-[#616161]"
+                      expired ? "text-red-600" : "text-dash-muted"
                     }`}
                   >
                     {expired
@@ -273,33 +273,33 @@ export default function PublicQuotationView({
 
             <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <h2 className="text-sm font-semibold text-[#212121]">Cliente</h2>
+                <h2 className="text-sm font-semibold text-dash-ink">Cliente</h2>
                 <p className="mt-1.5 font-medium">
                   {detail.lead?.businessName || "Cliente"}
                 </p>
                 {detail.lead?.address ? (
-                  <p className="mt-1 text-sm leading-relaxed text-[#616161]">
+                  <p className="mt-1 text-sm leading-relaxed text-dash-muted">
                     {detail.lead.address}
                   </p>
                 ) : null}
                 {detail.project?.name ? (
-                  <p className="mt-1 text-sm text-[#616161]">
+                  <p className="mt-1 text-sm text-dash-muted">
                     Proyecto: {detail.project.name}
                   </p>
                 ) : null}
               </div>
               <div>
-                <h2 className="text-sm font-semibold text-[#212121]">Asesor</h2>
+                <h2 className="text-sm font-semibold text-dash-ink">Asesor</h2>
                 <p className="mt-1.5 font-medium">{sellerName(detail)}</p>
                 {sellerEmail ? (
-                  <p className="mt-1 text-sm text-[#616161]">
+                  <p className="mt-1 text-sm text-dash-muted">
                     <a href={`mailto:${sellerEmail}`} className={paperLinkClass}>
                       {sellerEmail}
                     </a>
                   </p>
                 ) : null}
                 {sellerPhone ? (
-                  <p className="mt-1 text-sm text-[#616161]">
+                  <p className="mt-1 text-sm text-dash-muted">
                     <a href={telHref(sellerPhone)} className={paperLinkClass}>
                       {sellerPhone}
                     </a>
@@ -309,21 +309,21 @@ export default function PublicQuotationView({
             </div>
 
             <div className="mt-8">
-              <h2 className="text-sm font-semibold text-[#212121]">Conceptos</h2>
+              <h2 className="text-sm font-semibold text-dash-ink">Conceptos</h2>
               {products.length === 0 ? (
-                <p className="mt-3 rounded-xl border border-dashed border-[#e0e0e0] px-4 py-8 text-center text-sm text-[#616161]">
+                <p className="mt-3 rounded-xl border border-dashed border-dash-line px-4 py-8 text-center text-sm text-dash-muted">
                   Esta cotización no tiene conceptos todavía.
                 </p>
               ) : (
                 <>
-                  <ul className="mt-3 divide-y divide-[#eee] overflow-hidden rounded-xl border border-[#e8e8e8] md:hidden">
+                  <ul className="mt-3 divide-y divide-dash-line overflow-hidden rounded-xl border border-dash-line md:hidden">
                     {products.map((p) => (
                       <li key={p.id} className="px-4 py-3.5">
                         <p className="font-medium leading-snug">
                           {p.description || "—"}
                         </p>
                         <div className="mt-2 flex items-end justify-between gap-3 text-sm">
-                          <p className="text-[#616161]">
+                          <p className="text-dash-muted">
                             {p.quantity ?? "—"} × {formatMoney(p.unitPrice, cc)}
                             {showDiscount &&
                             p.discountType &&
@@ -339,7 +339,7 @@ export default function PublicQuotationView({
                     ))}
                   </ul>
 
-                  <div className="mt-3 hidden overflow-x-auto rounded-xl border border-[#e8e8e8] md:block">
+                  <div className="mt-3 hidden overflow-x-auto rounded-xl border border-dash-line md:block">
                     <table className="min-w-full text-sm">
                       <thead style={{ background: primary }}>
                         <tr className="text-white">
@@ -371,7 +371,7 @@ export default function PublicQuotationView({
                         {products.map((p) => (
                           <tr
                             key={p.id}
-                            className="border-t border-[#eee] break-inside-avoid"
+                            className="border-t border-dash-line break-inside-avoid"
                           >
                             <td className="px-4 py-3">{p.description || "—"}</td>
                             <td className="px-4 py-3 text-right tabular-nums">
@@ -411,26 +411,26 @@ export default function PublicQuotationView({
             <div className="mt-6 flex justify-end">
               <dl className="w-full max-w-xs space-y-2 text-sm">
                 <div className="flex justify-between gap-4">
-                  <dt className="text-[#616161]">Subtotal</dt>
+                  <dt className="text-dash-muted">Subtotal</dt>
                   <dd className="font-medium tabular-nums">
                     {formatMoney(detail.subtotal, cc)}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-4">
-                  <dt className="text-[#616161]">IVA</dt>
+                  <dt className="text-dash-muted">IVA</dt>
                   <dd className="font-medium tabular-nums">
                     {formatMoney(detail.taxTotal, cc)}
                   </dd>
                 </div>
                 {showDiscount ? (
                   <div className="flex justify-between gap-4">
-                    <dt className="text-[#616161]">Descuento</dt>
+                    <dt className="text-dash-muted">Descuento</dt>
                     <dd className="font-medium tabular-nums">
                       {formatMoney(detail.discountTotal, cc)}
                     </dd>
                   </div>
                 ) : null}
-                <div className="flex justify-between gap-4 border-t border-[#e0e0e0] pt-2 text-base font-bold">
+                <div className="flex justify-between gap-4 border-t border-dash-line pt-2 text-base font-bold">
                   <dt>Total</dt>
                   <dd className="tabular-nums" style={{ color: primary }}>
                     {formatMoney(detail.total, cc)}
@@ -446,7 +446,7 @@ export default function PublicQuotationView({
                 {showNotes && detail.notes ? (
                   <div>
                     <h3 className="text-sm font-semibold">Notas</h3>
-                    <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-[#424242]">
+                    <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-dash-soft">
                       {detail.notes}
                     </p>
                   </div>
@@ -456,7 +456,7 @@ export default function PublicQuotationView({
                     <h3 className="text-sm font-semibold">
                       Términos y condiciones
                     </h3>
-                    <p className="mt-2 max-w-prose whitespace-pre-wrap text-sm leading-relaxed text-[#424242]">
+                    <p className="mt-2 max-w-prose whitespace-pre-wrap text-sm leading-relaxed text-dash-soft">
                       {detail.terms || company?.termsQuotation}
                     </p>
                   </div>
@@ -466,21 +466,21 @@ export default function PublicQuotationView({
 
             <div className="mt-14 hidden grid-cols-2 gap-10 break-inside-avoid print:grid">
               <div className="pt-10">
-                <div className="border-t border-[#9ca3af] pt-2 text-center text-sm text-[#616161]">
+                <div className="border-t border-[#9ca3af] pt-2 text-center text-sm text-dash-muted">
                   Firma del cliente
                 </div>
               </div>
               <div className="pt-10">
-                <div className="border-t border-[#9ca3af] pt-2 text-center text-sm text-[#616161]">
+                <div className="border-t border-[#9ca3af] pt-2 text-center text-sm text-dash-muted">
                   Firma del asesor
                 </div>
               </div>
             </div>
 
-            <footer className="mt-10 border-t border-[#eee] pt-5 text-center">
+            <footer className="mt-10 border-t border-dash-line pt-5 text-center">
               <p className="text-sm font-semibold">{company?.name || ""}</p>
               {company?.contactEmail || company?.contactPhone ? (
-                <div className="mt-1 space-y-0.5 text-sm text-[#616161]">
+                <div className="mt-1 space-y-0.5 text-sm text-dash-muted">
                   {company?.contactEmail ? (
                     <p>
                       <a
@@ -508,10 +508,10 @@ export default function PublicQuotationView({
         </motion.article>
       </motion.div>
 
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-[#e0e0e0] bg-white px-4 py-3 print:hidden md:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-dash-line bg-white px-4 py-3 print:hidden md:hidden">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs text-[#616161]">Total</p>
+            <p className="text-xs text-dash-muted">Total</p>
             <p className="truncate text-base font-bold tabular-nums">
               {formatMoney(detail.total, cc)}
             </p>
@@ -523,7 +523,7 @@ export default function PublicQuotationView({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="WhatsApp"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#e0e0e0] text-[#212121]"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-dash-line text-dash-ink"
               >
                 <HugeiconsIcon icon={WhatsappIcon} size={18} />
               </a>
@@ -531,7 +531,7 @@ export default function PublicQuotationView({
               <a
                 href={`mailto:${sellerEmail}`}
                 aria-label="Enviar correo"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#e0e0e0] text-[#212121]"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-dash-line text-dash-ink"
               >
                 <HugeiconsIcon icon={Mail01Icon} size={18} />
               </a>
@@ -539,7 +539,7 @@ export default function PublicQuotationView({
               <a
                 href={telHref(sellerPhone)}
                 aria-label="Llamar"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#e0e0e0] text-[#212121]"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-dash-line text-dash-ink"
               >
                 <HugeiconsIcon icon={CallIcon} size={18} />
               </a>

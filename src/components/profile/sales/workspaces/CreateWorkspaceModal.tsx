@@ -105,20 +105,20 @@ export default function CreateWorkspaceModal({
         className="modal fixed inset-0 z-[125] pointer-events-none"
       >
         <div
-          className="pointer-events-auto w-full max-w-md rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] shadow-2xl"
+          className="pointer-events-auto w-full max-w-md rounded-3xl border border-dash-line bg-dash-surface shadow-2xl"
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
           aria-labelledby="create-workspace-title"
         >
-          <div className="border-b border-[#e0e0e0] dark:border-[#3a3a3a] px-5 py-4">
+          <div className="border-b border-dash-line px-5 py-4">
             <h2
               id="create-workspace-title"
-              className="text-lg font-semibold text-[#212121] dark:text-white"
+              className="text-lg font-semibold text-dash-ink"
             >
               Nuevo espacio de trabajo
             </h2>
-            <p className="mt-1 text-sm text-[#616161] dark:text-[#9e9e9e]">
+            <p className="mt-1 text-sm text-dash-muted">
               Agrupa tareas del espacio, actividades de ventas, seguimientos y propuestas en un mismo
               contexto.
             </p>
@@ -127,7 +127,7 @@ export default function CreateWorkspaceModal({
             <div>
               <label
                 htmlFor="ws-name"
-                className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                className="block text-sm font-medium text-dash-muted mb-1.5"
               >
                 Nombre
               </label>
@@ -136,12 +136,12 @@ export default function CreateWorkspaceModal({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Ej. Equipo norte, Cuenta ACME…"
-                className="w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#252525] px-3 py-2.5 text-sm text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full rounded-xl border border-dash-line bg-white dark:bg-[#252525] px-3 py-2.5 text-sm text-dash-ink placeholder:text-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 autoFocus
               />
             </div>
-            <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#181818] p-4 space-y-3">
-              <p className="text-sm font-semibold text-[#212121] dark:text-white">
+            <div className="rounded-xl border border-dash-line bg-dash-surface-2 dark:bg-[#181818] p-4 space-y-3">
+              <p className="text-sm font-semibold text-dash-ink">
                 Mostrar en este workspace
               </p>
               <label className="flex items-start gap-3 cursor-pointer select-none">
@@ -149,13 +149,13 @@ export default function CreateWorkspaceModal({
                   type="checkbox"
                   checked={showTasks}
                   onChange={(e) => setShowTasks(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-[#e0e0e0] dark:border-[#3a3a3a] accent-orange-500"
+                  className="mt-0.5 h-4 w-4 rounded border-dash-line accent-orange-500"
                 />
                 <span className="min-w-0">
-                  <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                  <span className="block text-sm font-medium text-dash-ink">
                     Tareas
                   </span>
-                  <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
+                  <span className="block text-xs text-dash-muted">
                     Mostrar tareas generales del workspace (no son actividades de ventas ni
                     seguimientos de lead)
                   </span>
@@ -166,13 +166,13 @@ export default function CreateWorkspaceModal({
                   type="checkbox"
                   checked={showActivities}
                   onChange={(e) => setShowActivities(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-[#e0e0e0] dark:border-[#3a3a3a] accent-orange-500"
+                  className="mt-0.5 h-4 w-4 rounded border-dash-line accent-orange-500"
                 />
                 <span className="min-w-0">
-                  <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                  <span className="block text-sm font-medium text-dash-ink">
                     Actividades
                   </span>
-                  <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
+                  <span className="block text-xs text-dash-muted">
                     Mostrar actividades de ventas en este espacio de trabajo
                   </span>
                 </span>
@@ -182,13 +182,13 @@ export default function CreateWorkspaceModal({
                   type="checkbox"
                   checked={showFollowUpTasks}
                   onChange={(e) => setShowFollowUpTasks(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-[#e0e0e0] dark:border-[#3a3a3a] accent-orange-500"
+                  className="mt-0.5 h-4 w-4 rounded border-dash-line accent-orange-500"
                 />
                 <span className="min-w-0">
-                  <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                  <span className="block text-sm font-medium text-dash-ink">
                     Seguimientos
                   </span>
-                  <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
+                  <span className="block text-xs text-dash-muted">
                     Mostrar tareas de seguimiento de CRM en este workspace
                   </span>
                 </span>
@@ -198,13 +198,13 @@ export default function CreateWorkspaceModal({
                   type="checkbox"
                   checked={showProposals}
                   onChange={(e) => setShowProposals(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-[#e0e0e0] dark:border-[#3a3a3a] accent-orange-500"
+                  className="mt-0.5 h-4 w-4 rounded border-dash-line accent-orange-500"
                 />
                 <span className="min-w-0">
-                  <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                  <span className="block text-sm font-medium text-dash-ink">
                     Propuestas
                   </span>
-                  <span className="block text-xs text-[#616161] dark:text-[#9e9e9e]">
+                  <span className="block text-xs text-dash-muted">
                     Mostrar propuestas de CRM en este workspace
                   </span>
                 </span>
@@ -214,14 +214,14 @@ export default function CreateWorkspaceModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-xl px-4 py-2 text-sm font-medium text-[#616161] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                className="rounded-xl px-4 py-2 text-sm font-medium text-dash-muted hover:bg-dash-hover"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={loading || !companyId?.trim()}
-                className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-60"
+                className="rounded-full dash-grad-accent px-4 py-2 text-sm font-semibold text-white hover:shadow-dash-accent-lift disabled:opacity-60 shadow-dash-accent"
               >
                 {loading ? "Guardando…" : "Crear espacio"}
               </button>

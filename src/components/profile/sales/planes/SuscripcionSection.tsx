@@ -47,7 +47,7 @@ function formatPeriod(frequency: string): string {
 }
 
 const inputBase =
-  "w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-4 py-2.5 text-sm text-[#212121] dark:text-[#ffffff] placeholder:text-[#9e9e9e] dark:placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent";
+  "w-full rounded-xl border border-dash-line bg-dash-surface px-4 py-2.5 text-sm text-dash-ink placeholder:text-dash-faint dark:placeholder:text-[#666] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent";
 
 const cardElementOptionsLight = {
   style: {
@@ -134,18 +134,18 @@ export default function SuscripcionSection() {
       <div className="max-w-lg mx-auto space-y-6">
         <Link
           href={Routes.panelPlans}
-          className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
+          className="inline-flex items-center gap-1.5 text-sm text-dash-muted hover:text-orange-500 dark:hover:text-orange-400"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
           Volver a planes
         </Link>
-        <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 text-center">
-          <p className="text-[#616161] dark:text-[#b0b0b0]">
+        <div className="rounded-3xl border border-dash-line bg-dash-surface p-6 text-center">
+          <p className="text-dash-muted">
             Identificador de plan no válido.
           </p>
           <Link
             href={Routes.panelPlans}
-            className="mt-4 inline-block rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+            className="mt-4 inline-block rounded-full dash-grad-accent px-4 py-2 text-sm font-medium text-white hover:shadow-dash-accent-lift shadow-dash-accent"
           >
             Ver planes
           </Link>
@@ -167,7 +167,7 @@ export default function SuscripcionSection() {
       <div className="max-w-lg mx-auto space-y-6">
         <Link
           href={Routes.panelPlans}
-          className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
+          className="inline-flex items-center gap-1.5 text-sm text-dash-muted hover:text-orange-500 dark:hover:text-orange-400"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
           Volver a planes
@@ -180,7 +180,7 @@ export default function SuscripcionSection() {
           </p>
           <Link
             href={Routes.panelPlans}
-            className="mt-4 inline-block rounded-xl bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+            className="mt-4 inline-block rounded-full dash-grad-accent px-4 py-2 text-sm font-medium text-white hover:shadow-dash-accent-lift shadow-dash-accent"
           >
             Ver planes
           </Link>
@@ -207,17 +207,17 @@ export default function SuscripcionSection() {
     <div className="w-full max-w-5xl mx-auto space-y-8">
       <Link
         href={Routes.panelPlans}
-        className="inline-flex items-center gap-1.5 text-sm text-[#616161] dark:text-[#b0b0b0] hover:text-orange-500 dark:hover:text-orange-400"
+        className="inline-flex items-center gap-1.5 text-sm text-dash-muted hover:text-orange-500 dark:hover:text-orange-400"
       >
         <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
         Volver a planes
       </Link>
 
       <section className="text-center">
-        <h1 className="text-2xl font-bold text-[#212121] dark:text-[#ffffff]">
+        <h1 className="text-2xl font-bold text-dash-ink">
           Iniciar suscripción
         </h1>
-        <p className="mt-1 text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-1 text-dash-muted">
           Revisa el resumen del plan e ingresa tu método de pago.
         </p>
       </section>
@@ -231,7 +231,7 @@ export default function SuscripcionSection() {
           )}
         >
           <div className="text-center">
-            <h2 className="text-xl font-bold text-[#212121] dark:text-[#ffffff]">
+            <h2 className="text-xl font-bold text-dash-ink">
               {plan.name}
             </h2>
             {!isActive && (
@@ -240,20 +240,20 @@ export default function SuscripcionSection() {
               </p>
             )}
             <div className="mt-4">
-              <span className="text-3xl font-bold text-[#212121] dark:text-[#ffffff]">
+              <span className="text-3xl font-bold text-dash-ink">
                 {formatPrice(plan.cost, plan.currency)}
               </span>
-              <span className="ml-1 text-xs font-medium text-[#616161] dark:text-[#757575]">
+              <span className="ml-1 text-xs font-medium text-dash-muted dark:text-[#757575]">
                 {plan.currency}
               </span>
-              <span className="text-[#616161] dark:text-[#b0b0b0]">
+              <span className="text-dash-muted">
                 /{formatPeriod(plan.frequency)}
               </span>
             </div>
             {plan.leadLimit != null && (
-              <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <p className="mt-2 text-sm text-dash-muted">
                 Cada mes puedes extraer{" "}
-                <strong className="text-[#212121] dark:text-[#e0e0e0]">
+                <strong className="text-dash-ink dark:text-[#e0e0e0]">
                   {plan.leadLimit}
                 </strong>{" "}
                 leads con esos créditos. Kadesh AI administrada usa la misma
@@ -294,7 +294,7 @@ export default function SuscripcionSection() {
                             size={20}
                             className="flex-shrink-0 text-orange-500 dark:text-orange-400"
                           />
-                          <span className="inline-flex flex-wrap items-center gap-1.5 text-[#212121] dark:text-[#e0e0e0]">
+                          <span className="inline-flex flex-wrap items-center gap-1.5 text-dash-ink dark:text-[#e0e0e0]">
                             {f.name}
                             {f.beta ? <FeatureBetaBadge /> : null}
                           </span>
@@ -316,8 +316,8 @@ export default function SuscripcionSection() {
         </div>
 
         {/* Formulario método de pago */}
-        <div className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-6 sm:p-8">
-          <h3 className="flex items-center gap-2 text-lg font-bold text-[#212121] dark:text-[#ffffff]">
+        <div className="rounded-3xl border border-dash-line bg-dash-surface p-6 sm:p-8">
+          <h3 className="flex items-center gap-2 text-lg font-bold text-dash-ink">
             <span
               className="flex size-9 items-center justify-center rounded-lg bg-orange-500/15 dark:bg-orange-500/20 text-orange-500 dark:text-orange-400"
               aria-hidden
@@ -338,7 +338,7 @@ export default function SuscripcionSection() {
             </span>
             Método de pago
           </h3>
-          <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1 text-sm text-dash-muted">
             Ingresa los datos de tu tarjeta para confirmar la suscripción.
           </p>
 
@@ -346,7 +346,7 @@ export default function SuscripcionSection() {
             <div>
               <label
                 htmlFor="cardName"
-                className="mb-1.5 block text-sm font-medium text-[#212121] dark:text-[#e0e0e0]"
+                className="mb-1.5 block text-sm font-medium text-dash-ink dark:text-[#e0e0e0]"
               >
                 Nombre en la tarjeta
               </label>
@@ -366,20 +366,20 @@ export default function SuscripcionSection() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[#212121] dark:text-[#e0e0e0]">
+              <label className="mb-1.5 block text-sm font-medium text-dash-ink dark:text-[#e0e0e0]">
                 Datos de la tarjeta
               </label>
-              <div className="rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-4 py-3 focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-transparent">
+              <div className="rounded-xl border border-dash-line bg-dash-surface px-4 py-3 focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-transparent">
                 <CardElement options={cardElementOptions} />
               </div>
             </div>
             <div>
               <label
                 htmlFor="notes"
-                className="mb-1.5 block text-sm font-medium text-[#212121] dark:text-[#e0e0e0]"
+                className="mb-1.5 block text-sm font-medium text-dash-ink dark:text-[#e0e0e0]"
               >
                 Notas{" "}
-                <span className="text-[#9e9e9e] dark:text-[#666]">
+                <span className="text-dash-faint dark:text-[#666]">
                   (opcional)
                 </span>
               </label>
@@ -398,9 +398,9 @@ export default function SuscripcionSection() {
                 type="checkbox"
                 checked={acceptTerms}
                 onChange={(e) => setAcceptTerms(e.target.checked)}
-                className="mt-1 size-4 rounded border-[#e0e0e0] text-orange-500 focus:ring-orange-500 dark:border-[#3a3a3a]"
+                className="mt-1 size-4 rounded border-dash-line text-orange-500 focus:ring-orange-500"
               />
-              <span className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <span className="text-sm text-dash-muted">
                 Acepto los términos del plan y el cargo recurrente según la
                 frecuencia seleccionada.
               </span>
@@ -408,7 +408,7 @@ export default function SuscripcionSection() {
 
             <div className="flex flex-col gap-3 pt-2">
               {(loadingPayment || redirecting) && (
-                <p className="text-center text-sm text-[#616161] dark:text-[#b0b0b0]">
+                <p className="text-center text-sm text-dash-muted">
                   {redirecting
                     ? "Redirigiendo a la confirmación…"
                     : "Procesando el pago…"}
@@ -438,7 +438,7 @@ export default function SuscripcionSection() {
               </button>
               <Link
                 href={Routes.panelPlans}
-                className="w-full rounded-xl border-2 border-[#e0e0e0] dark:border-[#3a3a3a] px-6 py-3 text-center text-sm font-semibold text-[#212121] dark:text-[#e0e0e0] transition-colors hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                className="w-full rounded-xl border-2 border-dash-line px-6 py-3 text-center text-sm font-semibold text-dash-ink dark:text-[#e0e0e0] transition-colors hover:bg-dash-hover"
               >
                 Cancelar
               </Link>

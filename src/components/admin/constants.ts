@@ -1,3 +1,19 @@
+import type { IconSvgElement } from "@hugeicons/react";
+import {
+  Activity01Icon,
+  Bone01Icon,
+  Building06Icon,
+  ChartLineData01Icon,
+  DashboardBrowsingIcon,
+  DashboardSquare01Icon,
+  Mail01Icon,
+  NoteEditIcon,
+  PackageIcon,
+  SparklesIcon,
+  Stethoscope02Icon,
+  Task01Icon,
+  UserGroupIcon,
+} from "@hugeicons/core-free-icons";
 import { PIPELINE_STATUS, Role } from "kadesh/constants/constans";
 
 export const ADMIN_TABS = {
@@ -12,6 +28,88 @@ export const ADMIN_TABS = {
 } as const;
 
 export type AdminTab = (typeof ADMIN_TABS)[keyof typeof ADMIN_TABS];
+
+/** Globos del menú (salen de `ADMIN_NAV_COUNTS_QUERY`). */
+export type AdminNavBadgeKey = "pendingPlaces" | "pendingServices";
+
+export type AdminNavItemConfig = {
+  id: string;
+  label: string;
+  icon: IconSvgElement;
+  tab: AdminTab;
+  /** `vista` que abre este item (sin vista = la de entrada de la sección). */
+  vista?: string;
+  description: string;
+  badgeKey?: AdminNavBadgeKey;
+};
+
+/**
+ * Menú lateral de Operaciones. Cada item es una sección (`tab`) o una vista de ella (`vista`):
+ * Empresas/Personas, Blog/Correos y las cuatro de Kadesh Pet ya no tienen segmentado propio.
+ */
+export const ADMIN_NAV_GROUPS: Array<{ id: string; title: string; items: AdminNavItemConfig[] }> = [
+  {
+    id: "general",
+    title: "General",
+    items: [
+      { id: "inicio", label: "Inicio", icon: DashboardSquare01Icon, tab: "inicio", description: "Cómo va Kadesh y lo que requiere atención." },
+      { id: "actividad", label: "Actividad", icon: Activity01Icon, tab: "actividad", description: "Lo que pasa en la plataforma, de todas las empresas." },
+      { id: "analitica", label: "Analítica", icon: ChartLineData01Icon, tab: "analitica", description: "Salud, ventas, activación, retención, uso, demanda y de dónde llegan." },
+    ],
+  },
+  {
+    id: "clientes",
+    title: "Clientes",
+    items: [
+      { id: "empresas", label: "Empresas", icon: Building06Icon, tab: "clientes", description: "Cada empresa con su plan, equipo, CRM y consumo." },
+      { id: "personas", label: "Personas", icon: UserGroupIcon, tab: "clientes", vista: "personas", description: "Todas las cuentas, con o sin empresa." },
+      { id: "planes", label: "Planes", icon: PackageIcon, tab: "planes", description: "Catálogo, precios y módulos de cada plan." },
+    ],
+  },
+  {
+    id: "contenido",
+    title: "Contenido",
+    items: [
+      { id: "blog", label: "Blog", icon: NoteEditIcon, tab: "contenido", description: "Artículos, categorías y etiquetas de los dos blogs." },
+      { id: "correos", label: "Correos", icon: Mail01Icon, tab: "contenido", vista: "correos", description: "Correos con la marca de Pet o de Negocios." },
+      { id: "novedades", label: "Novedades", icon: SparklesIcon, tab: "novedades", description: "Lo nuevo de la plataforma para tus clientes." },
+    ],
+  },
+  {
+    id: "pet",
+    title: "Kadesh Pet",
+    items: [
+      { id: "pet-resumen", label: "Resumen", icon: DashboardBrowsingIcon, tab: "veterinarias", description: "Animales, veterinarias y cuentas de Kadesh Pet en cifras." },
+      { id: "pet-animales", label: "Animales", icon: Bone01Icon, tab: "veterinarias", vista: "animales", description: "Reportes de animales perdidos, encontrados y en adopción." },
+      { id: "pet-fichas", label: "Veterinarias", icon: Stethoscope02Icon, tab: "veterinarias", vista: "fichas", description: "Fichas del directorio, reclamos y pipeline.", badgeKey: "pendingPlaces" },
+      { id: "pet-servicios", label: "Servicios", icon: Task01Icon, tab: "veterinarias", vista: "servicios", description: "Servicios que piden las veterinarias.", badgeKey: "pendingServices" },
+    ],
+  },
+];
+
+/** Item del menú que corresponde a la URL actual. */
+export function activeAdminNavItem(params: URLSearchParams | { get: (key: string) => string | null }): {
+  group: (typeof ADMIN_NAV_GROUPS)[number];
+  item: AdminNavItemConfig;
+} {
+  const tab = parseAdminTab(params.get("tab"));
+  const vista = params.get("vista");
+  let id: string = tab;
+  if (tab === ADMIN_TABS.CLIENTS) {
+    id = vista === "personas" || params.get("usuario") ? "personas" : "empresas";
+  } else if (tab === ADMIN_TABS.CONTENT) {
+    id = vista === "correos" ? "correos" : "blog";
+  } else if (tab === ADMIN_TABS.PET_PLACES) {
+    id = vista === "animales" ? "pet-animales" : vista === "fichas" ? "pet-fichas" : vista === "servicios" ? "pet-servicios" : "pet-resumen";
+  } else if (tab === ADMIN_TABS.RELEASES) {
+    id = "novedades";
+  }
+  for (const group of ADMIN_NAV_GROUPS) {
+    const item = group.items.find((candidate) => candidate.id === id);
+    if (item) return { group, item };
+  }
+  return { group: ADMIN_NAV_GROUPS[0], item: ADMIN_NAV_GROUPS[0].items[0] };
+}
 
 export const ADMIN_TAB_ITEMS: Array<{
   id: AdminTab;
@@ -484,7 +582,7 @@ export const POST_PRODUCT_BADGE: Record<string, string> = {
   [POST_PRODUCT.SAAS]:
     "bg-orange-500/15 text-orange-800 dark:text-orange-300 dark:bg-orange-500/20",
   [POST_PRODUCT.ALL]:
-    "bg-black/5 dark:bg-white/10 text-[#424242] dark:text-[#e0e0e0]",
+    "bg-dash-surface-2 text-dash-soft",
 };
 
 export const POST_STATUS_FILTERS = [
@@ -593,6 +691,8 @@ export const ADMIN_SCOPED_PARAMS = [
   "desglose",
   "metrica",
   "tipo_lugar",
+  // "+ Nuevo" de la barra: abre el editor de la sección al llegar.
+  "nuevo",
 ] as const;
 
 /** Arma un enlace interno de Operaciones (siempre sobre `Routes.panelAdmin`). */
@@ -693,7 +793,7 @@ export const PET_PLACE_CLAIM_STATUS_LABELS: Record<string, string> = {
 
 export const PET_PLACE_CLAIM_STATUS_CLASSES: Record<string, string> = {
   [PET_PLACE_CLAIM_STATUS.UNCLAIMED]:
-    "bg-[#e0e0e0] dark:bg-[#3a3a3a] text-[#616161] dark:text-[#b0b0b0]",
+    "bg-dash-surface-3 text-dash-muted",
   [PET_PLACE_CLAIM_STATUS.PENDING]:
     "bg-amber-500/15 text-amber-800 dark:text-amber-300 dark:bg-amber-500/20",
   [PET_PLACE_CLAIM_STATUS.VERIFIED]:

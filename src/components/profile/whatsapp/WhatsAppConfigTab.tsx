@@ -36,7 +36,7 @@ import { WhatsAppChatImportSection } from "./WhatsAppChatImportSection";
 import { WhatsAppConnectWizard } from "./WhatsAppConnectWizard";
 
 const INPUT_CLASS =
-  "w-full px-4 py-3 rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#121212] text-[#212121] dark:text-[#ffffff] placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
+  "w-full px-4 py-3 rounded-lg border border-dash-line bg-dash-surface text-dash-ink placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
 
 export interface WhatsAppConfigTabProps {
   companyId: string | null;
@@ -62,7 +62,7 @@ function CopyButton({ value, label }: { value: string; label: string }) {
     <button
       type="button"
       onClick={() => void handleCopy()}
-      className="inline-flex shrink-0 items-center rounded-md p-1 text-[#616161] transition-colors hover:bg-black/5 hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:bg-white/10 dark:hover:text-white"
+      className="inline-flex shrink-0 items-center rounded-md p-1 text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-ink"
       aria-label={copied ? `${label} copiado` : `Copiar ${label}`}
     >
       <HugeiconsIcon
@@ -258,24 +258,24 @@ export function WhatsAppConfigTab({
 
   if (loading && !saved) {
     return (
-      <div className="flex items-center justify-center rounded-2xl border border-[#e0e0e0] bg-white py-16 dark:border-[#3a3a3a] dark:bg-[#1e1e1e]">
+      <div className="flex items-center justify-center rounded-3xl border border-dash-line bg-dash-surface py-16">
         <span className="size-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-[#e0e0e0] bg-white p-6 shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e] sm:p-8">
+    <div className="rounded-3xl border border-dash-line bg-dash-surface p-6 shadow-sm sm:p-8">
       <div className="flex items-start gap-3">
         <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#25D366]/15 text-[#25D366]">
           <HugeiconsIcon icon={WhatsappIcon} size={22} />
         </span>
         <div>
-          <h2 className="flex flex-wrap items-center gap-2 text-xl font-semibold text-[#212121] dark:text-white">
+          <h2 className="flex flex-wrap items-center gap-2 text-xl font-semibold text-dash-ink">
             WhatsApp Business
             {beta ? <FeatureBetaBadge /> : null}
           </h2>
-          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-dash-muted">
             Conecta tu propia cuenta de WhatsApp Business (Cloud API de Meta) para mandar y
             recibir mensajes con tus leads desde el CRM.
           </p>
@@ -361,9 +361,9 @@ export function WhatsAppConfigTab({
 
 
       {isConnected && (
-        <div className="mt-3 rounded-xl border border-[#e0e0e0] p-4 text-sm dark:border-[#3a3a3a]">
-          <p className="font-semibold text-[#212121] dark:text-white">Estado de la conexión</p>
-          <ul className="mt-2 space-y-1.5 text-[#616161] dark:text-[#b0b0b0]">
+        <div className="mt-3 rounded-xl border border-dash-line p-4 text-sm">
+          <p className="font-semibold text-dash-ink">Estado de la conexión</p>
+          <ul className="mt-2 space-y-1.5 text-dash-muted">
             <HealthRow ok label="Conexión" />
             <HealthRow
               ok={Boolean(saved?.whatsappWebhookConfiguredAt)}
@@ -395,7 +395,7 @@ export function WhatsAppConfigTab({
               hint={templateStatus === "none" && templateError ? templateError : undefined}
             />
           </ul>
-          <p className="mt-3 text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-3 text-xs text-dash-muted">
             Meta pide un método de pago en tu cuenta de WhatsApp Business para las plantillas de
             inicio de conversación; el cobro es directo de Meta a tu tarjeta.
           </p>
@@ -416,7 +416,7 @@ export function WhatsAppConfigTab({
         <div className="mt-6 text-right">
             {confirmClear ? (
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm text-[#616161] dark:text-[#b0b0b0]">¿Quitar la conexión?</span>
+                <span className="text-sm text-dash-muted">¿Quitar la conexión?</span>
                 <button
                   type="button"
                   onClick={() => void handleClear()}
@@ -429,7 +429,7 @@ export function WhatsAppConfigTab({
                   type="button"
                   onClick={() => setConfirmClear(false)}
                   disabled={busy}
-                  className="rounded-lg border border-[#e0e0e0] px-3 py-1.5 text-sm font-medium text-[#212121] transition-colors hover:bg-[#f5f5f5] dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
+                  className="rounded-lg border border-dash-line px-3 py-1.5 text-sm font-medium text-dash-ink transition-colors hover:bg-dash-hover dark:text-[#e0e0e0]"
                 >
                   Cancelar
                 </button>
@@ -447,11 +447,11 @@ export function WhatsAppConfigTab({
             )}
         </div>
       )}
-      <details className="mt-8 rounded-xl border border-[#e0e0e0] p-4 dark:border-[#3a3a3a]">
-        <summary className="cursor-pointer text-sm font-semibold text-[#212121] dark:text-white">Configuración manual (avanzado)</summary>
+      <details className="mt-8 rounded-xl border border-dash-line p-4">
+        <summary className="cursor-pointer text-sm font-semibold text-dash-ink">Configuración manual (avanzado)</summary>
       <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
-          <label htmlFor="wa-phone-number-id" className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]">
+          <label htmlFor="wa-phone-number-id" className="mb-2 block text-sm font-semibold text-dash-muted">
             Phone Number ID
           </label>
           <input
@@ -463,13 +463,13 @@ export function WhatsAppConfigTab({
             placeholder="Ej. 109876543210987"
             className={INPUT_CLASS}
           />
-          <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1.5 text-xs text-dash-muted">
             Tu App → WhatsApp → Configuración de la API, campo &quot;De&quot;.
           </p>
         </div>
 
         <div>
-          <label htmlFor="wa-waba-id" className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]">
+          <label htmlFor="wa-waba-id" className="mb-2 block text-sm font-semibold text-dash-muted">
             WhatsApp Business Account ID
           </label>
           <input
@@ -481,13 +481,13 @@ export function WhatsAppConfigTab({
             placeholder="Ej. 123456789012345"
             className={INPUT_CLASS}
           />
-          <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1.5 text-xs text-dash-muted">
             Mismo panel, arriba a la derecha: &quot;ID de la cuenta de WhatsApp Business&quot;.
           </p>
         </div>
 
         <div>
-          <label htmlFor="wa-access-token" className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]">
+          <label htmlFor="wa-access-token" className="mb-2 block text-sm font-semibold text-dash-muted">
             Access Token
           </label>
           <div className="relative">
@@ -512,13 +512,13 @@ export function WhatsAppConfigTab({
             <button
               type="button"
               onClick={() => setShowSecrets((prev) => !prev)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#616161] transition-colors hover:bg-[#f0f0f0] hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a] dark:hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-dash-muted transition-colors hover:bg-[#f0f0f0] hover:text-dash-ink dark:hover:bg-[#2a2a2a]"
               aria-label={showSecrets ? "Ocultar" : "Mostrar"}
             >
               <HugeiconsIcon icon={showSecrets ? ViewOffIcon : EyeIcon} className="size-5" />
             </button>
           </div>
-          <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1.5 text-xs text-dash-muted">
             Configuración de la empresa → Usuarios del sistema → genera uno permanente con
             los permisos <code>whatsapp_business_messaging</code> y{" "}
             <code>whatsapp_business_management</code>. Déjalo vacío para conservar el actual.
@@ -526,7 +526,7 @@ export function WhatsAppConfigTab({
         </div>
 
         <div>
-          <label htmlFor="wa-app-secret" className="mb-2 block text-sm font-semibold text-[#616161] dark:text-[#b0b0b0]">
+          <label htmlFor="wa-app-secret" className="mb-2 block text-sm font-semibold text-dash-muted">
             App Secret
           </label>
           <input
@@ -543,7 +543,7 @@ export function WhatsAppConfigTab({
             placeholder={isConnected ? "Guardado" : "App Secret de tu App de Meta"}
             className={INPUT_CLASS}
           />
-          <p className="mt-1.5 text-xs text-[#616161] dark:text-[#b0b0b0]">
+          <p className="mt-1.5 text-xs text-dash-muted">
             Configuración de la app → Básica → Mostrar, junto a &quot;Clave secreta de la
             aplicación&quot;. Verifica la firma de los mensajes entrantes. Déjalo vacío para
             conservar el actual.
@@ -556,7 +556,7 @@ export function WhatsAppConfigTab({
           type="button"
           onClick={() => void persist()}
           disabled={busy || !isDirty}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center justify-center gap-2 rounded-full dash-grad-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 shadow-dash-accent"
         >
           {saving ? (
             <>
@@ -571,7 +571,7 @@ export function WhatsAppConfigTab({
           type="button"
           onClick={() => void handleTestConnection()}
           disabled={busy || isDirty || !isConnected}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#e0e0e0] px-5 py-2.5 text-sm font-semibold text-[#212121] transition-colors hover:bg-[#f5f5f5] disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#3a3a3a] dark:text-[#e0e0e0] dark:hover:bg-[#2a2a2a]"
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-dash-line px-5 py-2.5 text-sm font-semibold text-dash-ink transition-colors hover:bg-dash-hover disabled:cursor-not-allowed disabled:opacity-60 dark:text-[#e0e0e0]"
         >
           {testing ? (
             <>
@@ -587,7 +587,7 @@ export function WhatsAppConfigTab({
         </button>
       </div>
       {isDirty && (
-        <p className="mt-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-2 text-xs text-dash-muted">
           Guarda los cambios para poder probar la conexión con la configuración nueva.
         </p>
       )}
@@ -603,8 +603,8 @@ export function WhatsAppConfigTab({
         </div>
       )}
 
-      <div className="mt-6 rounded-xl border border-[#e0e0e0] bg-[#fafafa] p-4 text-sm leading-relaxed text-[#616161] dark:border-[#3a3a3a] dark:bg-[#252525] dark:text-[#b0b0b0]">
-        <p className="font-semibold text-[#212121] dark:text-white">Webhook (solo si Kadesh no pudo configurarlo)</p>
+      <div className="mt-6 rounded-xl border border-dash-line bg-dash-surface-2 p-4 text-sm leading-relaxed text-dash-muted">
+        <p className="font-semibold text-dash-ink">Webhook (solo si Kadesh no pudo configurarlo)</p>
         <p className="mt-1">
           En <strong>WhatsApp → Configuración → Webhook</strong> de tu App, usa esta Callback URL y
           Verify Token, guarda y suscríbete al campo <code>messages</code>.
@@ -622,7 +622,7 @@ export function WhatsAppConfigTab({
               <button
                 type="button"
                 onClick={() => setShowWebhookToken((prev) => !prev)}
-                className="inline-flex shrink-0 items-center rounded-md p-1 text-[#616161] transition-colors hover:bg-black/5 hover:text-[#212121] dark:text-[#b0b0b0] dark:hover:bg-white/10 dark:hover:text-white"
+                className="inline-flex shrink-0 items-center rounded-md p-1 text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-ink"
                 aria-label={showWebhookToken ? "Ocultar Verify Token" : "Mostrar Verify Token"}
               >
                 <HugeiconsIcon icon={showWebhookToken ? ViewOffIcon : EyeIcon} className="size-3.5" />

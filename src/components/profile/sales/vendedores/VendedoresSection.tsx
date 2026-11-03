@@ -18,14 +18,14 @@ export default function VendedoresSection({ userId }: VendedoresSectionProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-1 p-1 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#f5f5f5] dark:bg-[#2a2a2a] w-fit">
+      <div className="flex gap-1 p-1 rounded-xl border border-dash-line bg-dash-surface-2 w-fit">
         <button
           type="button"
           onClick={() => setActiveTab("vendedores")}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
             activeTab === "vendedores"
-              ? "bg-white dark:bg-[#1e1e1e] text-[#212121] dark:text-white shadow-sm"
-              : "text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-white"
+              ? "bg-dash-surface text-dash-ink shadow-sm"
+              : "text-dash-muted hover:text-dash-ink"
           }`}
         >
           <HugeiconsIcon icon={UserIcon} size={18} />
@@ -36,8 +36,8 @@ export default function VendedoresSection({ userId }: VendedoresSectionProps) {
           onClick={() => setActiveTab("calendario")}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
             activeTab === "calendario"
-              ? "bg-white dark:bg-[#1e1e1e] text-[#212121] dark:text-white shadow-sm"
-              : "text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-white"
+              ? "bg-dash-surface text-dash-ink shadow-sm"
+              : "text-dash-muted hover:text-dash-ink"
           }`}
         >
           <HugeiconsIcon icon={Calendar03Icon} size={18} />

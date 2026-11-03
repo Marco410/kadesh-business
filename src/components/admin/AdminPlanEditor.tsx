@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { AnimatePresence, motion } from "framer-motion";
+import { DASH_EASE } from "kadesh/components/app-shell";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Alert02Icon } from "@hugeicons/core-free-icons";
 import {
@@ -21,10 +22,10 @@ import AdminStripeCheckDialog from "./AdminStripeCheckDialog";
 import { formatCredits, formatMoney, formatPlanFrequency } from "./ui";
 
 const fieldClass =
-  "h-11 w-full rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] px-3 text-sm text-[#212121] dark:text-white placeholder:text-[#9e9e9e] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
+  "h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
 
 const labelClass =
-  "block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1";
+  "block text-xs font-medium text-dash-muted mb-1";
 
 function numberToInput(value: number | null | undefined) {
   return value == null ? "" : String(value);
@@ -81,15 +82,19 @@ export default function AdminPlanEditor({
   onClose: () => void;
   onSave: (payload: AdminPlanSavePayload) => Promise<void>;
 }) {
-  if (!isOpen || !plan) return null;
+  // AnimatePresence afuera: así el modal también anima al cerrarse (antes se desmontaba de golpe).
   return (
-    <AdminPlanEditorForm
-      key={plan.id}
-      plan={plan}
-      saving={saving}
-      onClose={onClose}
-      onSave={onSave}
-    />
+    <AnimatePresence>
+      {isOpen && plan ? (
+        <AdminPlanEditorForm
+          key={plan.id}
+          plan={plan}
+          saving={saving}
+          onClose={onClose}
+          onSave={onSave}
+        />
+      ) : null}
+    </AnimatePresence>
   );
 }
 
@@ -207,31 +212,31 @@ function AdminPlanEditorForm({
         onConfirm={checkIntent === "save" ? persist : undefined}
       />
 
-      <AnimatePresence>
+      <>
         <motion.div data-body-scroll-lock
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 z-50"
+          className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50"
           onClick={onClose}
         />
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 16 }}
-          transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+          initial={{ opacity: 0, y: 24, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 24, scale: 0.98 }}
+          transition={{ duration: 0.3, ease: DASH_EASE }}
           className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none"
         >
           <div
-            className="bg-white dark:bg-[#1e1e1e] rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
+            className="bg-dash-surface rounded-t-3xl sm:rounded-3xl shadow-dash-lift font-dash text-dash-ink w-full max-w-3xl max-h-[92vh] overflow-y-auto pointer-events-auto border border-dash-line"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 z-10 bg-white dark:bg-[#1e1e1e] px-4 sm:px-6 py-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a] flex items-start justify-between gap-3">
+            <div className="sticky top-0 z-10 bg-dash-surface px-4 sm:px-6 py-4 border-b border-dash-line flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="text-xl font-bold text-[#212121] dark:text-white">
+                <h3 className="text-xl font-bold text-dash-ink">
                   {plan.name ?? "Plan sin nombre"}
                 </h3>
-                <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-1">
+                <p className="text-sm text-dash-muted mt-1">
                   {formatMoney(plan.cost, plan.currency)}{" "}
                   {formatPlanFrequency(plan.frequency)} ·{" "}
                   {plan.subscriptionsCount ?? 0} suscripción
@@ -241,7 +246,7 @@ function AdminPlanEditorForm({
               <button
                 type="button"
                 onClick={onClose}
-                className="h-11 w-11 rounded-xl text-2xl text-[#616161] hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] cursor-pointer"
+                className="flex size-11 shrink-0 items-center justify-center rounded-full text-2xl leading-none text-dash-muted transition-colors hover:bg-dash-hover hover:text-dash-ink cursor-pointer"
                 aria-label="Cerrar"
               >
                 ×
@@ -250,7 +255,7 @@ function AdminPlanEditorForm({
 
             <div className="px-4 sm:px-6 py-5 flex flex-col gap-6">
               <section>
-                <h4 className="text-sm font-semibold text-[#212121] dark:text-white mb-3">
+                <h4 className="text-sm font-semibold text-dash-ink mb-3">
                   Nombre y visibilidad
                 </h4>
                 <label className="block">
@@ -269,7 +274,7 @@ function AdminPlanEditorForm({
                   </p>
                 ) : null}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
-                  <label className="flex items-start gap-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-3 py-3 cursor-pointer min-h-11">
+                  <label className="flex items-start gap-3 rounded-xl border border-dash-line bg-dash-surface-2 px-3 py-3 cursor-pointer min-h-11">
                     <input
                       type="checkbox"
                       checked={draft.active}
@@ -278,16 +283,16 @@ function AdminPlanEditorForm({
                       className="mt-1 h-4 w-4 accent-orange-500"
                     />
                     <span>
-                      <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                      <span className="block text-sm font-medium text-dash-ink">
                         Visible para contratar
                       </span>
-                      <span className="block text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                      <span className="block text-xs text-dash-muted mt-0.5">
                         Apagarlo lo quita de la página de precios. Quien ya lo
                         tiene no pierde nada.
                       </span>
                     </span>
                   </label>
-                  <label className="flex items-start gap-3 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-3 py-3 cursor-pointer min-h-11">
+                  <label className="flex items-start gap-3 rounded-xl border border-dash-line bg-dash-surface-2 px-3 py-3 cursor-pointer min-h-11">
                     <input
                       type="checkbox"
                       checked={draft.bestSeller}
@@ -296,10 +301,10 @@ function AdminPlanEditorForm({
                       className="mt-1 h-4 w-4 accent-orange-500"
                     />
                     <span>
-                      <span className="block text-sm font-medium text-[#212121] dark:text-white">
+                      <span className="block text-sm font-medium text-dash-ink">
                         Marcar como el más vendido
                       </span>
-                      <span className="block text-xs text-[#616161] dark:text-[#b0b0b0] mt-0.5">
+                      <span className="block text-xs text-dash-muted mt-0.5">
                         Lo destaca en precios y en el panel del cliente.
                       </span>
                     </span>
@@ -308,10 +313,10 @@ function AdminPlanEditorForm({
               </section>
 
               <section>
-                <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+                <h4 className="text-sm font-semibold text-dash-ink">
                   Precio y cobro
                 </h4>
-                <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+                <p className="text-xs text-dash-muted mt-1 mb-3">
                   Esto es lo que ve la gente en precios y lo que se cobra al
                   contratar. Cambiarlo pide verificar con Stripe.
                 </p>
@@ -406,10 +411,10 @@ function AdminPlanEditorForm({
               </section>
 
               <section>
-                <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+                <h4 className="text-sm font-semibold text-dash-ink">
                   Stripe
                 </h4>
-                <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+                <p className="text-xs text-dash-muted mt-1 mb-3">
                   El precio de Stripe no se edita: si cambia el monto, crea uno
                   nuevo allá y pega su ID aquí.
                 </p>
@@ -441,17 +446,17 @@ function AdminPlanEditorForm({
                   type="button"
                   onClick={() => openCheck("check")}
                   disabled={saving || !draft.stripePriceId.trim()}
-                  className="mt-3 h-11 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] px-4 text-sm font-semibold hover:border-orange-300 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="mt-3 h-11 rounded-full border border-dash-line px-4 text-sm font-semibold hover:border-orange-300 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   Verificar con Stripe
                 </button>
               </section>
 
               <section>
-                <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+                <h4 className="text-sm font-semibold text-dash-ink">
                   Comisión de referidos
                 </h4>
-                <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+                <p className="text-xs text-dash-muted mt-1 mb-3">
                   Porcentaje que gana quien refiere. 20 = 20%.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -491,10 +496,10 @@ function AdminPlanEditorForm({
               </section>
 
               <section>
-                <h4 className="text-sm font-semibold text-[#212121] dark:text-white">
+                <h4 className="text-sm font-semibold text-dash-ink">
                   Qué incluye este plan
                 </h4>
-                <p className="text-xs text-[#616161] dark:text-[#b0b0b0] mt-1 mb-3">
+                <p className="text-xs text-dash-muted mt-1 mb-3">
                   {includedCount} de {draft.features.length} módulos incluidos.
                   El nombre y la descripción se editan una sola vez para todos
                   los planes, en Planes → Módulos. Si un módulo está en beta,
@@ -504,7 +509,7 @@ function AdminPlanEditorForm({
                   {draft.features.map((f) => (
                     <div
                       key={f.key}
-                      className="flex flex-col gap-1 rounded-xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-[#fafafa] dark:bg-[#252525] px-3 py-3"
+                      className="flex flex-col gap-1 rounded-xl border border-dash-line bg-dash-surface-2 px-3 py-3"
                     >
                       <label className="flex cursor-pointer items-start gap-3">
                         <input
@@ -518,19 +523,19 @@ function AdminPlanEditorForm({
                         />
                         <span className="min-w-0">
                           <span className="flex flex-wrap items-center gap-2">
-                            <span className="text-sm font-medium text-[#212121] dark:text-white">
+                            <span className="text-sm font-medium text-dash-ink">
                               {f.name}
                             </span>
                             {f.beta ? <FeatureBetaBadge /> : null}
                           </span>
                           {f.description ? (
-                            <span className="mt-0.5 block text-xs text-[#616161] dark:text-[#b0b0b0]">
+                            <span className="mt-0.5 block text-xs text-dash-muted">
                               {f.description}
                             </span>
                           ) : null}
                         </span>
                       </label>
-                      <label className="ml-7 inline-flex min-h-11 cursor-pointer items-center gap-2 self-start text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+                      <label className="ml-7 inline-flex min-h-11 cursor-pointer items-center gap-2 self-start text-xs font-medium text-dash-muted">
                         <input
                           type="checkbox"
                           checked={f.beta}
@@ -548,8 +553,8 @@ function AdminPlanEditorForm({
               </section>
             </div>
 
-            <div className="sticky bottom-0 bg-white dark:bg-[#1e1e1e] px-4 sm:px-6 py-4 border-t border-[#e0e0e0] dark:border-[#3a3a3a] flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2">
-              <p className="text-xs text-[#616161] dark:text-[#b0b0b0]">
+            <div className="sticky bottom-0 bg-dash-surface px-4 sm:px-6 py-4 border-t border-dash-line flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2">
+              <p className="text-xs text-dash-muted">
                 {formatCredits(inputToNumber(draft.leadLimit))} créditos ·{" "}
                 {includedCount} módulos
               </p>
@@ -558,7 +563,7 @@ function AdminPlanEditorForm({
                   type="button"
                   onClick={onClose}
                   disabled={saving}
-                  className="h-11 rounded-xl px-4 text-sm font-semibold border border-[#e0e0e0] dark:border-[#3a3a3a] cursor-pointer disabled:opacity-60"
+                  className="h-11 rounded-full px-4 text-sm font-semibold border border-dash-line cursor-pointer disabled:opacity-60"
                 >
                   Cancelar
                 </button>
@@ -569,7 +574,7 @@ function AdminPlanEditorForm({
                     if (billingChanged) openCheck("save");
                     else void persist();
                   }}
-                  className="h-11 rounded-xl bg-orange-500 hover:bg-orange-600 text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer"
+                  className="h-11 rounded-full dash-grad-accent hover:shadow-dash-accent-lift text-white px-5 text-sm font-semibold disabled:opacity-60 cursor-pointer shadow-dash-accent"
                 >
                   {saving
                     ? "Guardando..."
@@ -581,7 +586,7 @@ function AdminPlanEditorForm({
             </div>
           </div>
         </motion.div>
-      </AnimatePresence>
+      </>
     </>
   );
 }

@@ -42,7 +42,7 @@ export default function ObtenerClientesPageContent({
     if (embedded) return emptyCompany;
 
     return (
-      <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#121212]">
+      <div className="min-h-screen bg-dash-surface-2 dark:bg-[#121212]">
         <Navigation />
         <main className="mx-auto max-w-7xl px-4 py-8 pt-20 sm:px-6 lg:px-8">
           {emptyCompany}
@@ -59,7 +59,7 @@ export default function ObtenerClientesPageContent({
           embedded ? undefined : "mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8"
         }
       >
-        <ObtenerClientesSection onLeadsSyncSuccess={onLeadsSyncSuccess} />
+        <ObtenerClientesSection onLeadsSyncSuccess={onLeadsSyncSuccess} inShell={embedded} />
       </div>
     </SubscriptionProvider>
   );
@@ -67,7 +67,7 @@ export default function ObtenerClientesPageContent({
   if (embedded) return content;
 
   return (
-    <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#121212]">
+    <div className="min-h-screen bg-dash-surface-2 dark:bg-[#121212]">
       <Navigation />
       {content}
     </div>

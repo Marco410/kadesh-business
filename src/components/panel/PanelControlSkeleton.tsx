@@ -2,8 +2,7 @@ import type { CSSProperties } from "react";
 import { Navigation } from "kadesh/components/layout";
 import { cn } from "kadesh/utils/cn";
 
-const boneClass =
-  "motion-safe:animate-pulse rounded-md bg-[#ececec] dark:bg-[#2a2a2a]";
+const boneClass = "dash-shimmer rounded-md";
 
 function Bone({
   className,
@@ -16,7 +15,7 @@ function Bone({
 }
 
 const cardClass =
-  "rounded-2xl border border-[#e0e0e0] bg-white shadow-sm dark:border-[#3a3a3a] dark:bg-[#1e1e1e]";
+  "rounded-3xl border border-dash-line bg-dash-surface shadow-sm";
 
 const SIDEBAR_ROWS = [46, 62, 38, 54, 70, 44, 58, 42];
 
@@ -85,10 +84,13 @@ function PanelControlSkeletonBody({ embedded }: { embedded: boolean }) {
         </div>
       ) : null}
       <div className="flex flex-col gap-6 lg:flex-row">
-        <aside className="flex w-full shrink-0 flex-col gap-5 lg:w-60">
-          <SidebarCard widths={SIDEBAR_ROWS} markFirst />
-          <SidebarCard widths={[52, 64]} />
-        </aside>
+        {/* Dentro del shell el menú real ya está a la izquierda: aquí solo el contenido. */}
+        {!embedded ? (
+          <aside className="flex w-full shrink-0 flex-col gap-5 lg:w-60">
+            <SidebarCard widths={SIDEBAR_ROWS} markFirst />
+            <SidebarCard widths={[52, 64]} />
+          </aside>
+        ) : null}
         <div className="min-w-0 flex-1 space-y-4">
           <div
             className={cn(
@@ -155,7 +157,7 @@ export default function PanelControlSkeleton({
   if (embedded) return <PanelControlSkeletonBody embedded />;
 
   return (
-    <div className="min-h-screen bg-[#f8f8f8] dark:bg-[#0a0a0a]">
+    <div className="min-h-screen bg-dash-surface-2">
       <Navigation />
       <PanelControlSkeletonBody embedded={false} />
     </div>

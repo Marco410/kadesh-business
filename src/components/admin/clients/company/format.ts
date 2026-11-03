@@ -28,7 +28,7 @@ export function quotationStatusLabel(status: string | null | undefined): string 
 export function quotationStatusClass(status: string | null | undefined): string {
   return (
     (status && (QUOTATION_STATUS_COLORS as Record<string, string>)[status]) ??
-    "bg-[#e0e0e0] text-[#616161] dark:bg-[#3a3a3a] dark:text-[#b0b0b0]"
+    "bg-dash-surface-3 text-dash-muted"
   );
 }
 

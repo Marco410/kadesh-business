@@ -53,10 +53,10 @@ import {
 import AdminAnimalDetailDrawer from "./AdminAnimalDetailDrawer";
 
 const selectClass =
-  "h-11 rounded-xl border border-[#e0e0e0] bg-white px-3 text-sm text-[#212121] dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white";
+  "h-11 rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink";
 
 const iconButton =
-  "inline-flex size-10 items-center justify-center rounded-xl border border-[#e0e0e0] text-[#424242] transition-colors hover:border-orange-400 hover:text-orange-800 disabled:opacity-40 dark:border-[#3a3a3a] dark:text-[#d6d6d6] dark:hover:text-orange-300";
+  "inline-flex size-10 items-center justify-center rounded-xl border border-dash-line text-dash-soft transition-colors hover:border-orange-400 hover:text-orange-800 disabled:opacity-40 dark:hover:text-orange-300";
 
 function parseFacebookFilter(value: string | null): AnimalFacebookFilter {
   return FACEBOOK_FILTER_OPTIONS.find((option) => option.value === value)?.value ?? "todos";
@@ -224,7 +224,7 @@ export default function AdminAnimalsPanel() {
       ) : rows.length === 0 ? (
         <AdminEmptyState title="Sin animales" description="Ningún animal coincide con los filtros." />
       ) : (
-        <ul className={`${surfaceClass} divide-y divide-[#eee] dark:divide-[#2a2a2a]`}>
+        <ul className={`${surfaceClass} divide-y divide-dash-line`}>
           {rows.map((row) => (
             <li key={row.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
               <button
@@ -241,11 +241,11 @@ export default function AdminAnimalsPanel() {
                     loading="lazy"
                   />
                 ) : (
-                  <span className="size-14 shrink-0 rounded-xl bg-[#eee] dark:bg-[#2a2a2a]" />
+                  <span className="size-14 shrink-0 rounded-xl bg-dash-surface-2" />
                 )}
                 <span className="min-w-0">
                   <span className="flex flex-wrap items-center gap-2">
-                    <span className="truncate font-semibold text-[#212121] dark:text-white">{row.name}</span>
+                    <span className="truncate font-semibold text-dash-ink">{row.name}</span>
                     {row.status ? (
                       <AdminStatusBadge
                         label={ANIMAL_STATUS_LABELS[row.status] ?? row.status}
@@ -259,22 +259,22 @@ export default function AdminAnimalsPanel() {
                       />
                     ) : null}
                   </span>
-                  <span className="mt-0.5 block truncate text-xs text-[#616161] dark:text-[#b0b0b0]">
+                  <span className="mt-0.5 block truncate text-xs text-dash-muted">
                     {[row.animalType, row.breed, [row.city, row.state].filter(Boolean).join(", ")]
                       .filter(Boolean)
                       .join(" · ")}
                   </span>
-                  <span className="mt-0.5 block truncate text-xs text-[#9e9e9e]">
+                  <span className="mt-0.5 block truncate text-xs text-dash-faint">
                     {row.creator ? formatPersonName(row.creator.name, row.creator.lastName) : "Sin dueño"}
                     {row.creatorIsAdmin ? " (admin)" : ""} · {formatDateShort(row.createdAt, false)}
                   </span>
                 </span>
               </button>
 
-              <div className="flex items-center gap-4 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              <div className="flex items-center gap-4 text-xs text-dash-muted">
                 <span className="inline-flex items-center gap-1" title="Vistas (7 días)">
                   <HugeiconsIcon icon={EyeIcon} size={14} /> {row.views}
-                  <span className="text-[#9e9e9e]">({row.views7d})</span>
+                  <span className="text-dash-faint">({row.views7d})</span>
                 </span>
                 <span className="inline-flex items-center gap-1" title="Favoritos">
                   <HugeiconsIcon icon={FavouriteIcon} size={14} /> {row.favorites}

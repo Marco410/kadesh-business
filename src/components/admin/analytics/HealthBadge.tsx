@@ -9,7 +9,7 @@ import {
 } from "../constants";
 import type { AdminHealthFlag } from "./analytics-queries";
 
-const NEUTRAL = "bg-black/5 text-[#616161] dark:bg-white/10 dark:text-[#b0b0b0]";
+const NEUTRAL = "bg-dash-surface-2 text-dash-muted";
 
 /** Salud de 0 a 100 con el color de su nivel (sana, por observar, en riesgo). */
 export function HealthBadge({
@@ -48,7 +48,7 @@ export function HealthTrend({ trend, changePct }: { trend: string; changePct: nu
       ? "text-emerald-700 dark:text-emerald-400"
       : trend === "down"
         ? "text-red-700 dark:text-red-400"
-        : "text-[#616161] dark:text-[#b0b0b0]";
+        : "text-dash-muted";
   return (
     <span className={cn("inline-flex items-center gap-0.5 whitespace-nowrap text-xs font-medium", tone)}>
       {icon ? <HugeiconsIcon icon={icon} size={14} aria-hidden /> : null}

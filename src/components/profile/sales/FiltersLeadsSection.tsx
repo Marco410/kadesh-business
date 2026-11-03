@@ -23,10 +23,10 @@ const LEAD_SOURCE_FILTER_OPTIONS = [
 ] as const;
 
 const fieldClass =
-  "w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-sm text-[#212121] dark:text-white placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
+  "w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-sm text-dash-ink placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
 
 const labelClass =
-  "block text-xs font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5";
+  "block text-xs font-medium text-dash-muted mb-1.5";
 
 export interface VendedorOption {
   id: string;
@@ -141,7 +141,7 @@ export default function FiltersLeadsSection({
             Empresa
           </label>
           <div className="relative">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9e9e9e]">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dash-faint">
               <HugeiconsIcon icon={Search01Icon} size={16} />
             </span>
             <input

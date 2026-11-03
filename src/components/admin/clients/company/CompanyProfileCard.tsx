@@ -45,14 +45,14 @@ function CopyRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-2">
       <div className="min-w-0">
-        <p className="text-xs text-[#9e9e9e]">{label}</p>
-        <p className="truncate font-mono text-xs text-[#212121] dark:text-white">{value}</p>
+        <p className="text-xs text-dash-faint">{label}</p>
+        <p className="truncate font-mono text-xs text-dash-ink">{value}</p>
       </div>
       <button
         type="button"
         onClick={() => copy(value, label)}
         aria-label={`Copiar ${label}`}
-        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[#616161] hover:bg-black/5 dark:text-[#b0b0b0] dark:hover:bg-white/10 cursor-pointer"
+        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-dash-muted hover:bg-dash-hover cursor-pointer"
       >
         <HugeiconsIcon icon={Copy01Icon} size={16} />
       </button>
@@ -114,11 +114,11 @@ export default function CompanyProfileCard({
   return (
     <aside className={`${surfaceClass} flex flex-col gap-5 p-4 sm:p-5 lg:sticky lg:top-24`}>
       <div>
-        <h2 className="text-xl font-bold text-[#212121] dark:text-white">{company.name}</h2>
+        <h2 className="text-xl font-bold text-dash-ink">{company.name}</h2>
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
           <AdminStatusBadge
             label={sub?.planName || company.plan?.name || "Sin plan"}
-            className="bg-black/5 text-[#424242] dark:bg-white/10 dark:text-[#e0e0e0]"
+            className="bg-dash-surface-2 text-dash-soft"
           />
           <SubscriptionStatusBadge status={sub?.status} />
           {company.suspendedAt ? (
@@ -128,7 +128,7 @@ export default function CompanyProfileCard({
             />
           ) : null}
         </div>
-        <p className="mt-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
+        <p className="mt-2 text-xs text-dash-muted">
           Cliente desde {formatDateShort(company.createdAt, false)}
           {sub?.planCost
             ? ` · ${formatMoney(sub.planCost, sub.planCurrency)} ${formatPlanFrequency(sub.planFrequency)}`
@@ -139,13 +139,13 @@ export default function CompanyProfileCard({
             className={`mt-1 text-xs ${
               trialDays != null && trialDays <= 3
                 ? "font-semibold text-amber-700 dark:text-amber-400"
-                : "text-[#616161] dark:text-[#b0b0b0]"
+                : "text-dash-muted"
             }`}
           >
             {periodLine}
           </p>
         ) : null}
-        <p className="mt-1 text-xs text-[#9e9e9e]">
+        <p className="mt-1 text-xs text-dash-faint">
           {insights?.lastActivityAt
             ? `Última actividad: ${formatDate(insights.lastActivityAt)}`
             : lastLogin
@@ -156,18 +156,18 @@ export default function CompanyProfileCard({
 
       <div>
         <div className="flex items-baseline justify-between gap-2">
-          <p className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+          <p className="text-xs font-medium text-dash-muted">
             Créditos de {monthLabel(year, month)}
           </p>
-          <p className="text-sm font-semibold tabular-nums text-[#212121] dark:text-white">
+          <p className="text-sm font-semibold tabular-nums text-dash-ink">
             {formatCredits(remaining)}
-            <span className="font-normal text-[#9e9e9e]"> / {formatCredits(total)}</span>
+            <span className="font-normal text-dash-faint"> / {formatCredits(total)}</span>
           </p>
         </div>
         <div className="mt-2">
           <AdminProgressBar value={used} max={total} label="Créditos usados este mes" />
         </div>
-        <p className="mt-1.5 text-xs text-[#9e9e9e]">
+        <p className="mt-1.5 text-xs text-dash-faint">
           {formatCredits(used)} usados · {formatCredits(plan)} del plan
           {bonus ? ` + ${formatCredits(bonus)} extra` : ""}
         </p>
@@ -179,14 +179,14 @@ export default function CompanyProfileCard({
           onClick={onAdjustPlan ?? undefined}
           disabled={!onAdjustPlan}
           title={onAdjustPlan ? undefined : "La empresa no tiene suscripción"}
-          className="h-11 w-full rounded-xl bg-orange-500 px-4 text-sm font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+          className="h-11 w-full rounded-full dash-grad-accent px-4 text-sm font-semibold text-white hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer shadow-dash-accent"
         >
           Ajustar plan
         </button>
         <button
           type="button"
           onClick={onSendEmail}
-          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] px-4 text-sm font-semibold text-[#212121] hover:border-orange-300 dark:border-[#3a3a3a] dark:text-white cursor-pointer"
+          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-dash-line px-4 text-sm font-semibold text-dash-ink hover:border-orange-300 cursor-pointer"
         >
           <HugeiconsIcon icon={Mail01Icon} size={16} />
           Enviar correo
@@ -195,7 +195,7 @@ export default function CompanyProfileCard({
           <button
             type="button"
             onClick={onExtendTrial}
-            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#e0e0e0] px-4 text-sm font-semibold text-[#212121] hover:border-orange-300 dark:border-[#3a3a3a] dark:text-white cursor-pointer"
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-dash-line px-4 text-sm font-semibold text-dash-ink hover:border-orange-300 cursor-pointer"
           >
             Extender prueba
           </button>
@@ -211,7 +211,7 @@ export default function CompanyProfileCard({
       <CompanyControl company={company} onChanged={onRefresh} />
 
       <div>
-        <p className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+        <p className="text-xs font-medium text-dash-muted">
           Equipo ({company.usersCount ?? company.users.length})
         </p>
         <ul className="mt-2 flex flex-col gap-1">
@@ -237,7 +237,7 @@ export default function CompanyProfileCard({
                 >
                   <AdminAvatar name={user.name} lastName={user.lastName} size={30} />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium text-[#212121] dark:text-white">
+                    <span className="block truncate text-sm font-medium text-dash-ink">
                       {formatPersonName(user.name, user.lastName)}
                       {user.suspendedAt ? (
                         <span className="ml-1.5 text-xs font-semibold text-red-600 dark:text-red-400">
@@ -245,7 +245,7 @@ export default function CompanyProfileCard({
                         </span>
                       ) : null}
                     </span>
-                    <span className="block truncate text-xs text-[#9e9e9e]">
+                    <span className="block truncate text-xs text-dash-faint">
                       {ROLE_LABELS[user.roles[0]?.name ?? ""] ?? user.roles[0]?.name ?? "Sin rol"}
                       {" · "}
                       {seen ? formatDate(seen) : "Nunca entró"}
@@ -260,17 +260,17 @@ export default function CompanyProfileCard({
 
       {/* En móvil los datos secundarios se pliegan para llegar rápido a las secciones. */}
       <div className={showMore ? "block" : "hidden lg:block"}>
-        <p className="text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">Más datos</p>
+        <p className="text-xs font-medium text-dash-muted">Más datos</p>
         <dl className="mt-3 space-y-3 text-sm">
           <div>
-            <dt className="text-xs text-[#9e9e9e]">Contacto</dt>
-            <dd className="break-words text-[#212121] dark:text-white">
+            <dt className="text-xs text-dash-faint">Contacto</dt>
+            <dd className="break-words text-dash-ink">
               {[company.contactEmail, company.contactPhone].filter(Boolean).join(" · ") || "—"}
             </dd>
           </div>
           <div>
-            <dt className="text-xs text-[#9e9e9e]">Categorías de Maps permitidas</dt>
-            <dd className="break-words text-[#212121] dark:text-white">
+            <dt className="text-xs text-dash-faint">Categorías de Maps permitidas</dt>
+            <dd className="break-words text-dash-ink">
               {categoriesLabel(company.allowedGooglePlaceCategories)}
             </dd>
           </div>
@@ -279,8 +279,8 @@ export default function CompanyProfileCard({
           company.onboardingAvgTicketValue ||
           company.onboardingSalesPain ? (
             <div>
-              <dt className="text-xs text-[#9e9e9e]">Lo que contó en el onboarding</dt>
-              <dd className="mt-1 space-y-1 text-xs leading-relaxed text-[#616161] dark:text-[#b0b0b0]">
+              <dt className="text-xs text-dash-faint">Lo que contó en el onboarding</dt>
+              <dd className="mt-1 space-y-1 text-xs leading-relaxed text-dash-muted">
                 {company.onboardingMainOffer ? <p>Vende: {company.onboardingMainOffer}</p> : null}
                 {company.onboardingIdealCustomer ? (
                   <p>Cliente ideal: {company.onboardingIdealCustomer}</p>

@@ -45,7 +45,7 @@ const DIGEST_STEPS = [
 function DigestDescription({ isCompanyWide }: { isCompanyWide: boolean }) {
   return (
     <div className="space-y-2">
-      <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
+      <p className="text-sm text-dash-muted">
         {isCompanyWide
           ? `${KADESH_URIM_AI_NAME} revisa el pipeline de la empresa y te propone 3 siguientes pasos para hoy: a quién contactar, qué cotización empujar y qué seguimiento no puede esperar.`
           : `${KADESH_URIM_AI_NAME} revisa tus clientes y te propone 3 siguientes pasos para hoy: a quién contactar, qué cotización empujar y qué seguimiento no puede esperar.`}
@@ -54,7 +54,7 @@ function DigestDescription({ isCompanyWide }: { isCompanyWide: boolean }) {
         {DIGEST_SOURCES.map((source) => (
           <li
             key={source}
-            className="flex items-center gap-2 text-sm text-[#616161] dark:text-[#b0b0b0]"
+            className="flex items-center gap-2 text-sm text-dash-muted"
           >
             <span
               className="h-1.5 w-1.5 shrink-0 rounded-full"
@@ -95,30 +95,30 @@ export function DailyDigestCard({
   if (digest.liveLoading && !configured) {
     return (
       <section
-        className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm"
+        className="rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm"
         aria-hidden
       >
-        <div className="h-20 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
+        <div className="h-20 rounded-xl dash-shimmer" />
       </section>
     );
   }
 
   if (!digest.isAiLive) {
     return (
-      <section className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm">
+      <section className="rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm">
         <div className="flex items-start gap-3">
           <span className="ai-urim-icon mt-0.5">
             <HugeiconsIcon icon={SparklesIcon} size={22} />
           </span>
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-semibold text-[#212121] dark:text-white">
+            <h3 className="text-lg font-semibold text-dash-ink">
               {title}
             </h3>
             <div className="mt-1">
               <DigestDescription isCompanyWide={isCompanyWide} />
             </div>
             {configured ? (
-              <p className="mt-2 text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <p className="mt-2 text-sm text-dash-muted">
                 Prueba la conexión de {KADESH_URIM_AI_NAME} para desbloquearlo.
               </p>
             ) : null}
@@ -146,7 +146,7 @@ export function DailyDigestCard({
                 </Link>
               )
             ) : (
-              <p className="mt-2 text-sm text-[#9e9e9e] dark:text-[#7a7a7a]">
+              <p className="mt-2 text-sm text-dash-faint dark:text-[#7a7a7a]">
                 Pide al administrador de la empresa que active{" "}
                 {KADESH_URIM_AI_NAME}.
               </p>
@@ -158,19 +158,19 @@ export function DailyDigestCard({
   }
 
   return (
-    <section className="rounded-2xl border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#1e1e1e] p-4 shadow-sm">
+    <section className="rounded-3xl border border-dash-line bg-dash-surface p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span className="ai-urim-icon">
               <HugeiconsIcon icon={SparklesIcon} size={20} />
             </span>
-            <h3 className="text-base font-semibold text-[#212121] dark:text-white">
+            <h3 className="text-base font-semibold text-dash-ink">
               {title}
             </h3>
           </div>
           {insight?.generatedAt ? (
-            <p className="mt-0.5 text-xs text-[#9e9e9e] dark:text-[#7a7a7a]">
+            <p className="mt-0.5 text-xs text-dash-faint dark:text-[#7a7a7a]">
               {formatDate(insight.generatedAt)}
             </p>
           ) : null}
@@ -181,7 +181,7 @@ export function DailyDigestCard({
             onClick={() => void digest.generate(true)}
             disabled={digest.generating}
             title={digest.isManaged ? digest.creditHint : undefined}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[#e0e0e0] px-2.5 py-1.5 text-xs font-medium text-[#616161] hover:border-violet-300 hover:text-violet-700 disabled:opacity-50 dark:border-[#3a3a3a] dark:text-[#b0b0b0] dark:hover:border-violet-500/50 dark:hover:text-violet-300"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-dash-line px-2.5 py-1.5 text-xs font-medium text-dash-muted hover:border-violet-300 hover:text-violet-700 disabled:opacity-50 dark:hover:border-violet-500/50 dark:hover:text-violet-300"
           >
             <HugeiconsIcon
               icon={RefreshIcon}
@@ -204,13 +204,13 @@ export function DailyDigestCard({
           momento.
         </p>
       ) : digest.loading ? (
-        <div className="h-24 rounded-xl bg-[#ececec] dark:bg-[#2a2a2a] animate-pulse" />
+        <div className="h-24 rounded-xl dash-shimmer" />
       ) : actions.length > 0 ? (
         <AiStepTimeline items={actions} linkFor={linkFor} />
       ) : (
         <div>
           <DigestDescription isCompanyWide={isCompanyWide} />
-          <p className="mt-2 text-sm text-[#9e9e9e] dark:text-[#7a7a7a]">
+          <p className="mt-2 text-sm text-dash-faint dark:text-[#7a7a7a]">
             {digest.creditHint}
           </p>
           <button

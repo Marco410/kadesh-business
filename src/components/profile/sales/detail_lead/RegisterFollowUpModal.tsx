@@ -209,17 +209,17 @@ export default function RegisterFollowUpModal({
             className="fixed inset-0 z-[90] flex items-center justify-center p-4 pointer-events-none"
           >
             <div
-              className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[min(90vh,760px)] flex flex-col overflow-hidden pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
+              className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[min(90vh,760px)] flex flex-col overflow-hidden pointer-events-auto border border-dash-line"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex justify-between items-start p-6 pb-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
-                <h3 className="text-xl font-bold text-[#212121] dark:text-[#ffffff] pr-4">
+              <div className="flex justify-between items-start p-6 pb-4 border-b border-dash-line">
+                <h3 className="text-xl font-bold text-dash-ink pr-4">
                   Programar seguimiento
                 </h3>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="text-2xl font-bold text-[#616161] dark:text-[#b0b0b0] hover:text-[#212121] dark:hover:text-[#ffffff] transition-colors flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a]"
+                  className="text-2xl font-bold text-dash-muted hover:text-dash-ink dark:hover:text-[#ffffff] transition-colors flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-dash-hover"
                   disabled={submitting}
                   aria-label="Cerrar"
                 >
@@ -228,7 +228,7 @@ export default function RegisterFollowUpModal({
               </div>
 
               <div className="px-6 pb-6 pt-4 flex-1 overflow-y-auto min-h-0">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-2">
                   Seguimientos programados
                 </p>
                 {tasksLoading ? (
@@ -236,27 +236,27 @@ export default function RegisterFollowUpModal({
                     <span className="animate-spin size-8 border-2 border-orange-500 border-t-transparent rounded-full" />
                   </div>
                 ) : tasks.length === 0 ? (
-                  <p className="text-sm text-[#616161] dark:text-[#b0b0b0] py-4">
+                  <p className="text-sm text-dash-muted py-4">
                     Aún no hay seguimientos para este lead.
                   </p>
                 ) : (
-                  <div className="rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] overflow-hidden">
+                  <div className="rounded-lg border border-dash-line overflow-hidden">
                     <table className="w-full text-sm border-collapse">
                       <thead>
-                        <tr className="bg-[#f5f5f5] dark:bg-[#2a2a2a] border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
-                          <th className="text-left px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                        <tr className="bg-dash-surface-2 border-b border-dash-line">
+                          <th className="text-left px-3 py-2 font-semibold text-dash-ink whitespace-nowrap">
                             Fecha programada
                           </th>
-                          <th className="text-left px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                          <th className="text-left px-3 py-2 font-semibold text-dash-ink whitespace-nowrap">
                             Estado
                           </th>
-                          <th className="text-left px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap">
+                          <th className="text-left px-3 py-2 font-semibold text-dash-ink whitespace-nowrap">
                             Prioridad
                           </th>
-                          <th className="text-left px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap max-w-[140px]">
+                          <th className="text-left px-3 py-2 font-semibold text-dash-ink whitespace-nowrap max-w-[140px]">
                             Notas
                           </th>
-                          <th className="text-right px-3 py-2 font-semibold text-[#212121] dark:text-[#ffffff] whitespace-nowrap w-[100px]">
+                          <th className="text-right px-3 py-2 font-semibold text-dash-ink whitespace-nowrap w-[100px]">
                             Acciones
                           </th>
                         </tr>
@@ -274,23 +274,23 @@ export default function RegisterFollowUpModal({
                                 setSelectedId(t.id);
                               }
                             }}
-                            className={`border-b border-[#e0e0e0] dark:border-[#3a3a3a] hover:bg-[#fafafa] dark:hover:bg-[#252525] cursor-pointer transition-colors ${
+                            className={`border-b border-dash-line hover:bg-dash-hover cursor-pointer transition-colors ${
                               editingTask?.id === t.id
                                 ? "bg-orange-50 dark:bg-orange-950/30 ring-inset ring-2 ring-orange-500/50"
                                 : ""
                             }`}
                           >
-                            <td className="px-3 py-2 text-[#616161] dark:text-[#b0b0b0] whitespace-nowrap">
+                            <td className="px-3 py-2 text-dash-muted whitespace-nowrap">
                               {formatDateShort(t.scheduledDate)}
                             </td>
-                            <td className="px-3 py-2 text-[#212121] dark:text-[#ffffff]">
+                            <td className="px-3 py-2 text-dash-ink">
                               {t.status}
                             </td>
-                            <td className="px-3 py-2 text-[#212121] dark:text-[#ffffff]">
+                            <td className="px-3 py-2 text-dash-ink">
                               {t.priority}
                             </td>
                             <td
-                              className="px-3 py-2 text-[#616161] dark:text-[#b0b0b0] max-w-[140px] truncate"
+                              className="px-3 py-2 text-dash-muted max-w-[140px] truncate"
                               title={t.notes ?? undefined}
                             >
                               {t.notes ?? "—"}
@@ -302,7 +302,7 @@ export default function RegisterFollowUpModal({
                               <button
                                 type="button"
                                 onClick={() => fillFormForEdit(t)}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] text-[#212121] dark:text-[#ffffff] text-xs font-medium hover:bg-[#f5f5f5] dark:hover:bg-[#333] transition-colors"
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded border border-dash-line bg-white dark:bg-[#2a2a2a] text-dash-ink text-xs font-medium hover:bg-dash-hover transition-colors"
                               >
                                 Editar
                               </button>
@@ -320,8 +320,8 @@ export default function RegisterFollowUpModal({
                 onClose={() => setSelectedId(null)}
               />
 
-              <div className="border-t border-[#e0e0e0] dark:border-[#3a3a3a] pt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#616161] dark:text-[#b0b0b0] mb-3">
+              <div className="border-t border-dash-line pt-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-dash-muted mb-3">
                   {isEditing ? "Editar seguimiento" : "Nueva programación"}
                 </p>
               </div>
@@ -330,7 +330,7 @@ export default function RegisterFollowUpModal({
                 <div>
                   <label
                     htmlFor="followup-scheduledDate"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Fecha programada <span className="text-red-500">*</span>
                   </label>
@@ -340,14 +340,14 @@ export default function RegisterFollowUpModal({
                     required
                     value={scheduledDate}
                     onChange={(e) => setScheduledDate(e.target.value)}
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="followup-status"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Estado
                   </label>
@@ -355,7 +355,7 @@ export default function RegisterFollowUpModal({
                     id="followup-status"
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
                     {FOLLOW_UP_STATUS_OPTIONS.map((opt) => (
                       <option key={opt} value={opt}>
@@ -368,7 +368,7 @@ export default function RegisterFollowUpModal({
                 <div>
                   <label
                     htmlFor="followup-priority"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Prioridad
                   </label>
@@ -376,7 +376,7 @@ export default function RegisterFollowUpModal({
                     id="followup-priority"
                     value={priority}
                     onChange={(e) => setPriority(e.target.value)}
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
                     {TASK_PRIORITY_OPTIONS.map((opt) => (
                       <option key={opt} value={opt}>
@@ -389,7 +389,7 @@ export default function RegisterFollowUpModal({
                 <div>
                   <label
                     htmlFor="followup-notes"
-                    className="block text-sm font-medium text-[#616161] dark:text-[#b0b0b0] mb-1.5"
+                    className="block text-sm font-medium text-dash-muted mb-1.5"
                   >
                     Notas
                   </label>
@@ -399,7 +399,7 @@ export default function RegisterFollowUpModal({
                     onChange={(e) => setNotes(e.target.value)}
                     rows={3}
                     placeholder="Notas del seguimiento..."
-                    className="w-full rounded-lg border border-[#e0e0e0] dark:border-[#3a3a3a] bg-white dark:bg-[#2a2a2a] px-3 py-2 text-[#212121] dark:text-[#ffffff] text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-y min-h-[80px]"
+                    className="w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-y min-h-[80px]"
                   />
                 </div>
 
@@ -408,7 +408,7 @@ export default function RegisterFollowUpModal({
                     type="button"
                     onClick={onClose}
                     disabled={submitting}
-                    className="px-4 py-2.5 border-2 border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-[#ffffff] font-semibold rounded-lg hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2.5 border-2 border-dash-line text-dash-ink font-semibold rounded-lg hover:bg-dash-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancelar
                   </button>
@@ -423,7 +423,7 @@ export default function RegisterFollowUpModal({
                         setNotes("");
                       }}
                       disabled={submitting}
-                      className="px-4 py-2.5 border-2 border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-[#ffffff] font-semibold rounded-lg hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2.5 border-2 border-dash-line text-dash-ink font-semibold rounded-lg hover:bg-dash-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Cancelar edición
                     </button>
@@ -431,7 +431,7 @@ export default function RegisterFollowUpModal({
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-4 py-2.5 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2.5 dash-grad-accent text-white font-semibold rounded-full hover:shadow-dash-accent-lift focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-[#1e1e1e] disabled:opacity-50 disabled:cursor-not-allowed shadow-dash-accent"
                   >
                     {submitting
                       ? "Guardando..."

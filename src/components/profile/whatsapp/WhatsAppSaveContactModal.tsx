@@ -107,18 +107,18 @@ export default function WhatsAppSaveContactModal({
             className="pointer-events-none fixed inset-0 z-[90] flex items-center justify-center p-4"
           >
             <div
-              className="pointer-events-auto w-full max-w-sm rounded-2xl border border-[#e0e0e0] bg-white p-5 shadow-2xl dark:border-[#3a3a3a] dark:bg-[#1e1e1e]"
+              className="pointer-events-auto w-full max-w-sm rounded-3xl border border-dash-line bg-dash-surface p-5 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-lg font-bold text-[#212121] dark:text-white">
+              <h3 className="text-lg font-bold text-dash-ink">
                 Guardar como cliente
               </h3>
-              <p className="mt-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+              <p className="mt-1 text-sm text-dash-muted">
                 Esta conversación pasa a ser la de tu cliente y queda en Clientes.
               </p>
 
               <label className="mt-4 block">
-                <span className="mb-1.5 block text-xs font-medium text-[#616161] dark:text-[#b0b0b0]">
+                <span className="mb-1.5 block text-xs font-medium text-dash-muted">
                   Nombre
                 </span>
                 <input
@@ -128,10 +128,10 @@ export default function WhatsAppSaveContactModal({
                   disabled={busy}
                   autoFocus
                   placeholder="Ej. Juan Pérez"
-                  className="w-full rounded-lg border border-[#e0e0e0] bg-white px-3 py-2.5 text-sm text-[#212121] placeholder:text-[#9e9e9e] focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-60 dark:border-[#3a3a3a] dark:bg-[#121212] dark:text-white"
+                  className="w-full rounded-lg border border-dash-line bg-dash-surface px-3 py-2.5 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-60"
                 />
               </label>
-              <p className="mt-2 text-xs text-[#616161] dark:text-[#b0b0b0]">
+              <p className="mt-2 text-xs text-dash-muted">
                 Teléfono: <span className="font-medium">{phone}</span>
               </p>
 
@@ -140,7 +140,7 @@ export default function WhatsAppSaveContactModal({
                   type="button"
                   onClick={onClose}
                   disabled={busy}
-                  className="h-10 rounded-lg px-4 text-sm font-semibold text-[#616161] hover:bg-[#f5f5f5] disabled:opacity-60 dark:text-[#b0b0b0] dark:hover:bg-[#2a2a2a]"
+                  className="h-10 rounded-lg px-4 text-sm font-semibold text-dash-muted hover:bg-dash-hover disabled:opacity-60"
                 >
                   Cancelar
                 </button>
@@ -148,7 +148,7 @@ export default function WhatsAppSaveContactModal({
                   type="button"
                   onClick={() => void handleSave()}
                   disabled={!canSave}
-                  className="h-10 rounded-lg bg-orange-500 px-4 text-sm font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="h-10 rounded-full dash-grad-accent px-4 text-sm font-semibold text-white hover:shadow-dash-accent-lift disabled:cursor-not-allowed disabled:opacity-60 shadow-dash-accent"
                 >
                   {busy ? "Guardando..." : "Guardar cliente"}
                 </button>

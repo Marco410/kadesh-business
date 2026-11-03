@@ -14,25 +14,89 @@ Solo el rol `admin` de plataforma. Un admin de empresa no entra. Si no hay sesi�
 
 El enlace **Operaciones** aparece en el menú del avatar y, de forma discreta, al final del dashboard de inicio.
 
-## Navegación en tres niveles
+## Navegación
 
-Antes las tabs, la vista Fichas/Servicios y los filtros eran la misma píldora y no se distinguían. Ahora cada nivel tiene su propio componente en `ui.tsx`:
+Operaciones vive en su propio shell (`kadesh/components/app-shell`). No lleva la barra ni el footer del sitio, ni el botón de WhatsApp de soporte (es para clientes), y el tour de bienvenida no arranca aquí.
 
-1. **Secciones** (Inicio, Clientes, Actividad, Analítica, Planes, Contenido, Veterinarias) — `AdminTabBar`: texto con subrayado naranja en la activa, no píldoras.
-2. **Vista dentro de una sección** (Empresas / Personas, Fichas / Servicios, Artículos / … / Correos) — `AdminSegmented`: control segmentado, opción activa como pastilla blanca. Hace scroll horizontal en móvil.
-3. **Filtros de una tabla** (estado, rol, tipo) — `AdminFilterChips`: chips pequeños, activo con tinte naranja (no relleno sólido), con etiqueta (**Estado**, **Rol**, **Tipo**) para que se lea qué filtran.
+1. **Menú lateral** (`ADMIN_NAV_GROUPS` en `constants.ts`). Grupos con título:
+   - **General:** Inicio, Actividad, Analítica.
+   - **Clientes:** Empresas, Personas, Planes.
+   - **Contenido:** Blog, Correos, Novedades.
+   - **Kadesh Pet:** Resumen, Animales, Veterinarias, Servicios.
 
-Dentro del **detalle 360** de un cliente, sus secciones (Resumen, Actividad, CRM…) usan `AdminTabBar` en variante `compact` y las subvistas (Leads / Pipeline / …) usan `AdminSegmented`.
+   Cada item es una sección (`tab`) o una vista (`vista`). Por eso Empresas/Personas, Blog/Correos y las cuatro de Pet ya no tienen segmentado propio. La opción activa es una píldora blanca que se desliza, con el icono naranja. Veterinarias y Servicios llevan un globo con lo que espera revisión (`ADMIN_NAV_COUNTS_QUERY`, cada minuto y al verificar o aprobar). En móvil el menú es un cajón.
+2. **Vista dentro de una sección** (Artículos / Categorías / Etiquetas, las 7 de Analítica, Catálogo / Módulos, las subvistas del 360): `AdminSegmented`. Pista cálida con la opción activa en píldora que se desliza.
+3. **Filtros de una lista** (estado, rol, tipo): `AdminFilterChips`. Píldoras con borde y la activa en **tinta** (negro en claro, blanco en oscuro), con etiqueta (**Estado**, **Rol**, **Tipo**). Pueden llevar `count` y `dot`.
 
-Una pantalla nueva usa el componente de su nivel. No vuelvas a poner píldoras sólidas en las tabs: compiten con el filtro y con los botones de acción, que son los únicos naranja sólido.
+Dentro del **detalle 360**, sus secciones (Resumen, Actividad, CRM…) usan `AdminTabBar compact`: subrayado naranja que se desliza.
 
-Toda la navegación vive en query params (`hooks/useAdminNavigation.ts`): cambiar filtros o sección usa `replace`; entrar a un detalle usa `push`, para que "atrás" regrese a la lista con sus filtros.
+El naranja sólido (degradado) queda solo para la acción principal ("+ Nuevo", Guardar, Publicar) y la barra del pico en las gráficas.
+
+**Barra superior:**
+- Migas: Operaciones › grupo › sección.
+- Buscador: lleva a Clientes → Empresas con `?q=`.
+- **+ Nuevo:** Nueva novedad, Nuevo artículo o Nuevo correo. Llega a la sección con `?nuevo=1` y esa sección abre su editor.
+- Campana, tamaño de texto, tema y saludo.
+
+**Encabezado de cada vista** (`AppPageHeader`):
+- Eyebrow: el grupo, o en Inicio la fecha larga.
+- Título: el nombre del item.
+- Descripción: la del item.
+- Al cambiar de vista, la vista se vuelve a montar (repite su entrada) y el foco pasa al título.
+
+Toda la navegación vive en query params (`hooks/useAdminNavigation.ts`):
+- El menú lateral usa enlaces limpios (`?tab=…&vista=…`). Cambiar de sección no arrastra filtros y "atrás" regresa a la sección anterior.
+- Los filtros usan `replace`.
+- Entrar a un detalle usa `push`, para que "atrás" regrese a la lista con sus filtros.
+
+## Diseño
+
+Mismo lenguaje que el admin de ICARM, con **solo colores de Kadesh**. Tokens, componentes y movimiento están en `kadesh/components/app-shell/README.md`.
+
+**Base visual:**
+- Fondo cálido con brillos naranja, tarjetas blancas de 24 px con sombra suave y bordes casi invisibles.
+- Inter (variable) en todo el panel, con cifras tabulares. El sitio público sigue con Poppins.
+- A más tamaño, menos tracking.
+
+**Indicadores** (`AdminStatTile`):
+- `variant="dark"` (oscuro con brillo naranja) para el número más importante de la vista.
+- `variant="tint"` (durazno) para el segundo.
+- Blancos para el resto.
+- `delta` es la pastilla ↗/↘ contra el periodo anterior.
+- `sparkline` es una línea dentro del indicador.
+- `tone` (alerta, peligro, éxito) pinta un punto y la cifra, no el borde.
+- Si el valor es número, cuenta hacia arriba al aparecer.
+
+**Gráficas** (sin librería, por el tope de 10 MB del worker):
+- `ColumnBars`: barras tipo píldora. El pico va en naranja con su cifra y el periodo en curso, rayado.
+- `HBarList`: rankings en naranja.
+- `Sparkline`.
+
+**Movimiento:**
+- Una sola curva.
+- Tarjetas que entran escalonadas, indicadores que se deslizan e insignias que cuentan.
+- Hover con lift en lo tocable.
+- Drawer desde la derecha y modal desde abajo.
+- Todo se apaga con "reducir movimiento".
+
+**Kit** (`ui.tsx`):
+- `AdminButton` y `adminButtonClass`: primario, tinta, contorno, fantasma, peligro.
+- `AdminModal` para modales nuevos. Los editores existentes conservan su estructura con el mismo aspecto.
+- Clases de tabla (`adminTh*`) y de campos (`adminInputClass`…).
+- Un componente nuevo usa los tokens `dash-*`. Nunca hex sueltos.
 
 ## Copy
 
 Decimos **Operaciones**, **planes**, **fichas**, **servicios**, **verificar**. Nunca GraphQL, Keystone ni `planFeatures` en la UI. Los IDs de Stripe (`price_…`, `prod_…`) solo aparecen en el editor de Planes, porque operaciones los necesita para ligar el cobro; en listados se dice “Ligado a Stripe” / “Sin precio de Stripe”.
 
 ## Inicio
+
+Orden, de arriba abajo (2026-11-03):
+1. **Saludo** ("Buenas tardes, Marco.") con una oración con las cifras clave y cuántas cosas requieren atención (en rojo, o "Todo en orden."). Trae atajos (Buscar cliente, Kadesh Pet) y la franja **Esperan revisión**: fichas, servicios y pruebas por vencer.
+2. Junto al saludo, **Requiere atención**: 5 filas y "Ver más".
+3. KPIs: Empresas activas (oscuro), MRR (tintado), Registros y Extracciones. Debajo una fila compacta: En prueba, Pagos con problema, Con acceso, Créditos.
+4. Actividad reciente y Ahorro en búsquedas.
+5. Colas de Kadesh Pet.
 
 KPIs de operación (`adminOpsSummary`): empresas activas, en prueba (cuántas vencen en ≤3 días), pagos con problema, registros y accesos de 7 días, extracciones fallidas en 24 h, créditos consumidos del mes y MRR estimado. Cada KPI lleva a la vista filtrada.
 
@@ -157,7 +221,7 @@ Un nombre, compartido por los dos blogs. No se renombran ni se borran desde aqu�
 
 ## Veterinarias
 
-Pestaña **Kadesh Pet** (`?tab=veterinarias`), cuatro vistas: **Resumen** (default, sin `vista`), **Animales** (`&vista=animales`), **Veterinarias** (`&vista=fichas`) y **Servicios** (`&vista=servicios`). El shell es `pet/AdminPetSection.tsx`; solo se monta la vista abierta, así cada una pide solo sus datos.
+Grupo **Kadesh Pet** del menú (`?tab=veterinarias`), cuatro vistas: **Resumen** (default, sin `vista`), **Animales** (`&vista=animales`), **Veterinarias** (`&vista=fichas`) y **Servicios** (`&vista=servicios`). Cada una es un item del menú. `pet/AdminPetSection.tsx` monta solo la vista abierta, así cada una pide solo sus datos.
 
 **Resumen** (`pet/overview/`, 2026-11-03): cómo va Kadesh Pet. Sale de `adminPetSummary` y `adminPetSeries` (kadesh-back, `queries/admin/adminPet.ts`).
 
@@ -207,6 +271,25 @@ Asunto, título de cabecera, etiqueta superior, vista previa de bandeja, cuerpo,
 La columna derecha es vista previa en vivo. **Revisar y enviar** primero cuenta destinatarios (`dryRun`) y pide confirmación antes del envío real. Mutación `sendAdminBroadcastEmail` (solo admin de plataforma).
 
 ## Decisiones
+
+### 2026-11-03 — Operaciones con shell propio, estilo ICARM y colores de Kadesh
+
+Qué:
+- Menú lateral agrupado, barra superior flotante, encabezados grandes y tarjetas KPI oscura y tintada.
+- Inicio con saludo y "Requiere atención", y animaciones de entrada.
+- Tokens `dash-*` con claro y oscuro e Inter variable.
+- Los colores fijos de los 77 archivos pasaron a tokens con un codemod.
+- **Reemplaza** la regla anterior de "no píldoras sólidas en las tabs": las secciones ahora están en el menú y los chips activos van en tinta.
+
+Por qué:
+- El diseño anterior era difícil de leer. Pesaban los grises, la Poppins con pesos 500/600 simulados y las pestañas que competían con los filtros.
+- El admin de ICARM ya resolvía la jerarquía: menú por grupos, una cifra protagonista por vista y el acento solo en la acción.
+- Se usan solo colores de Kadesh: el morado es de Kadesh AI.
+
+Qué no hacer:
+- No volver a hex sueltos (`#212121`, `#e0e0e0`…). Usar `text-dash-*`, `bg-dash-*`, `border-dash-line`.
+- No usar naranja sólido para estados.
+- No agregar librería de gráficas ni de animación.
 
 ### 2026-11-03 — Operaciones usa todo el ancho de la pantalla
 
