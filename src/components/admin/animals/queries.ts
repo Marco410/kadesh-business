@@ -30,6 +30,7 @@ export const ADMIN_ANIMALS_QUERY = gql`
     $reportedBy: String
     $creator: String
     $facebook: String
+    $status: String
     $take: Int
     $skip: Int
   ) {
@@ -39,6 +40,7 @@ export const ADMIN_ANIMALS_QUERY = gql`
       reportedBy: $reportedBy
       creator: $creator
       facebook: $facebook
+      status: $status
       take: $take
       skip: $skip
     ) {

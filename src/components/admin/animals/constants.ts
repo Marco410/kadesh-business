@@ -12,6 +12,11 @@ export const ANIMAL_STATUS_LABELS: Record<string, string> = {
   in_adoption: "En adopción",
 };
 
+/** Filtro por estatus actual (el registro más reciente de la bitácora); `""` = todos. */
+export const ANIMAL_STATUS_FILTER_OPTIONS = Object.entries(ANIMAL_STATUS_LABELS).map(
+  ([value, label]) => ({ value, label }),
+);
+
 export const ANIMAL_STATUS_CLASS: Record<string, string> = {
   lost: "bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300",
   found: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",

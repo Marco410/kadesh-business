@@ -39,6 +39,7 @@ import {
   ANIMAL_TYPE_LABELS,
   ANIMAL_STATUS_CLASS,
   ANIMAL_STATUS_DEFAULT_CLASS,
+  ANIMAL_STATUS_FILTER_OPTIONS,
   ANIMAL_STATUS_LABELS,
   CREATOR_FILTER_API,
   CREATOR_FILTER_OPTIONS,
@@ -50,6 +51,9 @@ import {
   type AnimalFacebookFilter,
 } from "./constants";
 import AdminAnimalDetailDrawer from "./AdminAnimalDetailDrawer";
+
+const selectClass =
+  "h-11 rounded-xl border border-[#e0e0e0] bg-white px-3 text-sm text-[#212121] dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white";
 
 const iconButton =
   "inline-flex size-10 items-center justify-center rounded-xl border border-[#e0e0e0] text-[#424242] transition-colors hover:border-orange-400 hover:text-orange-800 disabled:opacity-40 dark:border-[#3a3a3a] dark:text-[#d6d6d6] dark:hover:text-orange-300";
@@ -69,6 +73,7 @@ export default function AdminAnimalsPanel() {
   const [animalTypeId, setAnimalTypeId] = useState("");
   const [creator, setCreator] = useState<AnimalCreatorFilter>("todos");
   const [facebook, setFacebook] = useState<AnimalFacebookFilter>("todos");
+  const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebouncedValue(search, 300);
 
@@ -78,10 +83,11 @@ export default function AdminAnimalsPanel() {
       animalTypeId: animalTypeId || null,
       creator: CREATOR_FILTER_API[creator],
       facebook: FACEBOOK_FILTER_API[facebook],
+      status: status || null,
       take: ADMIN_ANIMALS_PAGE_SIZE,
       skip: (page - 1) * ADMIN_ANIMALS_PAGE_SIZE,
     }),
-    [animalTypeId, creator, debouncedSearch, facebook, page],
+    [animalTypeId, creator, debouncedSearch, facebook, page, status],
   );
 
   const { data, loading, error, refetch } = useQuery<AdminAnimalsResponse>(ADMIN_ANIMALS_QUERY, {
@@ -167,19 +173,35 @@ export default function AdminAnimalsPanel() {
             onChange={resetPage(setFacebook)}
           />
         </div>
-        <select
-          value={animalTypeId}
-          onChange={(e) => resetPage(setAnimalTypeId)(e.target.value)}
-          aria-label="Tipo de animal"
-          className="h-11 rounded-xl border border-[#e0e0e0] bg-white px-3 text-sm text-[#212121] dark:border-[#3a3a3a] dark:bg-[#1e1e1e] dark:text-white"
-        >
-          <option value="">Todos los tipos</option>
-          {(typesData?.animalTypes ?? []).map((type) => (
-            <option key={type.id} value={type.id}>
-              {ANIMAL_TYPE_LABELS[type.name] ?? type.name}
-            </option>
-          ))}
-        </select>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <select
+            value={status}
+            onChange={(e) => resetPage(setStatus)(e.target.value)}
+            aria-label="Estatus actual"
+            title="Según el registro más reciente de su bitácora"
+            className={selectClass}
+          >
+            <option value="">Todos los estatus</option>
+            {ANIMAL_STATUS_FILTER_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <select
+            value={animalTypeId}
+            onChange={(e) => resetPage(setAnimalTypeId)(e.target.value)}
+            aria-label="Tipo de animal"
+            className={selectClass}
+          >
+            <option value="">Todos los tipos</option>
+            {(typesData?.animalTypes ?? []).map((type) => (
+              <option key={type.id} value={type.id}>
+                {ANIMAL_TYPE_LABELS[type.name] ?? type.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {error ? (
