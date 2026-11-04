@@ -7,7 +7,9 @@ import {
   DashboardBrowsingIcon,
   DashboardSquare01Icon,
   Mail01Icon,
+  MapsLocation01Icon,
   NoteEditIcon,
+  Notification03Icon,
   PackageIcon,
   SparklesIcon,
   Stethoscope02Icon,
@@ -83,6 +85,8 @@ export const ADMIN_NAV_GROUPS: Array<{ id: string; title: string; items: AdminNa
       { id: "pet-animales", label: "Animales", icon: Bone01Icon, tab: "veterinarias", vista: "animales", description: "Reportes de animales perdidos, encontrados y en adopción." },
       { id: "pet-fichas", label: "Veterinarias", icon: Stethoscope02Icon, tab: "veterinarias", vista: "fichas", description: "Fichas del directorio, reclamos y pipeline.", badgeKey: "pendingPlaces" },
       { id: "pet-servicios", label: "Servicios", icon: Task01Icon, tab: "veterinarias", vista: "servicios", description: "Servicios que piden las veterinarias.", badgeKey: "pendingServices" },
+      { id: "pet-avisos", label: "Avisos", icon: Notification03Icon, tab: "veterinarias", vista: "avisos", description: "Cada aviso a quién le llegó y por dónde: campana, push y WhatsApp." },
+      { id: "pet-alertas-zona", label: "Alertas de zona", icon: MapsLocation01Icon, tab: "veterinarias", vista: "alertas-zona", description: "Quién recibe alertas de mascotas cerca, su zona y sus canales." },
     ],
   },
 ];
@@ -100,7 +104,11 @@ export function activeAdminNavItem(params: URLSearchParams | { get: (key: string
   } else if (tab === ADMIN_TABS.CONTENT) {
     id = vista === "correos" ? "correos" : "blog";
   } else if (tab === ADMIN_TABS.PET_PLACES) {
-    id = vista === "animales" ? "pet-animales" : vista === "fichas" ? "pet-fichas" : vista === "servicios" ? "pet-servicios" : "pet-resumen";
+    // El item de Kadesh Pet con esa `vista` (Animales, Avisos…); sin vista o desconocida, Resumen.
+    const petItem = ADMIN_NAV_GROUPS.flatMap((group) => group.items).find(
+      (candidate) => candidate.tab === ADMIN_TABS.PET_PLACES && candidate.vista && candidate.vista === vista,
+    );
+    id = petItem?.id ?? "pet-resumen";
   } else if (tab === ADMIN_TABS.RELEASES) {
     id = "novedades";
   }
