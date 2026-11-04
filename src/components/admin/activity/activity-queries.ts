@@ -25,6 +25,10 @@ export const ADMIN_ACTIVITY_FEED_QUERY = gql`
         entityType
         entityId
         meta
+        ip
+        userAgent
+        app
+        page
       }
       nextBefore
       hasMore
@@ -50,6 +54,14 @@ export type AdminActivityItem = {
   entityType: string | null;
   entityId: string | null;
   meta: Record<string, unknown> | null;
+  /** IP de la petición (eventos propios y accesos). */
+  ip: string | null;
+  /** User agent crudo; `describeUserAgent` lo traduce a sistema y navegador. */
+  userAgent: string | null;
+  /** pet-web | business-web | pet-mobile */
+  app: string | null;
+  /** Pantalla en la que estaba la persona (`pageLabel` la vuelve legible). */
+  page: string | null;
 };
 
 export type AdminActivityFeedResponse = {
@@ -68,6 +80,11 @@ export type AdminActivityFeedInput = {
   search?: string | null;
   before?: string | null;
   take?: number;
+  /** pet-web | business-web | pet-mobile */
+  app?: string | null;
+  ip?: string | null;
+  /** Ocurrencias de un error de la bandeja. */
+  fingerprint?: string | null;
 };
 
 export const ADMIN_OPS_SUMMARY_QUERY = gql`

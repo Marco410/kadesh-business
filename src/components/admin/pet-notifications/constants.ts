@@ -17,6 +17,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
   "petplace.service_requested": "Servicio solicitado",
   "user.bank_details_updated": "Datos bancarios",
   "pet.reminder_due": "Recordatorio de cartilla",
+  "security.alert": "Alerta de seguridad",
 };
 
 export function notificationTypeLabel(type: string) {

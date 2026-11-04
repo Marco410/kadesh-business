@@ -2,6 +2,7 @@ import type { IconSvgElement } from "@hugeicons/react";
 import {
   Activity01Icon,
   Bone01Icon,
+  Bug01Icon,
   Building06Icon,
   ChartLineData01Icon,
   DashboardBrowsingIcon,
@@ -11,6 +12,7 @@ import {
   NoteEditIcon,
   Notification03Icon,
   PackageIcon,
+  SecurityBlockIcon,
   SparklesIcon,
   Stethoscope02Icon,
   Task01Icon,
@@ -22,6 +24,8 @@ export const ADMIN_TABS = {
   OVERVIEW: "inicio",
   CLIENTS: "clientes",
   ACTIVITY: "actividad",
+  ERRORS: "errores",
+  SECURITY: "seguridad",
   ANALYTICS: "analitica",
   PLANS: "planes",
   CONTENT: "contenido",
@@ -32,7 +36,7 @@ export const ADMIN_TABS = {
 export type AdminTab = (typeof ADMIN_TABS)[keyof typeof ADMIN_TABS];
 
 /** Globos del menú (salen de `ADMIN_NAV_COUNTS_QUERY`). */
-export type AdminNavBadgeKey = "pendingPlaces" | "pendingServices";
+export type AdminNavBadgeKey = "pendingPlaces" | "pendingServices" | "openErrors";
 
 export type AdminNavItemConfig = {
   id: string;
@@ -56,6 +60,8 @@ export const ADMIN_NAV_GROUPS: Array<{ id: string; title: string; items: AdminNa
     items: [
       { id: "inicio", label: "Inicio", icon: DashboardSquare01Icon, tab: "inicio", description: "Cómo va Kadesh y lo que requiere atención." },
       { id: "actividad", label: "Actividad", icon: Activity01Icon, tab: "actividad", description: "Lo que pasa en la plataforma, de todas las empresas." },
+      { id: "errores", label: "Errores", icon: Bug01Icon, tab: "errores", description: "Lo que le falla a la gente, agrupado por error.", badgeKey: "openErrors" },
+      { id: "seguridad", label: "Seguridad", icon: SecurityBlockIcon, tab: "seguridad", description: "Límites rebasados, IPs bloqueadas y cuentas desde la misma IP." },
       { id: "analitica", label: "Analítica", icon: ChartLineData01Icon, tab: "analitica", description: "Salud, ventas, activación, retención, uso, demanda y de dónde llegan." },
     ],
   },
@@ -138,6 +144,16 @@ export const ADMIN_TAB_ITEMS: Array<{
     id: ADMIN_TABS.ACTIVITY,
     label: "Actividad",
     description: "Lo que pasa en la plataforma, de todas las empresas",
+  },
+  {
+    id: ADMIN_TABS.ERRORS,
+    label: "Errores",
+    description: "Lo que le falla a la gente, agrupado por error",
+  },
+  {
+    id: ADMIN_TABS.SECURITY,
+    label: "Seguridad",
+    description: "Límites rebasados, IPs bloqueadas y cuentas desde la misma IP",
   },
   {
     id: ADMIN_TABS.ANALYTICS,
@@ -322,8 +338,12 @@ export const ACTIVITY_TYPES = [
   { slug: "admin", type: "admin", label: "Kadesh" },
   // Secciones que abren: mucho volumen, por eso "Todo" no la incluye (el back la excluye).
   { slug: "navegacion", type: "product", label: "Navegación" },
-  // Lo que le falló a alguien en el panel (fase 5).
+  // Lo que le falló a alguien en el panel (fase 5) o en el navegador (fase 6.1).
   { slug: "errores", type: "errors", label: "Errores" },
+  // Reportes, comentarios, reseñas y veterinarias de Kadesh Pet (fase 6.4).
+  { slug: "pet", type: "pet", label: "Kadesh Pet" },
+  // Límites rebasados y bloqueos de IP (fase 6.5).
+  { slug: "seguridad", type: "security", label: "Seguridad" },
 ] as const;
 
 export type ActivityTypeSlug = (typeof ACTIVITY_TYPES)[number]["slug"];
@@ -369,6 +389,96 @@ export const PANEL_SECTION_LABELS: Record<string, string> = {
   creditos: "Créditos",
   "google-calendar": "Google Calendar",
 };
+
+/** App que hizo la petición (`ActivityEvent.app`): `slug` va en la URL (`&app=`). */
+export const ACTIVITY_APPS = [
+  { slug: "pet", value: "pet-web", label: "Kadesh Pet" },
+  { slug: "negocios", value: "business-web", label: "Negocios" },
+  { slug: "movil", value: "pet-mobile", label: "App móvil" },
+] as const;
+
+export type ActivityAppSlug = (typeof ACTIVITY_APPS)[number]["slug"];
+
+export const ACTIVITY_APP_FILTERS: Array<{ value: ActivityAppSlug | "todas"; label: string }> = [
+  { value: "todas", label: "Todas" },
+  ...ACTIVITY_APPS.map((app) => ({ value: app.slug, label: app.label })),
+];
+
+export function parseActivityAppSlug(value: string | null): ActivityAppSlug | "todas" {
+  return ACTIVITY_APPS.find((app) => app.slug === value)?.slug ?? "todas";
+}
+
+export function activityAppValue(slug: ActivityAppSlug | "todas"): string | null {
+  return ACTIVITY_APPS.find((app) => app.slug === slug)?.value ?? null;
+}
+
+export const ACTIVITY_APP_LABELS: Record<string, string> = Object.fromEntries(
+  ACTIVITY_APPS.map((app) => [app.value, app.label]),
+);
+
+/** Pestañas de `/perfil?tab=` en Kadesh Pet (landing). */
+const PET_PROFILE_TAB_LABELS: Record<string, string> = {
+  inicio: "Inicio",
+  profile: "Datos del perfil",
+  pets: "Mascotas",
+  posts: "Publicaciones",
+  animals: "Reportes",
+  appointments: "Citas",
+  clinics: "Clínicas",
+};
+
+/** Pantallas de Kadesh Pet (landing y app). Los segmentos con id o slug se comparan como `:id`. */
+export const PET_PAGE_LABELS: Record<string, string> = {
+  "/": "Inicio del sitio",
+  "/animales": "Mapa de animales",
+  "/animales/nuevo": "Publicar reporte",
+  "/animales/:id": "Ficha de animal",
+  "/animales/:id/editar": "Editar reporte",
+  "/veterinarias": "Directorio de veterinarias",
+  "/veterinarias/registro": "Registrar veterinaria",
+  "/veterinarias/:id": "Ficha de veterinaria",
+  "/blog": "Blog",
+  "/blog/:id": "Artículo del blog",
+  "/notificaciones": "Notificaciones",
+  "/notificaciones/alertas": "Alertas de zona",
+  "/notificaciones/ajustes": "Ajustes de avisos",
+  "/auth/login": "Iniciar sesión",
+  "/auth/register": "Registro",
+  "/contacto": "Contacto",
+  "/donaciones": "Donaciones",
+  "/anunciate": "Anúnciate",
+  "/novedades": "Novedades",
+};
+
+const PET_PAGE_PATTERNS: Array<[RegExp, string]> = Object.entries(PET_PAGE_LABELS)
+  .filter(([path]) => path.includes(":id"))
+  .map(([path, label]) => [new RegExp(`^${path.replace(/:id/g, "[^/]+")}/?$`), label]);
+
+/** Ruta legible de una pantalla: "Perfil · Mascotas", "Publicar reporte"… o la ruta tal cual. */
+export function pageLabel(page: string | null | undefined): string | null {
+  if (!page) return null;
+  const [pathname, query = ""] = page.split("?");
+  const params = new URLSearchParams(query);
+  const tab = params.get("tab");
+  if (pathname === "/perfil") {
+    return `Perfil · ${PET_PROFILE_TAB_LABELS[tab ?? "inicio"] ?? tab ?? "Inicio"}`;
+  }
+  if (pathname === "/panel" || pathname.startsWith("/panel/")) {
+    const key =
+      pathname === "/panel"
+        ? tab || "extraccion"
+        : pathname
+            .replace(/^\/panel\//, "")
+            .split("/")
+            .map((segment) => (/^[a-z0-9]{20,}$/i.test(segment) ? ":id" : segment))
+            .join("/");
+    if (pathname.startsWith("/panel/clientes/admin")) return "Operaciones";
+    return `Panel · ${PANEL_SECTION_LABELS[key] ?? key}`;
+  }
+  if (PET_PAGE_LABELS[pathname]) return PET_PAGE_LABELS[pathname];
+  const match = PET_PAGE_PATTERNS.find(([pattern]) => pattern.test(pathname));
+  return match ? match[1] : null;
+}
 
 /** Filtro del feed: todas o solo errores. */
 export const ACTIVITY_STATUS_FILTERS = [
@@ -515,6 +625,7 @@ export const PERSON_TABS = {
   PROFILE: "perfil",
   ACCESS: "accesos",
   ACTIVITY: "actividad",
+  DEVICES: "dispositivos",
   CONTROL: "control",
 } as const;
 
@@ -701,6 +812,10 @@ export const ADMIN_SCOPED_PARAMS = [
   "tipo_lugar",
   // "+ Nuevo" de la barra: abre el editor de la sección al llegar.
   "nuevo",
+  // Actividad, Errores y Seguridad (fase 6): app, IP y error abierto.
+  "app",
+  "ip",
+  "huella",
 ] as const;
 
 /** Arma un enlace interno de Operaciones (siempre sobre `Routes.panelAdmin`). */
