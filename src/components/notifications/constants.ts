@@ -3,6 +3,7 @@ import {
   BankIcon,
   StethoscopeIcon,
   Notification01Icon,
+  SecurityBlockIcon,
 } from "@hugeicons/core-free-icons";
 import { Routes } from "kadesh/core/routes";
 import { ADMIN_TABS } from "kadesh/components/admin/constants";
@@ -13,6 +14,8 @@ export const NOTIFICATION_TYPE = {
   ANIMAL_CREATED: "animal.created",
   PET_PLACE_SERVICE_REQUESTED: "petplace.service_requested",
   USER_BANK_DETAILS_UPDATED: "user.bank_details_updated",
+  /** Alguien se pasó de un límite contra abuso (fase 6.5). */
+  SECURITY_ALERT: "security.alert",
 } as const;
 
 /** Cada cuánto se revisa el contador de no leídas (sin websockets en esta fase). */
@@ -27,6 +30,8 @@ export function notificationIcon(type: string | null) {
       return StethoscopeIcon;
     case NOTIFICATION_TYPE.USER_BANK_DETAILS_UPDATED:
       return BankIcon;
+    case NOTIFICATION_TYPE.SECURITY_ALERT:
+      return SecurityBlockIcon;
     default:
       return Notification01Icon;
   }
@@ -43,6 +48,9 @@ export function notificationHref(item: NotificationItem): string | null {
       return Routes.panelAdminTab(ADMIN_TABS.PET_PLACES, { vista: "servicios" });
     case NOTIFICATION_TYPE.USER_BANK_DETAILS_UPDATED:
       return Routes.panelAdminTab(ADMIN_TABS.CLIENTS);
+    // El back manda la Actividad filtrada por la IP; si no, Seguridad.
+    case NOTIFICATION_TYPE.SECURITY_ALERT:
+      return item.url || Routes.panelAdminTab(ADMIN_TABS.SECURITY);
     default:
       return item.url || null;
   }

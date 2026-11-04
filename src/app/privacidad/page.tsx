@@ -19,7 +19,7 @@ export default function PrivacidadPage() {
             Kadesh — Plataforma de Prospección B2B
           </p>
           <p className="text-sm text-[#5c4033]/80 dark:text-[#d4c4b8]/80 text-center">
-            Última actualización: 14 de octubre de 2026
+            Última actualización: 4 de noviembre de 2026
           </p>
 
           <h2 className="text-2xl text-orange-500 mt-4 font-semibold">
@@ -69,8 +69,11 @@ export default function PrivacidadPage() {
             <li>Información sobre actividad profesional o giro comercial</li>
             <li>Datos de facturación (en caso de suscripción de pago)</li>
             <li>
-              Información de uso de la plataforma (logs, sesiones,
-              interacciones)
+              Información de uso y de seguridad de la plataforma: acciones que
+              realiza, pantallas que visita, errores que se le presentan, sesiones,
+              dirección IP, y el sistema operativo, navegador y tipo de
+              dispositivo desde los que accede, aun cuando navegue sin iniciar
+              sesión
             </li>
             <li>
               Datos de usuario de Google, cuando usted autoriza el inicio de
@@ -111,6 +114,16 @@ export default function PrivacidadPage() {
             <li>
               Autenticar su identidad mediante Google Sign-In y sincronizar
               calendarios cuando usted lo autorice
+            </li>
+            <li>
+              Proteger la plataforma y a sus usuarios: detectar y prevenir el
+              mal uso, el fraude, el spam y los accesos no autorizados, limitar
+              los intentos repetidos y, en su caso, bloquear el acceso desde una
+              dirección IP
+            </li>
+            <li>
+              Detectar y corregir errores que se le presenten al usar la
+              plataforma
             </li>
           </ul>
           <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
@@ -246,6 +259,11 @@ export default function PrivacidadPage() {
             prestar el servicio, salvo que la ley exija o permita un periodo de
             retención mayor (por ejemplo, obligaciones fiscales o de prevención
             de fraude).
+          </p>
+          <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
+            Los registros de actividad y de seguridad (acciones, pantallas,
+            errores, dirección IP, sistema operativo y navegador) se conservan
+            hasta 13 meses y después se eliminan.
           </p>
           <p className="text-base text-[#5c4033] dark:text-[#d4c4b8]">
             Cuando expire el periodo de retención aplicable a un tipo de dato,

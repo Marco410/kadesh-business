@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { formatDateShort } from "kadesh/utils/format-date";
+import { userAgentSummary } from "kadesh/utils/user-agent";
 import { ADMIN_PAGE_SIZE, AUTH_STEP_LABELS } from "../../constants";
 import {
   AdminEmptyState,
@@ -19,8 +20,8 @@ import {
 } from "../clients-queries";
 
 /**
- * Historial de accesos (`UserAuthLog`): logins, registros e intentos fallidos.
- * Lo escribe el backend; no guarda IP ni dispositivo todavía.
+ * Historial de accesos (`UserAuthLog`): logins, registros e intentos fallidos, con la IP y el
+ * sistema y navegador desde donde entró. Lo escribe el backend.
  */
 export default function AuthLogList({
   userId,
@@ -81,6 +82,11 @@ export default function AuthLogList({
                   : null}
                 {!row.success && row.message ? `${showPerson ? " · " : ""}${row.message}` : null}
               </p>
+              {row.ip || row.userAgent ? (
+                <p className="text-xs text-dash-faint">
+                  {[userAgentSummary(row.userAgent), row.ip].filter(Boolean).join(" · ")}
+                </p>
+              ) : null}
             </div>
             <time
               dateTime={row.createdAt}

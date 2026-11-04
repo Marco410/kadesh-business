@@ -5,12 +5,14 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   AiMagicIcon,
   Alert02Icon,
+  Bone01Icon,
   Calendar03Icon,
   Coins01Icon,
   CreditCardIcon,
   CursorPointer01Icon,
   Login01Icon,
   MapsLocation01Icon,
+  SecurityBlockIcon,
   Shield01Icon,
   UserMultipleIcon,
   UserSettings01Icon,
@@ -18,7 +20,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { cn } from "kadesh/utils/cn";
 import { formatDateShort } from "kadesh/utils/format-date";
-import { ACTIVITY_TYPE_LABELS, AI_FEATURE_LABELS, PANEL_SECTION_LABELS } from "../constants";
+import { ACTIVITY_TYPE_LABELS, AI_FEATURE_LABELS, PANEL_SECTION_LABELS, pageLabel } from "../constants";
 import {
   AdminEmptyState,
   AdminErrorState,
@@ -29,6 +31,7 @@ import {
   surfaceClass,
 } from "../ui";
 import type { AdminActivityItem } from "./activity-queries";
+import { ContextDetails, ContextLine, hasContext } from "./ActivityContext";
 
 type IconType = typeof Login01Icon;
 
@@ -60,6 +63,8 @@ const TYPE_STYLE: Record<string, { icon: IconType; tone: string }> = {
     tone: "bg-slate-500/15 text-slate-700 dark:text-slate-300",
   },
   errors: { icon: Alert02Icon, tone: "bg-red-500/15 text-red-700 dark:text-red-300" },
+  pet: { icon: Bone01Icon, tone: "bg-orange-500/15 text-orange-700 dark:text-orange-300" },
+  security: { icon: SecurityBlockIcon, tone: "bg-rose-500/15 text-rose-700 dark:text-rose-300" },
 };
 
 /** Etiquetas de `meta` que vale la pena mostrar al expandir un evento. */
@@ -87,6 +92,18 @@ const META_LABELS: Record<string, string> = {
   status: "Estado",
   activityType: "Tipo",
   operation: "Operación",
+  // Errores de la app (app.error, app.client_error)
+  kind: "Falla",
+  opType: "Petición",
+  code: "Código",
+  variables: "Variables",
+  digest: "Id del error",
+  stack: "Pila",
+  online: "Con red",
+  // Seguridad (límites y bloqueos)
+  rule: "Regla",
+  limit: "Límite",
+  windowMinutes: "Ventana (min)",
   direction: "Dirección",
   // Eventos propios (ActivityEvent)
   fields: "Campos",
@@ -116,6 +133,11 @@ const META_LABELS: Record<string, string> = {
   scheduledDate: "Fecha",
   priority: "Prioridad",
   keys: "Módulos",
+  // Kadesh Pet
+  rating: "Calificación",
+  commentKind: "Tipo de comentario",
+  approved: "Aprobada",
+  role: "Rol",
 };
 
 /** Nombres legibles de campos que aparecen en `changes` y `fields`. */
@@ -145,6 +167,20 @@ const FIELD_LABELS: Record<string, string> = {
   creditsToAdd: "créditos",
   active: "activo",
   bestSeller: "más vendido",
+};
+
+/** Valores de `kind`, `opType` y `commentKind` en español. */
+const ERROR_VALUE_LABELS: Record<string, string> = {
+  network: "Conexión",
+  crash: "Pantalla caída",
+  script: "Error de código",
+  chunk: "No cargó la pantalla",
+  comment: "Comentario",
+  duplicate_report: "Posible duplicado",
+  possible_match: "Posible coincidencia",
+  query: "Consulta",
+  mutation: "Cambio",
+  subscription: "Suscripción",
 };
 
 function readable(value: unknown): string {
@@ -181,6 +217,14 @@ function metaRows(meta: Record<string, unknown> | null) {
     let text = readable(value);
     if (key === "feature") text = AI_FEATURE_LABELS[String(value)] ?? String(value);
     if (key === "radius") text = String(value);
+    if ((key === "kind" || key === "opType" || key === "commentKind") && typeof value === "string") {
+      text = ERROR_VALUE_LABELS[value] ?? value;
+    }
+    // Antes de la fase 6.1, `kind` de app.error guardaba si era consulta o cambio.
+    if (key === "kind" && (value === "query" || value === "mutation")) {
+      rows.push({ key: "opType", label: META_LABELS.opType, value: text });
+      continue;
+    }
     if (key === "fields" && Array.isArray(value)) {
       text = value.map((field) => FIELD_LABELS[String(field)] ?? String(field)).join(", ");
     }
@@ -193,6 +237,8 @@ function metaRows(meta: Record<string, unknown> | null) {
 function itemTitle(item: AdminActivityItem): string {
   const section = typeof item.meta?.section === "string" ? item.meta.section : null;
   if (item.kind === "ui.section_viewed" && section) {
+    // Kadesh Pet manda la pantalla como ruta (`/perfil?tab=pets`, `/animales/:id`).
+    if (section.startsWith("/")) return `Abrió ${pageLabel(section) ?? section}`;
     return `Abrió ${PANEL_SECTION_LABELS[section] ?? section}`;
   }
   return item.title;
@@ -222,16 +268,18 @@ function TimelineRow({
   showCompany,
   onOpenCompany,
   onOpenPerson,
+  onFilterIp,
 }: {
   item: AdminActivityItem;
   showCompany: boolean;
   onOpenCompany?: (companyId: string) => void;
   onOpenPerson?: (userId: string, companyId: string | null) => void;
+  onFilterIp?: (ip: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const style = TYPE_STYLE[item.type] ?? TYPE_STYLE.admin;
   const rows = metaRows(item.meta);
-  const expandable = rows.length > 0;
+  const expandable = rows.length > 0 || hasContext(item);
   const time = new Date(item.occurredAt);
 
   return (
@@ -319,16 +367,20 @@ function TimelineRow({
             </>
           ) : null}
         </p>
+        <ContextLine item={item} />
         {open && rows.length ? (
           <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 rounded-xl bg-dash-surface-2 p-3 text-xs sm:grid-cols-3">
             {rows.map((row) => (
               <div key={row.key} className="min-w-0">
                 <dt className="text-dash-faint">{row.label}</dt>
-                <dd className="break-words text-dash-ink">{row.value}</dd>
+                <dd className={cn("break-words text-dash-ink", row.key === "stack" && "whitespace-pre-wrap font-mono text-[11px]")}>
+                  {row.value}
+                </dd>
               </div>
             ))}
           </dl>
         ) : null}
+        {open ? <ContextDetails item={item} onFilterIp={onFilterIp} /> : null}
       </div>
     </li>
   );
@@ -348,6 +400,7 @@ export default function ActivityTimeline({
   showCompany = true,
   onOpenCompany,
   onOpenPerson,
+  onFilterIp,
   emptyTitle = "Sin actividad registrada",
   emptyDescription = "Cuando haya accesos, extracciones, IA, pagos o movimientos del CRM, aparecen aquí.",
   header,
@@ -362,6 +415,8 @@ export default function ActivityTimeline({
   showCompany?: boolean;
   onOpenCompany?: (companyId: string) => void;
   onOpenPerson?: (userId: string, companyId: string | null) => void;
+  /** "Ver todo de esta IP". Sin esto, el enlace lleva a Actividad filtrada por esa IP. */
+  onFilterIp?: (ip: string) => void;
   emptyTitle?: string;
   emptyDescription?: string;
   header?: ReactNode;
@@ -424,6 +479,7 @@ export default function ActivityTimeline({
                   showCompany={showCompany}
                   onOpenCompany={onOpenCompany}
                   onOpenPerson={onOpenPerson}
+                  onFilterIp={onFilterIp}
                 />
               ))}
             </ul>
