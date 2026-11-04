@@ -19,12 +19,12 @@ El enlace **Operaciones** aparece en el menú del avatar y, de forma discreta, a
 Operaciones vive en su propio shell (`kadesh/components/app-shell`). No lleva la barra ni el footer del sitio, ni el botón de WhatsApp de soporte (es para clientes), y el tour de bienvenida no arranca aquí.
 
 1. **Menú lateral** (`ADMIN_NAV_GROUPS` en `constants.ts`). Grupos con título:
-   - **General:** Inicio, Actividad, Analítica.
+   - **General:** Inicio, Actividad, Errores, Seguridad, Analítica.
    - **Clientes:** Empresas, Personas, Planes.
    - **Contenido:** Blog, Correos, Novedades.
    - **Kadesh Pet:** Resumen, Animales, Veterinarias, Servicios, Avisos, Alertas de zona.
 
-   Cada item es una sección (`tab`) o una vista (`vista`). Por eso Empresas/Personas, Blog/Correos y las de Pet ya no tienen segmentado propio. La opción activa es una píldora blanca que se desliza, con el icono naranja. Veterinarias y Servicios llevan un globo con lo que espera revisión (`ADMIN_NAV_COUNTS_QUERY`, cada minuto y al verificar o aprobar). En móvil el menú es un cajón.
+   Cada item es una sección (`tab`) o una vista (`vista`). Por eso Empresas/Personas, Blog/Correos y las de Pet ya no tienen segmentado propio. La opción activa es una píldora blanca que se desliza, con el icono naranja. Veterinarias y Servicios llevan un globo con lo que espera revisión, y Errores con los abiertos en 24 h (`ADMIN_NAV_COUNTS_QUERY`, cada minuto y al verificar o aprobar). En móvil el menú es un cajón.
 2. **Vista dentro de una sección** (Artículos / Categorías / Etiquetas, las 7 de Analítica, Catálogo / Módulos, las subvistas del 360): `AdminSegmented`. Pista cálida con la opción activa en píldora que se desliza.
 3. **Filtros de una lista** (estado, rol, tipo): `AdminFilterChips`. Píldoras con borde y la activa en **tinta** (negro en claro, blanco en oscuro), con etiqueta (**Estado**, **Rol**, **Tipo**). Pueden llevar `count` y `dot`.
 
@@ -143,14 +143,16 @@ También se pueden **agregar créditos extra**: se suman ahora y se mantienen ca
 
 ### Panel de una persona
 
-Pestañas **Perfil** · **Accesos** · **Actividad** · **Control** (ver como, suspender, cerrar sesiones, exportar y anonimizar; no aplica al equipo de Kadesh). En Perfil se editan nombre, apellidos, teléfono, correo, cuenta verificada y **roles** (**Guardar usuario**). Debajo va la **suscripción al blog**, con una tarjeta por blog (Pet y SaaS) que se guarda por separado, para no mezclar errores de un bloque con el otro:
+Pestañas **Perfil** · **Accesos** · **Actividad** · **Dispositivos** · **Control** (ver como, suspender, cerrar sesiones, exportar y anonimizar; no aplica al equipo de Kadesh). En Perfil se editan nombre, apellidos, teléfono, correo, cuenta verificada y **roles** (**Guardar usuario**). Debajo va la **suscripción al blog**, con una tarjeta por blog (Pet y SaaS) que se guarda por separado, para no mezclar errores de un bloque con el otro:
 
 - Sin suscripción: **Suscribir** la crea con el correo del usuario (editable).
 - Con suscripción: se cambia el correo o se pausa/reactiva. Pausada = no recibe avisos de nuevos artículos. No se borra desde aquí.
 - Si alguien se suscribió con ese correo antes de tener cuenta, aparece igual y al guardar se liga a la cuenta.
 - Un mismo correo no puede repetirse en el mismo blog; el aviso de error viene del backend.
 
-Accesos es el historial de `UserAuthLog` (logins, altas e intentos fallidos), escrito por el backend.
+Accesos es el historial de `UserAuthLog` (logins, altas e intentos fallidos), escrito por el backend, con la IP y el sistema y navegador de cada uno.
+
+**Dispositivos** (`PersonDevices`, `adminPersonDevices`): cada IP + navegador que usó en 90 días (veces, primera y última vez) y **Cuentas con la misma IP**. Una IP con muchas cuentas (red móvil, oficina, VPN) se marca y no lista personas. Cada IP lleva a Actividad filtrada y tiene **Bloquear IP**.
 
 ### Persona sin empresa
 
@@ -158,13 +160,23 @@ Accesos es el historial de `UserAuthLog` (logins, altas e intentos fallidos), es
 
 ## Actividad
 
-`?tab=actividad` reemplaza el concentrado de Sync: una línea de tiempo de **todas** las empresas (`adminActivityFeed`), agrupada por día. Chips **Tipo** (Accesos, Extracción, CRM, Equipo, IA, Créditos, Pagos, WhatsApp, Calendario, Kadesh, Navegación) en `&tipo=` y **Estado** (Todas / Con error) en `&error=1`, más un buscador. Cada evento se expande para ver el detalle (los cambios salen como "antes → después"); la empresa y la persona abren su 360. Pagina con **Cargar más** (cursor por fecha).
+`?tab=actividad` reemplaza el concentrado de Sync: una línea de tiempo de **todas** las empresas (`adminActivityFeed`), agrupada por día. Chips **Tipo** (Accesos, Extracción, CRM, Equipo, IA, Créditos, Pagos, WhatsApp, Calendario, Kadesh, Navegación, Errores, Kadesh Pet, Seguridad) en `&tipo=`, **App** (Kadesh Pet, Negocios, App móvil) en `&app=` y **Estado** (Todas / Con error) en `&error=1`, más un buscador (también busca IP, pantalla y mensaje de error). Cada evento se expande para ver el detalle (los cambios salen como "antes → después"); la empresa y la persona abren su 360. Pagina con **Cargar más** (cursor por fecha).
+
+Cada fila trae una línea de **contexto** (`ActivityContext.tsx`): sistema y navegador (`describeUserAgent`, `src/utils/user-agent.ts`), IP, pantalla (`pageLabel`: "Perfil · Mascotas", "Publicar reporte"…) y la app. Al expandirla, el bloque **Contexto** trae todo, el user agent completo, **Ver todo de esta IP** (`&ip=`, chip removible) y **Bloquear IP**. En los errores también salen la operación, si era consulta o cambio, el código y los nombres de las variables (nunca sus valores).
 
 - **Equipo**: roles, permisos, altas de personas, espacios de trabajo y datos de la empresa.
 - **Kadesh**: lo que hace el admin, incluido qué 360, fichas y conversaciones de IA abrió.
 - **Navegación**: secciones del panel que abren, módulos bloqueados que ven, tours. Es mucho volumen, por eso **Todo** no la incluye: solo sale al elegirla.
 
 Nunca muestra prompts de IA, cuerpos de WhatsApp ni contraseñas.
+
+## Errores
+
+`?tab=errores` (`app-errors/`, `adminErrorIssues`): lo que le falla a la gente en Kadesh Pet, Negocios y la app, **agrupado por error**. Incluye errores del servidor (GraphQL) y del navegador (sin conexión, 5xx, pantalla caída, código que no cargó). Tabla con error, dónde (app y pantalla), veces, personas (y sin sesión), última vez y estado. Filtros **Estado** (Abiertos, Resueltos, Ignorados, Todos) en `&estado=`, **App** y **Periodo** (`&rango=`). La fila abre un cajón (`&huella=`) con el detalle, sistemas y navegadores, nota y **Marcar resuelto / Ignorar / Reabrir**, y las últimas ocurrencias. Si un error resuelto vuelve a pasar, regresa a Abiertos como **Reabierto**.
+
+## Seguridad
+
+`?tab=seguridad` (`security/`, `adminSecuritySummary`, `adminBlockedIps`): **Límites rebasados** (logins, registros, reportes, comentarios, reseñas, contacto y veterinarias) por IP, regla y persona; **IPs con varias cuentas nuevas**; **IPs bloqueadas** (con desbloquear) y un campo para bloquear una IP a mano. `BlockIpButton` pide duración y motivo; si un admin usó la IP hace poco, pide confirmar. Cuando alguien se pasa de un límite varias veces llega **Alerta de seguridad** a la campana.
 
 ## Analítica
 
@@ -271,6 +283,14 @@ Asunto, título de cabecera, etiqueta superior, vista previa de bandeja, cuerpo,
 La columna derecha es vista previa en vivo. **Revisar y enviar** primero cuenta destinatarios (`dryRun`) y pide confirmación antes del envío real. Mutación `sendAdminBroadcastEmail` (solo admin de plataforma).
 
 ## Decisiones
+
+### 2026-11-04 — Contexto en Actividad, bandeja de Errores y Seguridad (Fase 6)
+
+Qué: Actividad muestra desde dónde pasó cada evento (sistema, navegador, IP, pantalla, app) y filtra por app e IP. Secciones nuevas **Errores** (agrupados, con estado) y **Seguridad** (límites, multicuentas, bloqueo de IP). La ficha de una persona suma **Dispositivos**.
+
+Por qué: el back ya guardaba IP y navegador pero no se veían, y no había forma de saber en qué pantalla le falló algo a alguien ni de frenar el abuso.
+
+Qué no hacer: no agregar una librería para leer el user agent (el worker tiene límite de 10 MB); ampliar `describeUserAgent`. No mostrar valores de variables.
 
 ### 2026-11-03 — Operaciones con shell propio, estilo ICARM y colores de Kadesh
 

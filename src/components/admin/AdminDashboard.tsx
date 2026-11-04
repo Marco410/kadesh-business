@@ -34,6 +34,8 @@ import { adminButtonClass } from "./ui";
 import AdminOverview from "./AdminOverview";
 import AdminClientsSection from "./clients/AdminClientsSection";
 import AdminActivityPanel from "./activity/AdminActivityPanel";
+import AdminErrorsPanel from "./app-errors/AdminErrorsPanel";
+import AdminSecurityPanel from "./security/AdminSecurityPanel";
 import AdminAnalyticsSection from "./analytics/AdminAnalyticsSection";
 import AdminPlansPanel from "./AdminPlansPanel";
 import AdminContentSection from "./AdminContentSection";
@@ -365,6 +367,8 @@ function AdminDashboardContent() {
         ) : null}
         {tab === ADMIN_TABS.CLIENTS ? <AdminClientsSection /> : null}
         {tab === ADMIN_TABS.ACTIVITY ? <AdminActivityPanel /> : null}
+        {tab === ADMIN_TABS.ERRORS ? <AdminErrorsPanel /> : null}
+        {tab === ADMIN_TABS.SECURITY ? <AdminSecurityPanel /> : null}
         {tab === ADMIN_TABS.ANALYTICS ? <AdminAnalyticsSection /> : null}
         {tab === ADMIN_TABS.PLANS ? <AdminPlansPanel vista={plansVista} onVistaChange={setPlansVista} /> : null}
         {tab === ADMIN_TABS.CONTENT ? <AdminContentSection /> : null}

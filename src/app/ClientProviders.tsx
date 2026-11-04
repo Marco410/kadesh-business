@@ -17,6 +17,7 @@ import {
 import { BodyScrollLock } from "kadesh/components/shared";
 import { ImpersonationBanner } from "kadesh/components/impersonation";
 import SessionEndedListener from "kadesh/components/auth/SessionEndedListener";
+import { useClientErrorListener } from "kadesh/utils/activity";
 import { Toaster } from "sileo";
 import { useTheme } from "next-themes";
 
@@ -65,6 +66,8 @@ export default function ClientProviders({
 }: {
   children: ReactNode;
 }) {
+  // Errores de código que nadie atrapó → Operaciones → Actividad → Errores.
+  useClientErrorListener();
   return (
     <CookieConsentProvider>
       <ThemeProvider>

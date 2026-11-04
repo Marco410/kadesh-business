@@ -444,6 +444,8 @@ export const ADMIN_AUTH_LOGS_QUERY = gql`
       message
       emailMasked
       createdAt
+      ip
+      userAgent
       user {
         id
         name
@@ -462,6 +464,8 @@ export type AdminAuthLogRow = {
   message: string | null;
   emailMasked: string | null;
   createdAt: string;
+  ip: string | null;
+  userAgent: string | null;
   user: { id: string; name: string; lastName: string | null } | null;
 };
 

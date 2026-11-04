@@ -13,6 +13,7 @@ Lo que solo sabe el navegador: qué secciones abre la gente, cuánto tiempo tien
 | `lead.exported` (`count`) | `exportLeadsExcel` | Uso fuerte o riesgo de que se lleven la cartera |
 | `auth.logout` | `Navigation` (antes de borrar el token) | Fin de sesión |
 | `admin.viewed_company` / `admin.viewed_person` / `admin.viewed_ai_prompt` | 360, ficha de persona, conversación de IA | Auditoría del admin (el back solo los acepta de admin de plataforma) |
+| `app.client_error` (`kind`, `operation`, `status`, `page`…) | `requestErrorLink` (Apollo), `useClientErrorListener`, `src/app/error.tsx` y `global-error.tsx` | Errores que el back no ve: red caída, 5xx/413/429, pantalla caída, código que no cargó. También sin sesión |
 
 La sección sale de la URL: `/panel?tab=clientes` → `clientes`, `/panel` → `extraccion`, otras rutas del panel sin ids (`cotizacion/:id`). Operaciones (`/panel/clientes/admin`) no se registra como navegación: lo del admin va con los `admin.*`.
 
@@ -23,6 +24,13 @@ La sección sale de la URL: `/panel?tab=clientes` → `clientes`, `/panel` → `
 - El mismo evento repetido en 3 s cuenta una vez (StrictMode monta los efectos dos veces en desarrollo; algunos componentes se vuelven a renderizar al cargar sus datos).
 - Nunca lanza ni bloquea la UI. Si falla, el evento se pierde.
 - El back pone actor y empresa desde la sesión y rechaza tipos que no estén en su lista (`CLIENT_EVENT_TYPES`).
+
+## App y pantalla en cada petición (fase 6)
+
+- `clientContextHeaders()` (`clientContext.ts`) agrega `x-kadesh-app: business-web` y `x-kadesh-page` (la ruta con solo `tab`, `vista`, `clinic` y `pet`) a cada petición: Apollo (`clientContextLink` en `src/providers/apollo-client.ts`) y `trackEvents`. El back los guarda en cada evento de Actividad, incluidos los errores.
+- `requestErrorLink` reporta solo errores de red que el back no vio. Los errores de GraphQL ya los guarda el back (`app.error`) con la misma app, pantalla, IP y navegador.
+- Ante `RATE_LIMITED` o `IP_BLOCKED` muestra el mensaje del back en un aviso (una vez cada 30 s).
+- Sin sesión solo se manda `app.client_error`. Si un envío falla (sin red), se reintenta una vez.
 
 ## Reglas
 

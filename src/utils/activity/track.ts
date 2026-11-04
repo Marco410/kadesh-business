@@ -4,10 +4,14 @@
  * Junta los eventos y los manda en lote cada 10 s, al ocultar la pestaña o al salir.
  * Usa `fetch` con `keepalive` en vez de Apollo: es lo único que sigue enviando cuando la
  * página se cierra (y `sendBeacon` no deja mandar el header `Authorization`).
- * Nunca lanza ni bloquea la UI: si falla, el evento se pierde.
+ * Nunca lanza ni bloquea la UI: si falla, se reintenta una vez (p. ej. sin red) y luego se pierde.
+ *
+ * Sin sesión solo se mandan errores del navegador (`app.client_error`): el back los acepta con
+ * tope por IP. Cada envío lleva la app y la pantalla (`clientContextHeaders`).
  */
 
 import { notifySessionEnded, readSessionEndNotice } from "kadesh/utils/session-ended";
+import { clientContextHeaders } from "./clientContext";
 
 const SESSION_TOKEN_KEY = "keystonejs-session-token";
 /** Marca de "entrar como" (src/components/impersonation): lo que hace el admin no es uso del cliente. */
@@ -37,7 +41,12 @@ export const TRACK_EVENT = {
   ADMIN_VIEWED_COMPANY: "admin.viewed_company",
   ADMIN_VIEWED_PERSON: "admin.viewed_person",
   ADMIN_VIEWED_AI_PROMPT: "admin.viewed_ai_prompt",
+  /** Error que solo vio el navegador (red, pantalla caída). También sin sesión. */
+  CLIENT_ERROR: "app.client_error",
 } as const;
+
+/** Lo único que se manda sin sesión (ver `ANONYMOUS_CLIENT_EVENT_TYPES` en kadesh-back). */
+const ANONYMOUS_TYPES: ReadonlySet<string> = new Set([TRACK_EVENT.CLIENT_ERROR]);
 
 export type TrackEventType = (typeof TRACK_EVENT)[keyof typeof TRACK_EVENT];
 
@@ -51,6 +60,8 @@ type QueuedEvent = {
   entityId?: string;
   companyId?: string;
   occurredAt: string;
+  /** Ya se reintentó una vez. */
+  retried?: boolean;
 };
 
 let queue: QueuedEvent[] = [];
@@ -89,18 +100,29 @@ function readToken(): string | null {
   }
 }
 
-function send(events: QueuedEvent[], keepalive: boolean) {
+/** Al fallar el envío (sin red, back caído), se reintenta una sola vez en el siguiente lote. */
+function requeue(events: QueuedEvent[]) {
+  const pending = events.filter((event) => !event.retried).map((event) => ({ ...event, retried: true }));
+  if (pending.length === 0) return;
+  queue.push(...pending);
+  if (!timer) timer = setTimeout(() => flushActivity(), FLUSH_MS * 3);
+}
+
+function send(batch: QueuedEvent[], keepalive: boolean) {
   const url = process.env.NEXT_PUBLIC_API_URL;
   const token = readToken();
-  if (!url || !token || events.length === 0) return;
+  const events = token ? batch : batch.filter((event) => ANONYMOUS_TYPES.has(event.type));
+  if (!url || events.length === 0) return;
+  const payload = events.map(({ retried: _retried, ...event }) => event);
   fetch(url, {
     method: "POST",
     keepalive,
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${token}`,
+      ...clientContextHeaders(),
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
-    body: JSON.stringify({ query: TRACK_EVENTS_MUTATION, variables: { events } }),
+    body: JSON.stringify({ query: TRACK_EVENTS_MUTATION, variables: { events: payload } }),
   })
     // El latido llega aunque nadie toque el panel: también sirve para notar que la sesión terminó.
     .then((response) => (keepalive ? null : response.json()))
@@ -109,7 +131,8 @@ function send(events: QueuedEvent[], keepalive: boolean) {
       if (notice) notifySessionEnded(notice);
     })
     .catch(() => {
-      // Registro de uso: si no llega, no pasa nada.
+      // Sin red o back caído: un reintento más tarde; si vuelve a fallar, se pierde.
+      requeue(events);
     });
 }
 

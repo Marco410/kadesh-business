@@ -7,6 +7,7 @@ import AdminUserProfileForm from "../../AdminUserProfileForm";
 import { PERSON_TABS, type PersonTab } from "../../constants";
 import { AdminSegmented } from "../../ui";
 import AuthLogList from "./AuthLogList";
+import PersonDevices from "./PersonDevices";
 import PersonControl from "./PersonControl";
 
 function PersonActivity({ userId }: { userId: string }) {
@@ -27,7 +28,7 @@ function PersonActivity({ userId }: { userId: string }) {
   );
 }
 
-/** Perfil, accesos, actividad y control de acceso de una persona. */
+/** Perfil, accesos, actividad, dispositivos e IPs, y control de acceso de una persona. */
 export default function PersonPanels({
   userId,
   initialTab = PERSON_TABS.PROFILE,
@@ -45,6 +46,7 @@ export default function PersonPanels({
           { id: PERSON_TABS.PROFILE, label: "Perfil" },
           { id: PERSON_TABS.ACCESS, label: "Accesos" },
           { id: PERSON_TABS.ACTIVITY, label: "Actividad" },
+          { id: PERSON_TABS.DEVICES, label: "Dispositivos" },
           { id: PERSON_TABS.CONTROL, label: "Control" },
         ]}
         value={tab}
@@ -53,6 +55,7 @@ export default function PersonPanels({
       {tab === PERSON_TABS.PROFILE ? <AdminUserProfileForm userId={userId} /> : null}
       {tab === PERSON_TABS.ACCESS ? <AuthLogList userId={userId} /> : null}
       {tab === PERSON_TABS.ACTIVITY ? <PersonActivity userId={userId} /> : null}
+      {tab === PERSON_TABS.DEVICES ? <PersonDevices userId={userId} /> : null}
       {tab === PERSON_TABS.CONTROL ? <PersonControl userId={userId} /> : null}
     </div>
   );
