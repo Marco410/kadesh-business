@@ -4,7 +4,7 @@ Pantalla interna en `/panel/clientes/admin`. No es el panel de un cliente: es de
 
 ## Promesa
 
-Ver y controlar a cada **cliente** en 360° (empresa, plan y pagos, equipo, CRM, consumo, integraciones y lo que hace cada persona), seguir la **actividad** de toda la plataforma, y ajustar el **catálogo de planes**, el **contenido** (blog y correos) y **Kadesh Pet** (resumen con cifras y gráficas, animales, fichas de veterinarias y servicios). El default es Inicio. Las secciones viven en `?tab=clientes`, `?tab=actividad`, `?tab=analitica`, `?tab=planes`, `?tab=contenido` y `?tab=veterinarias` (Kadesh Pet; la llave se conserva para no romper enlaces).
+Ver y controlar a cada **cliente** en 360° (empresa, plan y pagos, equipo, CRM, consumo, integraciones y lo que hace cada persona), seguir la **actividad** de toda la plataforma, y ajustar el **catálogo de planes**, el **contenido** (blog y correos) y **Kadesh Pet** (resumen con cifras y gráficas, animales, fichas de veterinarias, servicios, avisos enviados y alertas de zona). El default es Inicio. Las secciones viven en `?tab=clientes`, `?tab=actividad`, `?tab=analitica`, `?tab=planes`, `?tab=contenido` y `?tab=veterinarias` (Kadesh Pet; la llave se conserva para no romper enlaces).
 
 Los enlaces viejos (`?tab=usuarios`, `suscripciones`, `empresas`, `blog`, `correos`) se redirigen solos a la sección nueva (`normalizeLegacyAdminParams` en `constants.ts`).
 
@@ -22,9 +22,9 @@ Operaciones vive en su propio shell (`kadesh/components/app-shell`). No lleva la
    - **General:** Inicio, Actividad, Analítica.
    - **Clientes:** Empresas, Personas, Planes.
    - **Contenido:** Blog, Correos, Novedades.
-   - **Kadesh Pet:** Resumen, Animales, Veterinarias, Servicios.
+   - **Kadesh Pet:** Resumen, Animales, Veterinarias, Servicios, Avisos, Alertas de zona.
 
-   Cada item es una sección (`tab`) o una vista (`vista`). Por eso Empresas/Personas, Blog/Correos y las cuatro de Pet ya no tienen segmentado propio. La opción activa es una píldora blanca que se desliza, con el icono naranja. Veterinarias y Servicios llevan un globo con lo que espera revisión (`ADMIN_NAV_COUNTS_QUERY`, cada minuto y al verificar o aprobar). En móvil el menú es un cajón.
+   Cada item es una sección (`tab`) o una vista (`vista`). Por eso Empresas/Personas, Blog/Correos y las de Pet ya no tienen segmentado propio. La opción activa es una píldora blanca que se desliza, con el icono naranja. Veterinarias y Servicios llevan un globo con lo que espera revisión (`ADMIN_NAV_COUNTS_QUERY`, cada minuto y al verificar o aprobar). En móvil el menú es un cajón.
 2. **Vista dentro de una sección** (Artículos / Categorías / Etiquetas, las 7 de Analítica, Catálogo / Módulos, las subvistas del 360): `AdminSegmented`. Pista cálida con la opción activa en píldora que se desliza.
 3. **Filtros de una lista** (estado, rol, tipo): `AdminFilterChips`. Píldoras con borde y la activa en **tinta** (negro en claro, blanco en oscuro), con etiqueta (**Estado**, **Rol**, **Tipo**). Pueden llevar `count` y `dot`.
 
@@ -365,3 +365,11 @@ En Planes → **Módulos** se edita el copy una vez (`updatePlanFeatureCatalog` 
 ### 2026-09-28 — Blog en Operaciones
 
 Artículos, categorías y etiquetas viven en Blog, no en una ruta nueva. El nombre de la categoría es texto libre (antes era una lista cerrada en el backend): así se pueden crear las que hagan falta. Los nombres viejos (`prospecting`, `care_health`, …) siguen mostrándose con su etiqueta. Publicar avisa a los suscriptores y comparte en Facebook; un guardado posterior no repite el aviso.
+
+## Kadesh Pet → Avisos y Alertas de zona
+
+Código en `pet-notifications/`. Datos de kadesh-back: `adminNotificationLog`, `adminZoneAlerts`, `adminZoneAlertPreview` y la mutación `adminUpdateZoneAlerts`.
+
+- **Avisos** (`?vista=avisos`): cada aviso de Kadesh Pet, una fila por persona, con a dónde se fue: campana (leída o no), push (cuántos dispositivos) y WhatsApp (no se mandó y por qué, aceptado, entregado, leído o falló con el error de Meta). Filtros: canal, resultado, tipo, periodo y búsqueda por quien lo recibió. `?persona=` llega con la búsqueda puesta. El ícono de enlace abre lo que lo originó (el animal en Operaciones o el enlace del aviso).
+- **Alertas de zona** (`?vista=alertas-zona`): quién tiene alertas, su zona (enlace a Google Maps), radio, canales y cuántas recibió. «Administrar» abre un panel para mover la zona o el radio, apagar o encender sus alertas y apagar su WhatsApp. Encenderle el WhatsApp no se puede: Meta exige que la persona acepte. Arriba, «¿Quién recibiría una alerta aquí?» acepta «latitud, longitud» o un enlace de Google Maps.
+
