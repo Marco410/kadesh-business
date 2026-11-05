@@ -33,6 +33,10 @@ import {
 } from "../../animals/constants";
 import { PET_VISTAS } from "../constants";
 import {
+  ADMIN_PET_EVENTS_PENDING_COUNT_QUERY,
+  type AdminPetEventsPendingCountResponse,
+} from "../../events/queries";
+import {
   ANIMAL_HOME_STATUSES,
   ANIMAL_ORIGIN_BAR_CLASS,
   ANIMAL_ORIGIN_LABELS,
@@ -385,6 +389,12 @@ export default function AdminPetOverview() {
   });
   const sparkline = sparkData?.adminPetSeries.points.map((point) => point.total) ?? null;
 
+  // Eventos por revisar: no viene en `adminPetSummary`, se cuenta aparte.
+  const { data: eventsData } = useQuery<AdminPetEventsPendingCountResponse>(ADMIN_PET_EVENTS_PENDING_COUNT_QUERY, {
+    fetchPolicy: "cache-and-network",
+  });
+  const pendingEvents = eventsData?.pendingEvents ?? null;
+
   const changeRange = (value: string) => {
     const next = findOption(PET_RANGE_OPTIONS, value, PET_DEFAULT_RANGE);
     // Si "Día" ya no cabe en el rango nuevo, se regresa a la agrupación por defecto.
@@ -429,7 +439,7 @@ export default function AdminPetOverview() {
 
       <PetGroup title="Pendientes por revisar" description="Lo que espera una respuesta de Kadesh.">
         {pending ? (
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
             <AdminStatTile
               label="Fichas en revisión"
               value={fmt(pending.placeClaims)}
@@ -447,6 +457,14 @@ export default function AdminPetOverview() {
               onClick={() => openPetList(PET_VISTAS.SERVICES)}
             />
             <AdminStatTile
+              label="Eventos por revisar"
+              value={pendingEvents == null ? "—" : fmt(pendingEvents)}
+              hint="Campañas y jornadas"
+              help={PET_HELP.events}
+              tone={pendingEvents ? "warning" : "default"}
+              onClick={() => openPetList(PET_VISTAS.EVENTS)}
+            />
+            <AdminStatTile
               label="Sin publicar en Facebook"
               value={fmt(pending.facebookPending)}
               hint="Animales"
@@ -462,7 +480,7 @@ export default function AdminPetOverview() {
             />
           </div>
         ) : (
-          <TilesSkeleton count={4} className="grid grid-cols-2 gap-3 lg:grid-cols-4" />
+          <TilesSkeleton count={5} className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5" />
         )}
       </PetGroup>
 

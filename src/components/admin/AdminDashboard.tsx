@@ -42,10 +42,12 @@ import AdminContentSection from "./AdminContentSection";
 import AdminReleasesPanel from "./releases/AdminReleasesPanel";
 import AdminPetSection from "./pet/AdminPetSection";
 import { parsePetVista, PET_VISTAS } from "./pet/constants";
+import { PET_EVENT_STATUS } from "./events/constants";
 
 const NAV_COUNTS_VARIABLES = {
   pendingWhere: { claimStatus: { equals: PET_PLACE_CLAIM_STATUS.PENDING } },
   pendingServiceWhere: { status: { equals: PET_PLACE_SERVICE_STATUS.PENDING } },
+  pendingEventWhere: { status: { equals: PET_EVENT_STATUS.PENDING } },
 };
 
 function AdminFallback() {

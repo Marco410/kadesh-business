@@ -10,6 +10,8 @@ export const PET_HELP = {
   // Pendientes
   placeClaims: "Fichas que alguien reclamó como suyas y esperan que Kadesh las apruebe o rechace.",
   services: "Servicios nuevos que pidió una veterinaria y esperan aprobación antes de salir en su ficha.",
+  events:
+    "Eventos que mandó la comunidad (campañas, jornadas, ferias de adopción) o que editaron después de publicarse. No salen en Kadesh Pet hasta que alguien de Kadesh los aprueba.",
   facebookPending: "Animales que todavía no se publican en la página de Facebook de Kadesh Pet.",
   animalClaims:
     "Personas que piden quedarse con un reporte (por ejemplo, el dueño de un perro que subió un voluntario). Se resuelven desde Kadesh Pet; aquí solo se cuentan.",
