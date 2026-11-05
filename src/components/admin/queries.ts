@@ -102,14 +102,19 @@ const PET_PLACE_SERVICE_FIELDS = gql`
   }
 `;
 
-/** Globos del menú lateral de Operaciones: fichas y servicios esperando revisión, errores abiertos. */
+/**
+ * Globos del menú lateral de Operaciones: fichas, servicios y eventos esperando revisión, errores
+ * abiertos.
+ */
 export const ADMIN_NAV_COUNTS_QUERY = gql`
   query AdminNavCounts(
     $pendingWhere: PetPlaceWhereInput!
     $pendingServiceWhere: PetPlaceServiceWhereInput!
+    $pendingEventWhere: PetEventWhereInput!
   ) {
     pendingPlaces: petPlacesCount(where: $pendingWhere)
     pendingServices: petPlaceServicesCount(where: $pendingServiceWhere)
+    pendingEvents: petEventsCount(where: $pendingEventWhere)
     openErrors: adminOpenErrorIssuesCount
   }
 `;
@@ -117,6 +122,7 @@ export const ADMIN_NAV_COUNTS_QUERY = gql`
 export type AdminNavCountsResponse = {
   pendingPlaces: number | null;
   pendingServices: number | null;
+  pendingEvents: number | null;
   /** Errores abiertos o reabiertos con actividad en las últimas 24 h. */
   openErrors: number | null;
 };

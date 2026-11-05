@@ -49,11 +49,17 @@ const fmt = (value: number) => value.toLocaleString("es-MX");
 const iconLink =
   "inline-flex size-10 items-center justify-center rounded-xl border border-dash-line text-dash-soft transition-colors hover:border-orange-400 hover:text-orange-800 dark:hover:text-orange-300";
 
-/** Dónde ver lo que originó el aviso: el animal en Operaciones o la URL del aviso. */
+/** Dónde ver lo que originó el aviso: el animal o el evento en Operaciones, o la URL del aviso. */
 function sourceHref(row: AdminNotificationRow): { href: string; internal: boolean } | null {
   if (row.entityType === "Animal" && row.entityId) {
     return {
       href: Routes.panelAdminTab(ADMIN_TABS.PET_PLACES, { vista: "animales", animal: row.entityId }),
+      internal: true,
+    };
+  }
+  if (row.entityType === "PetEvent" && row.entityId) {
+    return {
+      href: Routes.panelAdminTab(ADMIN_TABS.PET_PLACES, { vista: "eventos", evento: row.entityId }),
       internal: true,
     };
   }

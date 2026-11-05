@@ -4,7 +4,7 @@ Pantalla interna en `/panel/clientes/admin`. No es el panel de un cliente: es de
 
 ## Promesa
 
-Ver y controlar a cada **cliente** en 360° (empresa, plan y pagos, equipo, CRM, consumo, integraciones y lo que hace cada persona), seguir la **actividad** de toda la plataforma, y ajustar el **catálogo de planes**, el **contenido** (blog y correos) y **Kadesh Pet** (resumen con cifras y gráficas, animales, fichas de veterinarias, servicios, avisos enviados y alertas de zona). El default es Inicio. Las secciones viven en `?tab=clientes`, `?tab=actividad`, `?tab=analitica`, `?tab=planes`, `?tab=contenido` y `?tab=veterinarias` (Kadesh Pet; la llave se conserva para no romper enlaces).
+Ver y controlar a cada **cliente** en 360° (empresa, plan y pagos, equipo, CRM, consumo, integraciones y lo que hace cada persona), seguir la **actividad** de toda la plataforma, y ajustar el **catálogo de planes**, el **contenido** (blog y correos) y **Kadesh Pet** (resumen con cifras y gráficas, animales, fichas de veterinarias, servicios, eventos de la comunidad, avisos enviados y alertas de zona). El default es Inicio. Las secciones viven en `?tab=clientes`, `?tab=actividad`, `?tab=analitica`, `?tab=planes`, `?tab=contenido` y `?tab=veterinarias` (Kadesh Pet; la llave se conserva para no romper enlaces).
 
 Los enlaces viejos (`?tab=usuarios`, `suscripciones`, `empresas`, `blog`, `correos`) se redirigen solos a la sección nueva (`normalizeLegacyAdminParams` en `constants.ts`).
 
@@ -22,9 +22,9 @@ Operaciones vive en su propio shell (`kadesh/components/app-shell`). No lleva la
    - **General:** Inicio, Actividad, Errores, Seguridad, Analítica.
    - **Clientes:** Empresas, Personas, Planes.
    - **Contenido:** Blog, Correos, Novedades.
-   - **Kadesh Pet:** Resumen, Animales, Veterinarias, Servicios, Avisos, Alertas de zona.
+   - **Kadesh Pet:** Resumen, Animales, Veterinarias, Servicios, Eventos, Avisos, Alertas de zona.
 
-   Cada item es una sección (`tab`) o una vista (`vista`). Por eso Empresas/Personas, Blog/Correos y las de Pet ya no tienen segmentado propio. La opción activa es una píldora blanca que se desliza, con el icono naranja. Veterinarias y Servicios llevan un globo con lo que espera revisión, y Errores con los abiertos en 24 h (`ADMIN_NAV_COUNTS_QUERY`, cada minuto y al verificar o aprobar). En móvil el menú es un cajón.
+   Cada item es una sección (`tab`) o una vista (`vista`). Por eso Empresas/Personas, Blog/Correos y las de Pet ya no tienen segmentado propio. La opción activa es una píldora blanca que se desliza, con el icono naranja. Veterinarias, Servicios y Eventos llevan un globo con lo que espera revisión, y Errores con los abiertos en 24 h (`ADMIN_NAV_COUNTS_QUERY`, cada minuto y al verificar o aprobar). En móvil el menú es un cajón.
 2. **Vista dentro de una sección** (Artículos / Categorías / Etiquetas, las 7 de Analítica, Catálogo / Módulos, las subvistas del 360): `AdminSegmented`. Pista cálida con la opción activa en píldora que se desliza.
 3. **Filtros de una lista** (estado, rol, tipo): `AdminFilterChips`. Píldoras con borde y la activa en **tinta** (negro en claro, blanco en oscuro), con etiqueta (**Estado**, **Rol**, **Tipo**). Pueden llevar `count` y `dot`.
 
@@ -238,7 +238,7 @@ Grupo **Kadesh Pet** del menú (`?tab=veterinarias`), cuatro vistas: **Resumen**
 **Resumen** (`pet/overview/`, 2026-11-03): cómo va Kadesh Pet. Sale de `adminPetSummary` y `adminPetSeries` (kadesh-back, `queries/admin/adminPet.ts`).
 
 - **Controles globales** en la URL: **Periodo** (`&rango=30d|90d|6m|12m|todo`, default 90 días) y **Agrupar** (`&agrupar=dia|semana|mes`, default semana). "Día" solo aparece con 30 o 90 días; si cambias a un rango más largo, regresa a semana. El periodo también define "nuevos en el periodo" (con % contra el periodo anterior del mismo largo) y la interacción.
-- **Pendientes por revisar**: fichas en revisión, servicios por aprobar, animales sin publicar en Facebook y reclamos de animales (este último solo se cuenta: se resuelve en Kadesh Pet).
+- **Pendientes por revisar**: fichas en revisión, servicios por aprobar, eventos por revisar (se cuentan aparte: no vienen en `adminPetSummary`), animales sin publicar en Facebook y reclamos de animales (este último solo se cuenta: se resuelve en Kadesh Pet).
 - **Animales**: registrados, perdidos, encontrados, en adopción, de vuelta en casa (en familia + adoptados) y en Facebook. Gráfica **Animales registrados** con **Desglose** (`&desglose=estatus|origen`): barras apiladas por estatus actual o por quién lo publicó. Estatus actual (todos los de la bitácora + "Sin estatus"), tipo, quién lo publicó / quién lo reporta, dónde se reportan (estados o ciudades) e interacción con los más vistos.
 - **Veterinarias**: fichas, veterinarias, verificadas, en revisión, desde Google y reseñas. Gráfica con **Métrica** (`&metrica=altas|reclamadas|verificadas`) y **tipo de lugar** (`&tipo_lugar=`), estado del reclamo y tipos / estados.
 - **Usuarios de Kadesh Pet**: cuentas (sin cuentas de Negocios ni de prueba) y cuentas nuevas en el tiempo.
@@ -283,6 +283,14 @@ Asunto, título de cabecera, etiqueta superior, vista previa de bandeja, cuerpo,
 La columna derecha es vista previa en vivo. **Revisar y enviar** primero cuenta destinatarios (`dryRun`) y pide confirmación antes del envío real. Mutación `sendAdminBroadcastEmail` (solo admin de plataforma).
 
 ## Decisiones
+
+### 2026-11-04 — Eventos de la comunidad se revisan en Operaciones
+
+Qué: vista **Eventos** en Kadesh Pet, con globo en el menú, contador en el Resumen y la campana (`event.submitted`) llevando directo al modal de revisión.
+
+Por qué: cualquiera puede publicar un evento y aprobarlo avisa a la gente de la zona; la revisión evita spam y avisos falsos. Antes de aprobar se ve a cuántas personas llegará el aviso.
+
+Qué no hacer: no editar el evento desde aquí (las reglas de fechas, alcance y avisos viven en las mutaciones del back: aprobar, rechazar, cancelar); no rechazar sin motivo; no enlazar a la ficha pública de un evento que nunca se publicó.
 
 ### 2026-11-04 — Contexto en Actividad, bandeja de Errores y Seguridad (Fase 6)
 
@@ -385,6 +393,22 @@ En Planes → **Módulos** se edita el copy una vez (`updatePlanFeatureCatalog` 
 ### 2026-09-28 — Blog en Operaciones
 
 Artículos, categorías y etiquetas viven en Blog, no en una ruta nueva. El nombre de la categoría es texto libre (antes era una lista cerrada en el backend): así se pueden crear las que hagan falta. Los nombres viejos (`prospecting`, `care_health`, …) siguen mostrándose con su etiqueta. Publicar avisa a los suscriptores y comparte en Facebook; un guardado posterior no repite el aviso.
+
+## Kadesh Pet → Eventos
+
+Código en `events/`. Vista `?tab=veterinarias&vista=eventos`. Reglas del evento (fechas, alcance, avisos) en `kadesh-back/models/Pet/PetEvent/README.md`.
+
+Cualquier persona con sesión publica un evento en Kadesh Pet (campaña de esterilización, jornada de vacunación, feria de adopción…) y queda **En revisión** hasta que alguien de Kadesh lo aprueba. También vuelve a revisión si quien lo publicó lo edita estando publicado o rechazado.
+
+- **Lista:** chips **Pendientes** (default) / **Publicados** / **Rechazados** / **Cancelados**, con conteo, y buscador (evento, organizador, municipio o estado, quién lo publicó). Pendientes van con la **fecha más cercana primero** (es lo que urge); el resto, lo más nuevo primero. Cada fila: portada, título, estado, tipo, municipio, próxima fecha (en la hora del estado del evento), organizador; los publicados suman «Me interesa», «Asistirán» y «Avisó a N» si ya se avisó a la zona. Marcas: **Cambió fechas o lugar** y **Editado** (ya estuvo publicado).
+- **Revisar** (`?evento=<id>`, al que lleva la campana con `event.submitted`): modal con fotos, fechas, descripción y requisitos, tipo, para qué animales, alcance («Zona de N km», «Municipio», «Estado», «Nacional»), costo, cupo, registro (enlace o WhatsApp), quién organiza, sus redes (Facebook, Instagram, TikTok, X, sitio web: revisa que sean de quien organiza), veterinaria ligada, lugar con **Ver en Google Maps** y quién lo publicó.
+- **A quién avisará** (`adminPetEventAlertPreview`): «Esto avisará a N personas de la zona» si la próxima fecha está a 14 días o menos; si no, «Avisará a la zona el {fecha} (14 días antes)». Si ya se avisó, a cuántas y cuándo.
+- **Acciones:**
+  - **Aprobar y publicar** (pendientes y rechazados). No se puede si ya pasaron todas sus fechas.
+  - **Rechazar** pide motivo (mínimo 5 caracteres): le llega a quien lo publicó para corregirlo.
+  - **Quitar (cancelar)** en publicados, con motivo opcional: la ficha sigue visible con el aviso y se avisa a quienes marcaron «Me interesa» o «Asistiré».
+  - El mensaje del back sale en el aviso (toast), p. ej. «Evento publicado. Avisamos a 12 personas de la zona.».
+- **Ver en Kadesh Pet** (`pet.kadesh.com.mx/eventos/{slug}`) solo en publicados y en cancelados que llegaron a publicarse: los demás no son públicos.
 
 ## Kadesh Pet → Avisos y Alertas de zona
 
