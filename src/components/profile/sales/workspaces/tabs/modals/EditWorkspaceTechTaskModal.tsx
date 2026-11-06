@@ -25,6 +25,7 @@ import HiddenInWorkspaceSwitch from "./HiddenInWorkspaceSwitch";
 import { Routes } from "kadesh/core/routes";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { TASK_PRIORITY } from "kadesh/constants/constans";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
 
@@ -151,7 +152,7 @@ export default function EditWorkspaceTechTaskModal({
       onClose();
     },
     onError: (err) =>
-      sileo.error({ title: err.message || "No se pudo actualizar la tarea" }),
+      sileo.error({ title: friendlyErrorText(err, "No se pudo actualizar la tarea") }),
   });
 
   function handleSubmit(e: React.FormEvent) {

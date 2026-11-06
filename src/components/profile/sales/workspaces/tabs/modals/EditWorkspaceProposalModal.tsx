@@ -25,6 +25,7 @@ import HiddenInWorkspaceSwitch from "./HiddenInWorkspaceSwitch";
 import { Routes } from "kadesh/core/routes";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { PROPOSAL_STATUS } from "kadesh/constants/constans";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const PROPOSAL_STATUS_OPTIONS = Object.values(PROPOSAL_STATUS);
 
@@ -148,7 +149,7 @@ export default function EditWorkspaceProposalModal({
       onClose();
     },
     onError: (err) =>
-      sileo.error({ title: err.message || "No se pudo actualizar la propuesta" }),
+      sileo.error({ title: friendlyErrorText(err, "No se pudo actualizar la propuesta") }),
   });
 
   function handleSubmit(e: React.FormEvent) {

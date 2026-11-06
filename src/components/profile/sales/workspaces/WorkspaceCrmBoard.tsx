@@ -49,6 +49,7 @@ import EditWorkspaceActivityModal from "kadesh/components/profile/sales/workspac
 import EditWorkspaceFollowUpModal from "kadesh/components/profile/sales/workspaces/tabs/modals/EditWorkspaceFollowUpModal";
 import EditWorkspaceProposalModal from "kadesh/components/profile/sales/workspaces/tabs/modals/EditWorkspaceProposalModal";
 import EditWorkspaceTechTaskModal from "kadesh/components/profile/sales/workspaces/tabs/modals/EditWorkspaceTechTaskModal";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 type ActivityRow = TechSalesActivitiesResponse["techSalesActivities"][number];
 type TaskRow = TechFollowUpTasksResponse["techFollowUpTasks"][number];
@@ -335,7 +336,7 @@ export default function WorkspaceCrmBoard({
       } catch (err) {
         sileo.error({
           title:
-            err instanceof Error ? err.message : "No se pudo actualizar el estado CRM",
+            friendlyErrorText(err, "No se pudo actualizar el estado CRM"),
         });
       }
     },

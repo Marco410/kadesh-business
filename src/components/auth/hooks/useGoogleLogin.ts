@@ -16,6 +16,7 @@ import type { AuthenticatedItem } from "kadesh/utils/types";
 import { loadGoogleGsiScript } from "kadesh/utils/load-google-gsi";
 import { trackCompleteRegistration } from "kadesh/utils/facebook-pixel";
 import { persistSessionToken } from "./session";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 declare global {
   interface Window {
@@ -116,7 +117,7 @@ export function useGoogleLogin(options?: UseGoogleLoginOptions) {
   };
 
   const handleError = (err: Error) => {
-    setError(err.message || "Error al iniciar sesión con Google");
+    setError(friendlyErrorText(err, "Error al iniciar sesión con Google"));
     setLoading(false);
   };
 
@@ -201,7 +202,7 @@ export function useGoogleLogin(options?: UseGoogleLoginOptions) {
       })
       .catch((err) => {
         setError(
-          err instanceof Error ? err.message : "Error al cargar Google Sign-In",
+          friendlyErrorText(err, "Error al cargar Google Sign-In"),
         );
       });
   }, [handleCredential]);

@@ -17,6 +17,7 @@ import {
   type AdminOpsActionResult,
   type AdminPersonControlResponse,
 } from "../ops-queries";
+import { adminErrorText } from "../../errors";
 
 const MIN_REASON = 5;
 const fieldClass =
@@ -101,7 +102,7 @@ export default function PersonControl({ userId }: { userId: string }) {
     ADMIN_ANONYMIZE_USER_MUTATION,
   );
 
-  if (error) return <AdminErrorState message={error.message} />;
+  if (error) return <AdminErrorState message={adminErrorText(error, "No se pudo cargar el control de la cuenta.")} />;
   const person = data?.user;
   if (loading && !person) return <AdminLoadingRows rows={4} />;
   if (!person) return <AdminErrorState message="No se encontró a la persona." />;
@@ -136,7 +137,7 @@ export default function PersonControl({ userId }: { userId: string }) {
         returnUrl: window.location.href,
       });
     } catch (err) {
-      sileo.error({ title: err instanceof Error ? err.message : "No se pudo entrar como esta persona" });
+      sileo.error({ title: adminErrorText(err, "No se pudo entrar como esta persona") });
     }
   };
 
@@ -148,7 +149,7 @@ export default function PersonControl({ userId }: { userId: string }) {
       });
       if (await report(result?.adminSetUserSuspension, "No se pudo cambiar el acceso")) setSuspendReason("");
     } catch (err) {
-      sileo.error({ title: err instanceof Error ? err.message : "No se pudo cambiar el acceso" });
+      sileo.error({ title: adminErrorText(err, "No se pudo cambiar el acceso") });
     }
   };
 
@@ -158,7 +159,7 @@ export default function PersonControl({ userId }: { userId: string }) {
       const { data: result } = await revoke({ variables: { userId } });
       await report(result?.adminRevokeSessions, "No se pudieron cerrar las sesiones");
     } catch (err) {
-      sileo.error({ title: err instanceof Error ? err.message : "No se pudieron cerrar las sesiones" });
+      sileo.error({ title: adminErrorText(err, "No se pudieron cerrar las sesiones") });
     }
   };
 
@@ -169,7 +170,7 @@ export default function PersonControl({ userId }: { userId: string }) {
       download(`datos-personales-${slug(name) || "persona"}-${new Date().toISOString().slice(0, 10)}.json`, result.adminExportPersonData);
       sileo.success({ title: "Archivo descargado" });
     } catch (err) {
-      sileo.error({ title: err instanceof Error ? err.message : "No se pudieron exportar los datos" });
+      sileo.error({ title: adminErrorText(err, "No se pudieron exportar los datos") });
     }
   };
 
@@ -184,7 +185,7 @@ export default function PersonControl({ userId }: { userId: string }) {
         setAnonymizeReason("");
       }
     } catch (err) {
-      sileo.error({ title: err instanceof Error ? err.message : "No se pudo anonimizar la cuenta" });
+      sileo.error({ title: adminErrorText(err, "No se pudo anonimizar la cuenta") });
     }
   };
 

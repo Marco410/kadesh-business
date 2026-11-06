@@ -7,6 +7,7 @@ import { AdminErrorState, AdminSectionCard } from "../../ui";
 import type { PetGranularity, PetRangeOption } from "./constants";
 import { ADMIN_PET_SERIES_QUERY, type AdminPetSeriesResponse } from "./queries";
 import StackedSeriesBars, { bucketSinceLabel, type SeriesSegmentStyle } from "./StackedSeriesBars";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 const PERIOD_WORD: Record<PetGranularity, string> = {
   day: "día",
@@ -74,7 +75,7 @@ export default function PetSeriesCard({
       </div>
 
       {error && !series ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : !series ? (
         <div className="h-40 dash-shimmer rounded-xl" />
       ) : (

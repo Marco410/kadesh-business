@@ -30,6 +30,7 @@ import {
 import WhatsAppChatPanel, { type WhatsAppChatTarget } from "./WhatsAppChatPanel";
 import WhatsAppNewConversationModal from "./WhatsAppNewConversationModal";
 import WhatsAppSaveContactModal from "./WhatsAppSaveContactModal";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const CONVERSATIONS_POLL_MS = 8000;
 
@@ -153,7 +154,7 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
       sileo.success({ title: payload.message });
     } catch (err) {
       sileo.error({
-        title: err instanceof Error ? err.message : "No se pudo asignar el chat",
+        title: friendlyErrorText(err, "No se pudo asignar el chat"),
       });
     }
   };

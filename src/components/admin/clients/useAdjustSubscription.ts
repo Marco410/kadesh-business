@@ -11,6 +11,7 @@ import {
 import type { AdminSubscriptionRow } from "../types";
 import { formatCredits } from "../ui";
 import type { AdminCompanyProfile } from "./clients-queries";
+import { adminErrorText } from "../errors";
 
 /** Queries del 360 que cambian al ajustar el plan o agregar créditos. */
 const REFETCH_AFTER_ADJUST = [
@@ -122,7 +123,7 @@ export function useAdjustSubscription(companyId: string | null | undefined) {
         title: willGrantCredits
           ? "No se pudieron guardar los cambios"
           : "No se pudo guardar el plan",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: adminErrorText(err, "Intenta de nuevo."),
       });
       return false;
     } finally {

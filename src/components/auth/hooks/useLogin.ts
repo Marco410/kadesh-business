@@ -12,6 +12,7 @@ import { useUser } from "kadesh/utils/UserContext";
 import { Routes } from "kadesh/core/routes";
 import type { AuthenticatedItem } from "kadesh/utils/types";
 import { persistSessionToken } from "./session";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 /** Mensaje genérico de @keystone-6/auth cuando el correo o la contraseña no coinciden. */
 const KEYSTONE_AUTH_FAILED = "Authentication failed.";
@@ -77,7 +78,7 @@ export function useLogin(options?: UseLoginOptions) {
       }
     },
     onError: (error) => {
-      setError(error.message || "Error al iniciar sesión");
+      setError(friendlyErrorText(error, "Error al iniciar sesión"));
     },
   });
 

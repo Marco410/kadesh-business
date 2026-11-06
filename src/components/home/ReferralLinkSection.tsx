@@ -19,6 +19,7 @@ import {
   type UpdateUserVariables,
 } from "kadesh/utils/queries";
 import { sileo } from "sileo";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 export interface ReferralLinkSectionProps {
   userId: string;
@@ -148,7 +149,7 @@ export default function ReferralLinkSection({
     } catch (err) {
       sileo.error({
         title: "No se pudieron guardar los datos",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: friendlyErrorText(err, "Intenta de nuevo."),
       });
     }
   };

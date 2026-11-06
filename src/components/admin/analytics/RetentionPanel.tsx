@@ -14,6 +14,7 @@ import { monthLabel } from "../clients/company/format";
 import { ADMIN_COHORTS_QUERY, type AdminCohortsResponse } from "./analytics-queries";
 import { HELP } from "./help";
 import ViewGuide from "./ViewGuide";
+import { adminErrorText } from "../errors";
 
 const MONTH_OPTIONS = [
   { value: "6", label: "6 meses" },
@@ -59,7 +60,7 @@ export default function RetentionPanel() {
       />
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && rows.length === 0 ? (
         <AdminLoadingRows rows={6} />
       ) : rows.every((row) => row.size === 0) ? (

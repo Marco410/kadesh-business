@@ -9,6 +9,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { Image01Icon } from '@hugeicons/core-free-icons';
 import { getCategoryLabel, getCategoryColors } from './constants';
 import { Routes } from 'kadesh/core/routes';
+import { friendlyErrorText } from 'kadesh/utils/errorText';
 
 export default function CategorySection() {
   const { categories, loading, error } = useCategories();
@@ -35,7 +36,7 @@ export default function CategorySection() {
       <section className="bg-[#ffffff] dark:bg-[#121212] py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <ErrorState 
-            message={error?.message || 'Error desconocido al cargar las categorías'}
+            message={friendlyErrorText(error, 'Error desconocido al cargar las categorías')}
             title="Error al cargar las categorías"
           />
         </div>

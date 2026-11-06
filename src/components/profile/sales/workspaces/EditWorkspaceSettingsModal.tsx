@@ -29,6 +29,7 @@ import {
   type UpdateSaasWorkspaceVariables,
 } from "kadesh/components/profile/sales/workspaces/queries";
 import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const inputClassName =
   "w-full rounded-xl border border-dash-line bg-white dark:bg-[#252525] px-3 py-2.5 text-sm text-dash-ink placeholder:text-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
@@ -278,7 +279,7 @@ export default function EditWorkspaceSettingsModal({
         await Promise.all([refetchWorkspaceDetail(), refetchWorkspaceBoardData()]);
       } catch (err: unknown) {
         const msg =
-          err instanceof Error ? err.message : "No se pudo guardar el orden de los estados";
+          friendlyErrorText(err, "No se pudo guardar el orden de los estados");
         sileo.error({ title: msg });
         await refetchWorkspaceDetail();
       } finally {
@@ -356,7 +357,7 @@ export default function EditWorkspaceSettingsModal({
       onClose();
     } catch (err: unknown) {
       const msg =
-        err instanceof Error ? err.message : "No se pudo guardar el espacio de trabajo";
+        friendlyErrorText(err, "No se pudo guardar el espacio de trabajo");
       sileo.error({ title: msg });
     }
   }
@@ -396,7 +397,7 @@ export default function EditWorkspaceSettingsModal({
       setStatusPendingDelete(null);
     } catch (err: unknown) {
       const msg =
-        err instanceof Error ? err.message : "No se pudo eliminar el estado CRM";
+        friendlyErrorText(err, "No se pudo eliminar el estado CRM");
       sileo.error({ title: msg });
     } finally {
       setDeletingStatusId(null);
@@ -457,7 +458,7 @@ export default function EditWorkspaceSettingsModal({
       closeAddStatusModal();
     } catch (err: unknown) {
       const msg =
-        err instanceof Error ? err.message : "No se pudo crear el estado CRM";
+        friendlyErrorText(err, "No se pudo crear el estado CRM");
       sileo.error({ title: msg });
     }
   }

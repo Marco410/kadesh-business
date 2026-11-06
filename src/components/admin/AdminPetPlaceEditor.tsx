@@ -30,6 +30,7 @@ import type { AdminPetPlaceDetail } from "./types";
 import { AdminErrorState } from "./ui";
 import { useDebouncedValue } from "./hooks/useDebouncedValue";
 import { PIPELINE_STATUS } from "kadesh/constants/constans";
+import { adminErrorText } from "./errors";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -475,7 +476,7 @@ function EditorBody({
     } catch (err) {
       sileo.error({
         title: "No se pudo crear el servicio",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: adminErrorText(err, "Intenta de nuevo."),
       });
     } finally {
       setCreatingService(false);
@@ -581,7 +582,7 @@ function EditorBody({
     } catch (err) {
       sileo.error({
         title: "No se pudo guardar la ficha",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: adminErrorText(err, "Intenta de nuevo."),
       });
     } finally {
       setSaving(false);

@@ -6,6 +6,7 @@ import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { AdminDrawer } from "../../../ui";
 import { ADMIN_EXTEND_TRIAL_MUTATION, type AdminOpsActionResult } from "../../ops-queries";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 const QUICK_DAYS = [7, 14, 30] as const;
 
@@ -45,7 +46,7 @@ export default function ExtendTrialDialog({
       setUntil("");
       onDone();
     } catch (error) {
-      sileo.error({ title: error instanceof Error ? error.message : "No se pudo extender la prueba" });
+      sileo.error({ title: adminErrorText(error, "No se pudo extender la prueba") });
     }
   };
 

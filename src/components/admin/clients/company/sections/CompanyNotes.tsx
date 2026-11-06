@@ -22,6 +22,7 @@ import {
   type AdminCompanyNote,
   type AdminCompanyNotesResponse,
 } from "../../ops-queries";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 const MAX_LENGTH = 4000;
 
@@ -58,7 +59,7 @@ export default function CompanyNotes({ companyId }: { companyId: string }) {
       await refetch();
       sileo.success({ title: "Nota guardada" });
     } catch (err) {
-      sileo.error({ title: err instanceof Error ? err.message : "No se pudo guardar la nota" });
+      sileo.error({ title: adminErrorText(err, "No se pudo guardar la nota") });
     }
   };
 
@@ -67,7 +68,7 @@ export default function CompanyNotes({ companyId }: { companyId: string }) {
       await updateNote({ variables: { id: note.id, data: { pinned: !note.pinned } } });
       await refetch();
     } catch (err) {
-      sileo.error({ title: err instanceof Error ? err.message : "No se pudo actualizar la nota" });
+      sileo.error({ title: adminErrorText(err, "No se pudo actualizar la nota") });
     }
   };
 
@@ -78,7 +79,7 @@ export default function CompanyNotes({ companyId }: { companyId: string }) {
       await refetch();
       sileo.success({ title: "Nota borrada" });
     } catch (err) {
-      sileo.error({ title: err instanceof Error ? err.message : "No se pudo borrar la nota" });
+      sileo.error({ title: adminErrorText(err, "No se pudo borrar la nota") });
     }
   };
 
@@ -129,7 +130,7 @@ export default function CompanyNotes({ companyId }: { companyId: string }) {
       </AdminSectionCard>
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && notes.length === 0 ? (
         <AdminLoadingRows rows={3} />
       ) : notes.length === 0 ? (

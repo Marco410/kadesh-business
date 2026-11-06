@@ -58,6 +58,7 @@ import {
   petEventScopeLabel,
   whatsappUrl,
 } from "./constants";
+import { adminErrorText } from "../errors";
 
 type Mode = "idle" | "reject" | "cancel";
 
@@ -211,7 +212,7 @@ export default function AdminPetEventReviewModal({
       onChanged();
       onClose();
     } catch (err) {
-      sileo.error({ title: failTitle, description: err instanceof Error ? err.message : "Intenta de nuevo." });
+      sileo.error({ title: failTitle, description: adminErrorText(err, "Intenta de nuevo.") });
     } finally {
       setBusy(false);
     }

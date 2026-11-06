@@ -26,6 +26,7 @@ import { sileo } from "sileo";
 import { useUser } from "kadesh/utils/UserContext";
 import { can } from "kadesh/components/profile/usuarios/can";
 import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 function Field({
   label,
@@ -143,7 +144,7 @@ export default function ProjectDetailSection() {
       refetch();
     },
     onError: (err) => {
-      sileo.error({ title: err.message ?? "Error al guardar." });
+      sileo.error({ title: friendlyErrorText(err, "Error al guardar.") });
     },
   });
 
@@ -217,7 +218,7 @@ export default function ProjectDetailSection() {
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="rounded-xl border border-dash-line bg-dash-surface p-6 text-center">
           <p className="text-dash-muted mb-4">
-            {error?.message ?? "No se encontró el proyecto."}
+            {friendlyErrorText(error, "No se encontró el proyecto.")}
           </p>
           <button
             type="button"

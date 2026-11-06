@@ -25,6 +25,7 @@ import HiddenInWorkspaceSwitch from "./HiddenInWorkspaceSwitch";
 import { Routes } from "kadesh/core/routes";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { FOLLOW_UP_TASK_STATUS, TASK_PRIORITY } from "kadesh/constants/constans";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const FOLLOW_UP_STATUS_OPTIONS = Object.values(FOLLOW_UP_TASK_STATUS);
 const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
@@ -144,7 +145,7 @@ export default function EditWorkspaceFollowUpModal({
       onClose();
     },
     onError: (err) =>
-      sileo.error({ title: err.message || "No se pudo actualizar el seguimiento" }),
+      sileo.error({ title: friendlyErrorText(err, "No se pudo actualizar el seguimiento") }),
   });
 
   function handleSubmit(e: React.FormEvent) {

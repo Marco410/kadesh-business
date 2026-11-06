@@ -26,6 +26,7 @@ import {
   type AdminAiCallConversationResponse,
   type AdminAiCallLogsResponse,
 } from "../../../usage-queries";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 const BILLING_LABELS: Record<string, string> = {
   managed: "Créditos Kadesh",
@@ -146,7 +147,7 @@ export default function AiView({
       </div>
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && rows.length === 0 ? (
         <AdminLoadingRows rows={5} />
       ) : rows.length === 0 ? (

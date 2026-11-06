@@ -23,6 +23,7 @@ import {
 } from "../../../crm-queries";
 import { pipelineLabel, sortByPipeline } from "../../format";
 import LeadQuickView from "../../LeadQuickView";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 const neutralBadge = "bg-dash-surface-3 text-dash-muted";
 
@@ -110,7 +111,7 @@ export default function LeadsView({
       ) : null}
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && rows.length === 0 ? (
         <AdminLoadingRows />
       ) : rows.length === 0 ? (

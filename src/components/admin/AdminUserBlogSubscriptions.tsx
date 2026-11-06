@@ -13,6 +13,7 @@ import {
 import { BLOG_PRODUCT_OPTIONS } from "./constants";
 import type { AdminBlogSubscriptionRow } from "./types";
 import { AdminErrorState, AdminStatusBadge } from "./ui";
+import { adminErrorText } from "./errors";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -148,7 +149,7 @@ function SubscriptionCard({
     } catch (err) {
       sileo.error({
         title: "No se pudo guardar la suscripción",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: adminErrorText(err, "Intenta de nuevo."),
       });
     } finally {
       setSaving(false);

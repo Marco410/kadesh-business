@@ -14,6 +14,7 @@ import {
   type SaasCreditItem,
 } from "kadesh/components/profile/sales/queries";
 import { Routes } from "kadesh/core/routes";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 export interface CreditPurchasePaymentFormData {
   nameCard: string;
@@ -71,6 +72,7 @@ export function useCreditPurchasePayment(
       if (error) {
         sileo.error({
           title:
+            // Mensaje de Stripe para la persona (en español por `locale: "es"` en loadStripe).
             "Error al procesar el pago: " +
             (error.message ?? "Intenta de nuevo."),
         });
@@ -202,7 +204,7 @@ export function useCreditPurchasePayment(
     } catch (err) {
       setLoadingPayment(false);
       const message =
-        err instanceof Error ? err.message : "Error de conexión. Intenta de nuevo.";
+        friendlyErrorText(err, "Error de conexión. Intenta de nuevo.");
       sileo.error({ title: message });
     }
   };

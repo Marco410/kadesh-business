@@ -31,6 +31,7 @@ import {
 import AddCompanyUserForm from "kadesh/components/profile/sales/workspaces/members/AddCompanyUserForm";
 import { Routes } from "kadesh/core/routes";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 export interface WorkspaceMembersModalProps {
   isOpen: boolean;
@@ -190,7 +191,7 @@ export default function WorkspaceMembersModal({
       sileo.success({ title: "Miembros actualizados" });
       onClose();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "No se pudo guardar";
+      const msg = friendlyErrorText(err, "No se pudo guardar");
       sileo.error({ title: msg });
     }
   }

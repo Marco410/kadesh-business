@@ -64,6 +64,7 @@ import {
   quotationMotionTransition,
   quotationStagger,
 } from "./motion";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const inputClassName =
   "w-full min-h-11 rounded-xl border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-dash-ink text-sm placeholder-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
@@ -296,7 +297,7 @@ export default function QuotationDetail() {
     },
     onError: (err) => {
       sileo.error({
-        title: err.message || "No se pudo guardar la cotización.",
+        title: friendlyErrorText(err, "No se pudo guardar la cotización."),
       });
     },
   });
@@ -426,7 +427,7 @@ export default function QuotationDetail() {
       await exportQuotationPdf(detail);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "No se pudo generar el PDF.";
+        friendlyErrorText(err, "No se pudo generar el PDF.");
       sileo.error({ title: message });
     } finally {
       setExportingPdf(false);
@@ -489,7 +490,7 @@ export default function QuotationDetail() {
           </div>
         ) : error ? (
           <DetailMessage title="No se pudo cargar">
-            {error.message || "Intenta de nuevo en un momento."}
+            {friendlyErrorText(error, "Intenta de nuevo en un momento.")}
           </DetailMessage>
         ) : !detail ? (
           <DetailMessage title="No se encontró la cotización">

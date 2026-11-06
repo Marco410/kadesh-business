@@ -51,6 +51,7 @@ import {
   type AnimalFacebookFilter,
 } from "./constants";
 import AdminAnimalDetailDrawer from "./AdminAnimalDetailDrawer";
+import { adminErrorText } from "../errors";
 
 const selectClass =
   "h-11 rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink";
@@ -147,7 +148,7 @@ export default function AdminAnimalsPanel() {
       } catch (err) {
         sileo.error({
           title: "No se publicó",
-          description: err instanceof Error ? err.message : "Intenta de nuevo.",
+          description: adminErrorText(err, "Intenta de nuevo."),
         });
       } finally {
         setPublishingId(null);
@@ -218,7 +219,7 @@ export default function AdminAnimalsPanel() {
       </div>
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && rows.length === 0 ? (
         <AdminLoadingRows rows={6} />
       ) : rows.length === 0 ? (

@@ -29,6 +29,7 @@ import {
   type WhatsAppMessagesVariables,
 } from "./queries";
 import WhatsAppStartTemplateModal from "./WhatsAppStartTemplateModal";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const POLL_INTERVAL_MS = 5000;
 const NEAR_EDGE_PX = 120;
@@ -284,7 +285,7 @@ export default function WhatsAppChatPanel({
       await syncNewer(true);
     } catch (err) {
       sileo.error({
-        title: err instanceof Error ? err.message : "No se pudo enviar el mensaje",
+        title: friendlyErrorText(err, "No se pudo enviar el mensaje"),
       });
     }
   };
@@ -305,7 +306,7 @@ export default function WhatsAppChatPanel({
       await syncNewer(true);
     } catch (err) {
       sileo.error({
-        title: err instanceof Error ? err.message : "No se pudo enviar el archivo",
+        title: friendlyErrorText(err, "No se pudo enviar el archivo"),
       });
     }
   };
@@ -335,7 +336,7 @@ export default function WhatsAppChatPanel({
       await Promise.all([refetchStatus(), syncNewer(true)]);
     } catch (err) {
       sileo.error({
-        title: err instanceof Error ? err.message : "No se pudo iniciar la conversación",
+        title: friendlyErrorText(err, "No se pudo iniciar la conversación"),
       });
     }
   };
