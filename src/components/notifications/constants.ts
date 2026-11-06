@@ -2,6 +2,7 @@ import {
   Bone01Icon,
   BankIcon,
   Calendar03Icon,
+  CharityIcon,
   StethoscopeIcon,
   Notification01Icon,
   SecurityBlockIcon,
@@ -16,6 +17,8 @@ export const NOTIFICATION_TYPE = {
   PET_PLACE_SERVICE_REQUESTED: "petplace.service_requested",
   /** Un evento de Kadesh Pet nuevo o editado espera revisión (a los admins). */
   EVENT_SUBMITTED: "event.submitted",
+  /** Alguien activó un espacio de rescate y espera verificación (a los admins). */
+  RESCUE_SUBMITTED: "rescue.submitted",
   USER_BANK_DETAILS_UPDATED: "user.bank_details_updated",
   /** Alguien se pasó de un límite contra abuso (fase 6.5). */
   SECURITY_ALERT: "security.alert",
@@ -33,6 +36,8 @@ export function notificationIcon(type: string | null) {
       return StethoscopeIcon;
     case NOTIFICATION_TYPE.EVENT_SUBMITTED:
       return Calendar03Icon;
+    case NOTIFICATION_TYPE.RESCUE_SUBMITTED:
+      return CharityIcon;
     case NOTIFICATION_TYPE.USER_BANK_DETAILS_UPDATED:
       return BankIcon;
     case NOTIFICATION_TYPE.SECURITY_ALERT:
@@ -55,6 +60,10 @@ export function notificationHref(item: NotificationItem): string | null {
       return item.entityId
         ? Routes.panelAdminTab(ADMIN_TABS.PET_PLACES, { vista: "eventos", evento: item.entityId })
         : Routes.panelAdminTab(ADMIN_TABS.PET_PLACES, { vista: "eventos" });
+    case NOTIFICATION_TYPE.RESCUE_SUBMITTED:
+      return item.entityId
+        ? Routes.panelAdminTab(ADMIN_TABS.PET_PLACES, { vista: "espacios-rescate", espacio: item.entityId })
+        : Routes.panelAdminTab(ADMIN_TABS.PET_PLACES, { vista: "espacios-rescate" });
     case NOTIFICATION_TYPE.USER_BANK_DETAILS_UPDATED:
       return Routes.panelAdminTab(ADMIN_TABS.CLIENTS);
     // El back manda la Actividad filtrada por la IP; si no, Seguridad.

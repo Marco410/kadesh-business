@@ -24,11 +24,13 @@ import {
   parseAdminTab,
   parsePlansVista,
   PLANS_VISTAS,
+  type AdminNavBadgeKey,
   type AdminNavItemConfig,
   type AdminTab,
   type PlansVista,
 } from "./constants";
 import { ADMIN_NAV_COUNTS_QUERY, type AdminNavCountsResponse } from "./queries";
+import { ADMIN_RESCUE_NAV_COUNT_QUERY, type AdminRescueNavCountResponse } from "./rescue/queries";
 import { useAdminNavigation } from "./hooks/useAdminNavigation";
 import { adminButtonClass } from "./ui";
 import AdminOverview from "./AdminOverview";
@@ -201,12 +203,22 @@ function AdminDashboardContent() {
   const longDate = useLongDate();
   const isAdmin = Boolean(user?.id && isPlatformAdminUser(user));
 
-  const { data: counts } = useQuery<AdminNavCountsResponse>(ADMIN_NAV_COUNTS_QUERY, {
+  const { data: baseCounts } = useQuery<AdminNavCountsResponse>(ADMIN_NAV_COUNTS_QUERY, {
     variables: NAV_COUNTS_VARIABLES,
     fetchPolicy: "cache-and-network",
     pollInterval: 60_000,
     skip: !isAdmin,
   });
+  // Aparte: si el API aún no tiene espacios de rescate, solo falla este globo.
+  const { data: rescueCounts } = useQuery<AdminRescueNavCountResponse>(ADMIN_RESCUE_NAV_COUNT_QUERY, {
+    fetchPolicy: "cache-and-network",
+    pollInterval: 60_000,
+    skip: !isAdmin,
+  });
+  const counts: Partial<Record<AdminNavBadgeKey, number | null>> | undefined =
+    baseCounts || rescueCounts
+      ? { ...baseCounts, pendingRescues: rescueCounts?.pendingRescues ?? null }
+      : undefined;
 
   useEffect(() => {
     if (!loading && !user?.id) {
