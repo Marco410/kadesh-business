@@ -15,6 +15,7 @@ import {
   type CompanyWhatsappTeamVariables,
 } from "./queries";
 import type { WhatsAppChatTarget } from "./WhatsAppChatPanel";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const inputClass =
   "w-full rounded-lg border border-dash-line bg-dash-surface px-3 py-2.5 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-60";
@@ -99,7 +100,7 @@ export default function WhatsAppNewConversationModal({
       setPhone("");
     } catch (err) {
       sileo.error({
-        title: err instanceof Error ? err.message : "No se pudo agregar el cliente",
+        title: friendlyErrorText(err, "No se pudo agregar el cliente"),
       });
     }
   };

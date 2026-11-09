@@ -19,6 +19,7 @@ import {
 } from "./analytics-queries";
 import { HELP } from "./help";
 import ViewGuide from "./ViewGuide";
+import { adminErrorText } from "../errors";
 
 const pct = (part: number, total: number) => (total ? `${Math.round((part / total) * 100)}%` : "—");
 
@@ -93,7 +94,7 @@ export default function AcquisitionPanel() {
       />
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && !acquisition ? (
         <AdminLoadingRows rows={6} />
       ) : !acquisition || acquisition.companies === 0 ? (

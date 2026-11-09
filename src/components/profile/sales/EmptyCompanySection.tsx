@@ -18,6 +18,7 @@ import {
 } from "kadesh/utils/queries";
 import { Role } from "kadesh/constants/constans";
 import { sileo } from "sileo";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 interface EmptyCompanySectionProps {
   userId: string;
@@ -93,7 +94,7 @@ export default function EmptyCompanySection({ userId, onSuccess }: EmptyCompanyS
       setCompanyName("");
     } catch (err) {
       setCreateCompanyError(
-        err instanceof Error ? err.message : "Error al crear el negocio. Intenta de nuevo."
+        friendlyErrorText(err, "Error al crear el negocio. Intenta de nuevo.")
       );
     } finally {
       setCreatingCompany(false);

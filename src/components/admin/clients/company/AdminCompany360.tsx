@@ -43,6 +43,7 @@ import CompanyIntegrations from "./sections/CompanyIntegrations";
 import CompanySummary from "./sections/CompanySummary";
 import CompanyTeam from "./sections/CompanyTeam";
 import CompanyUsage from "./sections/CompanyUsage";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 const INSIGHTS_DAYS = 30;
 
@@ -134,7 +135,7 @@ export default function AdminCompany360({ companyId }: { companyId: string }) {
     return (
       <div className="flex flex-col gap-4">
         {backButton}
-        <AdminErrorState message={profileQuery.error.message} />
+        <AdminErrorState message={adminErrorText(profileQuery.error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       </div>
     );
   }

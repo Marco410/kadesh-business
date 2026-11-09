@@ -21,6 +21,7 @@ import {
   type AdminCompanyLedgerResponse,
 } from "../../../usage-queries";
 import { monthLabel } from "../../format";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 /** Cupo y gasto por mes, y cada movimiento de créditos (altas, recargas, gasto sync/IA). */
 export default function CreditsView({ companyId }: { companyId: string }) {
@@ -51,7 +52,7 @@ export default function CreditsView({ companyId }: { companyId: string }) {
     <div className="flex flex-col gap-4">
       <AdminSectionCard title="Por mes" description="Cupo del plan + extra, y cuánto se usó.">
         {periods.error ? (
-          <AdminErrorState message={periods.error.message} />
+          <AdminErrorState message={adminErrorText(periods.error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
         ) : periods.loading && periodRows.length === 0 ? (
           <AdminLoadingRows rows={3} />
         ) : periodRows.length === 0 ? (
@@ -92,7 +93,7 @@ export default function CreditsView({ companyId }: { companyId: string }) {
       <div className="flex flex-col gap-3">
         <h3 className="text-sm font-semibold text-dash-ink">Movimientos</h3>
         {ledger.error ? (
-          <AdminErrorState message={ledger.error.message} />
+          <AdminErrorState message={adminErrorText(ledger.error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
         ) : ledger.loading && rows.length === 0 ? (
           <AdminLoadingRows />
         ) : rows.length === 0 ? (

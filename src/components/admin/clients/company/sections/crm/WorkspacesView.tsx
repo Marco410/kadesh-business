@@ -13,6 +13,7 @@ import {
   ADMIN_COMPANY_WORKSPACES_QUERY,
   type AdminCompanyWorkspacesResponse,
 } from "../../../crm-queries";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 /** Espacios de trabajo de la empresa: quién está en cada uno, sus columnas y cuánto tienen. */
 export default function WorkspacesView({ companyId }: { companyId: string }) {
@@ -25,7 +26,7 @@ export default function WorkspacesView({ companyId }: { companyId: string }) {
   );
   const workspaces = data?.saasWorkspaces ?? [];
 
-  if (error) return <AdminErrorState message={error.message} />;
+  if (error) return <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />;
   if (loading && !data) return <AdminLoadingRows rows={3} />;
   if (workspaces.length === 0) {
     return (

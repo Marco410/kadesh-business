@@ -13,6 +13,7 @@ import {
   ADMIN_TRANSFER_OWNERSHIP_MUTATION,
   type AdminOpsActionResult,
 } from "../../ops-queries";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 type Mode = "suspend" | "reactivate" | "revoke" | "transfer" | null;
 
@@ -86,7 +87,7 @@ export default function CompanyControl({
         finish(data?.adminTransferCompanyOwnership, "No se pudo transferir la propiedad");
       }
     } catch (error) {
-      sileo.error({ title: error instanceof Error ? error.message : "No se pudo completar" });
+      sileo.error({ title: adminErrorText(error, "No se pudo completar") });
     }
   };
 

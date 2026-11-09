@@ -22,6 +22,7 @@ import {
 import ProjectCreateForm, {
   type ProjectCreateFormValues,
 } from "./ProjectCreateForm";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 interface CreateProjectModalProps {
   proposalId: string | null;
@@ -74,7 +75,7 @@ export default function CreateProjectModal({
       handleClose();
     },
     onError: (err) => {
-      sileo.error({ title: err.message || "No se pudo crear el proyecto" });
+      sileo.error({ title: friendlyErrorText(err, "No se pudo crear el proyecto") });
     },
   });
 

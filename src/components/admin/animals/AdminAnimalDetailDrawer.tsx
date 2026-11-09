@@ -34,6 +34,7 @@ import {
   petAnimalEditUrl,
   petAnimalUrl,
 } from "./constants";
+import { adminErrorText } from "../errors";
 
 const actionLink =
   "inline-flex h-10 items-center justify-center rounded-full border border-dash-line px-4 text-sm font-semibold text-dash-ink transition-colors hover:border-orange-400";
@@ -83,7 +84,7 @@ export default function AdminAnimalDetailDrawer({
       await refetch();
       onChanged();
     } catch (err) {
-      sileo.error({ title: "No se pudo", description: err instanceof Error ? err.message : "Intenta de nuevo." });
+      sileo.error({ title: "No se pudo", description: adminErrorText(err, "Intenta de nuevo.") });
     } finally {
       setBusy(null);
     }
@@ -111,7 +112,7 @@ export default function AdminAnimalDetailDrawer({
       subtitle={animal ? [animal.animalType, animal.breed].filter(Boolean).join(" · ") : undefined}
     >
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : !detail || !animal ? (
         loading ? <AdminLoadingRows rows={5} /> : <AdminErrorState message="No encontramos ese animal." />
       ) : (

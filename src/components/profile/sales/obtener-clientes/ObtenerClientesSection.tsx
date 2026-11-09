@@ -48,6 +48,7 @@ import {
 } from "./leadCategoryColors";
 import { readLeadMapView, writeLeadMapView } from "./leadMapView";
 import { useFitLeadMapStage } from "./useFitLeadMapStage";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const GOOGLE_CATEGORY_OPTIONS: AutocompleteOption[] =
   GOOGLE_PLACE_CATEGORIES.map((opt) => ({
@@ -1159,7 +1160,7 @@ export default function ObtenerClientesSection({
         };
       },
       error: (err) => ({
-        title: err instanceof Error ? err.message : "Error al sincronizar",
+        title: friendlyErrorText(err, "Error al sincronizar"),
       }),
     });
   };

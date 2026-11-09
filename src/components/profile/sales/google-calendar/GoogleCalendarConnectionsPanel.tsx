@@ -32,6 +32,7 @@ import {
 } from "./queries";
 import { useGoogleCalendarAccounts } from "./useGoogleCalendarAccounts";
 import { accountDisplayLabel, calendarDisplayName } from "./labels";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const DEFAULT_COLOR = "#039be5";
 
@@ -136,7 +137,7 @@ export default function GoogleCalendarConnectionsPanel({
       window.location.assign(result.url);
     } catch (err) {
       sileo.error({
-        title: err instanceof Error ? err.message : "No se pudo iniciar la conexión con Google.",
+        title: friendlyErrorText(err, "No se pudo iniciar la conexión con Google."),
       });
     }
   };
@@ -153,7 +154,7 @@ export default function GoogleCalendarConnectionsPanel({
       onChanged?.();
     } catch (err) {
       sileo.error({
-        title: err instanceof Error ? err.message : "No se pudo actualizar el calendario.",
+        title: friendlyErrorText(err, "No se pudo actualizar el calendario."),
       });
     }
   };
@@ -172,7 +173,7 @@ export default function GoogleCalendarConnectionsPanel({
       await refetch();
     } catch (err) {
       sileo.error({
-        title: err instanceof Error ? err.message : "No se pudo guardar la preferencia.",
+        title: friendlyErrorText(err, "No se pudo guardar la preferencia."),
       });
     }
   };
@@ -191,7 +192,7 @@ export default function GoogleCalendarConnectionsPanel({
       }
     } catch (err) {
       sileo.error({
-        title: err instanceof Error ? err.message : "No se pudo actualizar la lista.",
+        title: friendlyErrorText(err, "No se pudo actualizar la lista."),
       });
     } finally {
       setBusyAccountId(null);
@@ -213,7 +214,7 @@ export default function GoogleCalendarConnectionsPanel({
       }
     } catch (err) {
       sileo.error({
-        title: err instanceof Error ? err.message : "No se pudo desconectar la cuenta.",
+        title: friendlyErrorText(err, "No se pudo desconectar la cuenta."),
       });
     }
   };

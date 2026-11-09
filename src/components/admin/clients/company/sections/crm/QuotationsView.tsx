@@ -22,6 +22,7 @@ import {
   type AdminCompanyQuotationsResponse,
 } from "../../../crm-queries";
 import { quotationStatusClass, quotationStatusLabel } from "../../format";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 export default function QuotationsView({
   companyId,
@@ -67,7 +68,7 @@ export default function QuotationsView({
       </div>
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && rows.length === 0 ? (
         <AdminLoadingRows rows={5} />
       ) : rows.length === 0 ? (

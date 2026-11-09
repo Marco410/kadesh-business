@@ -23,6 +23,7 @@ import { ADMIN_SALES_VELOCITY_QUERY, type AdminSalesVelocityResponse } from "./a
 import { HELP } from "./help";
 import { formatDays, formatHours, formatMinutes, formatRate, formatShare } from "kadesh/utils/sales-velocity-format";
 import ViewGuide from "./ViewGuide";
+import { adminErrorText } from "../errors";
 
 /** Etapas de cierre: de ahí ya no se avanza ni se pierde. */
 const FINAL_STAGES = new Set([
@@ -73,7 +74,7 @@ export default function SalesVelocityPanel() {
       />
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && !v ? (
         <AdminLoadingRows rows={6} />
       ) : !v || !v.dataSince ? (

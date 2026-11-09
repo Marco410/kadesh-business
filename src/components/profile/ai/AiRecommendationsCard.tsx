@@ -34,6 +34,7 @@ import {
   type GenerateAiPlaybookResponse,
   type GenerateAiPlaybookVariables,
 } from "./queries";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 type AiRecommendationsCardProps = {
   companyId: string;
@@ -138,9 +139,7 @@ export function AiRecommendationsCard({
     } catch (err) {
       sileo.error({
         title:
-          err instanceof Error
-            ? err.message
-            : "No se pudieron generar recomendaciones",
+          friendlyErrorText(err, "No se pudieron generar recomendaciones"),
       });
     }
   }

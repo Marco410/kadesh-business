@@ -41,6 +41,7 @@ import {
 } from "./clients-queries";
 import { lastAccessAt } from "./company/format";
 import { HealthBadge, HealthSignals } from "../analytics/HealthBadge";
+import { adminErrorText } from "../errors";
 
 export function subscriptionStatusLabel(status: string | null | undefined) {
   if (!status) return "Sin plan";
@@ -177,7 +178,7 @@ export default function AdminCompaniesList() {
       </div>
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar la lista de negocios.")} />
       ) : loading && rows.length === 0 ? (
         <AdminLoadingRows />
       ) : rows.length === 0 ? (

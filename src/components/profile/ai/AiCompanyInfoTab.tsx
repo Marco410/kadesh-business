@@ -38,6 +38,7 @@ import {
 import { useCompanyKnowledge } from "./useCompanyKnowledge";
 import { AiMeter, AiSegmentMeter } from "./AiVisuals";
 import { aiMotionTransition, aiTabSwitchTransition } from "./motion";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const TEXTAREA_CLASS =
   "w-full min-h-[150px] px-4 py-3 rounded-lg border border-dash-line bg-dash-surface text-dash-ink placeholder:text-dash-faint dark:placeholder:text-[#7a7a7a] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed resize-y";
@@ -163,9 +164,7 @@ export function AiCompanyInfoTab({
       return true;
     } catch (err) {
       const message =
-        err instanceof Error
-          ? err.message
-          : "No se pudo guardar. Inténtalo de nuevo.";
+        friendlyErrorText(err, "No se pudo guardar. Inténtalo de nuevo.");
       setFormError(message);
       sileo.error({ title: message });
       return false;

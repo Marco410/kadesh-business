@@ -34,6 +34,7 @@ import {
 } from "./queries";
 import { WhatsAppChatImportSection } from "./WhatsAppChatImportSection";
 import { WhatsAppConnectWizard } from "./WhatsAppConnectWizard";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const INPUT_CLASS =
   "w-full px-4 py-3 rounded-lg border border-dash-line bg-dash-surface text-dash-ink placeholder:text-[#616161] dark:placeholder:text-[#b0b0b0] focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent transition-all disabled:opacity-60 disabled:cursor-not-allowed";
@@ -220,7 +221,7 @@ export function WhatsAppConfigTab({
       sileo.success({ title: payload.message || "Configuración de WhatsApp guardada" });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "No se pudo guardar la configuración.";
+        friendlyErrorText(err, "No se pudo guardar la configuración.");
       setFormError(message);
       sileo.error({ title: message });
     }
@@ -250,7 +251,7 @@ export function WhatsAppConfigTab({
       success ? sileo.success({ title: message }) : sileo.error({ title: message });
       if (success) await refetch();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "No se pudo probar la conexión.";
+      const message = friendlyErrorText(err, "No se pudo probar la conexión.");
       setTestResult({ success: false, message });
       sileo.error({ title: message });
     }

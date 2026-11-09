@@ -10,6 +10,7 @@ import {
   type AdminOpsActionResult,
   type AdminPlatformUsersResponse,
 } from "../../ops-queries";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 /** Quién de Kadesh lleva la cuenta. Sirve para "Mis cuentas" en la lista de empresas. */
 export default function AccountManagerSelect({
@@ -45,7 +46,7 @@ export default function AccountManagerSelect({
       sileo.success({ title: outcome.message });
       onChanged();
     } catch (error) {
-      sileo.error({ title: error instanceof Error ? error.message : "No se pudo asignar la cuenta" });
+      sileo.error({ title: adminErrorText(error, "No se pudo asignar la cuenta") });
     }
   };
 

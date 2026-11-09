@@ -18,6 +18,7 @@ import {
 import { ADMIN_ENGAGEMENT_QUERY, type AdminEngagementResponse } from "./analytics-queries";
 import { HELP } from "./help";
 import ViewGuide from "./ViewGuide";
+import { adminErrorText } from "../errors";
 
 const DAY_OPTIONS = [
   { value: "30", label: "30 días" },
@@ -60,7 +61,7 @@ export default function EngagementPanel() {
   });
   const engagement = data?.adminEngagement;
 
-  if (error) return <AdminErrorState message={error.message} />;
+  if (error) return <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />;
   if (loading && !engagement) return <AdminLoadingRows rows={6} />;
   if (!engagement || !engagement.ready) {
     return (

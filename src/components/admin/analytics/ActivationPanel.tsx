@@ -18,6 +18,7 @@ import {
   ADMIN_ACTIVATION_FUNNEL_QUERY,
   type AdminActivationFunnelResponse,
 } from "./analytics-queries";
+import { adminErrorText } from "../errors";
 
 function formatDays(days: number | null) {
   if (days == null) return null;
@@ -56,7 +57,7 @@ export default function ActivationPanel() {
       />
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && !funnel ? (
         <AdminLoadingRows rows={6} />
       ) : !funnel || funnel.cohortSize === 0 ? (

@@ -16,6 +16,7 @@ import {
   getLatestSubscription,
 } from "./AdminCompanySubscriptionsModal";
 import { AdminCompanyUserRow } from "./types";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 export default function AdminCompanySubscriptionsTable() {
   const featureKeys = useMemo(() => Object.values(PLAN_FEATURE_KEYS) as string[], []);
@@ -99,7 +100,7 @@ export default function AdminCompanySubscriptionsTable() {
           } catch (err) {
             sileo.error({
               title: "No se pudo actualizar plan features",
-              description: err instanceof Error ? err.message : "Intenta de nuevo.",
+              description: friendlyErrorText(err, "Intenta de nuevo."),
             });
           } finally {
             setSavingSubscriptionId(null);

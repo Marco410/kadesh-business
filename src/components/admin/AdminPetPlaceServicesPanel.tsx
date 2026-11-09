@@ -37,6 +37,7 @@ import {
   surfaceClass,
 } from "./ui";
 import { SUBSCRIPTION_STATUS } from "kadesh/constants/constans";
+import { adminErrorText } from "./errors";
 
 export default function AdminPetPlaceServicesPanel({
   initialServiceId,
@@ -158,7 +159,7 @@ export default function AdminPetPlaceServicesPanel({
     } catch (err) {
       sileo.error({
         title: "No se pudo aprobar el servicio",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: adminErrorText(err, "Intenta de nuevo."),
       });
     } finally {
       setBusyId(null);
@@ -184,7 +185,7 @@ export default function AdminPetPlaceServicesPanel({
     } catch (err) {
       sileo.error({
         title: "No se pudo rechazar el servicio",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: adminErrorText(err, "Intenta de nuevo."),
       });
     } finally {
       setBusyId(null);

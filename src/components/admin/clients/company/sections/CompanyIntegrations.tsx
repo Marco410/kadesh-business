@@ -18,6 +18,7 @@ import {
   type AdminCompanyInsights,
   type AdminCompanyIntegrationsResponse,
 } from "../../clients-queries";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 const TEMPLATE_STATUS: Record<string, string> = {
   none: "Sin plantilla",
@@ -67,7 +68,7 @@ export default function CompanyIntegrations({
     { variables, fetchPolicy: "cache-and-network" },
   );
 
-  if (error) return <AdminErrorState message={error.message} />;
+  if (error) return <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />;
   if (loading && !data) return <AdminLoadingRows rows={4} />;
   const company = data?.saasCompany;
   if (!company) return null;

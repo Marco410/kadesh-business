@@ -30,6 +30,7 @@ import { Role } from "kadesh/constants/constans";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { cn } from "kadesh/utils/cn";
 import { sileo } from "sileo";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const inputClassName =
   "w-full min-h-11 rounded-xl border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-sm text-dash-ink placeholder-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
@@ -151,6 +152,7 @@ export default function UserEditorForm({
       onDone();
     },
     onError: (err) => {
+      // Solo para detectar el correo repetido; a la persona se le muestra `friendlyErrorText`.
       const msg = err.message ?? "";
       const isEmailTaken =
         msg.includes("Unique constraint failed") &&
@@ -159,7 +161,7 @@ export default function UserEditorForm({
         title: isEmailTaken ? "Correo ya registrado" : "No se pudo crear",
         description: isEmailTaken
           ? "Usa otro correo o inicia sesión con esa cuenta."
-          : msg || "Intenta de nuevo.",
+          : friendlyErrorText(err, "Intenta de nuevo."),
       });
     },
   });
@@ -176,7 +178,7 @@ export default function UserEditorForm({
     onError: (err) => {
       sileo.error({
         title: "No se pudieron guardar los cambios",
-        description: err.message ?? "Intenta de nuevo.",
+        description: friendlyErrorText(err, "Intenta de nuevo."),
       });
     },
   });

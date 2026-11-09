@@ -43,6 +43,7 @@ import {
   type NotificationDaysFilter,
   type NotificationResultFilter,
 } from "./constants";
+import { adminErrorText } from "../errors";
 
 const fmt = (value: number) => value.toLocaleString("es-MX");
 
@@ -211,7 +212,7 @@ export default function AdminPetNotificationsPanel() {
       </div>
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && rows.length === 0 ? (
         <AdminLoadingRows rows={6} />
       ) : rows.length === 0 ? (

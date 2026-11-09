@@ -41,6 +41,7 @@ import { HealthBadge, HealthSignals, HealthTrend } from "./HealthBadge";
 import HowHealthWorks from "./HowHealthWorks";
 import { HELP } from "./help";
 import ViewGuide from "./ViewGuide";
+import { adminErrorText } from "../errors";
 
 /** Cada parte ocupa un ancho según sus puntos máximos: la fila completa son los 100 puntos. */
 const PARTS_GRID = { gridTemplateColumns: HEALTH_COMPONENTS.map((part) => `${part.max}fr`).join(" ") };
@@ -126,7 +127,7 @@ export default function HealthPanel() {
   const toggle = (param: "nivel" | "senal", slug: string, active: boolean) =>
     setParams({ [param]: active ? null : slug, pagina: null });
 
-  if (error) return <AdminErrorState message={error.message} />;
+  if (error) return <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />;
 
   if (result && !result.ready) {
     return (

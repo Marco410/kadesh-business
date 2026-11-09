@@ -12,6 +12,7 @@ import {
 } from "kadesh/components/profile/sales/workspaces/queries";
 import { useWorkspaceContext } from "kadesh/components/profile/sales/workspaces/WorkspaceContext";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 export interface CreateWorkspaceModalProps {
   isOpen: boolean;
@@ -80,7 +81,7 @@ export default function CreateWorkspaceModal({
       sileo.success({ title: "Espacio creado" });
       onClose();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "No se pudo crear el espacio";
+      const msg = friendlyErrorText(err, "No se pudo crear el espacio");
       sileo.error({ title: msg });
     }
   }

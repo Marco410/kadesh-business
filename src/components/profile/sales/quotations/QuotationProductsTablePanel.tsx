@@ -26,6 +26,7 @@ import QuotationProductFormModal from "./QuotationProductFormModal";
 import { useUser } from "kadesh/utils/UserContext";
 import { can } from "kadesh/components/profile/usuarios/can";
 import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const PAGE_SIZE = 10;
 
@@ -198,7 +199,7 @@ export default function QuotationProductsTablePanel({
                     colSpan={9}
                     className={`${quotationTdClass} text-center py-10 text-red-600 dark:text-red-400`}
                   >
-                    {error.message}
+                    {friendlyErrorText(error, "No se pudieron cargar los conceptos. Intenta de nuevo.")}
                   </td>
                 </tr>
               ) : rows.length === 0 ? (

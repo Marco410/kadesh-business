@@ -63,6 +63,7 @@ import {
   type AdminPetSummaryResponse,
   type PetCount,
 } from "./queries";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 const fmt = (value: number) => value.toLocaleString("es-MX");
 
@@ -434,7 +435,7 @@ export default function AdminPetOverview() {
           />
         </div>
 
-        {error && !summary ? <AdminErrorState message={error.message} /> : null}
+        {error && !summary ? <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} /> : null}
       </div>
 
       <PetGroup title="Pendientes por revisar" description="Lo que espera una respuesta de Kadesh.">

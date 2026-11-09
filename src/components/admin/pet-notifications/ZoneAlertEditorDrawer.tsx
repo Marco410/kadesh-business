@@ -23,6 +23,7 @@ import {
   type AdminZoneAlertRow,
 } from "./queries";
 import { ZONE_WHATSAPP, formatPoint, mapsUrl, parseLatLng } from "./constants";
+import { adminErrorText } from "../errors";
 
 /**
  * Administrar las alertas de zona de una persona: encenderlas o apagarlas, mover el centro de su
@@ -88,7 +89,7 @@ function ZoneAlertForm({ row, name, onSaved }: { row: AdminZoneAlertRow; name: s
         sileo.error({ title: "No se guardó", description: outcome?.message });
       }
     } catch (err) {
-      sileo.error({ title: "No se guardó", description: err instanceof Error ? err.message : "Intenta de nuevo." });
+      sileo.error({ title: "No se guardó", description: adminErrorText(err, "Intenta de nuevo.") });
     }
   };
 

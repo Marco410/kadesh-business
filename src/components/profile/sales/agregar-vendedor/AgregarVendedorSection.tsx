@@ -40,6 +40,7 @@ import { canManageCompanyUsers } from "kadesh/utils/user-roles";
 import { can } from "kadesh/components/profile/usuarios/can";
 import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 import RoleAccessDeniedSection from "../RoleAccessDeniedSection";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const fieldClass =
   "w-full min-h-11 rounded-xl border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-sm text-dash-ink placeholder:text-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
@@ -214,6 +215,7 @@ export default function AgregarVendedorSection() {
       resetForm();
     },
     onError: (err) => {
+      // Solo para detectar el correo repetido; a la persona se le muestra `friendlyErrorText`.
       const msg = err.message ?? "";
       const isEmailTaken =
         msg.includes("Unique constraint failed") &&
@@ -227,7 +229,7 @@ export default function AgregarVendedorSection() {
       } else {
         sileo.error({
           title: "No se pudo agregar el vendedor",
-          description: msg || "Intenta de nuevo más tarde.",
+          description: friendlyErrorText(err, "Intenta de nuevo más tarde."),
         });
       }
     },
@@ -243,6 +245,7 @@ export default function AgregarVendedorSection() {
       resetForm();
     },
     onError: (err) => {
+      // Solo para detectar el correo repetido; a la persona se le muestra `friendlyErrorText`.
       const msg = err.message ?? "";
       const isEmailTaken =
         msg.includes("Unique constraint failed") &&
@@ -255,7 +258,7 @@ export default function AgregarVendedorSection() {
       } else {
         sileo.error({
           title: "No se pudieron guardar los cambios",
-          description: msg || "Intenta de nuevo.",
+          description: friendlyErrorText(err, "Intenta de nuevo."),
         });
       }
     },
