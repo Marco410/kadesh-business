@@ -38,6 +38,7 @@ import {
   type ZoneStatusFilter,
 } from "./constants";
 import ZoneAlertEditorDrawer from "./ZoneAlertEditorDrawer";
+import { adminErrorText } from "../errors";
 
 const fmt = (value: number) => value.toLocaleString("es-MX");
 
@@ -84,7 +85,7 @@ function ZonePreview() {
 
       {error ? (
         <div className="mt-4">
-          <AdminErrorState message={error.message} />
+          <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
         </div>
       ) : called && preview ? (
         <div className="mt-4 flex flex-col gap-3">
@@ -219,7 +220,7 @@ export default function AdminZoneAlertsPanel() {
       />
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && rows.length === 0 ? (
         <AdminLoadingRows rows={6} />
       ) : rows.length === 0 ? (

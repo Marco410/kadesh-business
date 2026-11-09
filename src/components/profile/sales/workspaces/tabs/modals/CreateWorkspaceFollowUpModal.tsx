@@ -16,6 +16,7 @@ import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces
 import { workspaceConnectPayload } from "kadesh/components/profile/sales/workspaces/workspace-connect";
 import { FOLLOW_UP_TASK_STATUS, TASK_PRIORITY } from "kadesh/constants/constans";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const FOLLOW_UP_STATUS_OPTIONS = Object.values(FOLLOW_UP_TASK_STATUS);
 const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
@@ -78,7 +79,7 @@ export default function CreateWorkspaceFollowUpModal({
       onClose();
     },
     onError: (err) =>
-      sileo.error({ title: err.message || "No se pudo programar el seguimiento" }),
+      sileo.error({ title: friendlyErrorText(err, "No se pudo programar el seguimiento") }),
   });
 
   function handleSubmit(e: React.FormEvent) {

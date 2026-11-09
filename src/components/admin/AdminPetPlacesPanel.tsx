@@ -50,6 +50,7 @@ import {
   PIPELINE_STATUS_COLORS,
   SUBSCRIPTION_STATUS,
 } from "kadesh/constants/constans";
+import { adminErrorText } from "./errors";
 
 const fieldClass =
   "h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
@@ -327,7 +328,7 @@ export default function AdminPetPlacesPanel({
     } catch (err) {
       sileo.error({
         title: "No se pudo actualizar la ficha",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: adminErrorText(err, "Intenta de nuevo."),
       });
     } finally {
       setBusyId(null);
@@ -349,7 +350,7 @@ export default function AdminPetPlacesPanel({
     } catch (err) {
       sileo.error({
         title: "No se pudo cambiar el pipeline",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: adminErrorText(err, "Intenta de nuevo."),
       });
     } finally {
       setBusyId(null);
@@ -375,7 +376,7 @@ export default function AdminPetPlacesPanel({
     } catch (err) {
       sileo.error({
         title: "No se pudo quitar la verificación",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: adminErrorText(err, "Intenta de nuevo."),
       });
     } finally {
       setBusyId(null);

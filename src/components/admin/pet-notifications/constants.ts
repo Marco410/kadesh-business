@@ -24,6 +24,14 @@ export const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
   "event.updated": "Evento con cambios",
   "user.bank_details_updated": "Datos bancarios",
   "pet.reminder_due": "Recordatorio de cartilla",
+  "rescue.submitted": "Espacio de rescate por verificar (a admins)",
+  "rescue.verified": "Espacio de rescate verificado",
+  "rescue.rejected": "Espacio de rescate rechazado",
+  "rescue.member_added": "Agregado a un espacio de rescate",
+  "pet.adoption_completed": "Adopción completada",
+  "adoption.application_received": "Solicitud de adopción recibida",
+  "adoption.application_updated": "Solicitud de adopción actualizada",
+  "pet.transfer_redeemed": "Mascota recibida con código",
   "security.alert": "Alerta de seguridad",
 };
 

@@ -14,6 +14,7 @@ import {
   type AdminRelease,
 } from "./releases-queries";
 import { RELEASE_AUDIENCE, RELEASE_PRODUCT_ITEMS } from "./constants";
+import { adminErrorText } from "../errors";
 
 type Product = AdminRelease["product"];
 
@@ -106,7 +107,7 @@ export default function ReleaseEditor({
       onSaved();
       onClose();
     } catch (error) {
-      sileo.error({ title: error instanceof Error ? error.message : "No se pudo guardar la novedad" });
+      sileo.error({ title: adminErrorText(error, "No se pudo guardar la novedad") });
     }
   };
 
@@ -126,7 +127,7 @@ export default function ReleaseEditor({
       onSaved();
       onClose();
     } catch (error) {
-      sileo.error({ title: error instanceof Error ? error.message : "No se pudo eliminar" });
+      sileo.error({ title: adminErrorText(error, "No se pudo eliminar") });
     }
   };
 

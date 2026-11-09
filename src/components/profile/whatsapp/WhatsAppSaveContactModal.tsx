@@ -15,6 +15,7 @@ import {
   type LinkWhatsAppContactToLeadResponse,
   type LinkWhatsAppContactToLeadVariables,
 } from "./queries";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 export interface WhatsAppSaveContactModalProps {
   isOpen: boolean;
@@ -84,7 +85,7 @@ export default function WhatsAppSaveContactModal({
       onSaved({ id: payload.leadId, name: name.trim() });
     } catch (err) {
       sileo.error({
-        title: err instanceof Error ? err.message : "No se pudo guardar el cliente",
+        title: friendlyErrorText(err, "No se pudo guardar el cliente"),
       });
     }
   };

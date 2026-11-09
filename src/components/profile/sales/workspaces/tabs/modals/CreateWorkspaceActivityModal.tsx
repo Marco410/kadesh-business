@@ -27,6 +27,7 @@ import { workspaceConnectPayload } from "kadesh/components/profile/sales/workspa
 import { Role, SALES_ACTIVITY_TYPE, TASK_PRIORITY } from "kadesh/constants/constans";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useUser } from "kadesh/utils/UserContext";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const ACTIVITY_TYPE_OPTIONS = Object.values(SALES_ACTIVITY_TYPE);
 const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
@@ -140,7 +141,7 @@ export default function CreateWorkspaceActivityModal({
       sileo.success({ title: "Actividad registrada" });
       onClose();
     },
-    onError: (err) => sileo.error({ title: err.message || "No se pudo registrar la actividad" }),
+    onError: (err) => sileo.error({ title: friendlyErrorText(err, "No se pudo registrar la actividad") }),
   });
 
   function handleSubmit(e: React.FormEvent) {

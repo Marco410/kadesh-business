@@ -15,6 +15,7 @@ import {
   type PreviewWhatsAppChatExportResponse,
   type PreviewWhatsAppChatExportVariables,
 } from "./queries";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 type ImportRow = {
   rowId: string;
@@ -87,7 +88,7 @@ export function WhatsAppChatImportSection() {
       } catch (err) {
         updateRow(row.rowId, {
           previewLoading: false,
-          previewError: err instanceof Error ? err.message : "No se pudo leer el archivo",
+          previewError: friendlyErrorText(err, "No se pudo leer el archivo"),
         });
       }
     }
@@ -121,7 +122,7 @@ export function WhatsAppChatImportSection() {
       } catch (err) {
         updateRow(row.rowId, {
           status: "error",
-          resultMessage: err instanceof Error ? err.message : "No se pudo importar",
+          resultMessage: friendlyErrorText(err, "No se pudo importar"),
         });
       }
     }

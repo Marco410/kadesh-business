@@ -14,6 +14,7 @@ import {
   type ConnectGoogleCalendarAccountResponse,
   type ConnectGoogleCalendarAccountVariables,
 } from "./queries";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 type Status = "working" | "success" | "error";
 
@@ -78,7 +79,7 @@ export default function GoogleCalendarCallbackSection() {
       })
       .catch((err: unknown) => {
         setStatus("error");
-        setMessage(err instanceof Error ? err.message : "No se pudo conectar la cuenta de Google.");
+        setMessage(friendlyErrorText(err, "No se pudo conectar la cuenta de Google."));
       });
   }, [userLoading, user, searchParams, connect, router]);
 

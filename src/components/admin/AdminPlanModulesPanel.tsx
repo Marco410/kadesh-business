@@ -26,6 +26,7 @@ import {
   AdminStatusBadge,
   surfaceClass,
 } from "./ui";
+import { adminErrorText } from "./errors";
 
 const fieldClass =
   "h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
@@ -187,7 +188,7 @@ function AdminPlanModulesForm({
     } catch (err) {
       sileo.error({
         title: "No se pudieron guardar los módulos",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: adminErrorText(err, "Intenta de nuevo."),
       });
     }
   }

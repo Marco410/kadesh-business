@@ -23,6 +23,7 @@ import {
   companyBillingVariables,
   type AdminCompanyBillingResponse,
 } from "../../clients-queries";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 const STEP_LABELS: Record<string, string> = {
   SUCCESS: "Contrató el plan",
@@ -79,7 +80,7 @@ export default function CompanyBilling({
     { variables, fetchPolicy: "cache-and-network" },
   );
 
-  if (error) return <AdminErrorState message={error.message} />;
+  if (error) return <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />;
   if (loading && !data) return <AdminLoadingRows rows={6} />;
   if (!data) return null;
 

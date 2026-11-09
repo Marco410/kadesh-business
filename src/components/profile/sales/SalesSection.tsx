@@ -68,6 +68,7 @@ import {
   type LeadsPageSize,
 } from "./leadsPagination";
 import { gsap, useGSAP } from "kadesh/components/home/register-gsap";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const MAX_LEADS_EXPORT = 10_000;
 
@@ -721,7 +722,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       sileo.error({
         title: "Error al exportar",
         description:
-          e instanceof Error ? e.message : "No se pudo generar el archivo.",
+          friendlyErrorText(e, "No se pudo generar el archivo."),
       });
     } finally {
       setExportingExcel(false);
@@ -790,9 +791,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
         sileo.error({
           title: "No se pudo mover el cliente",
           description:
-            moveError instanceof Error
-              ? moveError.message
-              : "Intenta de nuevo.",
+            friendlyErrorText(moveError, "Intenta de nuevo."),
         });
       }
     },
@@ -882,7 +881,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
       sileo.error({
         title: "Error al asignar",
         description:
-          e instanceof Error ? e.message : "No se pudieron asignar los leads.",
+          friendlyErrorText(e, "No se pudieron asignar los leads."),
       });
     }
   }, [

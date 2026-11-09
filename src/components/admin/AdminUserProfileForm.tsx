@@ -13,6 +13,7 @@ import { ROLE_LABELS } from "./constants";
 import type { AdminUserDetail } from "./types";
 import AdminUserBlogSubscriptions from "./AdminUserBlogSubscriptions";
 import { AdminErrorState } from "./ui";
+import { adminErrorText } from "./errors";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -138,7 +139,7 @@ export default function AdminUserProfileForm({ userId }: { userId: string }) {
     } catch (err) {
       sileo.error({
         title: "No se pudo guardar el usuario",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: adminErrorText(err, "Intenta de nuevo."),
       });
     } finally {
       setSaving(false);

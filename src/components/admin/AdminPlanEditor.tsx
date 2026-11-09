@@ -20,6 +20,7 @@ import {
 } from "./planFeatures";
 import AdminStripeCheckDialog from "./AdminStripeCheckDialog";
 import { formatCredits, formatMoney, formatPlanFrequency } from "./ui";
+import { adminErrorText } from "./errors";
 
 const fieldClass =
   "h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
@@ -203,7 +204,7 @@ function AdminPlanEditorForm({
         planName={draft.name || "este plan"}
         loading={checking}
         result={checkData?.stripePlanCheck ?? null}
-        error={checkError ? checkError.message : null}
+        error={checkError ? adminErrorText(checkError, "No se pudo revisar el plan en Stripe. Intenta de nuevo.") : null}
         saving={saving}
         onRetry={() => runCheck({ variables: checkVariables() })}
         onClose={() => {

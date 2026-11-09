@@ -15,6 +15,7 @@ import {
   type GenerateDailyDigestResponse,
   type GenerateDailyDigestVariables,
 } from "./queries";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 /**
  * Resumen del día (3 pasos). Lo comparten Inicio y la tab Dashboard de Kadesh AI.
@@ -92,7 +93,7 @@ export function useDailyDigest({
     } catch (err) {
       sileo.error({
         title:
-          err instanceof Error ? err.message : "No se pudo generar el resumen",
+          friendlyErrorText(err, "No se pudo generar el resumen"),
       });
     }
   }

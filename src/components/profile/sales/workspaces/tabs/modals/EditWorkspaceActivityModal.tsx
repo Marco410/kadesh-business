@@ -25,6 +25,7 @@ import HiddenInWorkspaceSwitch from "./HiddenInWorkspaceSwitch";
 import { Routes } from "kadesh/core/routes";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { SALES_ACTIVITY_TYPE, TASK_PRIORITY } from "kadesh/constants/constans";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const ACTIVITY_TYPE_OPTIONS = Object.values(SALES_ACTIVITY_TYPE);
 const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
@@ -172,7 +173,7 @@ export default function EditWorkspaceActivityModal({
       onClose();
     },
     onError: (err) =>
-      sileo.error({ title: err.message || "No se pudo actualizar la actividad" }),
+      sileo.error({ title: friendlyErrorText(err, "No se pudo actualizar la actividad") }),
   });
 
   function handleSubmit(e: React.FormEvent) {

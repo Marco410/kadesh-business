@@ -16,6 +16,7 @@ import { ClientLeadAutocomplete } from "kadesh/components/shared";
 import { useRouter } from "next/navigation";
 import { Routes } from "kadesh/core/routes";
 import { quotationMotionTransition } from "./motion";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const inputClassName =
   "w-full rounded-xl border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2.5 text-dash-ink text-sm placeholder-[#9ca3af] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
@@ -74,7 +75,7 @@ export default function QuotationCreateModal({
       onClose();
     },
     onError: (err) => {
-      sileo.error({ title: err.message || "No se pudo crear la cotización." });
+      sileo.error({ title: friendlyErrorText(err, "No se pudo crear la cotización.") });
     },
   });
 

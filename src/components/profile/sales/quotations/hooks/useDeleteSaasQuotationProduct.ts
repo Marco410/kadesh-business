@@ -8,6 +8,7 @@ import {
   type DeleteSaasQuotationProductResponse,
   type DeleteSaasQuotationProductVariables,
 } from "../queries";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 export function useDeleteSaasQuotationProduct() {
   const [mutate, { loading }] = useMutation<
@@ -16,7 +17,7 @@ export function useDeleteSaasQuotationProduct() {
   >(DELETE_SAAS_QUOTATION_PRODUCT_MUTATION, {
     onError: (err) => {
       sileo.error({
-        title: err.message || "No se pudo eliminar el concepto.",
+        title: friendlyErrorText(err, "No se pudo eliminar el concepto."),
       });
     },
   });
@@ -46,7 +47,7 @@ export function useDeleteSaasQuotationProduct() {
       .then((result) => {
         if (result.errors?.length) {
           sileo.error({
-            title: result.errors.map((e) => e.message).join(", "),
+            title: friendlyErrorText({ graphQLErrors: result.errors }, "No se pudo eliminar el concepto."),
           });
           return;
         }
@@ -54,9 +55,7 @@ export function useDeleteSaasQuotationProduct() {
         options?.onCompleted?.();
       })
       .catch((err: unknown) => {
-        const message =
-          err instanceof Error ? err.message : "No se pudo eliminar el concepto.";
-        sileo.error({ title: message });
+        sileo.error({ title: friendlyErrorText(err, "No se pudo eliminar el concepto.") });
       });
   }
 

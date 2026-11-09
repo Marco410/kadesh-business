@@ -12,6 +12,7 @@ import type {
 import type { SubscriptionStatusVariables } from "kadesh/components/profile/sales/queries";
 import { REFRESH_SUBSCRIPTION_STATUS_QUERY } from "../queries";
 import type { PlanFeatureItem } from "kadesh/components/profile/sales/queries";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 export type AdminCompanySubscriptionsDraftState = {
   subscriptionByCompanyId: Record<string, SubscriptionData | null>;
@@ -82,7 +83,7 @@ export function useAdminCompanySubscriptions(
       } catch (err) {
         sileo.error({
           title: "Error al refrescar suscripción",
-          description: err instanceof Error ? err.message : "Intenta de nuevo.",
+          description: friendlyErrorText(err, "Intenta de nuevo."),
         });
       }
     },

@@ -5,6 +5,7 @@ import {
   Bug01Icon,
   Building06Icon,
   Calendar03Icon,
+  CharityIcon,
   ChartLineData01Icon,
   DashboardBrowsingIcon,
   DashboardSquare01Icon,
@@ -37,7 +38,7 @@ export const ADMIN_TABS = {
 export type AdminTab = (typeof ADMIN_TABS)[keyof typeof ADMIN_TABS];
 
 /** Globos del menú (salen de `ADMIN_NAV_COUNTS_QUERY`). */
-export type AdminNavBadgeKey = "pendingPlaces" | "pendingServices" | "pendingEvents" | "openErrors";
+export type AdminNavBadgeKey = "pendingPlaces" | "pendingServices" | "pendingEvents" | "pendingRescues" | "openErrors";
 
 export type AdminNavItemConfig = {
   id: string;
@@ -93,6 +94,7 @@ export const ADMIN_NAV_GROUPS: Array<{ id: string; title: string; items: AdminNa
       { id: "pet-fichas", label: "Veterinarias", icon: Stethoscope02Icon, tab: "veterinarias", vista: "fichas", description: "Fichas del directorio, reclamos y pipeline.", badgeKey: "pendingPlaces" },
       { id: "pet-servicios", label: "Servicios", icon: Task01Icon, tab: "veterinarias", vista: "servicios", description: "Servicios que piden las veterinarias.", badgeKey: "pendingServices" },
       { id: "pet-eventos", label: "Eventos", icon: Calendar03Icon, tab: "veterinarias", vista: "eventos", description: "Campañas, jornadas y ferias que publica la comunidad.", badgeKey: "pendingEvents" },
+      { id: "pet-rescate", label: "Espacios de rescate", icon: CharityIcon, tab: "veterinarias", vista: "espacios-rescate", description: "Rescatistas, refugios y colectivos: verificarlos y marcar aliados.", badgeKey: "pendingRescues" },
       { id: "pet-avisos", label: "Avisos", icon: Notification03Icon, tab: "veterinarias", vista: "avisos", description: "Cada aviso a quién le llegó y por dónde: campana, push y WhatsApp." },
       { id: "pet-alertas-zona", label: "Alertas de zona", icon: MapsLocation01Icon, tab: "veterinarias", vista: "alertas-zona", description: "Quién recibe alertas de mascotas cerca, su zona y sus canales." },
     ],
@@ -804,9 +806,10 @@ export const ADMIN_SCOPED_PARAMS = [
   "meses",
   "umbral",
   "producto",
-  // Kadesh Pet: animal y evento abiertos, filtro de Facebook y controles del Resumen.
+  // Kadesh Pet: animal, evento y espacio de rescate abiertos, filtro de Facebook y controles del Resumen.
   "animal",
   "evento",
+  "espacio",
   "facebook",
   "rango",
   "agrupar",

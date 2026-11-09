@@ -18,6 +18,7 @@ import {
 } from "../../../../ui";
 import type { AdminCompanyInsights } from "../../../clients-queries";
 import { ADMIN_SYNC_LOGS_QUERY, type AdminSyncLogsResponse } from "../../../usage-queries";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 function zoneLabel(row: { lat: number | null; lng: number | null; radius: number | null }) {
   if (row.lat == null || row.lng == null) return "—";
@@ -88,7 +89,7 @@ export default function ExtractionsView({
         }}
       />
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && rows.length === 0 ? (
         <AdminLoadingRows />
       ) : rows.length === 0 ? (

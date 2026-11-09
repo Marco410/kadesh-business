@@ -18,6 +18,7 @@ import {
   QUOTATION_DISCOUNT_TYPE,
   QUOTATION_DISCOUNT_TYPE_OPTIONS,
 } from "kadesh/constants/constans";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const inputClassName =
   "w-full rounded-lg border border-dash-line bg-white dark:bg-[#2a2a2a] px-3 py-2 text-dash-ink text-sm placeholder-[#9ca3af] focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
@@ -108,7 +109,7 @@ export default function QuotationProductFormModal({
     },
     onError: (err) => {
       sileo.error({
-        title: err.message || "No se pudo crear el ítem.",
+        title: friendlyErrorText(err, "No se pudo crear el ítem."),
       });
     },
   });
@@ -124,7 +125,7 @@ export default function QuotationProductFormModal({
     },
     onError: (err) => {
       sileo.error({
-        title: err.message || "No se pudo actualizar el ítem.",
+        title: friendlyErrorText(err, "No se pudo actualizar el ítem."),
       });
     },
   });

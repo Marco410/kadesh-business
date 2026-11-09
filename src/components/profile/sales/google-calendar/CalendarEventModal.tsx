@@ -14,6 +14,7 @@ import {
 import { localDateKey } from "./dates";
 import { useGoogleCalendarAccounts } from "./useGoogleCalendarAccounts";
 import { accountDisplayLabel, calendarDisplayName } from "./labels";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const INPUT_CLASS =
   "w-full rounded-lg border border-dash-line bg-white px-3 py-2 text-sm text-dash-ink outline-none focus:border-orange-500 dark:bg-[#252525]";
@@ -154,7 +155,7 @@ function ModalBody({
       onChanged();
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo crear el evento.");
+      setError(friendlyErrorText(err, "No se pudo crear el evento."));
     }
   };
 
@@ -166,7 +167,7 @@ function ModalBody({
       onChanged();
       onClose();
     } catch (err) {
-      sileo.error({ title: err instanceof Error ? err.message : "No se pudo eliminar el evento." });
+      sileo.error({ title: friendlyErrorText(err, "No se pudo eliminar el evento.") });
     }
   };
 

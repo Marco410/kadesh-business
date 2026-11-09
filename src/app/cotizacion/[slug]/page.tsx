@@ -13,6 +13,7 @@ import PublicQuotationView, {
   PublicQuotationMessage,
   PublicQuotationSkeleton,
 } from "kadesh/components/profile/sales/quotations/PublicQuotationView";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 export default function PublicQuotationPage() {
   const params = useParams<{ slug?: string }>();
@@ -60,8 +61,7 @@ export default function PublicQuotationPage() {
   if (error || !detail) {
     return (
       <PublicQuotationMessage title="No se encontró la cotización">
-        {error?.message ||
-          "Este enlace puede haber expirado o ya no existe. Contacta a la empresa que te lo envió."}
+        {friendlyErrorText(error, "Este enlace puede haber expirado o ya no existe. Contacta a la empresa que te lo envió.")}
       </PublicQuotationMessage>
     );
   }

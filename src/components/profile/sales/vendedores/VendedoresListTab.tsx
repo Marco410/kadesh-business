@@ -25,6 +25,7 @@ import { useUser } from "kadesh/utils/UserContext";
 import { can } from "kadesh/components/profile/usuarios/can";
 import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 import { canManageCompanyUsers } from "kadesh/utils/user-roles";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 export interface VendedoresListTabProps {
   userId: string;
@@ -120,7 +121,7 @@ export default function VendedoresListTab({ userId }: VendedoresListTabProps) {
     return (
       <div className="rounded-2xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-6 shadow-sm">
         <p className="text-red-700 dark:text-red-300">
-          No se pudieron cargar los vendedores. {error.message}
+          {friendlyErrorText(error, "No se pudieron cargar los vendedores. Intenta de nuevo.")}
         </p>
       </div>
     );

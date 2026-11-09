@@ -34,6 +34,7 @@ import { Role } from "kadesh/constants/constans";
 import { can } from "kadesh/components/profile/usuarios/can";
 import { PERMISSION_KEYS } from "kadesh/components/profile/usuarios/permissions";
 import { sileo } from "sileo";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 interface ArchivosSectionProps {
   userId: string;
@@ -146,7 +147,7 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
     } catch (err) {
       sileo.error({
         title: "No se pudo subir el archivo",
-        description: err instanceof Error ? err.message : "Intenta de nuevo más tarde.",
+        description: friendlyErrorText(err, "Intenta de nuevo más tarde."),
       });
     } finally {
       setUploading(false);
@@ -163,7 +164,7 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
     } catch (err) {
       sileo.error({
         title: "No se pudo eliminar el archivo",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: friendlyErrorText(err, "Intenta de nuevo."),
       });
     } finally {
       setDeletingId(null);

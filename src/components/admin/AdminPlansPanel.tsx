@@ -26,6 +26,7 @@ import {
   formatPlanFrequency,
   surfaceClass,
 } from "./ui";
+import { adminErrorText } from "./errors";
 
 type PlanFilter = (typeof PLAN_FILTERS)[number]["value"];
 
@@ -88,7 +89,7 @@ function AdminPlansCatalog() {
     } catch (err) {
       sileo.error({
         title: "No se pudo guardar el plan",
-        description: err instanceof Error ? err.message : "Intenta de nuevo.",
+        description: adminErrorText(err, "Intenta de nuevo."),
       });
     } finally {
       setSaving(false);

@@ -16,6 +16,7 @@ import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces
 import { workspaceConnectPayload } from "kadesh/components/profile/sales/workspaces/workspace-connect";
 import { PROPOSAL_STATUS } from "kadesh/constants/constans";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const PROPOSAL_STATUS_OPTIONS = Object.values(PROPOSAL_STATUS);
 
@@ -77,7 +78,7 @@ export default function CreateWorkspaceProposalModal({
       sileo.success({ title: "Propuesta registrada" });
       onClose();
     },
-    onError: (err) => sileo.error({ title: err.message || "No se pudo registrar la propuesta" }),
+    onError: (err) => sileo.error({ title: friendlyErrorText(err, "No se pudo registrar la propuesta") }),
   });
 
   function handleSubmit(e: React.FormEvent) {

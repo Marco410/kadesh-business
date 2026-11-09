@@ -19,6 +19,7 @@ import {
 import { ADMIN_DEMAND_GAPS_QUERY, type AdminDemandGapsResponse } from "./analytics-queries";
 import { HELP } from "./help";
 import ViewGuide from "./ViewGuide";
+import { adminErrorText } from "../errors";
 
 const THRESHOLD_OPTIONS = [
   { value: "0", label: "Sin resultados" },
@@ -84,7 +85,7 @@ export default function DemandPanel() {
       </div>
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && !demand ? (
         <AdminLoadingRows rows={6} />
       ) : !demand || demand.runs === 0 ? (

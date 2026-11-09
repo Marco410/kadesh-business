@@ -26,6 +26,7 @@ import { mergeWorkspaceFilter } from "kadesh/components/profile/sales/workspaces
 import { Role, TASK_PRIORITY } from "kadesh/constants/constans";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useUser } from "kadesh/utils/UserContext";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const TASK_PRIORITY_OPTIONS = Object.values(TASK_PRIORITY);
 
@@ -123,7 +124,7 @@ export default function CreateWorkspaceTechTaskModal({
       onClose();
     },
     onError: (err) =>
-      sileo.error({ title: err.message || "No se pudo crear la tarea" }),
+      sileo.error({ title: friendlyErrorText(err, "No se pudo crear la tarea") }),
   });
 
   function handleSubmit(e: React.FormEvent) {

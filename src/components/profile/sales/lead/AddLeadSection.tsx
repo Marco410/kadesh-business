@@ -35,6 +35,7 @@ import {
 import { hasPlanFeature } from "../helpers/plan-features";
 import { useSubscription } from "../SubscriptionContext";
 import FeatureLockedSection from "../FeatureLockedSection";
+import { friendlyErrorText } from "kadesh/utils/errorText";
 
 const LEAD_SOURCE_OPTIONS = [
   { value: "Referido", label: "Referido" },
@@ -243,7 +244,7 @@ export default function AddLeadSection() {
       success: (data) => ({ title: data.message }),
       error: (err) => ({
         title:
-          err instanceof Error ? err.message : "Error al agregar el cliente",
+          friendlyErrorText(err, "Error al agregar el cliente"),
       }),
     });
   };

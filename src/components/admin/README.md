@@ -22,9 +22,9 @@ Operaciones vive en su propio shell (`kadesh/components/app-shell`). No lleva la
    - **General:** Inicio, Actividad, Errores, Seguridad, Analítica.
    - **Clientes:** Empresas, Personas, Planes.
    - **Contenido:** Blog, Correos, Novedades.
-   - **Kadesh Pet:** Resumen, Animales, Veterinarias, Servicios, Eventos, Avisos, Alertas de zona.
+   - **Kadesh Pet:** Resumen, Animales, Veterinarias, Servicios, Eventos, Espacios de rescate, Avisos, Alertas de zona.
 
-   Cada item es una sección (`tab`) o una vista (`vista`). Por eso Empresas/Personas, Blog/Correos y las de Pet ya no tienen segmentado propio. La opción activa es una píldora blanca que se desliza, con el icono naranja. Veterinarias, Servicios y Eventos llevan un globo con lo que espera revisión, y Errores con los abiertos en 24 h (`ADMIN_NAV_COUNTS_QUERY`, cada minuto y al verificar o aprobar). En móvil el menú es un cajón.
+   Cada item es una sección (`tab`) o una vista (`vista`). Por eso Empresas/Personas, Blog/Correos y las de Pet ya no tienen segmentado propio. La opción activa es una píldora blanca que se desliza, con el icono naranja. Veterinarias, Servicios, Eventos y Espacios de rescate llevan un globo con lo que espera revisión, y Errores con los abiertos en 24 h (`ADMIN_NAV_COUNTS_QUERY`, cada minuto y al verificar o aprobar; el de espacios de rescate va en su propia query, `AdminRescueNavCount`). En móvil el menú es un cajón.
 2. **Vista dentro de una sección** (Artículos / Categorías / Etiquetas, las 7 de Analítica, Catálogo / Módulos, las subvistas del 360): `AdminSegmented`. Pista cálida con la opción activa en píldora que se desliza.
 3. **Filtros de una lista** (estado, rol, tipo): `AdminFilterChips`. Píldoras con borde y la activa en **tinta** (negro en claro, blanco en oscuro), con etiqueta (**Estado**, **Rol**, **Tipo**). Pueden llevar `count` y `dot`.
 
@@ -409,6 +409,29 @@ Cualquier persona con sesión publica un evento en Kadesh Pet (campaña de ester
   - **Quitar (cancelar)** en publicados, con motivo opcional: la ficha sigue visible con el aviso y se avisa a quienes marcaron «Me interesa» o «Asistiré».
   - El mensaje del back sale en el aviso (toast), p. ej. «Evento publicado. Avisamos a 12 personas de la zona.».
 - **Ver en Kadesh Pet** (`pet.kadesh.com.mx/eventos/{slug}`) solo en publicados y en cancelados que llegaron a publicarse: los demás no son públicos.
+
+## Kadesh Pet → Espacios de rescate
+
+Código en `rescue/`. Vista `?tab=veterinarias&vista=espacios-rescate`. Reglas en `kadesh-back/models/Pet/RescueOrganization/README.md`.
+
+Rescatistas, refugios, hogares temporales, colectivos y asociaciones activan su **espacio de rescate** desde su perfil en Kadesh Pet. Queda **En revisión**: su equipo ya lo usa, pero el público no lo ve. Suelen escribir por WhatsApp para que se les valide.
+
+- **Lista:** chips **En revisión** (default) / **Verificados** / **Aliados** / **Rechazados** / **Suspendidos**, con conteo, y buscador por nombre, municipio, estado, correo o WhatsApp. Lo más nuevo primero. Cada fila muestra:
+  - logo, nombre, estado y marca de **Aliado**;
+  - tipo y zona;
+  - cuándo se activó, cuántos hay en el equipo, cuántos animales publicaron y cuántos se adoptaron.
+- **Revisar** (`?espacio=<id>`): modal con:
+  - **Decisión**: un mensaje para el espacio, que lo ve en su panel. Botones según el estado:
+    - **Verificar**: llena `verifiedAt`, publica su perfil `/organizaciones/<slug>` y les avisa con `rescue.verified`.
+    - **Rechazar** (si está en revisión) y **Suspender** (si está verificado). Los dos exigen motivo de mínimo 10 caracteres y avisan con `rescue.rejected`. Suspender lo saca de lo público y le quita la marca de aliado.
+    - **Volver a «En revisión»**.
+  - **Aliado KADESH** (solo si está verificado): **Marcar como aliado** o **Quitar de aliados**, con un orden opcional en el muro. El backend llena `allySince`. Los aliados salen en la portada y en `/aliados`.
+  - **Perfil**: tipo, zona, qué rescata, capacidad, descripción, lo que necesitan y donaciones.
+  - **Contacto**: WhatsApp con un mensaje listo para validarlos, correo, sitio y redes, y quién lo activó (nombre, correo y teléfono).
+  - **Cifras y equipo**: publicados, en adopción, adoptados, fichas internas y cada miembro con su rol.
+  - **Notas internas** (`adminNotes`), que solo ven los admins.
+  - **Ver perfil público** solo si está verificado.
+- **Cómo escribe:** con el `updateRescueOrganization` de Keystone. Los campos de verificación y de aliado solo los acepta un admin de plataforma, y los hooks del backend hacen el resto (fechas, avisos, actividad).
 
 ## Kadesh Pet → Avisos y Alertas de zona
 

@@ -22,6 +22,7 @@ import {
   RELEASE_PRODUCT_LABELS,
   RELEASE_STATUS_FILTERS,
 } from "./constants";
+import { adminErrorText } from "../errors";
 
 function emailLine(release: AdminRelease): string {
   if (release.emailedAt) return `Correo enviado el ${formatDateShort(release.emailedAt, false)}`;
@@ -93,7 +94,7 @@ export default function AdminReleasesPanel() {
       </div>
 
       {error ? (
-        <AdminErrorState message={error.message} />
+        <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />
       ) : loading && releases.length === 0 ? (
         <AdminLoadingRows rows={5} />
       ) : releases.length === 0 ? (

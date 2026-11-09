@@ -17,6 +17,7 @@ import {
   companyFollowUpVariables,
   type AdminCompanyFollowUpResponse,
 } from "../../../crm-queries";
+import { adminErrorText } from "kadesh/components/admin/errors";
 
 const FOLLOW_UP_PENDING = "Pendiente";
 
@@ -49,7 +50,7 @@ export default function FollowUpView({ companyId }: { companyId: string }) {
     { variables, fetchPolicy: "cache-and-network" },
   );
 
-  if (error) return <AdminErrorState message={error.message} />;
+  if (error) return <AdminErrorState message={adminErrorText(error, "No se pudo cargar esta sección. Intenta de nuevo.")} />;
   if (loading && !data) return <AdminLoadingRows rows={6} />;
   if (!data) return null;
 
