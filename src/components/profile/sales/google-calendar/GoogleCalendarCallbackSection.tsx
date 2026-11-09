@@ -25,7 +25,9 @@ type Status = "working" | "success" | "error";
 export default function GoogleCalendarCallbackSection() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, loading: userLoading } = useUser();
+  const { user, loading: sessionLoading, sessionPending } = useUser();
+  // Sesión sin confirmar por red: se espera, no se manda al login.
+  const userLoading = sessionLoading || sessionPending;
   const startedRef = useRef(false);
   const [status, setStatus] = useState<Status>("working");
   const [message, setMessage] = useState("Conectando tu cuenta de Google…");

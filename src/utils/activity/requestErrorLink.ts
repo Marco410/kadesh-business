@@ -1,11 +1,16 @@
 import { onError } from "@apollo/client/link/error";
 import { getMainDefinition } from "@apollo/client/utilities";
+import { isAbortError, isNetworkFailureExpected } from "kadesh/utils/network";
 import { reportClientError } from "./reportClientError";
 
 /**
  * Interceptor de errores de Apollo. Reporta a Actividad solo lo que el back no vio:
  * - la petición no llegó (sin red, CORS, back caído) o la respuesta no era JSON;
  * - el back o el proxy respondieron 5xx, 413 (archivo muy grande) o 429.
+ *
+ * Va antes de `queryRetryLink`: ve el error solo cuando fallaron todos los reintentos. No reporta
+ * las peticiones canceladas (pantalla desmontada, cambio de ruta) ni las que cortó el navegador
+ * porque la página se iba, estaba oculta o sin red; los bots los descarta `reportClientError`.
  *
  * Los errores de GraphQL (400 con `errors`, o 200 con `errors`) ya los guarda el back como
  * `app.error`, con la misma app, pantalla, IP y navegador (van en los headers de la petición).
@@ -39,7 +44,8 @@ function operationType(query: Parameters<typeof getMainDefinition>[0]): string |
 }
 
 function shouldReport(error: Error & { statusCode?: number }): boolean {
-  if (error.name === "AbortError") return false;
+  if (isAbortError(error)) return false;
+  if (isNetworkFailureExpected()) return false;
   if (error.name === "ServerParseError") return true;
   const status = error.statusCode;
   if (typeof status !== "number") return true;

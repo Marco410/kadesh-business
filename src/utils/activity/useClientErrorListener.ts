@@ -10,6 +10,7 @@ import { isChunkLoadError, reportClientError } from "./reportClientError";
  *
  * Descarta el ruido que no es de Kadesh: extensiones del navegador, scripts de terceros (Maps,
  * AdSense, Google), `ResizeObserver loop` y "Script error." (error de otro dominio sin detalle).
+ * Los bots los descarta `reportClientError` para todos los reportes.
  */
 
 const NOISE: RegExp[] = [

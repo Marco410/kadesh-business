@@ -498,7 +498,9 @@ export default function ObtenerClientesSection({
     loading: isLoading,
     error: syncError,
   } = useSyncLeadsArea();
-  const { user, loading: userLoading } = useUser();
+  const { user, loading: sessionLoading, sessionPending } = useUser();
+  // Sesión sin confirmar por red: se espera, no se manda al login.
+  const userLoading = sessionLoading || sessionPending;
   const canExtractLeads = isAdminCompanyUser(user);
   const { leads: companyLeads, refetch: refetchMapLeads } =
     useCompanyLeadLocations(canExtractLeads && !userLoading);

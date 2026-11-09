@@ -64,7 +64,9 @@ function roleLabels(user: CompanyUserManageRow): string {
 }
 
 export default function UsuariosSection() {
-  const { user, loading: userLoading } = useUser();
+  const { user, loading: sessionLoading, sessionPending } = useUser();
+  // Sesión sin confirmar por red: se espera, no se manda al login.
+  const userLoading = sessionLoading || sessionPending;
   const [mode, setMode] = useState<"list" | "create" | "edit">("list");
   const [editingUser, setEditingUser] = useState<CompanyUserManageRow | null>(
     null,

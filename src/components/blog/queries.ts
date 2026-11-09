@@ -8,7 +8,7 @@ export const GET_POSTS_QUERY = gql`
       image {
         url
       }
-      author {
+      author: authorProfile {
         name
         profileImage {
           url
@@ -73,8 +73,7 @@ export const GET_POST_BY_URL_QUERY = gql`
       publishedAt
       createdAt
       updatedAt
-      author {
-        id
+      author: authorProfile {
         name
         lastName
         username

@@ -81,9 +81,24 @@ export const ADMIN_BLOG_POST_QUERY = gql`
         id
         name
       }
+      author {
+        id
+        name
+        lastName
+        profileImage {
+          url
+        }
+      }
     }
   }
 `;
+
+export type AdminBlogPostAuthor = {
+  id: string;
+  name: string | null;
+  lastName: string | null;
+  profileImage: { url: string } | null;
+};
 
 export type AdminBlogPostDetail = {
   id: string;
@@ -96,6 +111,8 @@ export type AdminBlogPostDetail = {
   image: { url: string } | null;
   category: { id: string; name: string | null; product: string | null } | null;
   tags: Array<{ id: string; name: string | null }>;
+  /** Vacío en los que llegan de ClickUp: se asigna al editarlos. */
+  author: AdminBlogPostAuthor | null;
 };
 
 export type AdminBlogPostResponse = {

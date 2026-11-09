@@ -76,7 +76,9 @@ function emptyForm() {
 }
 
 export default function AgregarVendedorSection() {
-  const { user, loading: userLoading } = useUser();
+  const { user, loading: sessionLoading, sessionPending } = useUser();
+  // Sesión sin confirmar por red: se espera, no se manda al login.
+  const userLoading = sessionLoading || sessionPending;
   const userId = user?.id ?? "";
   const formRef = useRef<HTMLFormElement>(null);
 
