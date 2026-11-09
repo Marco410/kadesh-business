@@ -33,7 +33,9 @@ function getMainTabFromUrl(tabParam: string | null, canAccessExtraccion: boolean
 function PanelPageSectionContent() {
   const searchParams = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
-  const { user, loading: userLoading } = useUser();
+  const { user, loading: sessionLoading, sessionPending } = useUser();
+  // Sesión sin confirmar por red: se espera, no se manda al login.
+  const userLoading = sessionLoading || sessionPending;
   const canAccessExtraccion = isAdminCompanyUser(user);
   const { data: userData } = useQuery<UserCompanyCategoriesResponse, UserCompanyCategoriesVariables>(
     USER_COMPANY_CATEGORIES_QUERY,

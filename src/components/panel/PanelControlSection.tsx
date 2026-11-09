@@ -113,7 +113,9 @@ type PanelControlSectionProps = {
 function PanelControlSectionContent({
   embedded = false,
 }: PanelControlSectionProps) {
-  const { user, loading } = useUser();
+  const { user, loading: sessionLoading, sessionPending } = useUser();
+  // Sesión sin confirmar por red: se espera, no se manda al login.
+  const loading = sessionLoading || sessionPending;
   const router = useRouter();
   const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false);
   const searchParams = useSearchParams();

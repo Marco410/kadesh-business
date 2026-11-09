@@ -21,7 +21,9 @@ import RoleAccessDeniedSection from "kadesh/components/profile/sales/RoleAccessD
 import AddCompanyUserForm from "kadesh/components/profile/sales/workspaces/members/AddCompanyUserForm";
 
 export default function AgregarUsuarioCompanySection() {
-  const { user, loading: userLoading } = useUser();
+  const { user, loading: sessionLoading, sessionPending } = useUser();
+  // Sesión sin confirmar por red: se espera, no se manda al login.
+  const userLoading = sessionLoading || sessionPending;
   const userId = user?.id ?? "";
   const [editingId, setEditingId] = useState<string | null>(null);
 

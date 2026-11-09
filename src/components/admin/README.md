@@ -223,6 +223,8 @@ Se publican en Pet, en SaaS o en ambos. La categoría tiene que ser del mismo bl
 
 Publicar ahora avisa a quienes siguen ese blog y lo comparte en Facebook. Una fecha futura lo deja oculto hasta ese día. Volver a guardar un artículo que ya estaba publicado no repite el aviso. Un borrador no se ve en el sitio.
 
+**Autor:** un artículo nuevo lleva como autor a quien lo crea. Al editar se ve el autor actual (o «Sin autor») y **Ponerme como autor** lo cambia a quien edita; el cambio se aplica al **Guardar artículo**. Existe porque los artículos que llegan de ClickUp se crean sin autor ni categoría, y sin autor el blog no muestra quién lo escribió (ni en la ficha ni en los datos para Google). Por ahora solo se puede poner uno mismo, no elegir a otra persona ni quitarlo.
+
 ### Categorías
 
 Nombre libre, blog (Pet, SaaS o ambos) e imagen. El nombre es el que ve la gente y arma la dirección. Si la categoría ya tiene artículos, el nombre no se edita para no cambiar esa dirección. No se borra desde aquí.

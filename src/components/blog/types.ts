@@ -3,7 +3,8 @@ export interface Image {
 }
 
 export interface Author {
-  id: string;
+  /** No viene en el blog público (`authorProfile` no expone el id del usuario). */
+  id?: string;
   name: string;
   lastName: string;
   username: string;
