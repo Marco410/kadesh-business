@@ -192,7 +192,9 @@ function AdminNewMenu() {
 }
 
 function AdminDashboardContent() {
-  const { user, loading } = useUser();
+  const { user, loading: sessionLoading, sessionPending } = useUser();
+  // Sesión sin confirmar por red: se espera, no se manda al login.
+  const loading = sessionLoading || sessionPending;
   const router = useRouter();
   const searchParams = useSearchParams();
   const tab = parseAdminTab(searchParams.get("tab"));

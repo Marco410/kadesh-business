@@ -23,8 +23,7 @@ const POST_CARD_FIELDS = `
   image {
     url
   }
-  author {
-    id
+  author: authorProfile {
     name
     lastName
     username

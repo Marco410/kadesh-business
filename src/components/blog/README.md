@@ -12,6 +12,7 @@ El módulo se portó de Pet: los cambios de estructura conviene hacerlos en los 
 
 - **Índice (`/blog`)**: grid de artículos publicados; filtro opcional `?category=<url-de-categoría>`. Vacío: `EmptyBlogState`. Hero con el degradado naranja del home (sin foto: la imagen `public/images/sections/blog.jpg` es de Pet y no aplica).
 - **Detalle (`/blog/<url>`)**: artículo completo, autor, fechas, etiquetas, likes, favoritos, comentarios y relacionados. Si el post no existe, no está publicado o es de Pet, es **404** con `noindex`.
+- **Autor**: se pide como `author: authorProfile { … }`, no como `author { … }`. `Post.author` apunta a `User` y un visitante no puede leer `User`, así que `author` siempre le llegaba `null` y el blog nunca mostraba quién escribió el artículo (ni en la ficha, ni en tarjetas, ni en el JSON-LD para Google). `authorProfile` (kadesh-back, `models/Blog/Post/Post.authorProfile.ts`) da solo nombre, apellido, usuario, verificado, foto y fecha de alta, sin `id` ni correo. Requiere ese back desplegado.
 - La paginación es de cliente (`take`/`skip`). Solo la **página 1** se hidrata con el HTML del servidor. Cambiar `?category=` vuelve a la página 1.
 - Likes, favoritos, comentarios y vistas requieren sesión para escribir (misma cuenta `User` que el panel); anónimos solo leen.
 - **Newsletter**: `NewsletterSubscription` guarda `product: 'saas'`. El mismo correo puede estar suscrito a Pet y al SaaS; repetir el mismo producto muestra "ya está suscrito".

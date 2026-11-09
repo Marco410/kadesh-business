@@ -9,6 +9,7 @@ export {
 export { panelSectionKey, usePanelActivity } from "./usePanelActivity";
 export { CLIENT_APP, clientContextHeaders, currentPage } from "./clientContext";
 export {
+  isAutomatedClient,
   isChunkLoadError,
   reportClientError,
   type ClientErrorKind,

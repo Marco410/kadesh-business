@@ -31,6 +31,8 @@ La sección sale de la URL: `/panel?tab=clientes` → `clientes`, `/panel` → `
 - `requestErrorLink` reporta solo errores de red que el back no vio. Los errores de GraphQL ya los guarda el back (`app.error`) con la misma app, pantalla, IP y navegador.
 - Ante `RATE_LIMITED` o `IP_BLOCKED` muestra el mensaje del back en un aviso (una vez cada 30 s).
 - Sin sesión solo se manda `app.client_error`. Si un envío falla (sin red), se reintenta una vez.
+- Errores de red (`requestErrorLink`): las consultas se reintentan hasta 3 veces (`queryRetryLink`, nunca mutaciones) y solo se reporta si fallan todas con la persona en línea y la página visible. No se reportan las canceladas (pantalla desmontada, cambio de ruta) ni las que cortó el navegador al cerrar o salir de la página (`pagehide`, `kadesh/utils/network`).
+- `reportClientError` no manda nada de bots: user agents de crawlers y vistas previas (`bingbot`, `Googlebot`, `facebookexternalhit`, `meta-externalagent`, `AhrefsBot`, `HeadlessChrome`…) o `navigator.webdriver`. Los de IPs de Meta con user agent normal los descarta el back.
 
 ## Reglas
 

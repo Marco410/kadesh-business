@@ -20,6 +20,7 @@ import {
   CREATE_ADMIN_POST_MUTATION,
   UPDATE_ADMIN_POST_MUTATION,
   type AdminBlogCategoriesResponse,
+  type AdminBlogPostAuthor,
   type AdminBlogPostResponse,
   type AdminBlogTagsResponse,
 } from "./blog-queries";
@@ -42,6 +43,11 @@ function toDatetimeLocal(value: string | null | undefined) {
   if (Number.isNaN(date.getTime())) return "";
   const pad = (part: number) => String(part).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function authorName(author: AdminBlogPostAuthor | null) {
+  if (!author) return "";
+  return [author.name, author.lastName].filter(Boolean).join(" ").trim();
 }
 
 export default function AdminBlogPostForm({
@@ -125,6 +131,15 @@ function PostFormBody({
   const post = data?.post ?? null;
   const ready = isNew || Boolean(post);
 
+  const me: AdminBlogPostAuthor | null = user
+    ? {
+        id: user.id,
+        name: user.name ?? null,
+        lastName: user.lastName ?? null,
+        profileImage: user.profileImage ?? null,
+      }
+    : null;
+
   return (
     <>
       <div className="sticky top-0 z-10 bg-dash-surface px-4 sm:px-6 py-4 border-b border-dash-line flex items-start justify-between gap-3">
@@ -160,7 +175,8 @@ function PostFormBody({
       ) : (
         <PostFormFields
           postId={isNew ? null : postId}
-          authorId={user?.id ?? null}
+          me={me}
+          savedAuthor={post?.author ?? null}
           initialTitle={post?.title ?? ""}
           initialExcerpt={post?.excerpt ?? ""}
           initialProduct={post?.product ?? POST_PRODUCT.SAAS}
@@ -182,7 +198,8 @@ function PostFormBody({
 
 function PostFormFields({
   postId,
-  authorId,
+  me,
+  savedAuthor,
   initialTitle,
   initialExcerpt,
   initialProduct,
@@ -198,7 +215,10 @@ function PostFormFields({
   onSaved,
 }: {
   postId: string | null;
-  authorId: string | null;
+  /** Quien está editando. Es el autor por defecto de un artículo nuevo. */
+  me: AdminBlogPostAuthor | null;
+  /** Autor guardado. `null` en los nuevos y en los que llegan de ClickUp. */
+  savedAuthor: AdminBlogPostAuthor | null;
   initialTitle: string;
   initialExcerpt: string;
   initialProduct: string;
@@ -223,6 +243,14 @@ function PostFormFields({
   const [tagIds, setTagIds] = useState<string[]>(initialTagIds);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const previewUrl = useObjectUrl(imageFile);
+  // Solo guarda lo que se eligió a mano: así un artículo nuevo toma a `me`
+  // aunque la sesión termine de cargar después de abrir el formulario.
+  const [chosenAuthor, setChosenAuthor] = useState<AdminBlogPostAuthor | null>(
+    null,
+  );
+  const author = chosenAuthor ?? (postId ? savedAuthor : me);
+  const authorIsMe = Boolean(me && author?.id === me.id);
+  const authorPending = Boolean(author && author.id !== savedAuthor?.id);
 
   const { data: categoriesData } = useQuery<AdminBlogCategoriesResponse>(
     ADMIN_BLOG_CATEGORIES_QUERY,
@@ -319,7 +347,7 @@ function PostFormFields({
     }
 
     if (imageFile) payload.image = { upload: imageFile };
-    if (!postId && authorId) payload.author = { connect: { id: authorId } };
+    if (author && authorPending) payload.author = { connect: { id: author.id } };
 
     if (!payload.category) delete payload.category;
 
@@ -407,6 +435,51 @@ function PostFormFields({
             </p>
           ) : null}
         </label>
+
+        <div>
+          <span className={labelClass}>Autor</span>
+          <div className="flex flex-col gap-3 rounded-xl border border-dash-line px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
+              {author?.profileImage?.url ? (
+                <img
+                  src={author.profileImage.url}
+                  alt=""
+                  className="size-10 shrink-0 rounded-full object-cover bg-dash-surface-2"
+                />
+              ) : (
+                <span
+                  aria-hidden
+                  className="flex size-10 shrink-0 items-center justify-center rounded-full bg-dash-surface-2 text-sm font-semibold text-dash-muted"
+                >
+                  {authorName(author).charAt(0).toUpperCase() || "?"}
+                </span>
+              )}
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-dash-ink">
+                  {author ? authorName(author) || "Sin nombre" : "Sin autor"}
+                </p>
+                <p className="text-xs text-dash-muted">
+                  {!author
+                    ? "En el blog no sale quién lo escribió."
+                    : authorPending && postId
+                      ? `${authorIsMe ? "Tú. " : ""}Se cambia al guardar el artículo.`
+                      : authorIsMe
+                        ? "Tú"
+                        : "Sale en el blog como autor."}
+                </p>
+              </div>
+            </div>
+            {me && !authorIsMe ? (
+              <button
+                type="button"
+                onClick={() => setChosenAuthor(me)}
+                className="h-11 w-full shrink-0 rounded-full border border-dash-line px-4 text-sm font-semibold text-dash-ink cursor-pointer hover:bg-dash-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 sm:w-auto"
+              >
+                Ponerme como autor
+              </button>
+            ) : null}
+          </div>
+        </div>
 
         <fieldset>
           <legend className={labelClass}>Etiquetas</legend>

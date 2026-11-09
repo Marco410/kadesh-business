@@ -35,8 +35,26 @@ function shortStack(stack: string | null | undefined): string | null {
   return stack.split("\n").slice(0, STACK_LINES).join("\n").slice(0, MAX_STACK);
 }
 
+/**
+ * Crawlers y vistas previas de enlaces (Meta, WhatsApp, X, buscadores…) y navegadores headless:
+ * abren la página y la cierran a media carga, y lo que les falla no le pasó a una persona. Ojo: el
+ * navegador interno de Facebook/Instagram (`FBAN`, `FB_IAB`, `Instagram`) sí es gente y no entra
+ * aquí. Los que llegan con un user agent normal desde IPs de Meta los descarta el back
+ * (`knownCrawlers` en kadesh-back). Misma lista que kadesh-landing.
+ */
+const BOT_USER_AGENT =
+  /facebookexternalhit|facebookcatalog|facebot|meta-externalagent|meta-externalfetcher|meta-webindexer|whatsapp|twitterbot|slackbot|telegrambot|linkedinbot|discordbot|pinterestbot|googlebot|google-inspectiontool|adsbot-google|mediapartners-google|storebot-google|bingbot|yandexbot|baiduspider|duckduckbot|applebot|petalbot|ahrefsbot|semrushbot|headlesschrome|chrome-lighthouse/i;
+
+/** Bot conocido o navegador controlado por automatización (`navigator.webdriver`). */
+export function isAutomatedClient(): boolean {
+  if (typeof navigator === "undefined") return false;
+  if (navigator.webdriver) return true;
+  return BOT_USER_AGENT.test(navigator.userAgent ?? "");
+}
+
 export function reportClientError(report: ClientErrorReport) {
   if (typeof window === "undefined") return;
+  if (isAutomatedClient()) return;
   const metadata: TrackMetadata = {
     kind: report.kind,
     message: (report.message || "Error desconocido").slice(0, MAX_MESSAGE),
