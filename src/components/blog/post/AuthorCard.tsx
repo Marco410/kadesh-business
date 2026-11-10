@@ -1,5 +1,6 @@
 import { Author } from '../types';
 import Avatar from './AuthorAvatar';
+import { formatLongDateMx } from 'kadesh/utils/format-date';
 
 interface AuthorCardProps {
   author?: Author | null;
@@ -18,11 +19,7 @@ export default function AuthorCard({ author }: AuthorCardProps) {
           {author.name} {author.lastName}
         </p>
         <p className="text-sm text-[#616161] dark:text-[#b0b0b0]">
-          @{author.username} | Se unio el: {new Date(author.createdAt).toLocaleDateString('es-MX', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
+          @{author.username} | Se unió el: {formatLongDateMx(author.createdAt)}
         </p>
       </div>
     </>

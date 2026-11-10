@@ -9,6 +9,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { Delete02Icon } from '@hugeicons/core-free-icons';
 import { useUser } from 'kadesh/utils/UserContext';
 import { Routes } from 'kadesh/core/routes';
+import { formatLongDateMx } from 'kadesh/utils/format-date';
 
 interface CommentsSectionProps {
   postId: string;
@@ -144,11 +145,9 @@ export default function CommentsSection({ postId }: CommentsSectionProps) {
                       {commentItem.comment}
                     </p>
                     <div className="flex items-center gap-2 justify-between">
-                      <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-3"> {new Date(commentItem.createdAt).toLocaleDateString('es-MX', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })} </p>
+                      <p className="text-sm text-[#616161] dark:text-[#b0b0b0] mt-3">
+                        <time dateTime={commentItem.createdAt}>{formatLongDateMx(commentItem.createdAt)}</time>
+                      </p>
                       {
                         commentItem.user?.id === user?.id && (
                           <button

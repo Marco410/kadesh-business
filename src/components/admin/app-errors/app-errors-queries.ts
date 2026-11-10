@@ -124,6 +124,8 @@ export const ERROR_KIND_LABELS: Record<string, string> = {
   crash: "Pantalla caída",
   script: "Error de código",
   chunk: "No cargó la pantalla",
+  // Hidratación en una página que tradujo el navegador: no es falla de Kadesh.
+  warning: "Aviso (baja prioridad)",
 };
 
 export const ERROR_ISSUE_STATUS_LABELS: Record<ErrorIssueStatus, string> = {

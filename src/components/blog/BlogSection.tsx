@@ -11,6 +11,8 @@ import { BlogPost, PostWhereInput } from "./types";
 import { friendlyErrorText } from "kadesh/utils/errorText";
 
 interface BlogSectionProps {
+  /** Clases de la cuadrícula; con la columna lateral del índice va a 3 por fila. */
+  gridClassName?: string;
   postsPerPage?: number;
   showPagination?: boolean;
   initialPosts?: BlogPost[];
@@ -49,7 +51,10 @@ function PaginationButton({
   );
 }
 
+const DEFAULT_GRID = 'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4';
+
 function BlogSectionContent({
+  gridClassName = DEFAULT_GRID,
   postsPerPage = 12,
   showPagination = true,
   initialPosts = [],
@@ -110,7 +115,7 @@ function BlogSectionContent({
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className={gridClassName}>
         {Array.from({ length: postsPerPage || 8 }).map((_, index) => (
           <BlogCardSkeleton key={index} />
         ))}
@@ -135,7 +140,7 @@ function BlogSectionContent({
     <>
       <div
         id="blog-posts"
-        className={`grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 ${
+        className={`${gridClassName} ${
           isPageLoading ? 'opacity-60' : ''
         }`}
       >
@@ -183,6 +188,7 @@ function BlogSectionContent({
 }
 
 export default function BlogSection({
+  gridClassName = DEFAULT_GRID,
   postsPerPage = 12,
   showPagination = true,
   initialPosts = [],
@@ -192,7 +198,7 @@ export default function BlogSection({
   return (
     <Suspense
       fallback={
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className={gridClassName}>
           {Array.from({ length: postsPerPage || 8 }).map((_, index) => (
             <BlogCardSkeleton key={index} />
           ))}
@@ -200,6 +206,7 @@ export default function BlogSection({
       }
     >
       <BlogSectionContent
+        gridClassName={gridClassName}
         postsPerPage={postsPerPage}
         showPagination={showPagination}
         initialPosts={initialPosts}

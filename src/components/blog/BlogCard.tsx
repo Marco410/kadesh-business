@@ -17,6 +17,7 @@ import { getCategoryLabel, getCategoryColors } from './constants';
 import { Routes } from 'kadesh/core/routes';
 import { useUser } from 'kadesh/utils/UserContext';
 import { usePostFavorites } from './hooks/usePostFavorites';
+import { formatShortDateMx } from 'kadesh/utils/format-date';
 
 interface BlogCardProps {
   post: BlogPost;
@@ -99,10 +100,8 @@ export default function BlogCard({ post, index, showExcerpt = true }: BlogCardPr
               <span className="font-medium text-[#212121] dark:text-[#ffffff]">{post.author?.name || 'Autor'}</span>
               <span className="text-[#616161] dark:text-[#b0b0b0]">·</span>
               <span className="text-[#616161] dark:text-[#b0b0b0]">
-                {post.publishedAt 
-                  ? new Date(post.publishedAt).toLocaleDateString('es-MX', { month: 'short', day: 'numeric', year: 'numeric' })
-                  : new Date(post.createdAt).toLocaleDateString('es-MX', { month: 'short', day: 'numeric', year: 'numeric' })
-                }
+                {/* Hora de México fija: igual en el servidor (UTC) y en el navegador. */}
+                {formatShortDateMx(post.publishedAt || post.createdAt)}
               </span>
             </div>
           </div>
