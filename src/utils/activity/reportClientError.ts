@@ -4,13 +4,14 @@ import { TRACK_EVENT, trackActivity, type TrackMetadata } from "./track";
 /**
  * Errores que solo ve el navegador (el back no se entera): la petición no llegó o volvió con
  * 5xx/413/429 (`network`), la pantalla se cayó (`crash`, error boundary), un error de código
- * suelto que no la tiró (`script`) o no cargó su código tras un despliegue (`chunk`).
+ * suelto que no la tiró (`script`), no cargó su código tras un despliegue (`chunk`) o un aviso de
+ * baja prioridad que no es falla de Kadesh (`warning`, p. ej. hidratación con traducción automática).
  * Llegan a Operaciones → Actividad → Errores como `app.client_error`, con la pantalla del momento.
  *
  * Los errores de GraphQL no se reportan desde aquí: el back ya los registra (`app.error`).
  */
 
-export type ClientErrorKind = "network" | "crash" | "script" | "chunk";
+export type ClientErrorKind = "network" | "crash" | "script" | "chunk" | "warning";
 
 export type ClientErrorReport = {
   kind: ClientErrorKind;
