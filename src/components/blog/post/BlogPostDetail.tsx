@@ -7,7 +7,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import {
   Image01Icon,
 } from '@hugeicons/core-free-icons';
-import { BlogPostDetail } from '../types';
+import type { BlogPostDetail, BlogSidebarCategory, RelatedPostsResult } from '../types';
 import { getCategoryLabel, getCategoryColors } from '../constants';
 import { Routes } from 'kadesh/core/routes';
 import renderers from 'kadesh/utils/renderes';
@@ -15,17 +15,24 @@ import { DocumentRenderer } from '@keystone-6/document-renderer';
 import PostActions from './PostActions';
 import AuthorCard from './AuthorCard';
 import CommentsSection from './CommentsSection';
-import RelatedPostsSlider from './RelatedPostsSlider';
+import BlogSidebar from '../BlogSidebar';
+import { dayKeyMx, formatLongDateMx } from 'kadesh/utils/format-date';
 
 interface BlogPostDetailProps {
   post: BlogPostDetail;
+  /** Para la columna derecha (relacionados o, si no hay, los más recientes). */
+  related?: RelatedPostsResult;
+  /** Categorías del blog, debajo de la publicidad. */
+  categories?: BlogSidebarCategory[];
 }
 
-
-export default function BlogPostDetailComponent({ post }: BlogPostDetailProps) {
+export default function BlogPostDetailComponent({ post, related, categories }: BlogPostDetailProps) {
   const categoryValue = post.category?.name || '';
   const categoryLabel = getCategoryLabel(categoryValue);
   const categoryColors = getCategoryColors(categoryValue);
+  const publishedAt = post.publishedAt || post.createdAt;
+  // "Actualizado" solo si cae otro día que la publicación, contando días de México.
+  const showUpdated = Boolean(post.updatedAt) && dayKeyMx(post.updatedAt) !== dayKeyMx(publishedAt);
 
   return (
     <article className="min-h-screen bg-[#ffffff] dark:bg-[#121212]">
@@ -33,7 +40,7 @@ export default function BlogPostDetailComponent({ post }: BlogPostDetailProps) {
         aria-label="Miga de pan"
         className="border-b border-[#e0e0e0] px-4 pt-24 pb-3 sm:px-6 lg:px-8 dark:border-[#3a3a3a]"
       >
-        <ol className="mx-auto flex max-w-4xl flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
+        <ol className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[#616161] dark:text-[#b0b0b0]">
           <li>
             <Link href={Routes.home} className="min-h-11 inline-flex items-center hover:text-orange-500">
               Inicio
@@ -74,8 +81,8 @@ export default function BlogPostDetailComponent({ post }: BlogPostDetailProps) {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         
-        <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-          <div className="max-w-4xl mx-auto">
+        <div className="absolute bottom-0 left-0 right-0 px-4 py-8 text-white sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-6xl">
             <div className="mb-4">
               <Link
                 href={`${Routes.blog.index}?category=${post.category?.url}`}
@@ -84,47 +91,31 @@ export default function BlogPostDetailComponent({ post }: BlogPostDetailProps) {
                 {categoryLabel}
               </Link>
             </div>
-            <h1 className="mb-4 break-words text-4xl font-bold sm:text-5xl lg:text-6xl">
+            <h1 className="mb-4 max-w-4xl text-balance break-words text-4xl font-bold sm:text-5xl lg:text-6xl">
               {post.title}
             </h1>
             <p className="text-sm">
               <span className="font-medium">Publicado el: </span>
-              <time
-                className="font-bold"
-                dateTime={post.publishedAt || post.createdAt}
-              >
-                {post.publishedAt
-                ? new Date(post.publishedAt).toLocaleDateString('es-MX', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
-                : new Date(post.createdAt).toLocaleDateString('es-MX', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
+              {/* Hora de México fija: igual en el servidor (UTC) y en el navegador. */}
+              <time className="font-bold" dateTime={publishedAt}>
+                {formatLongDateMx(publishedAt)}
               </time>
-              {post.updatedAt &&
-                (post.updatedAt.slice(0, 10) !==
-                  (post.publishedAt || post.createdAt).slice(0, 10)) && (
-                  <>
-                    <span className="font-medium"> · Actualizado el: </span>
-                    <time className="font-bold" dateTime={post.updatedAt}>
-                      {new Date(post.updatedAt).toLocaleDateString('es-MX', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </time>
-                  </>
-                )}
+              {showUpdated && (
+                <>
+                  <span className="font-medium"> · Actualizado el: </span>
+                  <time className="font-bold" dateTime={post.updatedAt}>
+                    {formatLongDateMx(post.updatedAt)}
+                  </time>
+                </>
+              )}
             </p>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Columna de lectura (~68ch) y, a la derecha, relacionados + publicidad + categorías. */}
+      <div className="mx-auto grid max-w-6xl gap-12 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:px-8">
+      <main className="min-w-0 max-w-[42rem]">
         <div className="mb-8 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end">
           <PostActions 
               postId={post.id}
@@ -166,10 +157,15 @@ export default function BlogPostDetailComponent({ post }: BlogPostDetailProps) {
         )}
 
         <CommentsSection postId={post.id} />
-      
-        <RelatedPostsSlider currentPost={post} />
-
       </main>
+
+      <BlogSidebar
+        title={related?.related ? 'Artículos relacionados' : 'Lo más reciente'}
+        posts={related?.posts ?? []}
+        categories={categories}
+        activeCategory={post.category?.url}
+      />
+      </div>
     </article>
   );
 }

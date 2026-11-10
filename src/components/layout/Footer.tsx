@@ -6,6 +6,7 @@ import {
   formatKadeshLegalAddress,
 } from 'kadesh/constants/legal';
 import { Routes } from 'kadesh/core/routes';
+import { currentYearMx } from 'kadesh/utils/format-date';
 import { ALLIES } from 'kadesh/components/allies';
 
 const FOOTER_LINKS = {
@@ -142,7 +143,8 @@ export default function Footer() {
         <div className="border-t border-gray-800 pt-8 mt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-400 text-sm text-center md:text-left">
-              © {new Date().getFullYear()} KADESH. Todos los derechos reservados.
+              {/* El HTML puede venir de caché (ISR) de antes de Año Nuevo: solo este texto. */}
+              © <span suppressHydrationWarning>{currentYearMx()}</span> KADESH. Todos los derechos reservados.
             </p>
             <p className="text-gray-400 text-sm text-center md:text-right">
               Hecho con ❤️ para equipos de ventas B2B

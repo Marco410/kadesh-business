@@ -8,7 +8,11 @@ import { BlogSection, CategorySection } from 'kadesh/components/blog';
 import { NewsletterSubscription } from 'kadesh/components/newsletter';
 import { useSearchParams } from 'next/navigation';
 import { Routes } from 'kadesh/core/routes';
-import type { BlogPost } from './types';
+import BlogSidebar from './BlogSidebar';
+import type { BlogPost, BlogSidebarCategory, BlogSidebarPost } from './types';
+
+/** Con la columna a la derecha caben 2 tarjetas por fila en lg y 3 en xl. */
+const GRID_WITH_SIDEBAR = 'grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3';
 
 function BlogFilters() {
   const searchParams = useSearchParams();
@@ -34,12 +38,18 @@ type BlogIndexClientProps = {
   initialPosts: BlogPost[];
   initialCount?: number;
   initialCategory?: string | null;
+  /** Lo más leído del blog, para la columna derecha. */
+  mostViewed?: BlogSidebarPost[];
+  /** Categorías del blog, debajo de la publicidad. */
+  categories?: BlogSidebarCategory[];
 };
 
 export default function BlogIndexClient({
   initialPosts,
   initialCount = 0,
   initialCategory = null,
+  mostViewed = [],
+  categories = [],
 }: BlogIndexClientProps) {
   return (
     <div className="min-h-screen bg-[#ffffff] dark:bg-[#121212]">
@@ -82,13 +92,23 @@ export default function BlogIndexClient({
         </div>
       </nav>
 
-      <main className="mx-auto max-w-7xl px-4 py-8 pb-16 sm:px-6 lg:px-8">
-        <BlogSection
-          initialPosts={initialPosts}
-          initialCount={initialCount}
-          initialCategory={initialCategory}
+      <div className="mx-auto grid max-w-7xl gap-12 px-4 py-8 pb-16 sm:px-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:px-8">
+        <main className="min-w-0">
+          <BlogSection
+            initialPosts={initialPosts}
+            initialCount={initialCount}
+            initialCategory={initialCategory}
+            gridClassName={GRID_WITH_SIDEBAR}
+          />
+        </main>
+        <BlogSidebar
+          title="Lo más leído"
+          posts={mostViewed}
+          ranked
+          categories={categories}
+          activeCategory={initialCategory}
         />
-      </main>
+      </div>
 
       <CategorySection />
       <NewsletterSubscription className="mt-16" />

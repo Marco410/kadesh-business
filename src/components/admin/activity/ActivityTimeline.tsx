@@ -175,6 +175,7 @@ const ERROR_VALUE_LABELS: Record<string, string> = {
   crash: "Pantalla caída",
   script: "Error de código",
   chunk: "No cargó la pantalla",
+  warning: "Aviso (baja prioridad)",
   comment: "Comentario",
   duplicate_report: "Posible duplicado",
   possible_match: "Posible coincidencia",
