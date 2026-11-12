@@ -1,6 +1,7 @@
 import type {
   BlogPost,
   BlogPostDetail,
+  BlogCategoryCard,
   BlogSidebarCategory,
   BlogSidebarPost,
   RelatedPostsResult,
@@ -115,6 +116,19 @@ const SIDEBAR_POSTS_QUERY = `
 const PRODUCT_LIST = JSON.stringify(BLOG_PRODUCT_FILTER.in);
 
 /** Categorías de este blog con cuántos artículos publicados (y ya en fecha) tiene cada una. */
+const CATEGORY_CARDS_QUERY = `
+  query GetBlogCategoryCards {
+    categories(where: { product: { in: ${PRODUCT_LIST} } }) {
+      id
+      name
+      url
+      image {
+        url
+      }
+    }
+  }
+`;
+
 const SIDEBAR_CATEGORIES_QUERY = `
   query GetBlogCategories($now: DateTime!) {
     categories(where: { product: { in: ${PRODUCT_LIST} } }) {
@@ -174,6 +188,10 @@ type SidebarPostsData = {
 
 type SidebarCategoriesData = {
   categories: BlogSidebarCategory[] | null;
+};
+
+type CategoryCardsData = {
+  categories: BlogCategoryCard[] | null;
 };
 
 type SitemapPostsData = {
@@ -334,6 +352,15 @@ export async function fetchRelatedPosts(
   }
 
   return { posts: await fetchSidebarPosts(where, limit), related: false };
+}
+
+/**
+ * Categorías del carrusel "Explora por categoría". Se piden aquí, con caché, para que cada visita
+ * al blog no las consulte desde el navegador. Sin `$now`: la misma petición se reutiliza.
+ */
+export async function fetchBlogCategoryCards(): Promise<BlogCategoryCard[]> {
+  const data = await queryGraphql<CategoryCardsData>(CATEGORY_CARDS_QUERY, {});
+  return (data?.categories ?? []).filter((category) => Boolean(category.url));
 }
 
 /** Categorías con artículos publicados, de la que más tiene a la que menos. */

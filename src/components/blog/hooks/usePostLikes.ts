@@ -5,9 +5,9 @@ import {
   CREATE_POST_LIKE_MUTATION, 
   CreatePostLikeVariables, 
   CreatePostLikeResponse,
-  GET_POST_LIKES_QUERY,
-  GetPostLikesResponse,
-  GetPostLikesVariables,
+  GET_POST_LIKES_SUMMARY_QUERY,
+  GetPostLikesSummaryResponse,
+  GetPostLikesSummaryVariables,
   DELETE_POST_LIKE_MUTATION,
   DeletePostLikeVariables,
   DeletePostLikeResponse
@@ -17,28 +17,23 @@ import { useUser } from 'kadesh/utils/UserContext';
 export function usePostLikes(postId: string) {
   const { user } = useUser();
 
+  // El total lo cuenta el back; de las filas solo se trae mi like (si hay sesión).
+  const postWhere = { post: { id: { equals: postId } } };
   const { data: likesData, loading: likesLoading, refetch: refetchLikes } = useQuery<
-    GetPostLikesResponse,
-    GetPostLikesVariables
-  >(GET_POST_LIKES_QUERY, {
+    GetPostLikesSummaryResponse,
+    GetPostLikesSummaryVariables
+  >(GET_POST_LIKES_SUMMARY_QUERY, {
     variables: {
-      where: {
-        post: {
-          id: {
-            equals: postId,
-          },
-        },
-      },
+      where: postWhere,
+      mineWhere: user?.id ? { ...postWhere, user: { id: { equals: user.id } } } : postWhere,
+      withMine: Boolean(user?.id),
     },
     skip: !postId,
   });
 
-  const likes = likesData?.postLikes || [];
-  const likesCount = likes.length;
+  const likesCount = likesData?.postLikesCount ?? 0;
 
-  const userLike = user?.id
-    ? likes.find((like) => like.user?.id === user.id) || null
-    : null;
+  const userLike = user?.id ? likesData?.myLikes?.[0] ?? null : null;
 
   const isLiked = !!userLike;
 
@@ -104,7 +99,6 @@ export function usePostLikes(postId: string) {
   };
 
   return {
-    likes,
     likesCount,
     isLiked,
     userLike,

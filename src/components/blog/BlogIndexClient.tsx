@@ -9,7 +9,12 @@ import { NewsletterSubscription } from 'kadesh/components/newsletter';
 import { useSearchParams } from 'next/navigation';
 import { Routes } from 'kadesh/core/routes';
 import BlogSidebar from './BlogSidebar';
-import type { BlogPost, BlogSidebarCategory, BlogSidebarPost } from './types';
+import type {
+  BlogCategoryCard,
+  BlogPost,
+  BlogSidebarCategory,
+  BlogSidebarPost,
+} from './types';
 
 /** Con la columna a la derecha caben 2 tarjetas por fila en lg y 3 en xl. */
 const GRID_WITH_SIDEBAR = 'grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3';
@@ -42,6 +47,8 @@ type BlogIndexClientProps = {
   mostViewed?: BlogSidebarPost[];
   /** Categorías del blog, debajo de la publicidad. */
   categories?: BlogSidebarCategory[];
+  /** Todas las categorías, para el carrusel "Explora por categoría". */
+  categoryCards?: BlogCategoryCard[];
 };
 
 export default function BlogIndexClient({
@@ -50,6 +57,7 @@ export default function BlogIndexClient({
   initialCategory = null,
   mostViewed = [],
   categories = [],
+  categoryCards = [],
 }: BlogIndexClientProps) {
   return (
     <div className="min-h-screen bg-[#ffffff] dark:bg-[#121212]">
@@ -110,7 +118,7 @@ export default function BlogIndexClient({
         />
       </div>
 
-      <CategorySection />
+      <CategorySection initialCategories={categoryCards} />
       <NewsletterSubscription className="mt-16" />
       <Footer />
     </div>

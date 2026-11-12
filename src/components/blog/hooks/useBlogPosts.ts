@@ -50,6 +50,10 @@ export function useBlogPosts({
     setCurrentPage(1);
   }, [filterKey]);
 
+  // La página 1 ya viene renderizada por el servidor (ISR): no se vuelve a pedir en el navegador.
+  // Sin posts iniciales (otra categoría que la del HTML, o el servidor falló) sí se consulta.
+  const canUseInitial = currentPage === 1 && initialPosts.length > 0;
+
   const { data, loading, error } = useQuery<
     GetPostsQueryResult,
     GetPostsQueryVariables
@@ -61,11 +65,12 @@ export function useBlogPosts({
       orderBy: resolvedOrderBy,
     },
     notifyOnNetworkStatusChange: true,
+    skip: canUseInitial,
   });
 
-  const canUseInitial = currentPage === 1 && initialPosts.length > 0;
-  const posts = data?.posts ?? (canUseInitial ? initialPosts : []);
-  const totalPosts = data?.postsCount ?? initialCount;
+  // Con `skip`, Apollo puede conservar el `data` de la página anterior: en la 1 manda el HTML.
+  const posts = canUseInitial ? initialPosts : data?.posts ?? [];
+  const totalPosts = canUseInitial ? initialCount : data?.postsCount ?? initialCount;
   const totalPages = Math.ceil(totalPosts / postsPerPage);
   const isLoading = loading && posts.length === 0;
 

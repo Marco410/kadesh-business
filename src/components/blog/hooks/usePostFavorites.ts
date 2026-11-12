@@ -13,11 +13,14 @@ import {
   DeletePostFavoriteResponse
 } from '../queries';
 import { useUser } from 'kadesh/utils/UserContext';
+import { usePostFavoritesBatch } from './PostFavoritesBatch';
 
 export function usePostFavorites(postId: string) {
   const { user } = useUser();
+  // En una lista de tarjetas los favoritos llegan juntos (`PostFavoritesBatchProvider`).
+  const batch = usePostFavoritesBatch();
 
-  const { data: favoritesData, loading: favoritesLoading, refetch: refetchFavorites } = useQuery<
+  const { data: favoritesData, loading: ownLoading, refetch: refetchOwn } = useQuery<
     GetPostFavoritesResponse,
     GetPostFavoritesVariables
   >(GET_POST_FAVORITES_QUERY, {
@@ -37,14 +40,19 @@ export function usePostFavorites(postId: string) {
         }),
       },
     },
-    skip: !postId,
+    // Sin sesión no hay favoritos que consultar: los visitantes y los bots no piden nada.
+    skip: !postId || !user?.id || Boolean(batch),
   });
 
   const favorites = favoritesData?.postFavorites || [];
+  const favoritesLoading = batch ? batch.loading : ownLoading;
+  const refetchFavorites = batch ? batch.refetch : refetchOwn;
 
-  const userFavorite = user?.id
-    ? favorites.find((favorite) => favorite.user?.id === user.id) || null
-    : null;
+  const userFavorite = !user?.id
+    ? null
+    : batch
+      ? batch.byPostId.get(postId) ?? null
+      : favorites.find((favorite) => favorite.user?.id === user.id) || null;
 
   const isFavorited = !!userFavorite;
   const postFavorite = userFavorite;

@@ -10,9 +10,20 @@ import { Image01Icon } from '@hugeicons/core-free-icons';
 import { getCategoryLabel, getCategoryColors } from './constants';
 import { Routes } from 'kadesh/core/routes';
 import { friendlyErrorText } from 'kadesh/utils/errorText';
+import type { BlogCategoryCard } from './types';
 
-export default function CategorySection() {
-  const { categories, loading, error } = useCategories();
+export default function CategorySection({
+  initialCategories = [],
+}: {
+  /** Las que ya trajo el servidor. Si llegan, no se consultan desde el navegador. */
+  initialCategories?: BlogCategoryCard[];
+}) {
+  // Respaldo: solo se piden aquí si el servidor no las pudo traer.
+  const hasInitial = initialCategories.length > 0;
+  const fetched = useCategories({ skip: hasInitial });
+  const categories: BlogCategoryCard[] = hasInitial ? initialCategories : fetched.categories;
+  const loading = !hasInitial && fetched.loading;
+  const error = hasInitial ? undefined : fetched.error;
 
   if (loading) {
     return (
