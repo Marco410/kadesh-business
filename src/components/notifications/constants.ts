@@ -24,8 +24,13 @@ export const NOTIFICATION_TYPE = {
   SECURITY_ALERT: "security.alert",
 } as const;
 
-/** Cada cuánto se revisa el contador de no leídas (sin websockets en esta fase). */
-export const NOTIFICATIONS_POLL_MS = 60_000;
+/**
+ * Cada cuánto se revisa el contador de no leídas (sin websockets en esta fase), solo con la
+ * pestaña visible. Eran 60 s también en segundo plano: 1,440 peticiones al día por pestaña abierta.
+ */
+export const NOTIFICATIONS_POLL_MS = 3 * 60_000;
+/** Al volver a la pestaña se revisa de inmediato si estuvo oculta al menos este tiempo. */
+export const NOTIFICATIONS_REFRESH_AFTER_HIDDEN_MS = 30_000;
 export const NOTIFICATIONS_PAGE_SIZE = 20;
 
 export function notificationIcon(type: string | null) {
