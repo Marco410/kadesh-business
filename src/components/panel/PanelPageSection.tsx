@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { useRemainingCredits } from "kadesh/components/panel/hooks";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
@@ -37,7 +37,7 @@ function PanelPageSectionContent() {
   // Sesión sin confirmar por red: se espera, no se manda al login.
   const userLoading = sessionLoading || sessionPending;
   const canAccessExtraccion = isAdminCompanyUser(user);
-  const { data: userData } = useQuery<UserCompanyCategoriesResponse, UserCompanyCategoriesVariables>(
+  const { data: userData } = useStableQuery<UserCompanyCategoriesResponse, UserCompanyCategoriesVariables>(
     USER_COMPANY_CATEGORIES_QUERY,
     { variables: { where: { id: user?.id ?? "" } }, skip: !user?.id },
   );

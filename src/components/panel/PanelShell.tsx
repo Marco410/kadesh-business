@@ -2,7 +2,7 @@
 
 import { createElement, useMemo, type ReactNode } from "react";
 import Link from "next/link";
-import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon } from "@hugeicons/core-free-icons";
 import { AppShell, type AppCrumb, type AppNavGroup } from "kadesh/components/app-shell";
@@ -85,7 +85,7 @@ export default function PanelShell({
 }) {
   const { user } = useUser();
   const mounted = useIsClient();
-  const { data: userData } = useQuery<UserCompanyCategoriesResponse, UserCompanyCategoriesVariables>(
+  const { data: userData } = useStableQuery<UserCompanyCategoriesResponse, UserCompanyCategoriesVariables>(
     USER_COMPANY_CATEGORIES_QUERY,
     { variables: { where: { id: user?.id ?? "" } }, skip: !user?.id },
   );
@@ -93,13 +93,12 @@ export default function PanelShell({
   const companyId = company?.id ?? null;
   const { remainingQuota, loading: creditsLoading } = useRemainingCredits(companyId);
   const { isAiLive } = useCompanyAiLive(companyId);
-  const { data: subscriptionData } = useQuery<SubscriptionStatusResponse, SubscriptionStatusVariables>(
+  const { data: subscriptionData } = useStableQuery<SubscriptionStatusResponse, SubscriptionStatusVariables>(
     SUBSCRIPTION_STATUS_QUERY,
     { variables: { companyId }, skip: !companyId },
   );
-  const { data: plansData } = useQuery<SaasPlansResponse>(SAAS_PLANS_QUERY, {
+  const { data: plansData } = useStableQuery<SaasPlansResponse>(SAAS_PLANS_QUERY, {
     skip: !companyId,
-    fetchPolicy: "cache-and-network",
   });
   const subscription = subscriptionData?.subscriptionStatus?.subscription ?? null;
   const betaFeatureKeys = useMemo(

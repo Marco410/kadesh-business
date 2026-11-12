@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import Autocomplete, { type AutocompleteOption } from "./Autocomplete";
 import { useUser } from "kadesh/utils/UserContext";
 import { Role } from "kadesh/constants/constans";
@@ -46,7 +47,7 @@ export default function ClientLeadAutocomplete({
     user?.roles?.some((r) => r.name === Role.USER_COMPANY) ?? false;
   const hasCompanyWideLeadScope = isAdminCompany || isUserCompany;
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

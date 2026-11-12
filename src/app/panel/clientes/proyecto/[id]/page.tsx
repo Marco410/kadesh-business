@@ -2,7 +2,7 @@
 
 import PanelShell from "kadesh/components/panel/PanelShell";
 import ProjectDetailSection from "kadesh/components/profile/sales/proyecto/ProjectDetailSection";
-import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
   type UserCompanyCategoriesResponse,
@@ -16,7 +16,7 @@ export default function ProjectDetailPage() {
   const { user } = useUser();
   const userId = user?.id ?? "";
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

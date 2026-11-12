@@ -6,7 +6,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import {
   SUBSCRIPTION_STATUS_QUERY,
   type SubscriptionStatusResponse,
@@ -47,7 +47,7 @@ interface SubscriptionProviderProps {
 }
 
 export function SubscriptionProvider({ companyId, children }: SubscriptionProviderProps) {
-  const { data, loading, refetch } = useQuery<
+  const { data, loading, refetch } = useStableQuery<
     SubscriptionStatusResponse,
     SubscriptionStatusVariables
   >(SUBSCRIPTION_STATUS_QUERY, {

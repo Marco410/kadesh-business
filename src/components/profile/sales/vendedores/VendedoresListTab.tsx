@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
   type UserCompanyCategoriesResponse,
@@ -60,7 +61,7 @@ export default function VendedoresListTab({ userId }: VendedoresListTabProps) {
     () => canManageCompanyUsers(user),
   );
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

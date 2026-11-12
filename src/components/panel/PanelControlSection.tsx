@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { useUser } from "kadesh/utils/UserContext";
 import { Routes } from "kadesh/core/routes";
 import { preserveRegisterSuccessParam } from "kadesh/utils/facebook-pixel";
@@ -158,7 +158,7 @@ function PanelControlSectionContent({
     canManageCompanyAi(user),
   );
 
-  const { data: userData, refetch: refetchUserCompany } = useQuery<
+  const { data: userData, refetch: refetchUserCompany } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {
@@ -167,7 +167,7 @@ function PanelControlSectionContent({
   });
   const companyId = userData?.user?.company?.id ?? null;
 
-  const { data: subscriptionData, loading: subscriptionLoading } = useQuery<
+  const { data: subscriptionData, loading: subscriptionLoading } = useStableQuery<
     SubscriptionStatusResponse,
     SubscriptionStatusVariables
   >(SUBSCRIPTION_STATUS_QUERY, {
@@ -176,9 +176,8 @@ function PanelControlSectionContent({
   });
   const subscription =
     subscriptionData?.subscriptionStatus?.subscription ?? null;
-  const { data: plansData } = useQuery<SaasPlansResponse>(SAAS_PLANS_QUERY, {
+  const { data: plansData } = useStableQuery<SaasPlansResponse>(SAAS_PLANS_QUERY, {
     skip: !companyId,
-    fetchPolicy: "cache-and-network",
   });
   const betaFeatureKeys = useMemo(
     () =>

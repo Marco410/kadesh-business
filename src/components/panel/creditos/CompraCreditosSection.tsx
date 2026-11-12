@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { CardElement } from "@stripe/react-stripe-js";
 import { useTheme } from "next-themes";
 import {
@@ -103,7 +104,7 @@ export default function CompraCreditosSection() {
   const [acceptTerms, setAcceptTerms] = useState(false);
 
   const { data, loading, error } = useQuery<SaasCreditsResponse>(SAAS_CREDITS_QUERY);
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

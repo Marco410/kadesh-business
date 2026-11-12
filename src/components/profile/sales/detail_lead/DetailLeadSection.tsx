@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import {
   TECH_BUSINESS_LEAD_QUERY,
   UPDATE_TECH_BUSINESS_LEAD_MUTATION,
@@ -128,7 +129,7 @@ export default function DetailLeadSection() {
   const { subscription } = useSubscription();
   const id = typeof params?.id === "string" ? params.id : "";
 
-  const { data: userCompanyData, loading: companyLoading } = useQuery<
+  const { data: userCompanyData, loading: companyLoading } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

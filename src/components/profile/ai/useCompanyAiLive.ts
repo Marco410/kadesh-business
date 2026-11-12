@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { isCompanyAiConfigured } from "./constants";
 import {
   COMPANY_AI_LIVE_QUERY,
@@ -12,7 +12,7 @@ import {
  * True cuando la empresa tiene Kadesh Urim AI configurado y al menos un ping de conexión exitoso.
  */
 export function useCompanyAiLive(companyId: string | null) {
-  const { data, loading } = useQuery<
+  const { data, loading } = useStableQuery<
     CompanyAiLiveStatusResponse,
     CompanyAiLiveStatusVariables
   >(COMPANY_AI_LIVE_QUERY, {

@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import Link from "next/link";
 import { useQuery, useMutation } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
   ROLES_BY_NAMES_QUERY,
@@ -106,7 +107,7 @@ export default function AgregarVendedorSection() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [listSearch, setListSearch] = useState("");
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

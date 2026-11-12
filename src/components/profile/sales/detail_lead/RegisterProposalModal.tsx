@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQuery, useMutation } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import {
   TECH_PROPOSALS_QUERY,
   TECH_PROPOSALS_COUNT_QUERY,
@@ -62,7 +63,7 @@ export default function RegisterProposalModal({
 }: RegisterProposalModalProps) {
   const { currentWorkspaceId } = useWorkspaceContext();
   const { subscription } = useSubscription();
-  const { data: userData } = useQuery<UserCompanyCategoriesResponse, UserCompanyCategoriesVariables>(
+  const { data: userData } = useStableQuery<UserCompanyCategoriesResponse, UserCompanyCategoriesVariables>(
     USER_COMPANY_CATEGORIES_QUERY,
     {
       variables: { where: { id: userId } },

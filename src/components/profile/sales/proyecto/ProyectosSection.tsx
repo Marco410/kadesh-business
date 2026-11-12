@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
   type UserCompanyCategoriesResponse,
@@ -38,7 +39,7 @@ export default function ProyectosSection({ userId }: ProyectosSectionProps) {
   const canCreateProject = can(user, PERMISSION_KEYS.PROYECTOS_CREAR, () => true);
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

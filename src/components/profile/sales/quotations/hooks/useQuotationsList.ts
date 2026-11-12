@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { useUser } from "kadesh/utils/UserContext";
 import { Role } from "kadesh/constants/constans";
 import {
@@ -33,7 +34,7 @@ export function useQuotationsList({ userId }: UseQuotationsListOptions) {
 
   const [page, setPage] = useState(1);
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

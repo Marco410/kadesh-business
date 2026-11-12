@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { AnimatePresence, motion } from "framer-motion";
-import { useQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import {
@@ -55,7 +56,7 @@ export default function CreateProjectModal({
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon, Edit02Icon } from "@hugeicons/core-free-icons";
 import {
@@ -27,7 +28,7 @@ export default function AgregarUsuarioCompanySection() {
   const userId = user?.id ?? "";
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

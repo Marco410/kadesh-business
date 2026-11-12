@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Add01Icon,
@@ -73,7 +74,7 @@ export default function UsuariosSection() {
   );
   const [searchInput, setSearchInput] = useState("");
 
-  const { data: companyData } = useQuery<
+  const { data: companyData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

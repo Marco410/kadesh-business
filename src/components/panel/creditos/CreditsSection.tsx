@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowLeft01Icon,
@@ -290,7 +291,7 @@ export default function CreditsSection({
   const router = useRouter();
   const { user } = useUser();
   const { data, loading, error } = useQuery<SaasCreditsResponse>(SAAS_CREDITS_QUERY);
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {
