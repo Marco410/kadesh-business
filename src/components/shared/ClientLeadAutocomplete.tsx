@@ -7,6 +7,7 @@ import Autocomplete, { type AutocompleteOption } from "./Autocomplete";
 import { useUser } from "kadesh/utils/UserContext";
 import { Role } from "kadesh/constants/constans";
 import { useDebouncedValue } from "kadesh/components/admin/hooks/useDebouncedValue";
+import { normalizeSearchText } from "kadesh/utils/normalizeSearchText";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
   type UserCompanyCategoriesResponse,
@@ -59,9 +60,9 @@ export interface ClientLeadAutocompleteProps {
 }
 
 /**
- * Buscador de clientes del CRM. La búsqueda la hace el servidor (nombre que contenga lo escrito,
- * sin distinguir mayúsculas) y trae como máximo `SEARCH_TAKE` coincidencias; sin texto muestra los
- * más recientes.
+ * Buscador de clientes del CRM. La búsqueda la hace el servidor sobre `businessNameSearch` (el
+ * nombre en minúsculas y sin acentos): "cafe" encuentra "Café". Trae como máximo `SEARCH_TAKE`
+ * coincidencias; sin texto muestra los más recientes. Se muestra siempre `businessName`.
  */
 export default function ClientLeadAutocomplete({
   userId,
@@ -92,7 +93,8 @@ export default function ClientLeadAutocomplete({
   const companyId = userData?.user?.company?.id ?? null;
 
   const [typed, setTyped] = useState("");
-  const term = typed.trim();
+  // Igual que el back guarda `businessNameSearch`: minúsculas y sin acentos ("PEÑA" → "pena").
+  const term = normalizeSearchText(typed);
   const debouncedTerm = useDebouncedValue(term, SEARCH_DEBOUNCE_MS);
 
   const searchVariables = useMemo<ClientLeadSearchVariables>(
@@ -105,7 +107,7 @@ export default function ClientLeadAutocomplete({
           ? { salesPerson: { some: { id: { equals: userId } } } }
           : {}),
         ...(debouncedTerm
-          ? { businessName: { contains: debouncedTerm, mode: "insensitive" } }
+          ? { businessNameSearch: { contains: debouncedTerm } }
           : {}),
       },
       take: SEARCH_TAKE,
