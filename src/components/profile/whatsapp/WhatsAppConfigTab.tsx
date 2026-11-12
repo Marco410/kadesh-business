@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -18,6 +18,7 @@ import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
 import FeatureBetaBadge from "kadesh/components/profile/sales/planes/FeatureBetaBadge";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
+import { skipPollWhenHidden } from "kadesh/utils/pageVisibility";
 import {
   COMPANY_WHATSAPP_SETTINGS_QUERY,
   COMPANY_WHATSAPP_WEBHOOK_INFO_QUERY,
@@ -90,6 +91,9 @@ function HealthRow({ ok, label, hint }: { ok: boolean; label: string; hint?: str
   );
 }
 
+/** Cada cuánto se revisa mientras se espera algo de Meta (plantilla o primer mensaje). */
+const WAITING_ON_META_POLL_MS = 20_000;
+
 /**
  * Conectar WhatsApp Business (Cloud API de Meta) a la empresa: BYOK, cada empresa trae su
  * propia App de Meta. Mismo patrón de UI que AiSettingsSection (guardar / probar / quitar).
@@ -98,18 +102,29 @@ export function WhatsAppConfigTab({
   companyId,
   beta = false,
 }: WhatsAppConfigTabProps) {
-  const { data, loading, refetch } = useQuery<
+  const { data, loading, refetch, startPolling, stopPolling } = useQuery<
     CompanyWhatsappSettingsResponse,
     CompanyWhatsappSettingsVariables
   >(COMPANY_WHATSAPP_SETTINGS_QUERY, {
     variables: { id: companyId ?? "" },
     skip: !companyId,
-    // Mientras se espera que Meta apruebe la plantilla de inicio de conversación (creada sola
-    // al probar la conexión), refresca sin que el usuario tenga que recargar la página.
-    pollInterval: 20000,
+    skipPollAttempt: skipPollWhenHidden,
   });
 
   const saved = data?.saasCompany ?? null;
+
+  // Solo se sondea mientras hay algo que esperar: que Meta apruebe la plantilla de inicio (creada
+  // sola al probar la conexión) o que llegue el primer mensaje real por el webhook. Antes se
+  // pedía cada 20 s siempre, aunque todo estuviera ya en verde.
+  const waitingOnMeta =
+    Boolean(saved?.whatsappConnectedAt) &&
+    (saved?.whatsappTemplateStatus === "pending" ||
+      Boolean(saved?.whatsappWebhookConfiguredAt && !saved?.whatsappLastWebhookAt));
+  useEffect(() => {
+    if (!waitingOnMeta) return;
+    startPolling(WAITING_ON_META_POLL_MS);
+    return () => stopPolling();
+  }, [waitingOnMeta, startPolling, stopPolling]);
 
   // Callback URL + Verify Token del webhook: nunca hardcodeados aquí, se piden autenticados
   // (ver COMPANY_WHATSAPP_WEBHOOK_INFO_QUERY) y solo se resuelven para quien ya puede

@@ -1,6 +1,7 @@
 "use client";
 
 import { gql, useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
   type UserCompanyCategoriesResponse,
@@ -44,7 +45,7 @@ export function useCompanyLeadLocations(enabled = true) {
   const { user } = useUser();
   const userId = user?.id ?? "";
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

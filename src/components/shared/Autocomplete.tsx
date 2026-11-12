@@ -29,6 +29,11 @@ interface AutocompleteProps {
   required?: boolean;
   disabled?: boolean;
   loading?: boolean;
+  /**
+   * Las opciones vienen de una búsqueda en servidor que sigue en curso: en lugar de "sin
+   * resultados" se muestra "Buscando…". No bloquea el campo (para eso está `loading`).
+   */
+  searching?: boolean;
   error?: string;
   searchKey?: string; // Key to use for search (default: 'label')
   displayKey?: string; // Key to display (default: 'label')
@@ -51,6 +56,7 @@ export default function Autocomplete({
   required = false,
   disabled = false,
   loading = false,
+  searching = false,
   error,
   searchKey = 'label',
   displayKey = 'label',
@@ -124,6 +130,7 @@ export default function Autocomplete({
   const handleClear = () => {
     setSearch('');
     setShowDropdown(true);
+    onChange?.('');
     onSelect({ id: '', label: '' } as AutocompleteOption);
     inputRef.current?.focus();
   };
@@ -132,7 +139,7 @@ export default function Autocomplete({
     if (disableBrowserAutocomplete) {
       setBlockBrowserAutocomplete(false);
     }
-    if (!disabled && !loading && options.length > 0) {
+    if (!disabled && !loading && (options.length > 0 || searching)) {
       setShowDropdown(true);
     }
   };
@@ -226,7 +233,9 @@ export default function Autocomplete({
         {/* No results message */}
         {showDropdown && !disabled && !loading && search && filteredOptions.length === 0 && (
           <div className={`absolute z-[200] w-full mt-1 bg-white dark:bg-[#121212] border border-[#e0e0e0] dark:border-[#3a3a3a] rounded-lg shadow-xl p-4 text-center text-[#616161] dark:text-[#b0b0b0] ${dropdownClassName}`}>
-            No se encontraron resultados que coincidan con &quot;{search}&quot;
+            {searching
+              ? 'Buscando…'
+              : <>No se encontraron resultados que coincidan con &quot;{search}&quot;</>}
           </div>
         )}
       </div>

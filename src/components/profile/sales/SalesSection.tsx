@@ -10,6 +10,7 @@ import {
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useApolloClient } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import {
   TECH_BUSINESS_LEADS_QUERY,
   TECH_BUSINESS_LEADS_COUNT_QUERY,
@@ -281,7 +282,7 @@ export default function SalesSection({ userId }: SalesSectionProps) {
     return () => clearTimeout(t);
   }, [countryInput]);
 
-  const { data: userData, refetch: refetchUserCompany } = useQuery<
+  const { data: userData, refetch: refetchUserCompany } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

@@ -10,7 +10,7 @@ type BuildClientLeadsQueryVariablesArgs = {
 
 /**
  * Shared query builder for visible clients (techBusinessLeads) by session scope.
- * Reused by SalesSection and ClientLeadAutocomplete.
+ * Used by SalesSection. ClientLeadAutocomplete has its own minimal search query.
  */
 export function buildClientLeadsQueryVariables({
   where,

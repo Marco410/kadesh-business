@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { UserIcon, Chart01Icon, UserAdd01Icon } from "@hugeicons/core-free-icons";
 import {
@@ -444,7 +445,7 @@ export default function ReferralDashboardSection({ userId }: ReferralDashboardSe
     { key: "commissions", label: "Mis comisiones", icon: Chart01Icon },
   ];
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
       UserCompanyCategoriesResponse,
       UserCompanyCategoriesVariables
     >(USER_COMPANY_CATEGORIES_QUERY, {

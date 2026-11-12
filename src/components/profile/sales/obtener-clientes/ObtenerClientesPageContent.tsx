@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { Footer, Navigation } from "kadesh/components/layout";
 import EmptyCompanySection from "kadesh/components/profile/sales/EmptyCompanySection";
 import ObtenerClientesSection from "./ObtenerClientesSection";
@@ -24,7 +24,7 @@ export default function ObtenerClientesPageContent({
   const { user } = useUser();
   const userId = user?.id ?? "";
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

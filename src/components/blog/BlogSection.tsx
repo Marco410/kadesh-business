@@ -4,6 +4,7 @@ import { Suspense, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ErrorState } from "../shared";
 import BlogCard from "./BlogCard";
+import { PostFavoritesBatchProvider } from "./hooks/PostFavoritesBatch";
 import BlogCardSkeleton from "./BlogCardSkeleton";
 import EmptyBlogState from "./EmptyBlogState";
 import { useBlogPosts } from "./hooks/useBlogPosts";
@@ -144,9 +145,11 @@ function BlogSectionContent({
           isPageLoading ? 'opacity-60' : ''
         }`}
       >
-        {posts.map((post, index) => (
-          <BlogCard key={post.id} post={post} index={index} />
-        ))}
+        <PostFavoritesBatchProvider postIds={posts.map((post) => post.id)}>
+          {posts.map((post, index) => (
+            <BlogCard key={post.id} post={post} index={index} />
+          ))}
+        </PostFavoritesBatchProvider>
       </div>
 
       {showPagination && totalPages > 1 && (

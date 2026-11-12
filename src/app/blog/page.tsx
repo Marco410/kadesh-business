@@ -6,11 +6,13 @@ import {
 } from 'kadesh/components/blog/blog-seo';
 import {
   fetchBlogCategories,
+  fetchBlogCategoryCards,
   fetchMostViewedPosts,
   fetchPublishedPosts,
 } from 'kadesh/components/blog/server';
 
-export const revalidate = 60;
+// Misma ventana que el caché de datos del blog (`CACHE_WINDOW_SECONDS` en blog/server.ts).
+export const revalidate = 600;
 
 export const metadata = buildBlogIndexMetadata();
 
@@ -20,7 +22,7 @@ export default async function BlogPage({
   searchParams: Promise<{ category?: string }>;
 }) {
   const { category } = await searchParams;
-  const [{ posts, postsCount }, mostViewed, categories] = await Promise.all([
+  const [{ posts, postsCount }, mostViewed, categories, categoryCards] = await Promise.all([
     fetchPublishedPosts({
       take: 12,
       skip: 0,
@@ -28,6 +30,7 @@ export default async function BlogPage({
     }),
     fetchMostViewedPosts(5),
     fetchBlogCategories(),
+    fetchBlogCategoryCards(),
   ]);
 
   return (
@@ -39,6 +42,7 @@ export default async function BlogPage({
         initialCategory={category || null}
         mostViewed={mostViewed}
         categories={categories}
+        categoryCards={categoryCards}
       />
     </>
   );

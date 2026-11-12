@@ -13,7 +13,8 @@ import {
 } from 'kadesh/components/blog/server';
 import BlogPostPageClient from 'kadesh/components/blog/post/BlogPostPageClient';
 
-export const revalidate = 60;
+// Misma ventana que el caché de datos del blog (`CACHE_WINDOW_SECONDS` en blog/server.ts).
+export const revalidate = 600;
 
 export async function generateMetadata({
   params,

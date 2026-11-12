@@ -147,6 +147,34 @@ export const GET_POST_LIKES_QUERY = gql`
   }
 `;
 
+/**
+ * Likes de un artículo: el total lo cuenta el back y solo se trae el like de quien está en sesión.
+ * `GET_POST_LIKES_QUERY` traía todas las filas (con su usuario) solo para contarlas.
+ */
+export const GET_POST_LIKES_SUMMARY_QUERY = gql`
+  query GetPostLikesSummary(
+    $where: PostLikeWhereInput!
+    $mineWhere: PostLikeWhereInput!
+    $withMine: Boolean!
+  ) {
+    postLikesCount(where: $where)
+    myLikes: postLikes(where: $mineWhere, take: 1) @include(if: $withMine) {
+      id
+    }
+  }
+`;
+
+export interface GetPostLikesSummaryResponse {
+  postLikesCount: number | null;
+  myLikes?: Array<{ id: string }> | null;
+}
+
+export interface GetPostLikesSummaryVariables {
+  where: { post: { id: { equals: string } } };
+  mineWhere: { post: { id: { equals: string } }; user?: { id: { equals: string } } };
+  withMine: boolean;
+}
+
 export interface PostLikeUser {
   id: string;
   name: string;
@@ -440,9 +468,8 @@ export interface GetPostFavoritesResponse {
 export interface GetPostFavoritesVariables {
   where: {
     post: {
-      id: {
-        equals: string;
-      };
+      /** `in`: los favoritos de toda una lista de artículos en una sola consulta. */
+      id: { equals: string } | { in: string[] };
     };
     user?: {
       id: {

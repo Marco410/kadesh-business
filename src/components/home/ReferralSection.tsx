@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { Routes } from "kadesh/core/routes";
 import { PRICING_PLAN_OFFERS } from "kadesh/components/pricing/constants";
 import {
@@ -66,7 +66,7 @@ function getPlanPairBySlug(
 }
 
 export default function ReferralSection() {
-  const { data } = useQuery<SaasPlansResponse>(SAAS_PLANS_QUERY);
+  const { data } = useStableQuery<SaasPlansResponse>(SAAS_PLANS_QUERY);
   const plans = data?.saasPlans ?? [];
 
   const { starter, pro, agencia } = useMemo(() => {

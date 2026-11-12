@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon, ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import {
   USER_COMPANY_CATEGORIES_QUERY,
   type UserCompanyCategoriesResponse,
@@ -110,7 +111,7 @@ export default function VendedoresCalendar({ userId }: VendedoresCalendarProps) 
   const canSeeTeamCalendar =
     canViewCompanyWideLeads(user) || isAdminCompany;
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

@@ -60,6 +60,14 @@ export interface BlogSidebarCategory {
   postsCount: number;
 }
 
+/** Categoría del carrusel "Explora por categoría": todas, tengan artículos o no. */
+export interface BlogCategoryCard {
+  id: string;
+  name: string;
+  url: string;
+  image?: { url: string } | null;
+}
+
 /** Relacionados de un artículo; `related: false` si no hubo y son los más recientes. */
 export interface RelatedPostsResult {
   posts: BlogSidebarPost[];

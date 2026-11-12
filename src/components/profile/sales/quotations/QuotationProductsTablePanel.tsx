@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useApplyOnKeyChange } from "kadesh/utils/useApplyOnKeyChange";
 import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon, Edit01Icon } from "@hugeicons/core-free-icons";
 import {
@@ -62,7 +63,7 @@ export default function QuotationProductsTablePanel({
   const [editingProduct, setEditingProduct] =
     useState<SaasQuotationProductRow | null>(null);
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

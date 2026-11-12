@@ -9,6 +9,7 @@ import { notifySessionEnded, readSessionEndNotice } from "kadesh/utils/session-e
 import { watchPageLifecycle } from "kadesh/utils/network";
 import { readSessionToken } from "kadesh/utils/sessionToken";
 import { queryRetryLink } from "./queryRetryLink";
+import { stableQueriesLink } from "./stableQueries";
 
 // Para no reportar las peticiones que el navegador corta al cerrar o salir de la página.
 watchPageLifecycle();
@@ -55,6 +56,8 @@ export const createApolloClient = () => {
       authLink,
       requestErrorLink,
       sessionEndedLink,
+      // Arriba de los reintentos: ve una sola respuesta por consulta, la final.
+      stableQueriesLink,
       queryRetryLink,
       uploadLink,
     ]),

@@ -1,21 +1,51 @@
 import type {
   BlogPost,
   BlogPostDetail,
+  BlogCategoryCard,
   BlogSidebarCategory,
   BlogSidebarPost,
   RelatedPostsResult,
 } from './types';
 import { BLOG_PRODUCT_FILTER } from './constants';
 
-const REVALIDATE_SECONDS = 60;
+/**
+ * Ventana de caché del blog: 10 minutos. Todas las consultas de una misma ventana son idénticas
+ * (misma hora redondeada, misma cabecera), así que la primera va al API y las demás salen del
+ * caché de Next (R2 en producción). Al cambiar de ventana cambia la llave: nunca se lee una
+ * respuesta de una ventana anterior, ni siquiera "vencida mientras se revalida".
+ *
+ * Por qué 10 minutos y no más: las portadas y avatares son URLs firmadas del bucket privado que
+ * caducan a la hora (`signed.expiry: 3600` en kadesh-back/keystone.ts). Con datos de 10 minutos
+ * como máximo, a quien abre la página le quedan al menos 50 minutos de vigencia.
+ * Por qué no menos: antes cada consulta llevaba la hora exacta, ninguna se repetía y cada visita
+ * llegaba al backend.
+ *
+ * Costo: un artículo nuevo, editado o programado tarda hasta 10 minutos en verse en el sitio.
+ */
+const CACHE_WINDOW_SECONDS = 600;
+const CACHE_WINDOW_HEADER = 'x-kadesh-cache-window';
+
+/** Inicio de la ventana de caché actual. */
+function cacheWindowStart(): Date {
+  const windowMs = CACHE_WINDOW_SECONDS * 1000;
+  return new Date(Math.floor(Date.now() / windowMs) * windowMs);
+}
 const SITEMAP_PAGE_SIZE = 100;
 const SITEMAP_MAX_POSTS = 2000;
 
 const PUBLISHED_EQUALS = { equals: true };
 
+/**
+ * "Ahora" para filtrar lo ya publicado: el inicio de la ventana, no la hora exacta, para que la
+ * consulta se pueda cachear. Un post programado aparece al empezar la ventana siguiente a su fecha.
+ */
+function publishedCutoff(): string {
+  return cacheWindowStart().toISOString();
+}
+
 /** Un post programado (`publishedAt` a futuro) no debe aparecer en el sitio hasta esa fecha. */
 function duePublishedAtFilter(): { lte: string } {
-  return { lte: new Date().toISOString() };
+  return { lte: publishedCutoff() };
 }
 
 const POST_CARD_FIELDS = `
@@ -115,6 +145,19 @@ const SIDEBAR_POSTS_QUERY = `
 const PRODUCT_LIST = JSON.stringify(BLOG_PRODUCT_FILTER.in);
 
 /** Categorías de este blog con cuántos artículos publicados (y ya en fecha) tiene cada una. */
+const CATEGORY_CARDS_QUERY = `
+  query GetBlogCategoryCards {
+    categories(where: { product: { in: ${PRODUCT_LIST} } }) {
+      id
+      name
+      url
+      image {
+        url
+      }
+    }
+  }
+`;
+
 const SIDEBAR_CATEGORIES_QUERY = `
   query GetBlogCategories($now: DateTime!) {
     categories(where: { product: { in: ${PRODUCT_LIST} } }) {
@@ -176,6 +219,10 @@ type SidebarCategoriesData = {
   categories: BlogSidebarCategory[] | null;
 };
 
+type CategoryCardsData = {
+  categories: BlogCategoryCard[] | null;
+};
+
 type SitemapPostsData = {
   posts: SitemapPost[] | null;
   postsCount: number;
@@ -195,9 +242,12 @@ async function queryGraphql<T>(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        // Entra en la llave del caché: también rota las consultas que no llevan fecha (p. ej. las
+        // categorías con imagen), para que sus URLs firmadas no se sirvan ya caducadas.
+        [CACHE_WINDOW_HEADER]: String(cacheWindowStart().getTime()),
       },
       body: JSON.stringify({ query, variables }),
-      next: { revalidate: REVALIDATE_SECONDS },
+      next: { revalidate: CACHE_WINDOW_SECONDS },
     });
 
     if (!response.ok) {
@@ -235,7 +285,7 @@ export async function fetchPublishedPostByUrl(
 
   const data = await queryGraphql<PostByUrlData>(POST_BY_URL_QUERY, {
     url,
-    now: new Date().toISOString(),
+    now: publishedCutoff(),
   });
   const post = data?.posts?.[0];
   const isScheduledForLater = post?.publishedAt ? new Date(post.publishedAt) > new Date() : false;
@@ -303,7 +353,7 @@ const MOST_VIEWED_POOL = 200;
 /**
  * Los más leídos. Keystone no ordena por un conteo (`post_viewsCount`), así que se piden los
  * publicados más recientes y se ordenan aquí (empates: el más reciente primero). Queda en el caché
- * de 60 s de la página, como el resto del blog.
+ * de 10 minutos del blog, como el resto.
  */
 export async function fetchMostViewedPosts(limit = 5): Promise<BlogSidebarPost[]> {
   const posts = await fetchSidebarPosts(publishedWhere(), MOST_VIEWED_POOL);
@@ -336,10 +386,19 @@ export async function fetchRelatedPosts(
   return { posts: await fetchSidebarPosts(where, limit), related: false };
 }
 
+/**
+ * Categorías del carrusel "Explora por categoría". Se piden aquí, con caché, para que cada visita
+ * al blog no las consulte desde el navegador.
+ */
+export async function fetchBlogCategoryCards(): Promise<BlogCategoryCard[]> {
+  const data = await queryGraphql<CategoryCardsData>(CATEGORY_CARDS_QUERY, {});
+  return (data?.categories ?? []).filter((category) => Boolean(category.url));
+}
+
 /** Categorías con artículos publicados, de la que más tiene a la que menos. */
 export async function fetchBlogCategories(): Promise<BlogSidebarCategory[]> {
   const data = await queryGraphql<SidebarCategoriesData>(SIDEBAR_CATEGORIES_QUERY, {
-    now: new Date().toISOString(),
+    now: publishedCutoff(),
   });
   return (data?.categories ?? [])
     .filter((category) => Boolean(category.url) && category.postsCount > 0)

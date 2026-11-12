@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useQuery, useMutation } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   FileAttachmentIcon,
@@ -54,7 +55,7 @@ export default function ArchivosSection({ userId }: ArchivosSectionProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

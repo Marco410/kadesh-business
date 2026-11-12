@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { CardElement } from "@stripe/react-stripe-js";
 import { useTheme } from "next-themes";
 import {
@@ -100,8 +100,8 @@ export default function SuscripcionSection() {
   const [acceptTerms, setAcceptTerms] = useState(false);
 
   const { data, loading, error } =
-    useQuery<SaasPlansResponse>(SAAS_PLANS_QUERY);
-  const { data: userData } = useQuery<
+    useStableQuery<SaasPlansResponse>(SAAS_PLANS_QUERY);
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

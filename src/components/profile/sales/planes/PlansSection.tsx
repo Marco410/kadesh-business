@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   SAAS_PLANS_QUERY,
@@ -815,7 +815,7 @@ export default function PlansSection({
   const router = useRouter();
   const { subscription } = useSubscription();
   const { data, loading, error } =
-    useQuery<SaasPlansResponse>(SAAS_PLANS_QUERY);
+    useStableQuery<SaasPlansResponse>(SAAS_PLANS_QUERY);
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("annual");
 
   const plans = data?.saasPlans ?? [];

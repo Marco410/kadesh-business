@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@apollo/client";
+import { useStableQuery } from "kadesh/providers/useStableQuery";
 import PanelShell from "kadesh/components/panel/PanelShell";
 import { DetailLeadSection } from "kadesh/components/profile/sales/detail_lead";
 import { USER_COMPANY_CATEGORIES_QUERY, UserCompanyCategoriesResponse, UserCompanyCategoriesVariables } from "kadesh/components/profile/sales/queries";
@@ -11,7 +11,7 @@ export default function LeadDetailPage() {
   const { user } = useUser();
   const userId = user?.id ?? "";
 
-  const { data: userData } = useQuery<
+  const { data: userData } = useStableQuery<
     UserCompanyCategoriesResponse,
     UserCompanyCategoriesVariables
   >(USER_COMPANY_CATEGORIES_QUERY, {

@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useApolloClient, useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Attachment01Icon, FileAttachmentIcon, SentIcon } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
+import { skipPollWhenHidden, useOnPageVisible } from "kadesh/utils/pageVisibility";
 import {
   BUSINESS_LEAD_WHATSAPP_STATUS_QUERY,
   SEND_WHATSAPP_MEDIA_MESSAGE_MUTATION,
@@ -31,9 +32,14 @@ import {
 import WhatsAppStartTemplateModal from "./WhatsAppStartTemplateModal";
 import { friendlyErrorText } from "kadesh/utils/errorText";
 
-const POLL_INTERVAL_MS = 5000;
+/** Mensajes nuevos: solo con la pestaña visible; al volver a ella se piden de inmediato. Eran 5 s. */
+const POLL_INTERVAL_MS = 10_000;
 const NEAR_EDGE_PX = 120;
-const STATUS_POLL_MS = 15000;
+/**
+ * Ventana de 24 h y plantilla: red de seguridad cada minuto (eran 15 s). No hace falta más seguido
+ * porque el estado se vuelve a pedir en cuanto llega un mensaje de la otra persona.
+ */
+const STATUS_POLL_MS = 60_000;
 const MEDIA_ACCEPT = "image/*,.pdf,.doc,.docx,.xls,.xlsx";
 
 /** Con quién es la conversación: un cliente del CRM, alguien del equipo, o un número que aún
@@ -183,9 +189,14 @@ export default function WhatsAppChatPanel({
 
   useEffect(() => {
     if (!active || !targetId || !loaded) return;
-    const timer = setInterval(() => void syncNewer(false), POLL_INTERVAL_MS);
+    const timer = setInterval(() => {
+      if (!document.hidden) void syncNewer(false);
+    }, POLL_INTERVAL_MS);
     return () => clearInterval(timer);
   }, [active, targetId, loaded, syncNewer]);
+  useOnPageVisible(() => void syncNewer(false), {
+    enabled: Boolean(active && targetId && loaded),
+  });
 
   /** Trae la página anterior a la más vieja que tenemos, sin mover lo que estás leyendo. */
   const loadOlder = async () => {
@@ -242,8 +253,26 @@ export default function WhatsAppChatPanel({
       skip: !active || !targetId,
       fetchPolicy: "cache-and-network",
       pollInterval: active ? STATUS_POLL_MS : 0,
+      skipPollAttempt: skipPollWhenHidden,
     },
   );
+
+  // Un mensaje entrante abre la ventana de 24 h: se pide el estado en ese momento, sin esperar
+  // al sondeo. El primer valor (los mensajes que ya estaban al abrir) no cuenta.
+  const lastInboundId = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i -= 1) {
+      if (messages[i].direction === "inbound") return messages[i].id;
+    }
+    return null;
+  }, [messages]);
+  const seenInboundId = useRef<string | null | undefined>(undefined);
+  useEffect(() => {
+    if (!loaded) return;
+    const previous = seenInboundId.current;
+    seenInboundId.current = lastInboundId;
+    if (previous === undefined || previous === lastInboundId || !lastInboundId) return;
+    void refetchStatus();
+  }, [loaded, lastInboundId, refetchStatus]);
   const status = statusData?.businessLeadWhatsappStatus;
   const canReplyFreely = status?.canReplyFreely ?? false;
   const templateStatus = status?.templateStatus ?? "none";

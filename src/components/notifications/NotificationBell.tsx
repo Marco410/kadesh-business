@@ -6,6 +6,7 @@ import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Notification01Icon } from "@hugeicons/core-free-icons";
 import { formatDateShort } from "kadesh/utils/format-date";
+import { skipPollWhenHidden, useOnPageVisible } from "kadesh/utils/pageVisibility";
 import {
   MARK_ALL_NOTIFICATIONS_READ_MUTATION,
   MARK_NOTIFICATION_READ_MUTATION,
@@ -18,12 +19,14 @@ import {
 import {
   NOTIFICATIONS_PAGE_SIZE,
   NOTIFICATIONS_POLL_MS,
+  NOTIFICATIONS_REFRESH_AFTER_HIDDEN_MS,
   notificationHref,
   notificationIcon,
 } from "./constants";
 
 /**
- * Campana de notificaciones. El contador se revisa cada minuto; la lista se pide al abrir.
+ * Campana de notificaciones. El contador se revisa cada 3 min con la pestaña visible (y al volver
+ * a ella); la lista se pide al abrir.
  * Clic en un aviso: lo marca como leído y lleva a la sección que lo resuelve.
  */
 export default function NotificationBell({
@@ -40,8 +43,13 @@ export default function NotificationBell({
 
   const { data: countData, refetch: refetchCount } = useQuery<MyUnreadNotificationsCountResponse>(
     MY_UNREAD_NOTIFICATIONS_COUNT_QUERY,
-    { pollInterval: NOTIFICATIONS_POLL_MS, fetchPolicy: "cache-and-network" },
+    {
+      pollInterval: NOTIFICATIONS_POLL_MS,
+      skipPollAttempt: skipPollWhenHidden,
+      fetchPolicy: "cache-and-network",
+    },
   );
+  useOnPageVisible(() => void refetchCount(), { minHiddenMs: NOTIFICATIONS_REFRESH_AFTER_HIDDEN_MS });
   const [loadList, { data: listData, loading, refetch: refetchList }] =
     useLazyQuery<MyNotificationsResponse>(MY_NOTIFICATIONS_QUERY, {
       variables: { take: NOTIFICATIONS_PAGE_SIZE },
