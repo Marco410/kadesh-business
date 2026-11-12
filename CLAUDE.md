@@ -84,10 +84,83 @@ Signup attribution is separate: `AttributionTracker` (`kadesh/components/consent
 - **Icons**: `@hugeicons/react` only — do not introduce lucide, heroicons, or other icon libraries.
 - **Styling**: Tailwind CSS, **mobile-first** (`.cursor/rules/mobile-first.mdc`), dark mode via `dark:` classes (the app supports light/dark throughout, see `ThemeProvider`). Unprefixed classes are the phone layout; `sm:` / `md:` / `lg:` only enhance. Do not design desktop-first and patch with `max-*`.
 - **GraphQL**: keep queries/mutations colocated in the feature that uses them (`queries.ts`/`mutations.ts` next to the components), using the shared Apollo client — don't create new client instances.
-- **Backend load**: the backend and its Postgres are billed by RAM and uptime, so avoid background traffic. Any polling must pause while the tab is hidden (`skipPollAttempt: skipPollWhenHidden` plus `useOnPageVisible`, from `kadesh/utils/pageVisibility`). The Apollo default is `cache-and-network`, so every mounted `useQuery` hits the network; for rarely-changing data requested by many screens (user's company, subscription status, plans, AI live status) use `useStableQuery` (`kadesh/providers/useStableQuery`, rules in `src/providers/stableQueries.ts`). Never issue one request per list item.
+- **Backend load**: see "Rendimiento y costo" below before adding any query, polling or cache.
 - **Naming**: PascalCase for component files (`AnimalCard.tsx`), camelCase for hooks/utils (`useLogin.ts`, `format-date.tsx`), lowercase-with-dashes for directories.
 - **Validation**: Zod for schema validation where applicable.
 - Early returns / guard clauses for error conditions over nested conditionals.
+
+## Rendimiento y costo
+
+How the performance rules in `~/.claude/CLAUDE.md` land in this repo. The backend (kadesh-back, Railway) and its Postgres are billed by RAM and uptime, so every request the front adds has a cost. The Apollo default is `cache-and-network`: **every mounted `useQuery` hits the network**.
+
+### Reuse these, don't write new ones
+
+| Need | Use | Where |
+|---|---|---|
+| Pause polling while the tab is hidden | `skipPollAttempt: skipPollWhenHidden` | `src/utils/pageVisibility.ts` |
+| Refetch when the tab comes back | `useOnPageVisible(cb, { minHiddenMs })` | `src/utils/pageVisibility.ts` |
+| Session data many screens ask for (user's company, subscription, plans, AI live status) | `useStableQuery` instead of `useQuery` | `src/providers/useStableQuery.ts`; allowlist and rules in `src/providers/stableQueries.ts` |
+| Accent/case-insensitive search against a backend `*Search` field | `normalizeSearchText` (copy of the backend function; change both together) | `src/utils/normalizeSearchText.ts` |
+| Debounce a search box | `useDebouncedValue(value, 300)` | `src/components/admin/hooks/useDebouncedValue.ts` |
+| Pick a CRM lead in a form | `ClientLeadAutocomplete` (minimal query, server search, `take: 20`) | `src/components/shared/ClientLeadAutocomplete.tsx` |
+| Server-side blog queries | `queryGraphql` and the cache window; never pass an exact time, use `publishedCutoff()` | `src/components/blog/server.ts` |
+| Favorites for a list of posts in one query | `PostFavoritesBatchProvider` | `src/components/blog/hooks/PostFavoritesBatch.tsx` |
+| Retry of failed queries | already global (`queryRetryLink`, up to 3 retries); don't add retry loops | `src/providers/queryRetryLink.ts` |
+
+To make another query "stable", add its operation name to `STABLE_OPERATIONS` and switch its call sites to `useStableQuery`. The registry is tied to the session token and cleared by any mutation except those in `READ_ONLY_MUTATIONS`.
+
+### Current values
+
+Change them in the constant, and update this table.
+
+| What | Value | Constant |
+|---|---|---|
+| Notification bell (platform admins) | 3 min; on return only if hidden ≥ 30 s | `NOTIFICATIONS_POLL_MS`, `NOTIFICATIONS_REFRESH_AFTER_HIDDEN_MS` in `src/components/notifications/constants.ts` |
+| WhatsApp conversation list | 15 s | `CONVERSATIONS_POLL_MS` in `WhatsAppChatsTab.tsx` |
+| WhatsApp open chat messages | 10 s | `POLL_INTERVAL_MS` in `WhatsAppChatPanel.tsx` |
+| WhatsApp 24 h window status | 60 s, plus on each new inbound message | `STATUS_POLL_MS` in `WhatsAppChatPanel.tsx` |
+| WhatsApp config | 20 s, only while waiting on Meta (template pending or no first webhook) | `WAITING_ON_META_POLL_MS` in `WhatsAppConfigTab.tsx` |
+| Operaciones nav counters | 60 s | inline in `src/components/admin/AdminDashboard.tsx` |
+| Activity heartbeat | 5 min | `HEARTBEAT_MS` in `src/utils/activity/usePanelActivity.ts` |
+| Stable queries | 60 s | `STABLE_QUERY_TTL_MS` in `src/providers/stableQueries.ts` |
+| Blog server data cache | 10 min window | `CACHE_WINDOW_SECONDS` in `src/components/blog/server.ts`; `revalidate = 600` in `src/app/blog/page.tsx` and `src/app/blog/[url]/page.tsx` |
+| Blog share image route | 1 h | `src/app/blog/[url]/og/route.ts` |
+| Landing stats | 6 h | `REVALIDATE_SECONDS` in `src/components/home/landing-stats.ts` |
+| Autocomplete search | 300 ms debounce, `take: 20` | `SEARCH_DEBOUNCE_MS`, `SEARCH_TAKE` in `ClientLeadAutocomplete.tsx` |
+| Signed image URLs (covers, avatars) | expire after 1 h | `signed.expiry: 3600` in kadesh-back `keystone.ts` |
+| Backend Postgres pool | `connection_limit` 5, `pool_timeout` 20 s | `DB_CONNECTION_LIMIT`, `DB_POOL_TIMEOUT` in kadesh-back `keystone.ts` |
+
+Any cache that holds image URLs must stay well under the 1 h signature. That is why the blog window is 10 minutes and why `/blog/[url]` has no `generateStaticParams`: a prerendered page is served stale to the first visitor after a quiet period, with expired image URLs. Prerendering needs a stable image URL first.
+
+### Known hot spots, not fixed yet
+
+Don't copy these patterns or add load to them. Several need a kadesh-back change first.
+
+- **Clients list filters in the browser**: with an assignment or text filter it fetches every candidate, up to `MAX_LEADS_EXPORT` (10,000) leads, and paginates locally. `src/components/profile/sales/SalesSection.tsx` (`clientListFetchTake`).
+- **Lead locations**: `take: 10000` to build the location filters. `src/components/profile/sales/obtener-clientes/hooks/useCompanyLeadLocations.ts`.
+- **Credits read as a mutation on mount**: `useRemainingCredits` fires the `RemainingCredits` mutation from 6 components. `src/components/panel/hooks/useRemainingCredits.ts`. Needs a backend query.
+- **Dashboard counts rows in the browser**: `DASHBOARD_STATUS_TAKE = 2000` statuses fetched and aggregated client-side. `src/components/panel/dashboard/queries.ts`, `useCompanyDashboard.ts`. Needs backend counts.
+- **Stats strip**: 4 separate queries on every Clients visit. `src/components/profile/sales/StatsSection.tsx`.
+- **Bulk assignment**: one `updateLead` mutation per selected lead, in a loop. `src/components/profile/sales/SalesSection.tsx`. Needs a batch mutation.
+- **Lead detail**: about 10 requests each time a lead is opened. `src/components/profile/sales/detail_lead/`.
+- **Project picker**: `take: 500`, filtered locally. `src/components/shared/ClientProjectAutocomplete.tsx`. Should follow `ClientLeadAutocomplete`.
+- **Large unpaginated lists**: calendar events `take: 1000` (`sales/google-calendar/queries.ts`), lead statuses `take: 500` (`sales/queries.ts`), company users `take: 300` (`sales/queries.ts`, `sales/workspaces/queries.ts`, `usuarios/queries.ts`).
+- **Operaciones counters keep polling in a hidden tab**: the two `pollInterval: 60_000` in `src/components/admin/AdminDashboard.tsx` lack `skipPollAttempt`.
+- **WhatsApp inbox**: the list comes from the custom `whatsappConversations` resolver in kadesh-back and is polled every 15 s, so its cost per call lives there. Don't add fields to `WHATSAPP_CONVERSATIONS_QUERY` without checking that resolver.
+
+### Checking that a feature adds no load
+
+In the browser Network tab, filtered by the API host (requests are named by GraphQL operation in the payload):
+
+1. Load the screen once and count requests. No operation should appear twice, and none should repeat per card or row.
+2. Navigate away and back within a minute: `UserCompanyCategories`, `SubscriptionStatus`, `SaasPlans` and `CompanyAiLiveStatus` must not fire again.
+3. Leave the screen idle for 2 minutes: only the polls in the table above may appear, at their interval.
+4. Hide the tab for a minute: nothing should fire. On return, one refetch per poll.
+5. Open a response and check its size and row count; a list must come with `take`.
+6. No mutation should fire just from opening a screen (except `RemainingCredits`, listed above, and `trackEvents`).
+7. For anonymous pages (`/blog`, home, niche pages) there should be no GraphQL request from the browser at all.
+
+In the backend logs (Railway, or the local server on `:3002`): visit a blog page several times within 10 minutes and confirm only the first visit produces requests. For a new panel feature, compare request count per minute with the screen open and idle against the same screen before the change.
 
 ## Other `.cursor/rules/`
 
