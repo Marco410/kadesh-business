@@ -21,6 +21,14 @@ El módulo se portó de Pet: los cambios de estructura conviene hacerlos en los 
 - Likes, favoritos, comentarios y vistas requieren sesión para escribir (misma cuenta `User` que el panel); anónimos solo leen.
 - **Newsletter**: `NewsletterSubscription` guarda `product: 'saas'`. El mismo correo puede estar suscrito a Pet y al SaaS; repetir el mismo producto muestra "ya está suscrito".
 
+## Caché de las consultas del servidor
+
+- Las consultas del blog que hace el servidor (`server.ts`) se guardan **10 minutos** (`CACHE_WINDOW_SECONDS`). Dentro de una ventana todas las visitas reutilizan la misma respuesta y solo la primera llega al backend. Antes cada consulta llevaba la hora exacta, ninguna se repetía y cada visita costaba de 4 a 6 peticiones.
+- La fecha con la que se filtra lo ya publicado es el **inicio de la ventana**, no la hora exacta. Consecuencia: un artículo nuevo, editado o programado puede tardar **hasta 10 minutos** en verse. Likes y vistas de las tarjetas también van con ese retraso.
+- La ventana no debe acercarse a 1 hora: portadas y avatares son URLs firmadas que caducan a los 60 minutos (`signed.expiry` en kadesh-back). Con 10 minutos, quien abre la página tiene al menos 50 de vigencia.
+- La ventana viaja en la cabecera `x-kadesh-cache-window`, que forma parte de la llave del caché: al cambiar de ventana nunca se reutiliza una respuesta anterior (ni "vencida mientras se revalida"), que es lo que dejaría imágenes rotas.
+- `/blog/[url]` **no** se pregenera (sin `generateStaticParams`), a propósito: una página estática se sirve vencida a la primera visita después de un rato sin tráfico, con las URLs firmadas ya caducadas. La página se arma en cada visita, pero con los datos del caché, así que no toca el backend. Para pregenerarla primero hay que servir las imágenes por una URL estable.
+
 ## Cuerpo del artículo
 
 El cuerpo lo pinta `src/utils/renderes.tsx` (renderer del campo de contenido del CMS) y **ahí** vive el espaciado: margen y color por bloque (párrafo, lista, título, divisor). No está instalado `@tailwindcss/typography`, así que las clases `prose` **no hacen nada**: no las reintroduzcas esperando que separen los párrafos (eso fue lo que dejó el texto "amontonado" aunque el editor sí tenía los espacios). El contenedor solo fija el tamaño de lectura (`text-lg`).
