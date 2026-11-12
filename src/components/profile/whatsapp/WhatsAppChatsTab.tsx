@@ -15,6 +15,7 @@ import { Routes } from "kadesh/core/routes";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { useUser } from "kadesh/utils/UserContext";
 import { isAdminCompanyUser, isPlatformAdminUser } from "kadesh/utils/user-roles";
+import { skipPollWhenHidden, useOnPageVisible } from "kadesh/utils/pageVisibility";
 import {
   ASSIGN_WHATSAPP_CONVERSATION_MUTATION,
   COMPANY_WHATSAPP_TEAM_QUERY,
@@ -32,7 +33,8 @@ import WhatsAppNewConversationModal from "./WhatsAppNewConversationModal";
 import WhatsAppSaveContactModal from "./WhatsAppSaveContactModal";
 import { friendlyErrorText } from "kadesh/utils/errorText";
 
-const CONVERSATIONS_POLL_MS = 8000;
+/** Solo con la pestaña visible; al volver a ella se pide de inmediato. Eran 8 s siempre. */
+const CONVERSATIONS_POLL_MS = 15_000;
 
 type ConversationRow = WhatsAppConversationSummary & { isNew?: boolean };
 
@@ -64,15 +66,17 @@ export function WhatsAppChatsTab({ companyId }: { companyId: string | null }) {
     variables: { companyId: companyId ?? "" },
   };
 
-  const { data, loading, error } = useQuery<
+  const { data, loading, error, refetch: refetchConversations } = useQuery<
     WhatsAppConversationsResponse,
     WhatsAppConversationsVariables
   >(WHATSAPP_CONVERSATIONS_QUERY, {
     variables: { companyId: companyId ?? "" },
     skip: !companyId,
     pollInterval: CONVERSATIONS_POLL_MS,
+    skipPollAttempt: skipPollWhenHidden,
     fetchPolicy: "cache-and-network",
   });
+  useOnPageVisible(() => void refetchConversations(), { enabled: Boolean(companyId) });
 
   const { data: teamData } = useQuery<
     CompanyWhatsappTeamResponse,
