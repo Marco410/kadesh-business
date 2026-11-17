@@ -125,6 +125,14 @@ export function petAnimalEditUrl(slug: string): string {
   return `${petAnimalUrl(slug)}/editar`;
 }
 
+/** Imagen 1080 × 1920 del cartel (historias y canal de WhatsApp). */
+export function petAnimalStoryUrl(slug: string): string {
+  return `${PET_PLACE_PUBLIC_ORIGIN}/cartel/${encodeURIComponent(slug)}/historia`;
+}
+
+/** Canal de WhatsApp de Kadesh Pet: `/canal` en la web redirige al canal que toque. */
+export const PET_WHATSAPP_CHANNEL_URL = `${PET_PLACE_PUBLIC_ORIGIN}/canal`;
+
 export function facebookPostUrl(postId: string): string {
   return `https://www.facebook.com/${postId}`;
 }

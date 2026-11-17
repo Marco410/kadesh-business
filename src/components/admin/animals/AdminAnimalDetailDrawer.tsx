@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
 import { formatDateShort } from "kadesh/utils/format-date";
 import {
@@ -15,7 +15,9 @@ import {
   formatPersonName,
 } from "../ui";
 import {
+  ADMIN_ANIMAL_CHANNEL_POST_QUERY,
   ADMIN_ANIMAL_DETAIL_QUERY,
+  type AdminAnimalChannelPostResponse,
   ADMIN_PURGE_ANIMAL_VIEWS_MUTATION,
   DELETE_ANIMAL_COMMENT_MUTATION,
   DELETE_ANIMAL_FAVORITE_MUTATION,
@@ -30,8 +32,10 @@ import {
   ANIMAL_STATUS_LABELS,
   REPORTED_BY_LABELS,
   SEX_LABELS,
+  PET_WHATSAPP_CHANNEL_URL,
   facebookPostUrl,
   petAnimalEditUrl,
+  petAnimalStoryUrl,
   petAnimalUrl,
 } from "./constants";
 import { adminErrorText } from "../errors";
@@ -71,6 +75,27 @@ export default function AdminAnimalDetailDrawer({
   const [deleteFavorite] = useMutation(DELETE_ANIMAL_FAVORITE_MUTATION);
   const [purgeViews] = useMutation<{ adminPurgeAnimalViews: AdminActionResult }>(ADMIN_PURGE_ANIMAL_VIEWS_MUTATION);
   const [busy, setBusy] = useState<string | null>(null);
+  const [loadChannelPost, { loading: loadingChannelPost }] = useLazyQuery<AdminAnimalChannelPostResponse>(
+    ADMIN_ANIMAL_CHANNEL_POST_QUERY,
+    { fetchPolicy: "network-only" },
+  );
+
+  /** «Copiar para el canal»: pide el texto (con la ciudad arriba y el enlace corto) y lo copia. */
+  const copyForChannel = async () => {
+    if (!animalId) return;
+    try {
+      const { data: result, error: queryError } = await loadChannelPost({ variables: { id: animalId } });
+      const text = result?.adminAnimalChannelPost?.text;
+      if (queryError || !text) throw queryError ?? new Error("No encontramos ese animal.");
+      await navigator.clipboard.writeText(text);
+      sileo.success({
+        title: "Copiado para el canal",
+        description: "Pégalo en el canal de Kadesh Pet y adjunta la imagen para el canal.",
+      });
+    } catch (err) {
+      sileo.error({ title: "No se pudo copiar", description: adminErrorText(err, "Intenta de nuevo.") });
+    }
+  };
 
   const detail = data?.adminAnimalDetail ?? null;
   const animal = detail?.animal ?? null;
@@ -126,6 +151,23 @@ export default function AdminAnimalDetailDrawer({
             >
               {animal.facebookPublishedAt ? "Volver a publicar en Facebook" : "Publicar en Facebook"}
             </button>
+            {/* Canal de WhatsApp: la API no publica en Canales; se copia y se pega a mano. */}
+            <button
+              type="button"
+              onClick={() => void copyForChannel()}
+              disabled={loadingChannelPost}
+              className="inline-flex h-10 items-center justify-center rounded-full bg-[#25D366] px-4 text-sm font-semibold text-[#0b3d1f] hover:bg-[#1ebe5b] disabled:opacity-50"
+            >
+              {loadingChannelPost ? "Copiando…" : "Copiar para el canal"}
+            </button>
+            {animal.slug ? (
+              <a className={actionLink} href={petAnimalStoryUrl(animal.slug)} target="_blank" rel="noopener noreferrer">
+                Imagen para el canal
+              </a>
+            ) : null}
+            <a className={actionLink} href={PET_WHATSAPP_CHANNEL_URL} target="_blank" rel="noopener noreferrer">
+              Abrir canal
+            </a>
             {animal.slug ? (
               <>
                 <a className={actionLink} href={petAnimalEditUrl(animal.slug)} target="_blank" rel="noopener noreferrer">
