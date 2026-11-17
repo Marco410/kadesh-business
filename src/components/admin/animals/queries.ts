@@ -96,6 +96,30 @@ export const ADMIN_PUBLISH_ANIMAL_TO_FACEBOOK_MUTATION = gql`
   }
 `;
 
+/**
+ * Texto para el canal de WhatsApp de Kadesh Pet (`adminAnimalChannelPost` en kadesh-back). Se pide
+ * solo al tocar «Copiar para el canal», no al abrir el detalle.
+ */
+export const ADMIN_ANIMAL_CHANNEL_POST_QUERY = gql`
+  query AdminAnimalChannelPost($id: ID!) {
+    adminAnimalChannelPost(id: $id) {
+      text
+      shortUrl
+      storyImageUrl
+      channelUrl
+    }
+  }
+`;
+
+export type AdminAnimalChannelPostResponse = {
+  adminAnimalChannelPost: {
+    text: string;
+    shortUrl: string;
+    storyImageUrl: string | null;
+    channelUrl: string;
+  } | null;
+};
+
 export const ADMIN_PURGE_ANIMAL_VIEWS_MUTATION = gql`
   mutation AdminPurgeAnimalViews($animalId: ID!, $onlyAnonymous: Boolean) {
     adminPurgeAnimalViews(animalId: $animalId, onlyAnonymous: $onlyAnonymous) {
