@@ -414,7 +414,7 @@ Artículos, categorías y etiquetas viven en Blog, no en una ruta nueva. El nomb
 
 ## Kadesh Pet → Tienda
 
-`?tab=veterinarias&vista=tienda` (`store/`, 2026-11-18). Administra la tienda de `pet.kadesh.com.mx`. Siete secciones en `&seccion=`: **Pedidos** (default, sin `seccion`), **Productos** (`productos`), **Categorías** (`categorias`), **Marcas** (`marcas`), **Reseñas** (`resenas`), **Cupones** (`cupones`) y **Ajustes** (`ajustes`). Solo se monta la abierta. El globo del menú cuenta los pedidos que necesitan a alguien: comprobantes por revisar y pagados sin surtir del todo.
+`?tab=veterinarias&vista=tienda` (`store/`, 2026-11-18). Administra la tienda de `pet.kadesh.com.mx`. Ocho secciones en `&seccion=`: **Pedidos** (default, sin `seccion`), **Resumen** (`resumen`), **Productos** (`productos`), **Categorías** (`categorias`), **Marcas** (`marcas`), **Reseñas** (`resenas`), **Cupones** (`cupones`) y **Ajustes** (`ajustes`). Solo se monta la abierta. El globo del menú cuenta los pedidos que necesitan a alguien: comprobantes por revisar y pagados sin surtir del todo.
 
 **Pedidos** (2026-11-19): por cola de trabajo, en `&cola=`: **Por surtir** (default), **Comprobantes por revisar**, **Esperando pago**, **En camino**, **Entregados**, **Cancelados** y **Todos** (`todos`). Las tres primeras muestran cuántos hay. El buscador (folio, nombre, correo o teléfono) busca en todos los pedidos, sin importar la cola. El pedido abierto vive en `&pedido={id}`.
 
@@ -427,6 +427,15 @@ Artículos, categorías y etiquetas viven en Blog, no en una ruta nueva. El nomb
 - **Pago que llegó a un pedido cancelado**: el pedido lo dice en rojo y se reembolsa desde ahí.
 - **Nota interna**: solo la ve el equipo.
 - **Lo que ha pasado**: cada paso con fecha y quién lo hizo ("Sistema" = Stripe o el vencimiento automático). Lo marcado "solo interno" no lo ve quien compró.
+
+**Resumen** (2026-11-19): el reporte de ventas, con periodo en `&dias=` (7, 30 por default, 90 o 365).
+
+- **Ventas** (lo que pagó la gente: productos, menos cupones, más envío cobrado), **Margen** (ventas menos costo de productos y de envíos, antes de comisiones), **Pedidos**, **Pedido promedio**, **Personas que compraron** y **Reembolsos**. Ventas y Pedidos comparan contra el periodo anterior del mismo largo.
+- Una venta es un pedido pagado que no se ha reembolsado, contado el día en que se pagó (hora del centro de México). No cuentan las cuentas de prueba.
+- **Ventas por día** (por mes en 12 meses), **Lo más vendido**, **De dónde sale lo vendido** (Propio / Dropi, con su costo), **Cómo pagaron** y **Cupones más usados**.
+- **Inventario ahora**: cuántos productos activos están agotados y cuáles están por agotarse (5 piezas o menos); cada uno abre su editor.
+- El margen depende de que cada variante tenga su costo y cada envío lo que costó mandarlo: si faltan, sale más alto de lo real.
+- Datos: una sola petición (`AdminStoreSummary`) al abrir o cambiar de periodo; el back la guarda 5 minutos. Las gráficas son `ColumnBars` y `HBarList`, las mismas del resto de Operaciones.
 
 **Cupones** (2026-11-19): los códigos de descuento, del más nuevo al más viejo (hasta 100). Cada fila: código, estado (Activo, Apagado, Programado, Vencido o Agotado), qué da, sus condiciones y cuántas veces se usó.
 

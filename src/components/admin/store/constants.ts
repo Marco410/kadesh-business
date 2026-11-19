@@ -3,6 +3,7 @@ import { PET_PLACE_PUBLIC_ORIGIN } from "kadesh/components/admin/constants";
 /** Sub-sections of Operaciones → Kadesh Pet → Tienda (`&seccion=`). No value = orders. */
 export const STORE_SECTIONS = {
   ORDERS: "pedidos",
+  SUMMARY: "resumen",
   PRODUCTS: "productos",
   CATEGORIES: "categorias",
   BRANDS: "marcas",
@@ -15,6 +16,7 @@ export type StoreSection = (typeof STORE_SECTIONS)[keyof typeof STORE_SECTIONS];
 
 export const STORE_SECTION_ITEMS: Array<{ id: StoreSection; label: string }> = [
   { id: STORE_SECTIONS.ORDERS, label: "Pedidos" },
+  { id: STORE_SECTIONS.SUMMARY, label: "Resumen" },
   { id: STORE_SECTIONS.PRODUCTS, label: "Productos" },
   { id: STORE_SECTIONS.CATEGORIES, label: "Categorías" },
   { id: STORE_SECTIONS.BRANDS, label: "Marcas" },
@@ -322,4 +324,29 @@ export function localInputToIso(value: string): string | null {
   if (!value) return null;
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+// ─── Sales report ───────────────────────────────────────────────────────────────────────────
+
+/** Periods of Tienda → Resumen (`&dias=`). Same values as `STORE_SUMMARY_DAYS` in kadesh-back. */
+export const STORE_SUMMARY_DAY_OPTIONS = [
+  { value: "7", label: "7 días" },
+  { value: "30", label: "30 días" },
+  { value: "90", label: "90 días" },
+  { value: "365", label: "12 meses" },
+] as const;
+
+export const STORE_SUMMARY_DEFAULT_DAYS = 30;
+
+/** The ↗/↘ pill against the period right before. `null` when there is nothing to compare with. */
+export function storeSummaryDelta(
+  current: number,
+  previous: number,
+  format: (value: number) => string,
+): { value: number; label: string } | null {
+  if (previous <= 0) return null;
+  return {
+    value: Math.round(((current - previous) / previous) * 100),
+    label: `Contra ${format(previous)} del periodo anterior`,
+  };
 }

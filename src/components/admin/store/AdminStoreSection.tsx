@@ -8,11 +8,12 @@ import AdminStoreOrdersPanel from "./AdminStoreOrdersPanel";
 import AdminStoreProductsPanel from "./AdminStoreProductsPanel";
 import AdminStoreReviewsPanel from "./AdminStoreReviewsPanel";
 import AdminStoreSettingsPanel from "./AdminStoreSettingsPanel";
+import AdminStoreSummaryPanel from "./AdminStoreSummaryPanel";
 import AdminStoreTaxonomyPanel from "./AdminStoreTaxonomyPanel";
 import { STORE_SECTIONS, STORE_SECTION_ITEMS, parseStoreSection } from "./constants";
 
 /**
- * Operaciones → Kadesh Pet → Tienda. Orders, products, categories, brands, reviews, coupons and settings of
+ * Operaciones → Kadesh Pet → Tienda. Orders, the sales report, products, categories, brands, reviews, coupons and settings of
  * the Kadesh Pet store; the sub-section lives in `&seccion=` (none = orders). Only the open one is mounted, so each asks only for
  * its own data.
  */
@@ -27,11 +28,12 @@ export default function AdminStoreSection() {
         items={STORE_SECTION_ITEMS}
         value={section}
         onChange={(next) =>
-          setParams({ seccion: next === STORE_SECTIONS.ORDERS ? null : next, producto: null, pedido: null, cola: null })
+          setParams({ seccion: next === STORE_SECTIONS.ORDERS ? null : next, producto: null, pedido: null, cola: null, dias: null })
         }
         ariaLabel="Secciones de la tienda"
       />
       {section === STORE_SECTIONS.ORDERS ? <AdminStoreOrdersPanel /> : null}
+      {section === STORE_SECTIONS.SUMMARY ? <AdminStoreSummaryPanel /> : null}
       {section === STORE_SECTIONS.PRODUCTS ? <AdminStoreProductsPanel /> : null}
       {section === STORE_SECTIONS.CATEGORIES ? <AdminStoreTaxonomyPanel key="category" kind="category" /> : null}
       {section === STORE_SECTIONS.BRANDS ? <AdminStoreTaxonomyPanel key="brand" kind="brand" /> : null}
