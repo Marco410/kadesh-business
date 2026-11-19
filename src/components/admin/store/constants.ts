@@ -7,6 +7,7 @@ export const STORE_SECTIONS = {
   CATEGORIES: "categorias",
   BRANDS: "marcas",
   REVIEWS: "resenas",
+  COUPONS: "cupones",
   SETTINGS: "ajustes",
 } as const;
 
@@ -18,6 +19,7 @@ export const STORE_SECTION_ITEMS: Array<{ id: StoreSection; label: string }> = [
   { id: STORE_SECTIONS.CATEGORIES, label: "Categorías" },
   { id: STORE_SECTIONS.BRANDS, label: "Marcas" },
   { id: STORE_SECTIONS.REVIEWS, label: "Reseñas" },
+  { id: STORE_SECTIONS.COUPONS, label: "Cupones" },
   { id: STORE_SECTIONS.SETTINGS, label: "Ajustes" },
 ];
 
@@ -229,4 +231,95 @@ export const STORE_SHIPMENT_PROVIDER_LABELS: Record<string, string> = {
 /** Whether an order is cancelled as a whole (its payment and shipping badges then say little). */
 export function isStoreOrderCancelled(status: string): boolean {
   return status === "cancelled";
+}
+
+// ─── Coupons ────────────────────────────────────────────────────────────────────────────────
+
+/** Same values as `STORE_COUPON_TYPE` in kadesh-back. */
+export const STORE_COUPON_TYPE = {
+  PERCENT: "percent",
+  FIXED: "fixed",
+  FREE_SHIPPING: "free_shipping",
+} as const;
+
+export const STORE_COUPON_TYPE_OPTIONS = [
+  { value: STORE_COUPON_TYPE.PERCENT, label: "Porcentaje" },
+  { value: STORE_COUPON_TYPE.FIXED, label: "Monto fijo" },
+  { value: STORE_COUPON_TYPE.FREE_SHIPPING, label: "Envío gratis" },
+];
+
+/** The list is one page: the backend caps `storeCoupons` at 100 rows. */
+export const ADMIN_STORE_COUPONS_TAKE = 100;
+/** Products and categories one coupon can be limited to. */
+export const ADMIN_STORE_COUPON_SCOPE_MAX = 50;
+export const ADMIN_STORE_COUPON_PRODUCT_SEARCH_TAKE = 20;
+export const ADMIN_STORE_COUPON_CODE_MAX = 40;
+
+/** What the backend does to a code before saving it: "  verano 10 " → "VERANO10". */
+export function normalizeCouponCode(code: string): string {
+  return code
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9_-]/g, "")
+    .slice(0, ADMIN_STORE_COUPON_CODE_MAX);
+}
+
+export type StoreCouponState = "active" | "inactive" | "scheduled" | "expired" | "used_up";
+
+export const STORE_COUPON_STATE_LABELS: Record<StoreCouponState, string> = {
+  active: "Activo",
+  inactive: "Apagado",
+  scheduled: "Programado",
+  expired: "Vencido",
+  used_up: "Agotado",
+};
+
+export const STORE_COUPON_STATE_CLASS: Record<StoreCouponState, string> = {
+  active: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
+  inactive: "bg-dash-surface-2 text-dash-soft",
+  scheduled: "bg-sky-100 text-sky-800 dark:bg-sky-500/15 dark:text-sky-300",
+  expired: "bg-stone-200 text-stone-700 dark:bg-stone-500/20 dark:text-stone-300",
+  used_up: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
+};
+
+/** Whether a coupon can be used right now, in the same order the backend checks it. */
+export function storeCouponState(
+  coupon: {
+    isActive: boolean | null;
+    startsAt: string | null;
+    endsAt: string | null;
+    usageLimit: number | null;
+    usedCount: number;
+  },
+  now: number,
+): StoreCouponState {
+  if (coupon.isActive === false) return "inactive";
+  if (coupon.startsAt && new Date(coupon.startsAt).getTime() > now) return "scheduled";
+  if (coupon.endsAt && new Date(coupon.endsAt).getTime() <= now) return "expired";
+  if (coupon.usageLimit != null && coupon.usedCount >= coupon.usageLimit) return "used_up";
+  return "active";
+}
+
+/** "10 % de descuento", "$50.00 de descuento", "Envío gratis". */
+export function storeCouponBenefit(coupon: { type: string; value: number }): string {
+  if (coupon.type === STORE_COUPON_TYPE.FREE_SHIPPING) return "Envío gratis";
+  if (coupon.type === STORE_COUPON_TYPE.PERCENT) return `${coupon.value} % de descuento`;
+  return `${formatCents(coupon.value)} de descuento`;
+}
+
+/** ISO date → value of an `<input type="datetime-local">` in the browser's time zone. */
+export function isoToLocalInput(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+/** Value of an `<input type="datetime-local">` → ISO date. `null` when empty or not a date. */
+export function localInputToIso(value: string): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }

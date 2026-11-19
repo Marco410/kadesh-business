@@ -255,7 +255,8 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
   const transfer = order.paymentMethod === "bank_transfer";
   const proof = detail.payments.find((payment) => payment.transferProofUrl);
   const awaitingTransfer = open && transfer && (order.paymentStatus === "in_review" || order.paymentStatus === "pending");
-  const margin = detail.subtotalCents + detail.shippingCents - detail.costCents - detail.shippingCostCents;
+  // What the person paid (already without the coupon discount) minus what it cost.
+  const margin = order.totalCents - detail.costCents - detail.shippingCostCents;
   const address = detail.address;
   const addressText = [
     address.recipientName,
@@ -427,6 +428,11 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
           ))}
         </ul>
         <Row label="Subtotal">{formatCents(detail.subtotalCents)}</Row>
+        {detail.couponCode ? (
+          <Row label={`Cupón ${detail.couponCode}`}>
+            {detail.couponDiscountCents > 0 ? `−${formatCents(detail.couponDiscountCents)}` : "Envío gratis"}
+          </Row>
+        ) : null}
         <Row label="Envío que pagó">{detail.shippingCents > 0 ? formatCents(detail.shippingCents) : "Gratis"}</Row>
         <Row label="Total">
           <span className="font-semibold">{formatCents(order.totalCents)}</span>

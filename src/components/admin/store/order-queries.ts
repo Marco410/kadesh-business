@@ -144,6 +144,8 @@ export type AdminStoreOrderDetail = {
   phone: string | null;
   subtotalCents: number;
   shippingCents: number;
+  couponCode: string | null;
+  couponDiscountCents: number;
   costCents: number;
   shippingCostCents: number;
   stripePaymentIntentId: string | null;
@@ -171,6 +173,8 @@ export const ADMIN_STORE_ORDER_QUERY = gql`
       phone
       subtotalCents
       shippingCents
+      couponCode
+      couponDiscountCents
       costCents
       shippingCostCents
       stripePaymentIntentId

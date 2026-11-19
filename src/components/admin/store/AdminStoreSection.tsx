@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useAdminNavigation } from "../hooks/useAdminNavigation";
 import { AdminSegmented } from "../ui";
+import AdminStoreCouponsPanel from "./AdminStoreCouponsPanel";
 import AdminStoreOrdersPanel from "./AdminStoreOrdersPanel";
 import AdminStoreProductsPanel from "./AdminStoreProductsPanel";
 import AdminStoreReviewsPanel from "./AdminStoreReviewsPanel";
@@ -11,7 +12,7 @@ import AdminStoreTaxonomyPanel from "./AdminStoreTaxonomyPanel";
 import { STORE_SECTIONS, STORE_SECTION_ITEMS, parseStoreSection } from "./constants";
 
 /**
- * Operaciones → Kadesh Pet → Tienda. Orders, products, categories, brands, reviews and settings of
+ * Operaciones → Kadesh Pet → Tienda. Orders, products, categories, brands, reviews, coupons and settings of
  * the Kadesh Pet store; the sub-section lives in `&seccion=` (none = orders). Only the open one is mounted, so each asks only for
  * its own data.
  */
@@ -35,6 +36,7 @@ export default function AdminStoreSection() {
       {section === STORE_SECTIONS.CATEGORIES ? <AdminStoreTaxonomyPanel key="category" kind="category" /> : null}
       {section === STORE_SECTIONS.BRANDS ? <AdminStoreTaxonomyPanel key="brand" kind="brand" /> : null}
       {section === STORE_SECTIONS.REVIEWS ? <AdminStoreReviewsPanel /> : null}
+      {section === STORE_SECTIONS.COUPONS ? <AdminStoreCouponsPanel /> : null}
       {section === STORE_SECTIONS.SETTINGS ? <AdminStoreSettingsPanel /> : null}
     </div>
   );

@@ -414,19 +414,29 @@ Artículos, categorías y etiquetas viven en Blog, no en una ruta nueva. El nomb
 
 ## Kadesh Pet → Tienda
 
-`?tab=veterinarias&vista=tienda` (`store/`, 2026-11-18). Administra la tienda de `pet.kadesh.com.mx`. Seis secciones en `&seccion=`: **Pedidos** (default, sin `seccion`), **Productos** (`productos`), **Categorías** (`categorias`), **Marcas** (`marcas`), **Reseñas** (`resenas`) y **Ajustes** (`ajustes`). Solo se monta la abierta. El globo del menú cuenta los pedidos que necesitan a alguien: comprobantes por revisar y pagados sin surtir del todo.
+`?tab=veterinarias&vista=tienda` (`store/`, 2026-11-18). Administra la tienda de `pet.kadesh.com.mx`. Siete secciones en `&seccion=`: **Pedidos** (default, sin `seccion`), **Productos** (`productos`), **Categorías** (`categorias`), **Marcas** (`marcas`), **Reseñas** (`resenas`), **Cupones** (`cupones`) y **Ajustes** (`ajustes`). Solo se monta la abierta. El globo del menú cuenta los pedidos que necesitan a alguien: comprobantes por revisar y pagados sin surtir del todo.
 
 **Pedidos** (2026-11-19): por cola de trabajo, en `&cola=`: **Por surtir** (default), **Comprobantes por revisar**, **Esperando pago**, **En camino**, **Entregados**, **Cancelados** y **Todos** (`todos`). Las tres primeras muestran cuántos hay. El buscador (folio, nombre, correo o teléfono) busca en todos los pedidos, sin importar la cola. El pedido abierto vive en `&pedido={id}`.
 
 - **Transferencia por confirmar**: muestra el comprobante que subió la persona, el monto que debe decir y el concepto (el folio). **Confirmar pago** solo cuando el dinero ya está en el banco: el comprobante por sí solo no es el pago. **Rechazar comprobante** pide un motivo, que la persona lee; el pedido vuelve a "Esperando pago" y tiene 24 h para subir otro.
 - **Envíos**: se crean cuando el pedido se paga, uno para lo que envía Kadesh y uno por proveedor de Dropi. En cada uno se captura estatus, paquetería, guía, enlace de rastreo y lo que costó enviarlo. La primera vez que pasa a "Guía generada", "En camino" o "Entregado", quien compró recibe aviso con la guía. Con todos entregados el pedido se completa solo.
 - **Envío de Dropi**: por ahora se pide a mano en Dropi con la dirección del pedido (botón Copiar) y aquí se captura la guía. Al comprador nunca se le nombra a Dropi.
-- **Productos**: cada línea dice de dónde sale (Propio / Dropi con su id y variación) y lo que costó. Abajo, el **margen** del pedido: lo que pagó menos el costo de productos y de envíos (antes de comisiones).
+- **Productos**: cada línea dice de dónde sale (Propio / Dropi con su id y variación) y lo que costó. Si el pedido usó un cupón, sale el código y lo que descontó. Abajo, el **margen** del pedido: lo que pagó (ya con el descuento) menos el costo de productos y de envíos (antes de comisiones).
 - **Cancelar pedido** (no pagado): pide motivo, regresa el stock y avisa a la persona.
 - **Reembolsar** (pagado): con tarjeta devuelve el total por Stripe; con transferencia cancela el pedido y el dinero se devuelve desde el banco. "Regresar los productos al stock" viene marcado. Solo reembolso total.
 - **Pago que llegó a un pedido cancelado**: el pedido lo dice en rojo y se reembolsa desde ahí.
 - **Nota interna**: solo la ve el equipo.
 - **Lo que ha pasado**: cada paso con fecha y quién lo hizo ("Sistema" = Stripe o el vencimiento automático). Lo marcado "solo interno" no lo ve quien compró.
+
+**Cupones** (2026-11-19): los códigos de descuento, del más nuevo al más viejo (hasta 100). Cada fila: código, estado (Activo, Apagado, Programado, Vencido o Agotado), qué da, sus condiciones y cuántas veces se usó.
+
+- **Tipo**: porcentaje (con tope opcional en pesos), monto fijo o envío gratis. El descuento es sobre los productos, nunca sobre el envío, y un pedido usa un solo cupón.
+- **Condiciones**: compra mínima, fechas de inicio y fin (en la hora del equipo donde se captura), usos en total, usos por persona y "solo primera compra".
+- **A qué aplica**: sin marcar nada, a todo el carrito. Con categorías (una principal incluye sus subcategorías) o productos, solo a esas líneas. Los productos se buscan por nombre; máximo 50.
+- **El código** se guarda en mayúsculas, sin espacios ni acentos. No se repite.
+- **No se borra**: se apaga. Los pedidos guardan el código que usaron.
+- **Usos**: los cuenta el back. Un pedido cancelado, vencido o reembolsado devuelve su uso.
+- Datos: `AdminStoreCoupons` trae solo campos simples (una consulta más el conteo). Las categorías y productos de un cupón se piden al abrirlo (`AdminStoreCouponScope`), no en la lista, porque Keystone hace una consulta por fila para las relaciones a-muchos. El buscador de productos espera 300 ms y pide 20.
 
 **Ajustes** (2026-11-19): envío (tarifa por pedido y desde qué subtotal es gratis), formas de pago (tarjeta, transferencia con banco, beneficiario y CLABE), minutos para pagar con tarjeta y horas para transferir antes de que el pedido se cancele solo, WhatsApp de soporte y política de cambios y devoluciones. Aplican en menos de un minuto, sin deploy. La transferencia no se ofrece en el checkout hasta guardar CLABE y beneficiario. Si la tienda está abierta o no es una variable del servidor (`STORE_ENABLED`), no un ajuste.
 
@@ -454,7 +464,7 @@ Datos: la lista de productos usa `adminStoreProducts` de kadesh-back (portada y 
 
 Pedidos y ajustes: las listas y acciones de pedidos usan `adminStoreOrders`, `adminStoreOrder` y las mutaciones `adminStore*` de kadesh-back (la API generada no puede escribir un pedido); los ajustes son la fila única `StoreSettings` de la API generada. El contador del menú va dentro de `ADMIN_NAV_COUNTS_QUERY` (un `count` más en el poll de 60 s que ya existía), no en un poll nuevo: por eso el back debe publicarse antes que este front.
 
-Pendiente: importador de Dropi, mandar el envío a Dropi con un botón, cupones y reembolsos parciales. Ver `kadesh-back/models/Pet/Store/README.md`.
+Pendiente: importador de Dropi, mandar el envío a Dropi con un botón y reembolsos parciales. Ver `kadesh-back/models/Pet/Store/README.md`.
 
 ## Kadesh Pet → Eventos
 
