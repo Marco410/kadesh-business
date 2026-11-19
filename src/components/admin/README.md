@@ -235,7 +235,7 @@ Un nombre, compartido por los dos blogs. No se renombran ni se borran desde aqu�
 
 ## Veterinarias
 
-Grupo **Kadesh Pet** del menú (`?tab=veterinarias`), cuatro vistas: **Resumen** (default, sin `vista`), **Animales** (`&vista=animales`), **Veterinarias** (`&vista=fichas`) y **Servicios** (`&vista=servicios`). Cada una es un item del menú. `pet/AdminPetSection.tsx` monta solo la vista abierta, así cada una pide solo sus datos.
+Grupo **Kadesh Pet** del menú (`?tab=veterinarias`). La **Tienda** (`&vista=tienda`) tiene su propia sección más abajo. Aquí, cuatro vistas: **Resumen** (default, sin `vista`), **Animales** (`&vista=animales`), **Veterinarias** (`&vista=fichas`) y **Servicios** (`&vista=servicios`). Cada una es un item del menú. `pet/AdminPetSection.tsx` monta solo la vista abierta, así cada una pide solo sus datos.
 
 **Resumen** (`pet/overview/`, 2026-11-03): cómo va Kadesh Pet. Sale de `adminPetSummary` y `adminPetSeries` (kadesh-back, `queries/admin/adminPet.ts`).
 
@@ -285,6 +285,14 @@ Asunto, título de cabecera, etiqueta superior, vista previa de bandeja, cuerpo,
 La columna derecha es vista previa en vivo. **Revisar y enviar** primero cuenta destinatarios (`dryRun`) y pide confirmación antes del envío real. Mutación `sendAdminBroadcastEmail` (solo admin de plataforma).
 
 ## Decisiones
+
+### 2026-11-18 — Tienda de Kadesh Pet en Operaciones
+
+Qué: vista **Tienda** en el grupo Kadesh Pet, con productos, categorías, marcas y reseñas.
+
+Por qué: la tienda vende productos propios, de Dropi y enlaces de afiliado de Mercado Libre desde un mismo catálogo, y la opera el equipo de Kadesh. Un solo editor para los tres orígenes evita tres flujos distintos; el origen solo cambia qué campos se piden.
+
+Qué no hacer: no mostrar el origen ni el costo fuera de Operaciones; no pedir portada o conteos por fila con la API generada (una consulta por fila); no mandar una mutación por variante o por foto.
 
 ### 2026-11-04 — Eventos de la comunidad se revisan en Operaciones
 
@@ -395,6 +403,34 @@ En Planes → **Módulos** se edita el copy una vez (`updatePlanFeatureCatalog` 
 ### 2026-09-28 — Blog en Operaciones
 
 Artículos, categorías y etiquetas viven en Blog, no en una ruta nueva. El nombre de la categoría es texto libre (antes era una lista cerrada en el backend): así se pueden crear las que hagan falta. Los nombres viejos (`prospecting`, `care_health`, …) siguen mostrándose con su etiqueta. Publicar avisa a los suscriptores y comparte en Facebook; un guardado posterior no repite el aviso.
+
+## Kadesh Pet → Tienda
+
+`?tab=veterinarias&vista=tienda` (`store/`, 2026-11-18). Administra la tienda de `pet.kadesh.com.mx`. Cuatro secciones en `&seccion=`: **Productos** (default, sin `seccion`), **Categorías** (`categorias`), **Marcas** (`marcas`) y **Reseñas** (`resenas`). Solo se monta la abierta.
+
+**Productos**: todos, en cualquier estatus. Buscador (nombre, SKU o id externo), chips de estatus con cuántos hay de cada uno, origen, categoría y "Solo sin stock". Cada fila: portada, estatus, origen, categoría y marca, stock, precio y estrellas. Acciones: **destacar**, **editar** y **ver en la tienda** (solo si está activo). El producto abierto vive en `&producto={id}`; `&producto=nuevo` abre el editor vacío.
+
+- **Estatus**: Borrador, Activo, Pausado y Archivado. Solo **Activo** se ve en la tienda, y además necesita precio mayor a cero. Sin precio, la fila lo avisa.
+- **Origen**: Propio, Dropi o Mercado Libre. Es interno y no se cambia después de crear el producto. En la tienda, Propio y Dropi salen como "vendido por Kadesh"; Dropi nunca se nombra al público.
+  - **Dropi** pide el id del producto en Dropi.
+  - **Mercado Libre** pide el **enlace de afiliado** (se genera en el portal de afiliados y se pega aquí). No lleva stock y tiene un solo precio, aproximado; al guardarlo queda la fecha de revisión que la tienda muestra junto al precio.
+- **Variantes**: cada una es algo que se puede comprar (una talla, un tamaño) con precio, precio anterior (tachado; debe ser mayor que el precio), costo, stock, SKU y "A la venta". Un producto sin opciones tiene una sola variante con el nombre vacío. El **costo** es interno: con él, el editor muestra el margen.
+- **Inventario**: "Con stock contado" (en cero sale agotado) o "Sin stock (sobre pedido)" (siempre disponible).
+- **Fotos**: hasta 12. La primera es la portada; se reordenan con las flechas. Se suben (JPG, PNG, WEBP o GIF de hasta 8 MB) o se pega el enlace `https://` de una imagen, que es lo normal en productos de Mercado Libre.
+- **Borrar**: un producto con reseñas no se puede borrar; se archiva. Sin reseñas, se borra con sus variantes y fotos.
+- El precio y el stock que muestra la lista los calcula el back a partir de las variantes a la venta: el precio es el de la más barata.
+
+**Categorías**: dos niveles. Nombre, "Dentro de" (categoría principal), orden (el menor sale primero), imagen y "Visible en la tienda". Una categoría con subcategorías no puede meterse dentro de otra. **Marcas**: nombre, logo y visible. La dirección (`slug`) se arma del nombre al crear y no cambia al renombrar.
+
+**Reseñas**: lo que la gente escribió, de la más reciente a la más vieja, con filtro Todas / Publicadas / Ocultas. Todos los productos empiezan sin estrellas; no se importan calificaciones de Dropi ni de Mercado Libre.
+
+- **Ocultar** la saca de la tienda y de las estrellas del producto (el back las recalcula). Su autor no puede volver a publicarla editándola. **Publicar de nuevo** la regresa.
+- **Responder** guarda una respuesta pública de Kadesh; vacía, la quita.
+- **Borrar** es definitivo. Para sacarla de la tienda basta con ocultarla.
+
+Datos: la lista de productos usa `adminStoreProducts` de kadesh-back (portada y número de variantes de toda la página en dos consultas). El detalle y todas las escrituras usan la API que Keystone genera para las lists `Store*`, que es solo para admin. Guardar un producto es **una sola petición** (`SaveAdminStoreProduct`): variantes y fotos editadas o quitadas van en lote y las nuevas se crean junto con el producto. Categorías, marcas y tipos de animal del formulario y de los filtros salen de una sola consulta (`AdminStoreOptions`), que Apollo guarda en caché.
+
+Pendiente: pedidos, envíos, cupones e importador de Dropi (fases siguientes). Ver `kadesh-back/models/Pet/Store/README.md`.
 
 ## Kadesh Pet → Eventos
 

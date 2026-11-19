@@ -17,6 +17,7 @@ import {
   SecurityBlockIcon,
   SparklesIcon,
   Stethoscope02Icon,
+  Store01Icon,
   Task01Icon,
   UserGroupIcon,
 } from "@hugeicons/core-free-icons";
@@ -97,6 +98,7 @@ export const ADMIN_NAV_GROUPS: Array<{ id: string; title: string; items: AdminNa
       { id: "pet-rescate", label: "Espacios de rescate", icon: CharityIcon, tab: "veterinarias", vista: "espacios-rescate", description: "Rescatistas, refugios y colectivos: verificarlos y marcar aliados.", badgeKey: "pendingRescues" },
       { id: "pet-avisos", label: "Avisos", icon: Notification03Icon, tab: "veterinarias", vista: "avisos", description: "Cada aviso a quién le llegó y por dónde: campana, push y WhatsApp." },
       { id: "pet-alertas-zona", label: "Alertas de zona", icon: MapsLocation01Icon, tab: "veterinarias", vista: "alertas-zona", description: "Quién recibe alertas de mascotas cerca, su zona y sus canales." },
+      { id: "pet-tienda", label: "Tienda", icon: Store01Icon, tab: "veterinarias", vista: "tienda", description: "Productos, categorías, marcas y reseñas de la tienda de Kadesh Pet." },
     ],
   },
 ];
