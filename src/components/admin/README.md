@@ -286,6 +286,14 @@ La columna derecha es vista previa en vivo. **Revisar y enviar** primero cuenta 
 
 ## Decisiones
 
+### 2026-11-19 — Pedidos de la tienda por cola de trabajo
+
+Qué: Pedidos abre en "Por surtir" y no en la lista completa; el detalle es un panel lateral con las acciones en el orden en que se usan (confirmar transferencia, envíos, dirección).
+
+Por qué: quien opera la tienda entra a resolver lo que falta, no a consultar el historial. Las colas con contador responden "¿qué tengo que hacer hoy?" sin filtros. Confirmar una transferencia pide ver primero el comprobante y recuerda revisar el banco, porque una captura no prueba el pago.
+
+Qué no hacer: no agregar un botón que marque "pagado" un pedido con tarjeta (eso lo dice Stripe); no reembolsar desde Stripe sin necesidad (el pedido se actualiza igual por el webhook, pero aquí queda quién lo hizo y el motivo); no mostrar el margen fuera de Operaciones.
+
 ### 2026-11-18 — Tienda de Kadesh Pet en Operaciones
 
 Qué: vista **Tienda** en el grupo Kadesh Pet, con productos, categorías, marcas y reseñas.
@@ -406,9 +414,23 @@ Artículos, categorías y etiquetas viven en Blog, no en una ruta nueva. El nomb
 
 ## Kadesh Pet → Tienda
 
-`?tab=veterinarias&vista=tienda` (`store/`, 2026-11-18). Administra la tienda de `pet.kadesh.com.mx`. Cuatro secciones en `&seccion=`: **Productos** (default, sin `seccion`), **Categorías** (`categorias`), **Marcas** (`marcas`) y **Reseñas** (`resenas`). Solo se monta la abierta.
+`?tab=veterinarias&vista=tienda` (`store/`, 2026-11-18). Administra la tienda de `pet.kadesh.com.mx`. Seis secciones en `&seccion=`: **Pedidos** (default, sin `seccion`), **Productos** (`productos`), **Categorías** (`categorias`), **Marcas** (`marcas`), **Reseñas** (`resenas`) y **Ajustes** (`ajustes`). Solo se monta la abierta. El globo del menú cuenta los pedidos que necesitan a alguien: comprobantes por revisar y pagados sin surtir del todo.
 
-**Productos**: todos, en cualquier estatus. Buscador (nombre, SKU o id externo), chips de estatus con cuántos hay de cada uno, origen, categoría y "Solo sin stock". Cada fila: portada, estatus, origen, categoría y marca, stock, precio y estrellas. Acciones: **destacar**, **editar** y **ver en la tienda** (solo si está activo). El producto abierto vive en `&producto={id}`; `&producto=nuevo` abre el editor vacío.
+**Pedidos** (2026-11-19): por cola de trabajo, en `&cola=`: **Por surtir** (default), **Comprobantes por revisar**, **Esperando pago**, **En camino**, **Entregados**, **Cancelados** y **Todos** (`todos`). Las tres primeras muestran cuántos hay. El buscador (folio, nombre, correo o teléfono) busca en todos los pedidos, sin importar la cola. El pedido abierto vive en `&pedido={id}`.
+
+- **Transferencia por confirmar**: muestra el comprobante que subió la persona, el monto que debe decir y el concepto (el folio). **Confirmar pago** solo cuando el dinero ya está en el banco: el comprobante por sí solo no es el pago. **Rechazar comprobante** pide un motivo, que la persona lee; el pedido vuelve a "Esperando pago" y tiene 24 h para subir otro.
+- **Envíos**: se crean cuando el pedido se paga, uno para lo que envía Kadesh y uno por proveedor de Dropi. En cada uno se captura estatus, paquetería, guía, enlace de rastreo y lo que costó enviarlo. La primera vez que pasa a "Guía generada", "En camino" o "Entregado", quien compró recibe aviso con la guía. Con todos entregados el pedido se completa solo.
+- **Envío de Dropi**: por ahora se pide a mano en Dropi con la dirección del pedido (botón Copiar) y aquí se captura la guía. Al comprador nunca se le nombra a Dropi.
+- **Productos**: cada línea dice de dónde sale (Propio / Dropi con su id y variación) y lo que costó. Abajo, el **margen** del pedido: lo que pagó menos el costo de productos y de envíos (antes de comisiones).
+- **Cancelar pedido** (no pagado): pide motivo, regresa el stock y avisa a la persona.
+- **Reembolsar** (pagado): con tarjeta devuelve el total por Stripe; con transferencia cancela el pedido y el dinero se devuelve desde el banco. "Regresar los productos al stock" viene marcado. Solo reembolso total.
+- **Pago que llegó a un pedido cancelado**: el pedido lo dice en rojo y se reembolsa desde ahí.
+- **Nota interna**: solo la ve el equipo.
+- **Lo que ha pasado**: cada paso con fecha y quién lo hizo ("Sistema" = Stripe o el vencimiento automático). Lo marcado "solo interno" no lo ve quien compró.
+
+**Ajustes** (2026-11-19): envío (tarifa por pedido y desde qué subtotal es gratis), formas de pago (tarjeta, transferencia con banco, beneficiario y CLABE), minutos para pagar con tarjeta y horas para transferir antes de que el pedido se cancele solo, WhatsApp de soporte y política de cambios y devoluciones. Aplican en menos de un minuto, sin deploy. La transferencia no se ofrece en el checkout hasta guardar CLABE y beneficiario. Si la tienda está abierta o no es una variable del servidor (`STORE_ENABLED`), no un ajuste.
+
+**Productos**: todos, en cualquier estatus. Buscador (nombre, SKU o id externo), chips de estatus con cuántos hay de cada uno, origen, categoría y "Solo sin stock". Cada fila: portada, estatus, origen, categoría y marca, stock, precio y estrellas. Acciones: **destacar**, **editar** y **ver en la tienda** (solo si está activo). El producto abierto vive en `&producto={id}`; `&producto=nuevo` abre el editor vacío. Un producto que ya está en pedidos tampoco se borra: se archiva.
 
 - **Estatus**: Borrador, Activo, Pausado y Archivado. Solo **Activo** se ve en la tienda, y además necesita precio mayor a cero. Sin precio, la fila lo avisa.
 - **Origen**: Propio, Dropi o Mercado Libre. Es interno y no se cambia después de crear el producto. En la tienda, Propio y Dropi salen como "vendido por Kadesh"; Dropi nunca se nombra al público.
@@ -430,7 +452,9 @@ Artículos, categorías y etiquetas viven en Blog, no en una ruta nueva. El nomb
 
 Datos: la lista de productos usa `adminStoreProducts` de kadesh-back (portada y número de variantes de toda la página en dos consultas). El detalle y todas las escrituras usan la API que Keystone genera para las lists `Store*`, que es solo para admin. Guardar un producto es **una sola petición** (`SaveAdminStoreProduct`): variantes y fotos editadas o quitadas van en lote y las nuevas se crean junto con el producto. Categorías, marcas y tipos de animal del formulario y de los filtros salen de una sola consulta (`AdminStoreOptions`), que Apollo guarda en caché.
 
-Pendiente: pedidos, envíos, cupones e importador de Dropi (fases siguientes). Ver `kadesh-back/models/Pet/Store/README.md`.
+Pedidos y ajustes: las listas y acciones de pedidos usan `adminStoreOrders`, `adminStoreOrder` y las mutaciones `adminStore*` de kadesh-back (la API generada no puede escribir un pedido); los ajustes son la fila única `StoreSettings` de la API generada. El contador del menú va dentro de `ADMIN_NAV_COUNTS_QUERY` (un `count` más en el poll de 60 s que ya existía), no en un poll nuevo: por eso el back debe publicarse antes que este front.
+
+Pendiente: importador de Dropi, mandar el envío a Dropi con un botón, cupones y reembolsos parciales. Ver `kadesh-back/models/Pet/Store/README.md`.
 
 ## Kadesh Pet → Eventos
 

@@ -111,10 +111,12 @@ export const ADMIN_NAV_COUNTS_QUERY = gql`
     $pendingWhere: PetPlaceWhereInput!
     $pendingServiceWhere: PetPlaceServiceWhereInput!
     $pendingEventWhere: PetEventWhereInput!
+    $pendingStoreOrderWhere: StoreOrderWhereInput!
   ) {
     pendingPlaces: petPlacesCount(where: $pendingWhere)
     pendingServices: petPlaceServicesCount(where: $pendingServiceWhere)
     pendingEvents: petEventsCount(where: $pendingEventWhere)
+    pendingStoreOrders: storeOrdersCount(where: $pendingStoreOrderWhere)
     openErrors: adminOpenErrorIssuesCount
   }
 `;
@@ -123,6 +125,8 @@ export type AdminNavCountsResponse = {
   pendingPlaces: number | null;
   pendingServices: number | null;
   pendingEvents: number | null;
+  /** Pedidos de la tienda con comprobante por revisar o pagados sin surtir del todo. */
+  pendingStoreOrders: number | null;
   /** Errores abiertos o reabiertos con actividad en las últimas 24 h. */
   openErrors: number | null;
 };
