@@ -211,8 +211,11 @@ function SettingsForm({ settings }: { settings: AdminStoreSettings | null }) {
       <AdminSectionCard title="Atención" index={2}>
         <div className="flex flex-col gap-4">
           <label className="block sm:max-w-xs">
-            <span className={adminLabelClass}>WhatsApp de soporte</span>
+            <span className={adminLabelClass}>WhatsApp de soporte y comprobantes</span>
             <input value={form.supportWhatsapp} onChange={(event) => set("supportWhatsapp", event.target.value)} className={adminInputClass} inputMode="tel" placeholder="10 dígitos" />
+            <span className="mt-1 block text-[13px] text-dash-muted">
+              A este número llegan los comprobantes de transferencia (botón «Mandar comprobante») y las dudas de un pedido.
+            </span>
           </label>
           <label className="block">
             <span className={adminLabelClass}>Política de cambios y devoluciones</span>

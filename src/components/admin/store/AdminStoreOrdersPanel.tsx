@@ -45,8 +45,13 @@ export default function AdminStoreOrdersPanel() {
   const queue = parseQueue(searchParams.get("cola"));
 
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
   const debouncedSearch = useDebouncedValue(search, 300);
+  // The page belongs to one queue + search: changing either starts at page 1 in the same render,
+  // so a chip click or a search sends one request (not one for the old filter's page 1 first).
+  const pageKey = `${queue}|${debouncedSearch.trim()}`;
+  const [pageState, setPageState] = useState({ key: pageKey, page: 1 });
+  const page = pageState.key === pageKey ? pageState.page : 1;
+  const setPage = (next: number) => setPageState({ key: pageKey, page: next });
 
   const variables = useMemo(
     () => ({
@@ -59,14 +64,21 @@ export default function AdminStoreOrdersPanel() {
     [debouncedSearch, page, queue],
   );
 
-  const { data, loading, error, refetch } = useQuery<AdminStoreOrdersResponse>(ADMIN_STORE_ORDERS_QUERY, {
+  // Orders move between queues on their own (a buyer uploads a proof, a card payment lands, the
+  // expiry cron cancels one), so a queue cached earlier is never shown: switching the queue, the
+  // page or the search always asks the server (one request) and shows the loading rows until it
+  // answers. Rows and counts then come from that same response, so they always agree.
+  // `cache-first` afterwards only keeps re-renders from asking again; `refetch()` still goes out.
+  const { data, previousData, loading, error, refetch } = useQuery<AdminStoreOrdersResponse>(ADMIN_STORE_ORDERS_QUERY, {
     variables,
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
   });
 
   const rows = data?.adminStoreOrders.items ?? [];
   const total = data?.adminStoreOrders.total ?? 0;
-  const queueCounts = data?.adminStoreOrders.queues ?? [];
+  // While the next queue loads, the chips keep the counts of the last answer instead of blinking.
+  const queueCounts = (data ?? previousData)?.adminStoreOrders.queues ?? [];
   const options = STORE_ORDER_QUEUE_OPTIONS.map((option) => ({
     ...option,
     count: queueCounts.find((entry) => entry.key === option.value)?.count ?? null,
@@ -77,29 +89,24 @@ export default function AdminStoreOrdersPanel() {
       <AdminStoreOrderDrawer
         orderId={selectedId}
         onClose={() => setParams({ pedido: null })}
+        // Only the queue on screen is asked again; the others ask the server when opened.
         onChanged={() => void refetch()}
       />
 
       <AdminSearchInput
         value={search}
-        onChange={(value) => {
-          setSearch(value);
-          setPage(1);
-        }}
+        onChange={setSearch}
         placeholder="Buscar por folio, nombre, correo o teléfono"
       />
       <AdminFilterChips
         options={options}
         value={queue}
-        onChange={(value) => {
-          setPage(1);
-          setParams({ cola: value === "toFulfill" ? null : value || "todos" });
-        }}
+        onChange={(value) => setParams({ cola: value === "toFulfill" ? null : value || "todos" })}
       />
 
       {error ? (
         <AdminErrorState message={adminErrorText(error, "No se pudieron cargar los pedidos. Intenta de nuevo.")} />
-      ) : loading && rows.length === 0 ? (
+      ) : loading && !data ? (
         <AdminLoadingRows rows={6} />
       ) : rows.length === 0 ? (
         <AdminEmptyState

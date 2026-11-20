@@ -104,6 +104,8 @@ export type AdminStoreShipment = {
   id: string;
   provider: string;
   status: string;
+  /** Statuses an admin may set next, the current one first (decided by the backend). */
+  nextStatuses: string[];
   carrier: string | null;
   trackingCode: string | null;
   trackingUrl: string | null;
@@ -230,6 +232,7 @@ export const ADMIN_STORE_ORDER_QUERY = gql`
         id
         provider
         status
+        nextStatuses
         carrier
         trackingCode
         trackingUrl

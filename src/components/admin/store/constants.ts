@@ -152,6 +152,21 @@ export function inputToInt(value: string): number | null {
   return parsed;
 }
 
+/** Hosts a Mercado Libre affiliate link may point to (and their subdomains). Same list as kadesh-back. */
+const MERCADO_LIBRE_HOSTS = ["mercadolibre.com.mx", "mercadolibre.com", "meli.la"];
+
+/** Whether a link is an https link to Mercado Libre (including `meli.la` short links). */
+export function isMercadoLibreUrl(value: string): boolean {
+  try {
+    const url = new URL(value.trim());
+    if (url.protocol !== "https:") return false;
+    const host = url.hostname.toLowerCase();
+    return MERCADO_LIBRE_HOSTS.some((allowed) => host === allowed || host.endsWith(`.${allowed}`));
+  } catch {
+    return false;
+  }
+}
+
 // ─── Orders ─────────────────────────────────────────────────────────────────────────────────
 
 export const ADMIN_STORE_ORDERS_PAGE_SIZE = 25;
@@ -184,6 +199,16 @@ export const STORE_PAYMENT_STATUS_CLASS: Record<string, string> = {
   paid: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
   failed: "bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300",
   refunded: "bg-violet-100 text-violet-800 dark:bg-violet-500/15 dark:text-violet-300",
+};
+
+/** One payment attempt (`StorePayment.status`); same values as `STORE_PAYMENT_ATTEMPT_STATUS` in kadesh-back. */
+export const STORE_PAYMENT_ATTEMPT_STATUS_LABELS: Record<string, string> = {
+  pending: "Pendiente",
+  in_review: "En revisión",
+  succeeded: "Pagado",
+  failed: "Falló",
+  cancelled: "Cancelado",
+  refunded: "Reembolsado",
 };
 
 /** Same values as `STORE_FULFILLMENT_STATUS` in kadesh-back. */

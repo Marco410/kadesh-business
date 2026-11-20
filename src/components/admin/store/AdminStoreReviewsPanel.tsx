@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { StarIcon } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
+import { ConfirmModal, ModalPortal } from "kadesh/components/shared";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { adminErrorText } from "../errors";
 import {
@@ -59,6 +60,7 @@ export default function AdminStoreReviewsPanel() {
   const [replyingId, setReplyingId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const variables = useMemo(
     () => ({
@@ -115,11 +117,8 @@ export default function AdminStoreReviewsPanel() {
     ).then(() => setReplyingId(null));
   }
 
-  function remove(row: AdminStoreReviewRow) {
-    if (!window.confirm("¿Borrar esta reseña? No se puede deshacer. Para sacarla de la tienda basta con ocultarla.")) {
-      return;
-    }
-    void run(row.id, () => deleteReview({ variables: { id: row.id } }), "Reseña borrada");
+  function remove(id: string) {
+    void run(id, () => deleteReview({ variables: { id } }), "Reseña borrada").then(() => setConfirmDeleteId(null));
   }
 
   return (
@@ -223,7 +222,7 @@ export default function AdminStoreReviewsPanel() {
                       {row.adminReply ? "Editar respuesta" : "Responder"}
                     </AdminButton>
                   ) : null}
-                  <AdminButton variant="danger-ghost" size="sm" onClick={() => remove(row)} disabled={busy} className="sm:ml-auto">
+                  <AdminButton variant="danger-ghost" size="sm" onClick={() => setConfirmDeleteId(row.id)} disabled={busy} className="sm:ml-auto">
                     Borrar
                   </AdminButton>
                 </div>
@@ -239,6 +238,24 @@ export default function AdminStoreReviewsPanel() {
         currentPage={page}
         onPageChange={setPage}
       />
+
+      <ModalPortal>
+        <ConfirmModal
+          isOpen={Boolean(confirmDeleteId)}
+          onClose={() => {
+            if (!busyId) setConfirmDeleteId(null);
+          }}
+          onConfirm={() => {
+            if (confirmDeleteId) remove(confirmDeleteId);
+          }}
+          title="Borrar reseña"
+          message="¿Borrar esta reseña? No se puede deshacer. Para sacarla de la tienda basta con ocultarla."
+          confirmText="Borrar"
+          cancelText="Cancelar"
+          isLoading={Boolean(busyId && busyId === confirmDeleteId)}
+          confirmButtonColor="red"
+        />
+      </ModalPortal>
     </div>
   );
 }

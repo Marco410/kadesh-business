@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { sileo } from "sileo";
+import { ConfirmModal, ModalPortal } from "kadesh/components/shared";
 import { formatDateShort } from "kadesh/utils/format-date";
 import { adminErrorText } from "../errors";
 import {
@@ -19,10 +20,10 @@ import {
 } from "../ui";
 import StoreOrderBadges from "./StoreOrderBadges";
 import {
+  STORE_PAYMENT_ATTEMPT_STATUS_LABELS,
   STORE_PAYMENT_METHOD_LABELS,
   STORE_SHIPMENT_PROVIDER_LABELS,
   STORE_SHIPMENT_STATUS_LABELS,
-  STORE_SHIPMENT_STATUS_OPTIONS,
   STORE_SOURCE_CLASS,
   STORE_SOURCE_LABELS,
   centsToInput,
@@ -72,9 +73,14 @@ function ShipmentEditor({
   shipment: AdminStoreShipment;
   itemNames: string[];
   disabled: boolean;
-  onSave: (input: Record<string, unknown>) => Promise<void>;
+  /** Resolves with the backend's message when it refused the change (e.g. a status jump it does not allow). */
+  onSave: (input: Record<string, unknown>) => Promise<string | null>;
 }) {
   const [status, setStatus] = useState(shipment.status);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  // Only the statuses the backend allows from here (the current one first): own packages never
+  // get the Dropi steps, and a package cannot jump, say, from «Por preparar» to «Devuelto».
+  const statusValues = shipment.nextStatuses.length > 0 ? shipment.nextStatuses : [shipment.status];
   const [carrier, setCarrier] = useState(shipment.carrier ?? "");
   const [trackingCode, setTrackingCode] = useState(shipment.trackingCode ?? "");
   const [trackingUrl, setTrackingUrl] = useState(shipment.trackingUrl ?? "");
@@ -86,13 +92,15 @@ function ShipmentEditor({
     if (trackingUrl.trim() && !/^https:\/\//i.test(trackingUrl.trim())) {
       return void sileo.warning({ title: "El enlace de rastreo debe empezar con https://." });
     }
-    await onSave({
+    setSaveError(null);
+    const refused = await onSave({
       status,
       carrier: carrier.trim(),
       trackingCode: trackingCode.trim(),
       trackingUrl: trackingUrl.trim(),
       ...(costCents !== null ? { shippingCostCents: costCents } : {}),
     });
+    setSaveError(refused);
   }
 
   return (
@@ -121,9 +129,9 @@ function ShipmentEditor({
         <label className="block">
           <span className={adminLabelClass}>Estatus</span>
           <select value={status} onChange={(event) => setStatus(event.target.value)} className={adminSelectClass}>
-            {STORE_SHIPMENT_STATUS_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
+            {statusValues.map((value) => (
+              <option key={value} value={value}>
+                {STORE_SHIPMENT_STATUS_LABELS[value] ?? value}
               </option>
             ))}
           </select>
@@ -157,6 +165,11 @@ function ShipmentEditor({
           />
         </label>
       </div>
+      {saveError ? (
+        <p role="alert" className="text-sm text-red-700 dark:text-red-400">
+          {saveError}
+        </p>
+      ) : null}
       <AdminButton variant="outline" size="sm" onClick={() => void save()} disabled={disabled} className="self-start">
         Guardar envío
       </AdminButton>
@@ -225,6 +238,7 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
   const [reason, setReason] = useState("");
   const [restock, setRestock] = useState(true);
   const [note, setNote] = useState(detail.adminNote ?? "");
+  const [confirmClose, setConfirmClose] = useState(false);
 
   const [reviewTransfer] = useMutation(ADMIN_REVIEW_STORE_TRANSFER_MUTATION);
   const [updateShipment] = useMutation(ADMIN_UPDATE_STORE_SHIPMENT_MUTATION);
@@ -232,8 +246,15 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
   const [refundOrder] = useMutation(ADMIN_REFUND_STORE_ORDER_MUTATION);
   const [setOrderNote] = useMutation(ADMIN_SET_STORE_ORDER_NOTE_MUTATION);
 
-  /** Runs one admin action and shows what the backend answered. */
-  async function run(mutate: (options: { variables: Record<string, unknown> }) => Promise<{ data?: unknown }>, field: string, variables: Record<string, unknown>) {
+  /**
+   * Runs one admin action and shows what the backend answered. Resolves with `null` when it went
+   * through, or with the message of why not (the backend explains in Spanish).
+   */
+  async function run(
+    mutate: (options: { variables: Record<string, unknown> }) => Promise<{ data?: unknown }>,
+    field: string,
+    variables: Record<string, unknown>,
+  ): Promise<string | null> {
     setBusy(true);
     try {
       const { data } = await mutate({ variables });
@@ -241,10 +262,11 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
       if (result?.success) sileo.success({ title: result.message });
       else sileo.error({ title: "No se pudo", description: result?.message });
       await onDone();
-      return Boolean(result?.success);
+      return result?.success ? null : result?.message || "No se pudo. Intenta de nuevo.";
     } catch (err) {
-      sileo.error({ title: "No se pudo", description: adminErrorText(err, "Intenta de nuevo.") });
-      return false;
+      const message = adminErrorText(err, "Intenta de nuevo.");
+      sileo.error({ title: "No se pudo", description: message });
+      return message;
     } finally {
       setBusy(false);
     }
@@ -253,8 +275,17 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
   const open = order.status === "open";
   const paid = order.paymentStatus === "paid";
   const transfer = order.paymentMethod === "bank_transfer";
-  const proof = detail.payments.find((payment) => payment.transferProofUrl);
   const awaitingTransfer = open && transfer && (order.paymentStatus === "in_review" || order.paymentStatus === "pending");
+  // Approving or rejecting only makes sense with a proof waiting for review. A rejected proof
+  // comes back as a `pending` attempt with the reason in `errorMessage` (payments: newest first).
+  const inReview = order.paymentStatus === "in_review";
+  const proof = inReview
+    ? detail.payments.find((payment) => payment.transferProofUrl && payment.status === "in_review") ??
+      detail.payments.find((payment) => payment.transferProofUrl)
+    : null;
+  const rejectedProof = inReview
+    ? null
+    : detail.payments.find((payment) => payment.transferProofUrl && payment.status === "pending" && payment.errorMessage);
   // What the person paid (already without the coupon discount) minus what it cost.
   const margin = order.totalCents - detail.costCents - detail.shippingCostCents;
   const address = detail.address;
@@ -287,7 +318,35 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
         </p>
       ) : null}
 
-      {awaitingTransfer ? (
+      {awaitingTransfer && !inReview ? (
+        <Section title="Esperando la transferencia">
+          {rejectedProof ? (
+            <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-500/10 dark:text-red-300">
+              <span className="font-semibold">Comprobante rechazado: </span>
+              {rejectedProof.errorMessage}
+            </p>
+          ) : (
+            <p className="text-sm text-dash-muted">
+              No ha subido comprobante aquí. Normalmente llega por WhatsApp con el folio {order.number}.
+            </p>
+          )}
+          <Row label="Debe decir">{formatCents(order.totalCents)}</Row>
+          <Row label="Concepto">{order.number}</Row>
+          <p className="text-[13px] text-dash-muted">
+            Confirma solo si el dinero ya está en la cuenta del banco: el comprobante por sí solo no es el pago.
+          </p>
+          {/* Proofs usually come by WhatsApp: the payment is confirmed from here without an upload. */}
+          <AdminButton
+            onClick={() => void run(reviewTransfer, "adminReviewStoreTransfer", { orderId: order.id, approve: true })}
+            disabled={busy}
+            className="self-start"
+          >
+            El dinero llegó: confirmar pago
+          </AdminButton>
+        </Section>
+      ) : null}
+
+      {awaitingTransfer && inReview ? (
         <Section title="Transferencia por confirmar">
           {proof?.transferProofUrl ? (
             <a href={proof.transferProofUrl} target="_blank" rel="noopener noreferrer" className="block">
@@ -314,31 +373,29 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
           >
             El dinero llegó: confirmar pago
           </AdminButton>
-          {order.paymentStatus === "in_review" ? (
-            <div className="flex flex-col gap-2">
-              <label className="block">
-                <span className={adminLabelClass}>Si no se puede confirmar, dile por qué</span>
-                <input
-                  value={rejectNote}
-                  onChange={(event) => setRejectNote(event.target.value)}
-                  className={adminInputClass}
-                  placeholder="El monto no coincide con el total del pedido"
-                  maxLength={300}
-                />
-              </label>
-              <AdminButton
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  void run(reviewTransfer, "adminReviewStoreTransfer", { orderId: order.id, approve: false, note: rejectNote.trim() })
-                }
-                disabled={busy || !rejectNote.trim()}
-                className="self-start"
-              >
-                Rechazar comprobante
-              </AdminButton>
-            </div>
-          ) : null}
+          <div className="flex flex-col gap-2">
+            <label className="block">
+              <span className={adminLabelClass}>Si no se puede confirmar, dile por qué</span>
+              <input
+                value={rejectNote}
+                onChange={(event) => setRejectNote(event.target.value)}
+                className={adminInputClass}
+                placeholder="El monto no coincide con el total del pedido"
+                maxLength={300}
+              />
+            </label>
+            <AdminButton
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                void run(reviewTransfer, "adminReviewStoreTransfer", { orderId: order.id, approve: false, note: rejectNote.trim() })
+              }
+              disabled={busy || !rejectNote.trim()}
+              className="self-start"
+            >
+              Rechazar comprobante
+            </AdminButton>
+          </div>
         </Section>
       ) : null}
 
@@ -353,9 +410,7 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
                   .filter((item) => item.shipmentId === shipment.id)
                   .map((item) => `${item.name}${item.quantity > 1 ? ` × ${item.quantity}` : ""}`)}
                 disabled={busy}
-                onSave={async (input) => {
-                  await run(updateShipment, "adminUpdateStoreShipment", { shipmentId: shipment.id, input });
-                }}
+                onSave={(input) => run(updateShipment, "adminUpdateStoreShipment", { shipmentId: shipment.id, input })}
               />
             ))}
           </ul>
@@ -451,7 +506,7 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
         {detail.payments.map((payment) => (
           <div key={payment.id} className="flex flex-col gap-1 rounded-2xl border border-dash-line p-4">
             <Row label={STORE_PAYMENT_METHOD_LABELS[payment.provider] ?? payment.provider}>
-              {formatCents(payment.amountCents)} · {payment.status}
+              {formatCents(payment.amountCents)} · {STORE_PAYMENT_ATTEMPT_STATUS_LABELS[payment.status] ?? payment.status}
             </Row>
             {payment.stripePaymentIntentId ? <Row label="PaymentIntent">{payment.stripePaymentIntentId}</Row> : null}
             {payment.reviewedBy ? (
@@ -460,7 +515,13 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
               </Row>
             ) : null}
             {payment.refundedCents ? <Row label="Reembolsado">{formatCents(payment.refundedCents)}</Row> : null}
-            {payment.errorMessage ? <p className="text-sm text-red-700 dark:text-red-400">{payment.errorMessage}</p> : null}
+            {payment.errorMessage ? (
+              <p className="text-sm text-red-700 dark:text-red-400">
+                {payment.provider === "bank_transfer" && payment.status === "pending" && payment.transferProofUrl
+                  ? `Comprobante rechazado: ${payment.errorMessage}`
+                  : payment.errorMessage}
+              </p>
+            ) : null}
           </div>
         ))}
         {detail.paidAt ? <Row label="Pagado el">{formatDateShort(detail.paidAt)}</Row> : null}
@@ -531,19 +592,37 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
             variant="danger"
             size="sm"
             disabled={busy || !reason.trim()}
-            onClick={() => {
-              const question = paid
-                ? `¿Reembolsar ${formatCents(order.totalCents)} del pedido ${order.number}?`
-                : `¿Cancelar el pedido ${order.number}?`;
-              if (!window.confirm(question)) return;
-              void (paid
-                ? run(refundOrder, "adminRefundStoreOrder", { orderId: order.id, reason: reason.trim(), restock })
-                : run(cancelOrder, "adminCancelStoreOrder", { orderId: order.id, reason: reason.trim() }));
-            }}
+            onClick={() => setConfirmClose(true)}
             className="self-start"
           >
             {paid ? "Reembolsar pedido" : "Cancelar pedido"}
           </AdminButton>
+          <ModalPortal>
+            <ConfirmModal
+              isOpen={confirmClose}
+              onClose={() => {
+                if (!busy) setConfirmClose(false);
+              }}
+              onConfirm={() => {
+                void (
+                  paid
+                    ? run(refundOrder, "adminRefundStoreOrder", { orderId: order.id, reason: reason.trim(), restock })
+                    : run(cancelOrder, "adminCancelStoreOrder", { orderId: order.id, reason: reason.trim() })
+                ).finally(() => setConfirmClose(false));
+              }}
+              title={paid ? "Reembolsar pedido" : "Cancelar pedido"}
+              message={
+                paid
+                  ? `¿Reembolsar ${formatCents(order.totalCents)} del pedido ${order.number}? No se puede deshacer.`
+                  : `¿Cancelar el pedido ${order.number}? Su stock regresa a la tienda.`
+              }
+              confirmText={paid ? "Reembolsar" : "Cancelar pedido"}
+              cancelText="Volver"
+              isLoading={busy}
+              confirmButtonColor="red"
+              stackedOverModal
+            />
+          </ModalPortal>
         </Section>
       ) : null}
     </div>

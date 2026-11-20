@@ -11,6 +11,7 @@ import {
   PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
+import { ConfirmModal, ModalPortal } from "kadesh/components/shared";
 import { ANIMAL_TYPE_LABELS } from "../animals/constants";
 import { imageFileError } from "../blog-image";
 import { adminErrorText } from "../errors";
@@ -41,6 +42,7 @@ import {
   formatCents,
   inputToCents,
   inputToInt,
+  isMercadoLibreUrl,
 } from "./constants";
 import {
   ADMIN_STORE_OPTIONS_QUERY,
@@ -251,6 +253,7 @@ function ProductForm({
   const [removedImageIds, setRemovedImageIds] = useState<string[]>([]);
   const [imageLink, setImageLink] = useState("");
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const [createProduct] = useMutation(CREATE_ADMIN_STORE_PRODUCT_MUTATION);
   const [saveProduct] = useMutation(SAVE_ADMIN_STORE_PRODUCT_MUTATION);
@@ -368,12 +371,19 @@ function ProductForm({
     };
   }
 
+  // Only links to Mercado Libre (or its meli.la short links): the button sends shoppers there.
+  const affiliateUrlError =
+    form.affiliateUrl.trim() && !isMercadoLibreUrl(form.affiliateUrl)
+      ? "El enlace debe ser https y de Mercado Libre (mercadolibre.com.mx, mercadolibre.com o meli.la)."
+      : null;
+
   async function handleSave() {
     const name = form.name.trim();
     if (!name) return void sileo.warning({ title: "Escribe el nombre del producto." });
     if (isAffiliate && !isHttps(form.affiliateUrl.trim())) {
       return void sileo.warning({ title: "Pega el enlace de afiliado de Mercado Libre (https://…)." });
     }
+    if (isAffiliate && affiliateUrlError) return void sileo.warning({ title: affiliateUrlError });
     if (form.externalUrl.trim() && !isHttps(form.externalUrl.trim())) {
       return void sileo.warning({ title: "El enlace del producto debe empezar con https://." });
     }
@@ -485,7 +495,6 @@ function ProductForm({
 
   async function handleDelete() {
     if (!product) return;
-    if (!window.confirm(`¿Borrar "${product.name}"? Se borran también sus variantes y fotos.`)) return;
     setSaving(true);
     try {
       await deleteProduct({ variables: { id: product.id } });
@@ -499,6 +508,7 @@ function ProductForm({
       });
     } finally {
       setSaving(false);
+      setConfirmDelete(false);
     }
   }
 
@@ -523,7 +533,7 @@ function ProductForm({
       footer={
         <>
           {product ? (
-            <AdminButton variant="danger-ghost" size="sm" onClick={() => void handleDelete()} disabled={saving} className="mr-auto">
+            <AdminButton variant="danger-ghost" size="sm" onClick={() => setConfirmDelete(true)} disabled={saving} className="mr-auto">
               Borrar
             </AdminButton>
           ) : null}
@@ -646,7 +656,14 @@ function ProductForm({
                   className={adminInputClass}
                   inputMode="url"
                   placeholder="https://mercadolibre.com/sec/…"
+                  aria-invalid={affiliateUrlError ? true : undefined}
+                  aria-describedby={affiliateUrlError ? "affiliate-url-error" : undefined}
                 />
+                {affiliateUrlError ? (
+                  <p id="affiliate-url-error" role="alert" className="mt-1 text-sm text-red-700 dark:text-red-400">
+                    {affiliateUrlError}
+                  </p>
+                ) : null}
               </Field>
               <Field label="Enlace normal del producto (opcional)" hint="Para volver a revisar su precio.">
                 <input
@@ -979,6 +996,24 @@ function ProductForm({
           </div>
         </details>
       </div>
+      {product ? (
+        <ModalPortal>
+          <ConfirmModal
+            isOpen={confirmDelete}
+            onClose={() => {
+              if (!saving) setConfirmDelete(false);
+            }}
+            onConfirm={() => void handleDelete()}
+            title="Borrar producto"
+            message={`¿Borrar "${product.name}"? Se borran también sus variantes y fotos. No se puede deshacer.`}
+            confirmText="Borrar"
+            cancelText="Cancelar"
+            isLoading={saving}
+            confirmButtonColor="red"
+            stackedOverModal
+          />
+        </ModalPortal>
+      ) : null}
     </AdminModal>
   );
 }

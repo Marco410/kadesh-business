@@ -64,6 +64,8 @@ type Draft = {
   maxDiscount: string;
   startsAt: string;
   endsAt: string;
+  /** `endsAt` as it was saved (same input format): an old coupon that already ended stays editable. */
+  savedEndsAt: string;
   usageLimit: string;
   usageLimitPerUser: string;
   firstOrderOnly: boolean;
@@ -83,6 +85,7 @@ const EMPTY_DRAFT: Draft = {
   maxDiscount: "",
   startsAt: "",
   endsAt: "",
+  savedEndsAt: "",
   usageLimit: "",
   usageLimitPerUser: "",
   firstOrderOnly: false,
@@ -103,6 +106,7 @@ function draftFrom(row: AdminStoreCouponRow): Draft {
     maxDiscount: row.maxDiscountCents ? centsToInput(row.maxDiscountCents) : "",
     startsAt: isoToLocalInput(row.startsAt),
     endsAt: isoToLocalInput(row.endsAt),
+    savedEndsAt: isoToLocalInput(row.endsAt),
     usageLimit: row.usageLimit != null ? String(row.usageLimit) : "",
     usageLimitPerUser: row.usageLimitPerUser != null ? String(row.usageLimitPerUser) : "",
     firstOrderOnly: Boolean(row.firstOrderOnly),
@@ -111,6 +115,21 @@ function draftFrom(row: AdminStoreCouponRow): Draft {
     products: [],
     usedCount: row.usedCount,
   };
+}
+
+/**
+ * What is wrong with the dates of the form, or `null`. The end must be after the start and, when
+ * it is being set (new coupon or a changed date), in the future. Same rules as kadesh-back.
+ */
+function couponDatesError(draft: Draft, nowMs: number): string | null {
+  const startsAt = localInputToIso(draft.startsAt);
+  const endsAt = localInputToIso(draft.endsAt);
+  if (!endsAt) return null;
+  const endsMs = new Date(endsAt).getTime();
+  const settingEnd = !draft.id || draft.endsAt !== draft.savedEndsAt;
+  if (settingEnd && endsMs <= nowMs) return "La fecha de fin ya pasó. Elige una fecha futura.";
+  if (startsAt && endsMs <= new Date(startsAt).getTime()) return "La fecha de fin debe ser posterior a la de inicio.";
+  return null;
 }
 
 /** The conditions of a coupon in one line, for its row in the list. */
@@ -138,6 +157,7 @@ export default function AdminStoreCouponsPanel() {
   const [saving, setSaving] = useState(false);
   const [scopeLoading, setScopeLoading] = useState(false);
   const [productSearch, setProductSearch] = useState("");
+  const [datesError, setDatesError] = useState<string | null>(null);
   // Read once per render of the list: good enough to tell "expired" from "active".
   const [now] = useState(() => Date.now());
 
@@ -163,10 +183,18 @@ export default function AdminStoreCouponsPanel() {
   function close() {
     setDraft(null);
     setProductSearch("");
+    setDatesError(null);
+  }
+
+  /** Changes a date of the form and checks it right away (inline message under the dates). */
+  function setDates(next: Draft) {
+    setDraft(next);
+    setDatesError(couponDatesError(next, Date.now()));
   }
 
   async function startEdit(row: AdminStoreCouponRow) {
     setDraft(draftFrom(row));
+    setDatesError(null);
     setProductSearch("");
     setScopeLoading(true);
     try {
@@ -234,9 +262,9 @@ export default function AdminStoreCouponsPanel() {
     }
     const startsAt = localInputToIso(draft.startsAt);
     const endsAt = localInputToIso(draft.endsAt);
-    if (startsAt && endsAt && new Date(endsAt).getTime() <= new Date(startsAt).getTime()) {
-      return warn("La fecha de fin debe ser posterior a la de inicio.");
-    }
+    const dateProblem = couponDatesError(draft, Date.now());
+    setDatesError(dateProblem);
+    if (dateProblem) return warn(dateProblem);
 
     const categoryRefs = draft.categoryIds.map((id) => ({ id }));
     const productRefs = draft.products.map((product) => ({ id: product.id }));
@@ -248,7 +276,9 @@ export default function AdminStoreCouponsPanel() {
       minSubtotalCents: minSubtotalCents || null,
       maxDiscountCents: maxDiscountCents || null,
       startsAt,
-      endsAt,
+      // An unchanged end date is not sent: the backend checks a date being set is in the future,
+      // and an old coupon that already ended must stay editable (e.g. to switch it off).
+      ...(draft.id && draft.endsAt === draft.savedEndsAt ? {} : { endsAt }),
       usageLimit,
       usageLimitPerUser,
       firstOrderOnly: draft.firstOrderOnly,
@@ -284,7 +314,10 @@ export default function AdminStoreCouponsPanel() {
 
   return (
     <div className="flex flex-col gap-4">
-      <AdminButton icon={PlusSignIcon} onClick={() => setDraft(EMPTY_DRAFT)} className="self-start">
+      <AdminButton icon={PlusSignIcon} onClick={() => {
+          setDraft(EMPTY_DRAFT);
+          setDatesError(null);
+        }} className="self-start">
         Nuevo cupón
       </AdminButton>
 
@@ -410,7 +443,7 @@ export default function AdminStoreCouponsPanel() {
                 <input
                   type="datetime-local"
                   value={draft.startsAt}
-                  onChange={(event) => setDraft({ ...draft, startsAt: event.target.value })}
+                  onChange={(event) => setDates({ ...draft, startsAt: event.target.value })}
                   className={adminInputClass}
                 />
                 <span className="mt-1 block text-xs text-dash-faint">Vacío: desde que se guarda.</span>
@@ -420,11 +453,18 @@ export default function AdminStoreCouponsPanel() {
                 <input
                   type="datetime-local"
                   value={draft.endsAt}
-                  onChange={(event) => setDraft({ ...draft, endsAt: event.target.value })}
+                  onChange={(event) => setDates({ ...draft, endsAt: event.target.value })}
                   className={adminInputClass}
+                  aria-invalid={datesError ? true : undefined}
+                  aria-describedby={datesError ? "coupon-dates-error" : undefined}
                 />
                 <span className="mt-1 block text-xs text-dash-faint">Vacío: no vence. En la hora de este equipo.</span>
               </label>
+              {datesError ? (
+                <p id="coupon-dates-error" role="alert" className="text-sm text-red-700 dark:text-red-400 sm:col-span-2">
+                  {datesError}
+                </p>
+              ) : null}
             </div>
 
             <fieldset disabled={scopeLoading} className="flex flex-col gap-3 rounded-2xl border border-dash-line p-4">
