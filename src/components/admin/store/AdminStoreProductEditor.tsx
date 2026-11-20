@@ -210,7 +210,9 @@ export default function AdminStoreProductEditor({
   if (!productId) return null;
 
   const product = isNew ? null : data?.storeProduct ?? null;
-  if (!isNew && !product) {
+  // Wait for the fresh copy: Apollo can hand back the one from the last time this product was
+  // opened, and the form keeps whatever it starts with (saving it again would undo the last save).
+  if (!isNew && (loading || !product)) {
     return (
       <AdminModal open onClose={onClose} title="Producto" ariaLabel="Editar producto" size="xl">
         {error ? (
@@ -254,6 +256,21 @@ function ProductForm({
   const [imageLink, setImageLink] = useState("");
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  // What the form started with, to know if closing would lose changes.
+  const [pristine] = useState(() =>
+    JSON.stringify([initialForm(product), initialVariants(product), initialImages(product)]),
+  );
+  const dirty =
+    removedVariantIds.length > 0 ||
+    removedImageIds.length > 0 ||
+    JSON.stringify([form, variants, images]) !== pristine;
+  // Esc, the X or «Cancelar» with unsaved changes asks first.
+  const requestClose = () => {
+    if (saving) return;
+    if (dirty) setConfirmDiscard(true);
+    else onClose();
+  };
 
   const [createProduct] = useMutation(CREATE_ADMIN_STORE_PRODUCT_MUTATION);
   const [saveProduct] = useMutation(SAVE_ADMIN_STORE_PRODUCT_MUTATION);
@@ -517,7 +534,7 @@ function ProductForm({
   return (
     <AdminModal
       open
-      onClose={saving ? () => undefined : onClose}
+      onClose={requestClose}
       title={product ? "Editar producto" : "Nuevo producto"}
       subtitle={
         product
@@ -537,7 +554,7 @@ function ProductForm({
               Borrar
             </AdminButton>
           ) : null}
-          <AdminButton variant="ghost" onClick={onClose} disabled={saving}>
+          <AdminButton variant="ghost" onClick={requestClose} disabled={saving}>
             Cancelar
           </AdminButton>
           <AdminButton onClick={() => void handleSave()} disabled={saving}>
@@ -996,6 +1013,22 @@ function ProductForm({
           </div>
         </details>
       </div>
+      <ModalPortal>
+        <ConfirmModal
+          isOpen={confirmDiscard}
+          onClose={() => setConfirmDiscard(false)}
+          onConfirm={() => {
+            setConfirmDiscard(false);
+            onClose();
+          }}
+          title="Descartar cambios"
+          message="Tienes cambios sin guardar en este producto. ¿Cerrar sin guardarlos?"
+          confirmText="Descartar"
+          cancelText="Seguir editando"
+          confirmButtonColor="red"
+          stackedOverModal
+        />
+      </ModalPortal>
       {product ? (
         <ModalPortal>
           <ConfirmModal

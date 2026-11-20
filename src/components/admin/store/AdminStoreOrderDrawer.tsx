@@ -239,6 +239,7 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
   const [restock, setRestock] = useState(true);
   const [note, setNote] = useState(detail.adminNote ?? "");
   const [confirmClose, setConfirmClose] = useState(false);
+  const [confirmPaid, setConfirmPaid] = useState(false);
 
   const [reviewTransfer] = useMutation(ADMIN_REVIEW_STORE_TRANSFER_MUTATION);
   const [updateShipment] = useMutation(ADMIN_UPDATE_STORE_SHIPMENT_MUTATION);
@@ -337,7 +338,7 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
           </p>
           {/* Proofs usually come by WhatsApp: the payment is confirmed from here without an upload. */}
           <AdminButton
-            onClick={() => void run(reviewTransfer, "adminReviewStoreTransfer", { orderId: order.id, approve: true })}
+            onClick={() => setConfirmPaid(true)}
             disabled={busy}
             className="self-start"
           >
@@ -367,7 +368,7 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
             Confirma solo si el dinero ya está en la cuenta del banco: el comprobante por sí solo no es el pago.
           </p>
           <AdminButton
-            onClick={() => void run(reviewTransfer, "adminReviewStoreTransfer", { orderId: order.id, approve: true })}
+            onClick={() => setConfirmPaid(true)}
             disabled={busy}
             className="self-start"
           >
@@ -597,6 +598,25 @@ function OrderBody({ detail, onDone }: { detail: AdminStoreOrderDetail; onDone: 
           >
             {paid ? "Reembolsar pedido" : "Cancelar pedido"}
           </AdminButton>
+          <ModalPortal>
+            <ConfirmModal
+              isOpen={confirmPaid}
+              onClose={() => {
+                if (!busy) setConfirmPaid(false);
+              }}
+              onConfirm={() => {
+                void run(reviewTransfer, "adminReviewStoreTransfer", { orderId: order.id, approve: true }).finally(() =>
+                  setConfirmPaid(false),
+                );
+              }}
+              title="Confirmar pago"
+              message={`¿Ya está en el banco la transferencia de ${formatCents(order.totalCents)} con concepto ${order.number}? El pedido queda pagado y se avisa al cliente.`}
+              confirmText="Sí, confirmar pago"
+              cancelText="Volver"
+              isLoading={busy}
+              stackedOverModal
+            />
+          </ModalPortal>
           <ModalPortal>
             <ConfirmModal
               isOpen={confirmClose}
