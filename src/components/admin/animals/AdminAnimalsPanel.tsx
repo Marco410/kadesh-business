@@ -52,6 +52,7 @@ import {
 } from "./constants";
 import AdminAnimalDetailDrawer from "./AdminAnimalDetailDrawer";
 import { adminErrorText } from "../errors";
+import { useConfirm } from "kadesh/components/shared";
 
 const selectClass =
   "h-11 rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink";
@@ -75,6 +76,7 @@ function parseStatusFilter(value: string | null): string {
  * iniciales.
  */
 export default function AdminAnimalsPanel() {
+  const [confirm, confirmDialog] = useConfirm();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -137,7 +139,17 @@ export default function AdminAnimalsPanel() {
   const publishToFacebook = useCallback(
     async (row: AdminAnimalRow) => {
       const force = Boolean(row.facebookPublishedAt);
-      if (force && !window.confirm(`"${row.name}" ya está en Facebook. ¿Publicarlo otra vez?`)) return;
+      if (
+        force &&
+        !(await confirm({
+          title: "Publicar otra vez",
+          message: `"${row.name}" ya está en Facebook. ¿Publicarlo otra vez?`,
+          confirmText: "Publicar",
+          tone: "neutral",
+        }))
+      ) {
+        return;
+      }
       setPublishingId(row.id);
       try {
         const { data: result } = await publish({ variables: { animalId: row.id, force } });
@@ -154,10 +166,11 @@ export default function AdminAnimalsPanel() {
         setPublishingId(null);
       }
     },
-    [publish, refetch],
+    [confirm, publish, refetch],
   );
 
   return (
+    <>
     <div className="flex flex-col gap-4">
       <AdminAnimalDetailDrawer
         animalId={selectedId}
@@ -333,5 +346,7 @@ export default function AdminAnimalsPanel() {
         onPageChange={setPage}
       />
     </div>
+      {confirmDialog}
+    </>
   );
 }

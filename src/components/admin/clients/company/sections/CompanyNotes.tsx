@@ -23,6 +23,7 @@ import {
   type AdminCompanyNotesResponse,
 } from "../../ops-queries";
 import { adminErrorText } from "kadesh/components/admin/errors";
+import { useConfirm } from "kadesh/components/shared";
 
 const MAX_LENGTH = 4000;
 
@@ -31,6 +32,7 @@ const MAX_LENGTH = 4000;
  * prueba…). El cliente nunca las ve. Las fijadas van arriba.
  */
 export default function CompanyNotes({ companyId }: { companyId: string }) {
+  const [confirm, confirmDialog] = useConfirm();
   const [body, setBody] = useState("");
   const [pinned, setPinned] = useState(false);
   const { data, loading, error, refetch } = useQuery<AdminCompanyNotesResponse>(
@@ -73,7 +75,8 @@ export default function CompanyNotes({ companyId }: { companyId: string }) {
   };
 
   const remove = async (note: AdminCompanyNote) => {
-    if (!window.confirm("¿Borrar esta nota? No se puede deshacer.")) return;
+    const confirmed = await confirm({ title: "Borrar nota", message: "¿Borrar esta nota? No se puede deshacer.", confirmText: "Borrar" });
+    if (!confirmed) return;
     try {
       await deleteNote({ variables: { id: note.id } });
       await refetch();
@@ -84,6 +87,7 @@ export default function CompanyNotes({ companyId }: { companyId: string }) {
   };
 
   return (
+    <>
     <div className="flex flex-col gap-4">
       <AdminSectionCard
         title="Nueva nota"
@@ -187,5 +191,7 @@ export default function CompanyNotes({ companyId }: { companyId: string }) {
         </ul>
       )}
     </div>
+      {confirmDialog}
+    </>
   );
 }

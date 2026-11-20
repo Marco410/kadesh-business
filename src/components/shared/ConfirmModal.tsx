@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useId, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 interface ConfirmModalProps {
@@ -27,6 +28,35 @@ export default function ConfirmModal({
   confirmButtonColor = 'red',
   stackedOverModal = false,
 }: ConfirmModalProps) {
+  const titleId = useId();
+  const messageId = useId();
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  const confirmRef = useRef<HTMLButtonElement>(null);
+  // Like the browser's confirm(): Escape cancels and the focus starts on a button, so the keyboard
+  // and screen readers land in the dialog (the panel's DashModal does this on its own).
+  const closeRef = useRef(onClose);
+  const busyRef = useRef(isLoading);
+  useEffect(() => {
+    closeRef.current = onClose;
+    busyRef.current = isLoading;
+  });
+  useEffect(() => {
+    if (!isOpen) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const timer = window.setTimeout(() => (cancelRef.current ?? confirmRef.current)?.focus(), 0);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !busyRef.current) {
+        event.stopPropagation();
+        closeRef.current();
+      }
+    };
+    document.addEventListener('keydown', onKey, true);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener('keydown', onKey, true);
+      previous?.focus?.();
+    };
+  }, [isOpen]);
   const backdropZ = stackedOverModal ? 'z-[140]' : 'z-50';
   const dialogZ = stackedOverModal ? 'z-[145]' : 'z-[60]';
 
@@ -54,12 +84,16 @@ export default function ConfirmModal({
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className={`fixed inset-0 flex items-center justify-center p-4 pointer-events-none ${dialogZ}`}
           >
-            <div 
+            <div
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby={titleId}
+              aria-describedby={messageId}
               className="bg-[#ffffff] dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-lg w-full p-8 pointer-events-auto border border-[#e0e0e0] dark:border-[#3a3a3a]"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-start mb-6 pb-4 border-b border-[#e0e0e0] dark:border-[#3a3a3a]">
-                <h3 className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] pr-4 flex-1">
+                <h3 id={titleId} className="text-2xl font-bold text-[#212121] dark:text-[#ffffff] pr-4 flex-1">
                   {title}
                 </h3>
                 <button
@@ -72,11 +106,13 @@ export default function ConfirmModal({
                 </button>
               </div>
               <div className="flex flex-col gap-6">
-                <p className="text-md text-[#616161] dark:text-[#b0b0b0] leading-relaxed">
+                <p id={messageId} className="text-md text-[#616161] dark:text-[#b0b0b0] leading-relaxed">
                   {message}
                 </p>
                 <div className={`flex flex-col sm:flex-row gap-3 ${cancelText ? 'sm:justify-end' : 'sm:justify-center'}`}>
-                  <button 
+                  <button
+                    ref={confirmRef}
+                    type="button"
                     onClick={onConfirm}
                     disabled={isLoading}
                     className={`order-1 px-5 py-2.5 ${confirmButtonClasses[confirmButtonColor]} text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap hover:opacity-90 w-full sm:w-auto`}
@@ -84,7 +120,9 @@ export default function ConfirmModal({
                     {isLoading ? 'Procesando...' : confirmText}
                   </button>
                   {cancelText && (
-                    <button 
+                    <button
+                      ref={cancelRef}
+                      type="button"
                       onClick={onClose}
                       disabled={isLoading}
                       className="order-2 px-5 py-2.5 border-2 border-[#e0e0e0] dark:border-[#3a3a3a] text-[#212121] dark:text-[#ffffff] font-semibold rounded-lg hover:bg-[#f5f5f5] dark:hover:bg-[#2a2a2a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap w-full sm:w-auto"
