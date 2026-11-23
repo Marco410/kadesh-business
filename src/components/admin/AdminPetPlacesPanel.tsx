@@ -51,6 +51,7 @@ import {
   SUBSCRIPTION_STATUS,
 } from "kadesh/constants/constans";
 import { adminErrorText } from "./errors";
+import { useConfirm } from "kadesh/components/shared";
 
 const fieldClass =
   "h-11 w-full rounded-xl border border-dash-line bg-dash-surface px-3 text-sm text-dash-ink placeholder:text-dash-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400";
@@ -203,6 +204,7 @@ export default function AdminPetPlacesPanel({
   initialPlaceId?: string | null;
   onConsumedInitialPlace?: () => void;
 }) {
+  const [confirm, confirmDialog] = useConfirm();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<PetPlaceClaimStatus | "all">(() =>
@@ -304,9 +306,11 @@ export default function AdminPetPlacesPanel({
 
   async function runVerify(place: AdminPetPlaceRow, approved: boolean) {
     if (!approved) {
-      const confirmed = window.confirm(
-        "¿Rechazar esta solicitud? La ficha vuelve a quedar disponible y se suelta al solicitante.",
-      );
+      const confirmed = await confirm({
+        title: "Rechazar solicitud",
+        message: "¿Rechazar esta solicitud? La ficha vuelve a quedar disponible y se suelta al solicitante.",
+        confirmText: "Rechazar",
+      });
       if (!confirmed) return;
     }
     setBusyId(place.id);
@@ -358,9 +362,11 @@ export default function AdminPetPlacesPanel({
   }
 
   async function runUnverify(place: AdminPetPlaceRow) {
-    const confirmed = window.confirm(
-      "¿Quitar la verificación? El dueño dejará de poder editar la ficha hasta que la apruebes otra vez.",
-    );
+    const confirmed = await confirm({
+      title: "Quitar verificación",
+      message: "¿Quitar la verificación? El dueño dejará de poder editar la ficha hasta que la apruebes otra vez.",
+      confirmText: "Quitar verificación",
+    });
     if (!confirmed) return;
     setBusyId(place.id);
     try {
@@ -384,6 +390,7 @@ export default function AdminPetPlacesPanel({
   }
 
   return (
+    <>
     <div className="flex flex-col gap-4">
       <AdminPetPlaceReviewModal
         isOpen={Boolean(selectedId)}
@@ -607,5 +614,7 @@ export default function AdminPetPlacesPanel({
         </>
       )}
     </div>
+      {confirmDialog}
+    </>
   );
 }

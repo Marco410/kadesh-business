@@ -10,6 +10,8 @@ import {
   FilterHorizontalIcon,
   Location01Icon,
   MentoringIcon,
+  MinusSignIcon,
+  PlusSignIcon,
   Radar01Icon,
   Search01Icon,
   StarIcon,
@@ -65,10 +67,13 @@ const INEGI_CATEGORY_OPTIONS: AutocompleteOption[] = INEGI_DENUE_CATEGORIES.map(
 
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-const MAPLIBRE_CSS = "https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css";
-const MAPLIBRE_JS = "https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js";
+// Exact versions: with a floating version a new release changes the map under us. 0.1.4 of the
+// Leaflet plugin no longer reads the global `maplibregl` and broke the panel
+// ("maplibre_gl.Map is not a constructor"); 0.1.3 does.
+const MAPLIBRE_CSS = "https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css";
+const MAPLIBRE_JS = "https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js";
 const MAPLIBRE_LEAFLET_JS =
-  "https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js";
+  "https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.1.3/leaflet-maplibre-gl.js";
 
 /** Liberty en ambos modos; el aspecto dark se logra con filtros CSS (estilo Google dark). */
 const LEAD_MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
@@ -297,24 +302,55 @@ function isBusinessSearchTermValid(value: string): boolean {
   return /[\p{L}\p{N}]/u.test(value);
 }
 
+/**
+ * One promise per URL, resolved when the file has really loaded. Checking only whether the tag
+ * exists was not enough: StrictMode runs the effect twice and the second pass found the tags still
+ * downloading, so the map was marked ready before the MapLibre plugin existed (empty map), or the
+ * plugin ran before maplibre-gl (crash).
+ */
+const externalResources = new Map<string, Promise<void>>();
+
 function loadExternalResource(
   tag: "link" | "script",
   attrs: Record<string, string>,
 ): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const attrKey = tag === "link" ? "href" : "src";
-    const attrVal = attrs[attrKey];
-    const existing = document.querySelector(`${tag}[${attrKey}="${attrVal}"]`);
-    if (existing) {
+  const attrKey = tag === "link" ? "href" : "src";
+  const url = attrs[attrKey];
+  const cached = externalResources.get(url);
+  if (cached) return cached;
+
+  const promise = new Promise<void>((resolve, reject) => {
+    const existing = document.querySelector<HTMLElement>(`${tag}[${attrKey}="${url}"]`);
+    if (existing?.dataset.loaded === "true") {
       resolve();
       return;
     }
-    const el = document.createElement(tag);
-    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
-    el.onload = () => resolve();
-    el.onerror = () => reject(new Error(`Failed to load ${tag}`));
-    document.head.appendChild(el);
+    const el = existing ?? document.createElement(tag);
+    el.addEventListener(
+      "load",
+      () => {
+        el.dataset.loaded = "true";
+        resolve();
+      },
+      { once: true },
+    );
+    el.addEventListener(
+      "error",
+      () => {
+        externalResources.delete(url);
+        reject(new Error(`Failed to load ${tag} ${url}`));
+      },
+      { once: true },
+    );
+    if (!existing) {
+      Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+      // Run in insertion order: the Leaflet plugin needs maplibre-gl already defined.
+      if (el instanceof HTMLScriptElement) el.async = false;
+      document.head.appendChild(el);
+    }
   });
+  externalResources.set(url, promise);
+  return promise;
 }
 
 interface LeafletDivIcon {
@@ -337,6 +373,8 @@ interface LeafletTileLayer extends LeafletLayer {
 interface LeafletMap {
   setView(center: [number, number], zoom: number): LeafletMap;
   getZoom(): number;
+  zoomIn(): LeafletMap;
+  zoomOut(): LeafletMap;
   fitBounds(bounds: unknown, options?: { padding?: [number, number] }): void;
   on(
     event: string,
@@ -388,7 +426,7 @@ interface LeafletCircle {
 declare global {
   interface Window {
     L?: {
-      map(el: HTMLElement, options?: { preferCanvas?: boolean }): LeafletMap;
+      map(el: HTMLElement, options?: { preferCanvas?: boolean; zoomControl?: boolean }): LeafletMap;
       divIcon(options: {
         className: string;
         html: string;
@@ -536,7 +574,12 @@ export default function ObtenerClientesSection({
   const applyLeadMapBaseLayer = useCallback(() => {
     const L = window.L;
     const map = mapRef.current;
-    if (!L?.maplibreGL || !map) return;
+    if (!map) return;
+    if (!L?.maplibreGL) {
+      // The loader only marks the map ready once the plugin exists; this would be a real bug.
+      console.error("MapLibre Leaflet plugin is not loaded: the clients map has no base layer");
+      return;
+    }
 
     if (tileLayerRef.current) {
       map.removeLayer(tileLayerRef.current);
@@ -641,7 +684,8 @@ export default function ObtenerClientesSection({
     const pinLng = storedView?.pinLng ?? DEFAULT_CENTER.lng;
     const restoredPin = { lat: pinLat, lng: pinLng };
 
-    const map = L.map(container, { preferCanvas: true }).setView(
+    // No Leaflet zoom control: top-left sits under the search bar. Zoom lives in the button column.
+    const map = L.map(container, { preferCanvas: true, zoomControl: false }).setView(
       [cameraLat, cameraLng],
       cameraZoom,
     );
@@ -1618,6 +1662,30 @@ export default function ObtenerClientesSection({
           animate={{ opacity: 1, x: 0 }}
           transition={{ ...motionTransition, delay: reduceMotion ? 0 : 0.08 }}
         >
+          <motion.button
+            type="button"
+            onClick={() => mapRef.current?.zoomIn()}
+            disabled={!leafletReady}
+            whileHover={reduceMotion ? undefined : { scale: 1.06 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.94 }}
+            className={`flex size-11 cursor-pointer items-center justify-center rounded-full border border-dash-line bg-dash-surface text-dash-ink shadow-sm transition-colors duration-150 hover:bg-orange-50 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
+            title="Acercar"
+            aria-label="Acercar"
+          >
+            <HugeiconsIcon icon={PlusSignIcon} size={20} aria-hidden />
+          </motion.button>
+          <motion.button
+            type="button"
+            onClick={() => mapRef.current?.zoomOut()}
+            disabled={!leafletReady}
+            whileHover={reduceMotion ? undefined : { scale: 1.06 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.94 }}
+            className={`flex size-11 cursor-pointer items-center justify-center rounded-full border border-dash-line bg-dash-surface text-dash-ink shadow-sm transition-colors duration-150 hover:bg-orange-50 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
+            title="Alejar"
+            aria-label="Alejar"
+          >
+            <HugeiconsIcon icon={MinusSignIcon} size={20} aria-hidden />
+          </motion.button>
           <motion.button
             type="button"
             onClick={goToMyLocation}

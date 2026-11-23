@@ -38,6 +38,7 @@ import {
 } from "./ui";
 import { SUBSCRIPTION_STATUS } from "kadesh/constants/constans";
 import { adminErrorText } from "./errors";
+import { useConfirm } from "kadesh/components/shared";
 
 export default function AdminPetPlaceServicesPanel({
   initialServiceId,
@@ -46,6 +47,7 @@ export default function AdminPetPlaceServicesPanel({
   initialServiceId?: string | null;
   onConsumedInitialService?: () => void;
 }) {
+  const [confirm, confirmDialog] = useConfirm();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<PetPlaceServiceStatus | "all">(
     PET_PLACE_SERVICE_STATUS.PENDING,
@@ -167,9 +169,11 @@ export default function AdminPetPlaceServicesPanel({
   }
 
   async function runReject(service: AdminPetPlaceServiceRow) {
-    const confirmed = window.confirm(
-      "¿Rechazar este servicio? No saldrá en el catálogo ni en la ficha.",
-    );
+    const confirmed = await confirm({
+      title: "Rechazar servicio",
+      message: "¿Rechazar este servicio? No saldrá en el catálogo ni en la ficha.",
+      confirmText: "Rechazar",
+    });
     if (!confirmed) return;
     setBusyId(service.id);
     try {
@@ -193,6 +197,7 @@ export default function AdminPetPlaceServicesPanel({
   }
 
   return (
+    <>
     <div className="flex flex-col gap-4">
       <AdminPetPlaceServiceReviewModal
         isOpen={Boolean(selectedId)}
@@ -365,5 +370,7 @@ export default function AdminPetPlaceServicesPanel({
         </>
       )}
     </div>
+      {confirmDialog}
+    </>
   );
 }
