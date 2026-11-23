@@ -50,6 +50,14 @@ const NAV_COUNTS_VARIABLES = {
   pendingWhere: { claimStatus: { equals: PET_PLACE_CLAIM_STATUS.PENDING } },
   pendingServiceWhere: { status: { equals: PET_PLACE_SERVICE_STATUS.PENDING } },
   pendingEventWhere: { status: { equals: PET_EVENT_STATUS.PENDING } },
+  // Store orders that need someone: a transfer proof to review, or paid and not fully shipped.
+  pendingStoreOrderWhere: {
+    status: { equals: "open" },
+    OR: [
+      { paymentStatus: { equals: "in_review" } },
+      { paymentStatus: { equals: "paid" }, fulfillmentStatus: { in: ["unfulfilled", "partial"] } },
+    ],
+  },
 };
 
 function AdminFallback() {

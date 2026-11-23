@@ -18,6 +18,7 @@ import {
   type AdminPersonControlResponse,
 } from "../ops-queries";
 import { adminErrorText } from "../../errors";
+import { useConfirm } from "kadesh/components/shared";
 
 const MIN_REASON = 5;
 const fieldClass =
@@ -77,6 +78,7 @@ function download(filename: string, data: unknown) {
  * derechos ARCO (exportar y anonimizar). Nada de esto aplica al equipo de Kadesh.
  */
 export default function PersonControl({ userId }: { userId: string }) {
+  const [confirm, confirmDialog] = useConfirm();
   const { data, loading, error, refetch } = useQuery<AdminPersonControlResponse>(
     ADMIN_PERSON_CONTROL_QUERY,
     { variables: { id: userId }, fetchPolicy: "network-only" },
@@ -154,7 +156,12 @@ export default function PersonControl({ userId }: { userId: string }) {
   };
 
   const revokeSessions = async () => {
-    if (!window.confirm(`¿Cerrar todas las sesiones de ${name}? Tendrá que volver a iniciar sesión.`)) return;
+    const confirmed = await confirm({
+      title: "Cerrar sesiones",
+      message: `¿Cerrar todas las sesiones de ${name}? Tendrá que volver a iniciar sesión.`,
+      confirmText: "Cerrar sesiones",
+    });
+    if (!confirmed) return;
     try {
       const { data: result } = await revoke({ variables: { userId } });
       await report(result?.adminRevokeSessions, "No se pudieron cerrar las sesiones");
@@ -175,7 +182,12 @@ export default function PersonControl({ userId }: { userId: string }) {
   };
 
   const anonymizeAccount = async () => {
-    if (!window.confirm(`¿Anonimizar la cuenta de ${name}? Se borran sus datos personales y no se puede deshacer.`)) return;
+    const confirmed = await confirm({
+      title: "Anonimizar cuenta",
+      message: `¿Anonimizar la cuenta de ${name}? Se borran sus datos personales y no se puede deshacer.`,
+      confirmText: "Anonimizar",
+    });
+    if (!confirmed) return;
     try {
       const { data: result } = await anonymize({
         variables: { userId, confirmEmail: confirmEmail.trim(), reason: anonymizeReason.trim() },
@@ -209,6 +221,7 @@ export default function PersonControl({ userId }: { userId: string }) {
   const companySuspended = Boolean(person.company?.suspendedAt);
 
   return (
+    <>
     <div className="flex flex-col gap-4">
       {person.suspendedAt || companySuspended ? (
         <div className="rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-800 dark:text-red-300">
@@ -344,5 +357,7 @@ export default function PersonControl({ userId }: { userId: string }) {
         </div>
       </Block>
     </div>
+      {confirmDialog}
+    </>
   );
 }

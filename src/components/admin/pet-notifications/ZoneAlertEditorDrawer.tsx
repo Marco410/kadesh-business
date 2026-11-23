@@ -24,6 +24,7 @@ import {
 } from "./queries";
 import { ZONE_WHATSAPP, formatPoint, mapsUrl, parseLatLng } from "./constants";
 import { adminErrorText } from "../errors";
+import { useConfirm } from "kadesh/components/shared";
 
 /**
  * Administrar las alertas de zona de una persona: encenderlas o apagarlas, mover el centro de su
@@ -62,6 +63,7 @@ export default function ZoneAlertEditorDrawer({
 }
 
 function ZoneAlertForm({ row, name, onSaved }: { row: AdminZoneAlertRow; name: string; onSaved: () => void }) {
+  const [confirm, confirmDialog] = useConfirm();
   const [point, setPoint] = useState(() => formatPoint(row.lat, row.lng));
   const [radius, setRadius] = useState(row.radiusKm ?? 5);
   const [update, { loading }] = useMutation<AdminUpdateZoneAlertsResponse>(ADMIN_UPDATE_ZONE_ALERTS_MUTATION);
@@ -94,6 +96,7 @@ function ZoneAlertForm({ row, name, onSaved }: { row: AdminZoneAlertRow; name: s
   };
 
   return (
+    <>
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center gap-2">
         <AdminStatusBadge label={row.enabled ? "Alertas activas" : "Alertas apagadas"} tone={row.enabled ? "ok" : "neutral"} />
@@ -166,10 +169,13 @@ function ZoneAlertForm({ row, name, onSaved }: { row: AdminZoneAlertRow; name: s
         {row.whatsapp !== "off" ? (
           <AdminButton
             variant="danger-ghost"
-            onClick={() => {
-              if (window.confirm(`¿Apagar todos los avisos por WhatsApp de ${name}? Solo esa persona puede volver a encenderlos.`)) {
-                void save({ disableWhatsapp: true });
-              }
+            onClick={async () => {
+              const confirmed = await confirm({
+                title: "Apagar WhatsApp",
+                message: `¿Apagar todos los avisos por WhatsApp de ${name}? Solo esa persona puede volver a encenderlos.`,
+                confirmText: "Apagar",
+              });
+              if (confirmed) void save({ disableWhatsapp: true });
             }}
             disabled={loading}
           >
@@ -188,5 +194,7 @@ function ZoneAlertForm({ row, name, onSaved }: { row: AdminZoneAlertRow; name: s
         </Link>
       </div>
     </div>
+      {confirmDialog}
+    </>
   );
 }

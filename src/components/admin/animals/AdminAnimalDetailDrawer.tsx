@@ -39,6 +39,7 @@ import {
   petAnimalUrl,
 } from "./constants";
 import { adminErrorText } from "../errors";
+import { useConfirm } from "kadesh/components/shared";
 
 const actionLink =
   "inline-flex h-10 items-center justify-center rounded-full border border-dash-line px-4 text-sm font-semibold text-dash-ink transition-colors hover:border-orange-400";
@@ -66,6 +67,7 @@ export default function AdminAnimalDetailDrawer({
   publishing: boolean;
   onChanged: () => void;
 }) {
+  const [confirm, confirmDialog] = useConfirm();
   const { data, loading, error, refetch } = useQuery<AdminAnimalDetailResponse>(ADMIN_ANIMAL_DETAIL_QUERY, {
     variables: { id: animalId ?? "" },
     skip: !animalId,
@@ -101,7 +103,8 @@ export default function AdminAnimalDetailDrawer({
   const animal = detail?.animal ?? null;
 
   const run = async (key: string, confirmText: string, action: () => Promise<unknown>, done: string) => {
-    if (!window.confirm(confirmText)) return;
+    const title = key.startsWith("purge") ? "Borrar vistas" : key.startsWith("comment") ? "Borrar comentario" : "Quitar favorito";
+    if (!(await confirm({ title, message: confirmText, confirmText: key.startsWith("favorite") ? "Quitar" : "Borrar" }))) return;
     setBusy(key);
     try {
       await action();
@@ -129,6 +132,7 @@ export default function AdminAnimalDetailDrawer({
   const maxDaily = Math.max(1, ...(detail?.viewStats.daily ?? []).map((d) => d.count));
 
   return (
+    <>
     <AdminDrawer
       open={Boolean(animalId)}
       onClose={onClose}
@@ -383,5 +387,7 @@ export default function AdminAnimalDetailDrawer({
         </div>
       )}
     </AdminDrawer>
+      {confirmDialog}
+    </>
   );
 }
