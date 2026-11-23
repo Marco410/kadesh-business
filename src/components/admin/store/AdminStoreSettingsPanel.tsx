@@ -225,7 +225,11 @@ function SettingsForm({ settings }: { settings: AdminStoreSettings | null }) {
               className={`${adminTextareaClass} min-h-36`}
               maxLength={3000}
             />
-            <span className="mt-1 block text-xs text-dash-faint">Se muestra en el checkout y en cada pedido.</span>
+            <span className="mt-1 block text-xs text-dash-faint">
+              Se muestra en el checkout y en cada pedido. Vacío, sale el texto de la tienda: solo defectuosos, avisar en 5
+              días y el envío de regreso lo paga quien compra. Si escribes uno, que diga lo mismo: la página de cada producto
+              y Google muestran esa regla.
+            </span>
           </label>
         </div>
       </AdminSectionCard>

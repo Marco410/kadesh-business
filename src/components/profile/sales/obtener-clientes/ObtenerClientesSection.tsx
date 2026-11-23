@@ -65,10 +65,13 @@ const INEGI_CATEGORY_OPTIONS: AutocompleteOption[] = INEGI_DENUE_CATEGORIES.map(
 
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-const MAPLIBRE_CSS = "https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css";
-const MAPLIBRE_JS = "https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js";
+// Exact versions: with a floating version a new release changes the map under us. 0.1.4 of the
+// Leaflet plugin no longer reads the global `maplibregl` and broke the panel
+// ("maplibre_gl.Map is not a constructor"); 0.1.3 does.
+const MAPLIBRE_CSS = "https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css";
+const MAPLIBRE_JS = "https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js";
 const MAPLIBRE_LEAFLET_JS =
-  "https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js";
+  "https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.1.3/leaflet-maplibre-gl.js";
 
 /** Liberty en ambos modos; el aspecto dark se logra con filtros CSS (estilo Google dark). */
 const LEAD_MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
