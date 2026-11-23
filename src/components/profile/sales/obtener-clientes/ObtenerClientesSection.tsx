@@ -10,6 +10,8 @@ import {
   FilterHorizontalIcon,
   Location01Icon,
   MentoringIcon,
+  MinusSignIcon,
+  PlusSignIcon,
   Radar01Icon,
   Search01Icon,
   StarIcon,
@@ -371,6 +373,8 @@ interface LeafletTileLayer extends LeafletLayer {
 interface LeafletMap {
   setView(center: [number, number], zoom: number): LeafletMap;
   getZoom(): number;
+  zoomIn(): LeafletMap;
+  zoomOut(): LeafletMap;
   fitBounds(bounds: unknown, options?: { padding?: [number, number] }): void;
   on(
     event: string,
@@ -422,7 +426,7 @@ interface LeafletCircle {
 declare global {
   interface Window {
     L?: {
-      map(el: HTMLElement, options?: { preferCanvas?: boolean }): LeafletMap;
+      map(el: HTMLElement, options?: { preferCanvas?: boolean; zoomControl?: boolean }): LeafletMap;
       divIcon(options: {
         className: string;
         html: string;
@@ -680,7 +684,8 @@ export default function ObtenerClientesSection({
     const pinLng = storedView?.pinLng ?? DEFAULT_CENTER.lng;
     const restoredPin = { lat: pinLat, lng: pinLng };
 
-    const map = L.map(container, { preferCanvas: true }).setView(
+    // No Leaflet zoom control: top-left sits under the search bar. Zoom lives in the button column.
+    const map = L.map(container, { preferCanvas: true, zoomControl: false }).setView(
       [cameraLat, cameraLng],
       cameraZoom,
     );
@@ -1657,6 +1662,30 @@ export default function ObtenerClientesSection({
           animate={{ opacity: 1, x: 0 }}
           transition={{ ...motionTransition, delay: reduceMotion ? 0 : 0.08 }}
         >
+          <motion.button
+            type="button"
+            onClick={() => mapRef.current?.zoomIn()}
+            disabled={!leafletReady}
+            whileHover={reduceMotion ? undefined : { scale: 1.06 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.94 }}
+            className={`flex size-11 cursor-pointer items-center justify-center rounded-full border border-dash-line bg-dash-surface text-dash-ink shadow-sm transition-colors duration-150 hover:bg-orange-50 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
+            title="Acercar"
+            aria-label="Acercar"
+          >
+            <HugeiconsIcon icon={PlusSignIcon} size={20} aria-hidden />
+          </motion.button>
+          <motion.button
+            type="button"
+            onClick={() => mapRef.current?.zoomOut()}
+            disabled={!leafletReady}
+            whileHover={reduceMotion ? undefined : { scale: 1.06 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.94 }}
+            className={`flex size-11 cursor-pointer items-center justify-center rounded-full border border-dash-line bg-dash-surface text-dash-ink shadow-sm transition-colors duration-150 hover:bg-orange-50 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-[#2a2a2a] ${FOCUS_RING}`}
+            title="Alejar"
+            aria-label="Alejar"
+          >
+            <HugeiconsIcon icon={MinusSignIcon} size={20} aria-hidden />
+          </motion.button>
           <motion.button
             type="button"
             onClick={goToMyLocation}
