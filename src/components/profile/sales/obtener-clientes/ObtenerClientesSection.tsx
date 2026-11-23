@@ -300,24 +300,55 @@ function isBusinessSearchTermValid(value: string): boolean {
   return /[\p{L}\p{N}]/u.test(value);
 }
 
+/**
+ * One promise per URL, resolved when the file has really loaded. Checking only whether the tag
+ * exists was not enough: StrictMode runs the effect twice and the second pass found the tags still
+ * downloading, so the map was marked ready before the MapLibre plugin existed (empty map), or the
+ * plugin ran before maplibre-gl (crash).
+ */
+const externalResources = new Map<string, Promise<void>>();
+
 function loadExternalResource(
   tag: "link" | "script",
   attrs: Record<string, string>,
 ): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const attrKey = tag === "link" ? "href" : "src";
-    const attrVal = attrs[attrKey];
-    const existing = document.querySelector(`${tag}[${attrKey}="${attrVal}"]`);
-    if (existing) {
+  const attrKey = tag === "link" ? "href" : "src";
+  const url = attrs[attrKey];
+  const cached = externalResources.get(url);
+  if (cached) return cached;
+
+  const promise = new Promise<void>((resolve, reject) => {
+    const existing = document.querySelector<HTMLElement>(`${tag}[${attrKey}="${url}"]`);
+    if (existing?.dataset.loaded === "true") {
       resolve();
       return;
     }
-    const el = document.createElement(tag);
-    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
-    el.onload = () => resolve();
-    el.onerror = () => reject(new Error(`Failed to load ${tag}`));
-    document.head.appendChild(el);
+    const el = existing ?? document.createElement(tag);
+    el.addEventListener(
+      "load",
+      () => {
+        el.dataset.loaded = "true";
+        resolve();
+      },
+      { once: true },
+    );
+    el.addEventListener(
+      "error",
+      () => {
+        externalResources.delete(url);
+        reject(new Error(`Failed to load ${tag} ${url}`));
+      },
+      { once: true },
+    );
+    if (!existing) {
+      Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+      // Run in insertion order: the Leaflet plugin needs maplibre-gl already defined.
+      if (el instanceof HTMLScriptElement) el.async = false;
+      document.head.appendChild(el);
+    }
   });
+  externalResources.set(url, promise);
+  return promise;
 }
 
 interface LeafletDivIcon {
@@ -539,7 +570,12 @@ export default function ObtenerClientesSection({
   const applyLeadMapBaseLayer = useCallback(() => {
     const L = window.L;
     const map = mapRef.current;
-    if (!L?.maplibreGL || !map) return;
+    if (!map) return;
+    if (!L?.maplibreGL) {
+      // The loader only marks the map ready once the plugin exists; this would be a real bug.
+      console.error("MapLibre Leaflet plugin is not loaded: the clients map has no base layer");
+      return;
+    }
 
     if (tileLayerRef.current) {
       map.removeLayer(tileLayerRef.current);
