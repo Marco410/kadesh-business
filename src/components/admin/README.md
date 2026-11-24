@@ -22,7 +22,7 @@ Operaciones vive en su propio shell (`kadesh/components/app-shell`). No lleva la
    - **General:** Inicio, Actividad, Errores, Seguridad, Analítica.
    - **Clientes:** Empresas, Personas, Planes.
    - **Contenido:** Blog, Correos, Novedades.
-   - **Kadesh Pet:** Resumen, Animales, Veterinarias, Servicios, Eventos, Espacios de rescate, Avisos, Alertas de zona.
+   - **Kadesh Pet:** Resumen, Animales, Veterinarias, Servicios, Eventos, Espacios de rescate, Avisos, Alertas de zona, Tienda, Anuncios.
 
    Cada item es una sección (`tab`) o una vista (`vista`). Por eso Empresas/Personas, Blog/Correos y las de Pet ya no tienen segmentado propio. La opción activa es una píldora blanca que se desliza, con el icono naranja. Veterinarias, Servicios, Eventos y Espacios de rescate llevan un globo con lo que espera revisión, y Errores con los abiertos en 24 h (`ADMIN_NAV_COUNTS_QUERY`, cada minuto y al verificar o aprobar; el de espacios de rescate va en su propia query, `AdminRescueNavCount`). En móvil el menú es un cajón.
 2. **Vista dentro de una sección** (Artículos / Categorías / Etiquetas, las 7 de Analítica, Catálogo / Módulos, las subvistas del 360): `AdminSegmented`. Pista cálida con la opción activa en píldora que se desliza.
@@ -520,4 +520,12 @@ Código en `pet-notifications/`. Datos de kadesh-back: `adminNotificationLog`, `
 
 - **Avisos** (`?vista=avisos`): cada aviso de Kadesh Pet, una fila por persona, con a dónde se fue: campana (leída o no), push (cuántos dispositivos) y WhatsApp (no se mandó y por qué, aceptado, entregado, leído o falló con el error de Meta). Filtros: canal, resultado, tipo, periodo y búsqueda por quien lo recibió. `?persona=` llega con la búsqueda puesta. El ícono de enlace abre lo que lo originó (el animal en Operaciones o el enlace del aviso).
 - **Alertas de zona** (`?vista=alertas-zona`): quién tiene alertas, su zona (enlace a Google Maps), radio, canales y cuántas recibió. «Administrar» abre un panel para mover la zona o el radio, apagar o encender sus alertas y apagar su WhatsApp. Encenderle el WhatsApp no se puede: Meta exige que la persona acepte. Arriba, «¿Quién recibiría una alerta aquí?» acepta «latitud, longitud» o un enlace de Google Maps.
+
+## Anuncios (Kadesh Pet)
+
+`?tab=veterinarias&vista=anuncios` (`components/admin/ads/`). Dos secciones (`&seccion=`):
+- **Anuncios** (default): lista con estado, pago, impresiones, clics y tasa del periodo (`adminAds`, 20 por página). `?anuncio=<id>` o `?anuncio=nuevo` abre el editor: tipo, destino, textos con su límite, color (uno de la lista o «Personalizado» en hexadecimal; las sombras salen de `customTone.ts`, igual que en el landing y la app), imagen, lugares (el tipo solo sugiere; se avisa sin bloquear), fechas, peso, zona y pago. Escribe con `createAd` / `updateAd`. Con un anuncio guardado, el editor muestra sus números de 30 días y copia un reporte para el anunciante.
+- **Resumen**: impresiones, clics, tasa por día, por lugar y los 10 con más impresiones (`adminAdStats`, 5 min de caché en el back).
+
+Las reglas (tipos, lugares, límites, cómo se cuenta) están en kadesh-back `models/Pet/Ad/README.md`. Las constantes de `ads/constants.ts` son copia de las del back.
 

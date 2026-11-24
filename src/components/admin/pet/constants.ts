@@ -9,6 +9,7 @@ export const PET_VISTAS = {
   NOTIFICATIONS: "avisos",
   ZONE_ALERTS: "alertas-zona",
   STORE: "tienda",
+  ADS: "anuncios",
 } as const;
 
 export type PetVista = (typeof PET_VISTAS)[keyof typeof PET_VISTAS];
@@ -23,6 +24,7 @@ export const PET_VISTA_ITEMS: Array<{ id: PetVista; label: string }> = [
   { id: PET_VISTAS.NOTIFICATIONS, label: "Avisos" },
   { id: PET_VISTAS.ZONE_ALERTS, label: "Alertas de zona" },
   { id: PET_VISTAS.STORE, label: "Tienda" },
+  { id: PET_VISTAS.ADS, label: "Anuncios" },
 ];
 
 /** `fichas` se queda como valor de Veterinarias para no romper enlaces viejos. */
@@ -35,7 +37,8 @@ export function parsePetVista(value: string | null): PetVista {
     value === PET_VISTAS.RESCUES ||
     value === PET_VISTAS.NOTIFICATIONS ||
     value === PET_VISTAS.ZONE_ALERTS ||
-    value === PET_VISTAS.STORE
+    value === PET_VISTAS.STORE ||
+    value === PET_VISTAS.ADS
   ) {
     return value;
   }
