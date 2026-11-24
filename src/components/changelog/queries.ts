@@ -4,7 +4,7 @@ import { gql } from "@apollo/client";
 export const SAAS_CHANGELOG_LIST_QUERY = gql`
   query SaasChangelogList($take: Int!, $skip: Int!) {
     systemReleases(
-      where: { product: { in: ["saas", "all"] } }
+      where: { isPublished: { equals: true }, product: { in: ["saas", "all"] } }
       orderBy: [{ releasedAt: desc }]
       take: $take
       skip: $skip
@@ -16,6 +16,6 @@ export const SAAS_CHANGELOG_LIST_QUERY = gql`
       body
       releasedAt
     }
-    systemReleasesCount(where: { product: { in: ["saas", "all"] } })
+    systemReleasesCount(where: { isPublished: { equals: true }, product: { in: ["saas", "all"] } })
   }
 `;
