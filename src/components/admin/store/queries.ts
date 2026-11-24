@@ -22,6 +22,7 @@ export type AdminStoreProductRow = {
   ratingAverage: number;
   ratingCount: number;
   salesCount: number;
+  viewsCount: number;
   isFeatured: boolean;
   externalId: string | null;
   category: string | null;
@@ -77,6 +78,7 @@ export const ADMIN_STORE_PRODUCTS_QUERY = gql`
         ratingAverage
         ratingCount
         salesCount
+        viewsCount
         isFeatured
         externalId
         category

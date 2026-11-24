@@ -31,6 +31,8 @@ const HELP = {
   margin: "Ventas menos el costo de los productos y lo que costó enviar cada paquete. No descuenta la comisión de Stripe. Si faltan costos por capturar, el margen sale más alto de lo real.",
   average: "Ventas entre número de pedidos.",
   refunds: "Pedidos pagados que se reembolsaron, contados el día en que se cancelaron. No están en las ventas.",
+  views:
+    "Productos activos cuya página se abrió más veces, desde que empezamos a contar. No cuentan los admins, los buscadores ni volver a abrirla en 30 min. Las piezas vendidas también son de siempre; los productos de Mercado Libre no tienen ventas aquí.",
   source: "De dónde sale lo vendido. Es interno: en la tienda todo aparece como vendido por Kadesh.",
 };
 
@@ -256,6 +258,45 @@ export default function AdminStoreSummaryPanel() {
           </>
         ) : (
           <p className="mt-2 text-sm text-dash-muted">Ningún producto está por agotarse.</p>
+        )}
+      </AdminSectionCard>
+
+      <AdminSectionCard
+        title="Más vistos"
+        description="Desde que empezamos a contar. No depende del periodo."
+        help={HELP.views}
+        index={6}
+      >
+        {summary.topViewed.length === 0 ? (
+          <p className="text-sm text-dash-muted">Todavía nadie abrió la página de un producto.</p>
+        ) : (
+          <ul className="-mx-1.5 divide-y divide-dash-line">
+            {summary.topViewed.map((product) => (
+              <li key={product.productId}>
+                <button
+                  type="button"
+                  onClick={() => setParams({ seccion: STORE_SECTIONS.PRODUCTS, producto: product.productId, dias: null }, "push")}
+                  className="flex w-full items-center gap-3 rounded-lg px-1.5 py-2 text-left transition-colors hover:bg-dash-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                >
+                  {product.coverUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={product.coverUrl} alt="" className="size-10 shrink-0 rounded-lg object-cover" loading="lazy" />
+                  ) : (
+                    <span className="size-10 shrink-0 rounded-lg bg-dash-surface-2" />
+                  )}
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate text-sm font-semibold text-dash-ink">{product.name}</span>
+                    <span className="text-xs text-dash-muted">
+                      {count(product.salesCount)} {product.salesCount === 1 ? "pieza vendida" : "piezas vendidas"}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-sm tabular-nums text-dash-muted">
+                    {count(product.views)} {product.views === 1 ? "vista" : "vistas"}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
       </AdminSectionCard>
     </div>
