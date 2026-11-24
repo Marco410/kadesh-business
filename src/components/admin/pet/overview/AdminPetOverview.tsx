@@ -10,6 +10,7 @@ import {
   ADMIN_TABS,
   PET_PLACE_CLAIM_STATUS,
   PET_PLACE_CLAIM_STATUS_LABELS,
+  PET_PLACE_PUBLIC_ORIGIN,
   PET_PLACE_TYPE_OPTIONS,
 } from "../../constants";
 import { useAdminNavigation } from "../../hooks/useAdminNavigation";
@@ -350,6 +351,50 @@ function EngagementCard({
               </button>
             </li>
           ))}
+        </ul>
+      )}
+    </AdminSectionCard>
+  );
+}
+
+/** Clinics whose public page was opened the most (all time). Opens the page in a new tab. */
+function TopViewedPlacesCard({ places }: { places: AdminPetSummary["places"] }) {
+  return (
+    <AdminSectionCard
+      title="Más vistas"
+      description={`${fmt(places.views)} vistas en total, desde que empezamos a contar`}
+      help={PET_HELP.placesTopViewed}
+    >
+      {places.topViewed.length === 0 ? (
+        <p className="text-sm text-dash-muted">Todavía nadie abrió la página de una veterinaria.</p>
+      ) : (
+        <ul className="-mx-1.5 divide-y divide-dash-line">
+          {places.topViewed.map((place) => {
+            const where = [place.municipality, place.state].filter(Boolean).join(", ");
+            return (
+              <li key={place.id}>
+                <a
+                  href={`${PET_PLACE_PUBLIC_ORIGIN}/veterinarias/${encodeURIComponent(place.slug || place.id)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full items-center gap-3 rounded-lg px-1.5 py-2 text-left transition-colors hover:bg-dash-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+                >
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate text-sm font-semibold text-dash-ink">
+                      {place.name}
+                      {place.verified ? <span className="ml-1.5 text-xs font-medium text-emerald-500">Verificada</span> : null}
+                    </span>
+                    {where ? <span className="truncate text-xs text-dash-muted">{where}</span> : null}
+                  </span>
+                  <span className="inline-flex shrink-0 items-center gap-1 text-sm tabular-nums text-dash-muted">
+                    <HugeiconsIcon icon={EyeIcon} size={16} aria-hidden />
+                    {fmt(place.views)}
+                    <span className="sr-only">vistas</span>
+                  </span>
+                </a>
+              </li>
+            );
+          })}
         </ul>
       )}
     </AdminSectionCard>
@@ -742,6 +787,8 @@ export default function AdminPetOverview() {
                 emptyLabel="Las fichas todavía no tienen estado."
               />
             </AdminSectionCard>
+
+            <TopViewedPlacesCard places={places} />
           </div>
         ) : null}
       </PetGroup>

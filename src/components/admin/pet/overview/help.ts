@@ -42,6 +42,8 @@ export const PET_HELP = {
   verified: "Fichas cuyo dueño o encargado ya se verificó con Kadesh y puede editarlas.",
   placesPending: "Fichas con un reclamo esperando revisión.",
   fromGoogle: "Fichas que se importaron de Google Maps.",
+  placesTopViewed:
+    "Las fichas cuya página se abrió más veces, desde que empezamos a contar. No cuentan quien la administra, los admins, los buscadores ni volver a abrirla en 30 min. Toca una para abrir su página.",
   reviews: "Reseñas en fichas del directorio (las de Google importadas y las de usuarios de Kadesh Pet).",
   placesSeries:
     'Altas = fichas nuevas en el directorio. Reclamadas = cuándo alguien pidió ser dueño (cuenta el último reclamo de cada ficha). Verificadas = cuándo Kadesh aprobó al dueño. Por día, semana o mes en hora de Ciudad de México.',
