@@ -32,6 +32,8 @@ export const ADMIN_PET_SUMMARY_QUERY = gql`
         byClaimStatus { key count }
         byType { key count }
         topStates { key count }
+        views
+        topViewed { id name slug municipality state verified views }
       }
       users {
         total
@@ -85,6 +87,16 @@ export type AdminPetTopAnimal = {
   views: number;
 };
 
+export type AdminPetTopPlace = {
+  id: string;
+  name: string;
+  slug: string | null;
+  municipality: string | null;
+  state: string | null;
+  verified: boolean;
+  views: number;
+};
+
 export type AdminPetSummary = {
   days: number | null;
   generatedAt: string;
@@ -114,6 +126,10 @@ export type AdminPetSummary = {
     byClaimStatus: PetCount[];
     byType: PetCount[];
     topStates: PetCount[];
+    /** All-time views of every clinic page. */
+    views: number;
+    /** Clinics with the most page views, all time. */
+    topViewed: AdminPetTopPlace[];
   };
   users: { total: number; newInPeriod: number; newPrevPeriod: number };
   engagement: {

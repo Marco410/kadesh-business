@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "@apollo/client";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Edit02Icon, LinkSquare02Icon, PlusSignIcon, StarIcon } from "@hugeicons/core-free-icons";
+import { Edit02Icon, EyeIcon, LinkSquare02Icon, PlusSignIcon, StarIcon } from "@hugeicons/core-free-icons";
 import { sileo } from "sileo";
 import { adminErrorText } from "../errors";
 import { useAdminNavigation } from "../hooks/useAdminNavigation";
@@ -275,6 +275,11 @@ export default function AdminStoreProductsPanel() {
                   >
                     <HugeiconsIcon icon={StarIcon} size={14} />
                     {row.ratingCount > 0 ? `${row.ratingAverage.toFixed(1)} (${row.ratingCount})` : "Sin reseñas"}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-xs tabular-nums text-dash-muted" title="Vistas de su página">
+                    <HugeiconsIcon icon={EyeIcon} size={14} />
+                    {row.viewsCount.toLocaleString("es-MX")}
+                    <span className="sr-only">vistas</span>
                   </span>
                 </div>
 

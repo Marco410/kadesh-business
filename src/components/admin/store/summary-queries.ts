@@ -29,6 +29,15 @@ export type AdminStoreSummary = {
   topCoupons: Array<{ code: string; uses: number; discountCents: number }>;
   outOfStock: number;
   lowStock: Array<{ productId: string; name: string; stockTotal: number }>;
+  /** Active products with the most page views, all time (not limited to the period). */
+  topViewed: Array<{
+    productId: string;
+    name: string;
+    slug: string | null;
+    coverUrl: string | null;
+    views: number;
+    salesCount: number;
+  }>;
 };
 
 export type AdminStoreSummaryResponse = { adminStoreSummary: AdminStoreSummary };
@@ -87,6 +96,14 @@ export const ADMIN_STORE_SUMMARY_QUERY = gql`
         productId
         name
         stockTotal
+      }
+      topViewed {
+        productId
+        name
+        slug
+        coverUrl
+        views
+        salesCount
       }
     }
   }
