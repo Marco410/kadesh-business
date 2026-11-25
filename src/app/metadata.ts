@@ -64,6 +64,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://kadesh.com.mx/',
   },
+  // Meta Business domain verification for kadesh.com.mx (Kadesh portfolio). Must be in the
+  // server-rendered <head> of the home page; Meta re-checks it, so do not remove it.
+  other: {
+    'facebook-domain-verification': '1gch2j9p5n5cj7w7r9ta0bud0uzyqh',
+  },
 };
 
 export const viewport: Viewport = {
