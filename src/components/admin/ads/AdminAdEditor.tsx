@@ -645,7 +645,7 @@ function AdForm({
             <label className="block">
               <span className={adminLabelClass}>Peso en la rotación</span>
               <input value={draft.weight} onChange={(event) => set({ weight: event.target.value })} className={adminInputClass} inputMode="numeric" />
-              <span className="mt-1 block text-xs text-dash-faint">1 a 10. Más peso, sale más seguido.</span>
+              <span className="mt-1 block text-xs text-dash-faint">1 a 10. Reparte el tiempo: con 2 sale el doble que con 1.</span>
             </label>
           </div>
 

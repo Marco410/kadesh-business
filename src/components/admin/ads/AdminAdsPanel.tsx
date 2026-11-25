@@ -122,7 +122,7 @@ export default function AdminAdsPanel() {
       ) : rows.length === 0 ? (
         <AdminEmptyState
           title={status || kind || search ? "Sin anuncios con esos filtros" : "Todavía no hay anuncios"}
-          description="Crea el primero: los de Kadesh (de la casa) rellenan el espacio cuando no hay uno pagado."
+          description="Crea el primero: todos rotan en el mismo espacio y el peso reparte el tiempo."
         />
       ) : (
         <>
